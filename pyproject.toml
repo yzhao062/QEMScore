@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qem-bench"
+version = "0.0.1.dev0"
+description = "A controlled benchmark for distribution-shift reliability in learned quantum error mitigation"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "BSD-2-Clause" }
+authors = [{ name = "Yue Zhao", email = "yzhao010@usc.edu" }]
+dependencies = [
+    "numpy>=1.26",
+    "scikit-learn>=1.4",
+    "qiskit>=1.0",
+    "qiskit-aer>=0.15",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+qem-bench = "qem_bench.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["qem_bench*"]
