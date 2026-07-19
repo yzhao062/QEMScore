@@ -6,14 +6,14 @@ qem-bench measures when they stay accurate, when they overcorrect and make the r
 estimate worse, and whether pre-label risk signals can route risky cases to a fixed
 fallback.
 
-Status: walking-skeleton stage. One vertical slice runs end to end: transverse-field
-Ising (Trotter) circuits, a depolarizing-plus-readout noise model at three severity
-levels, exact statevector labels, a raw baseline, and a ridge prediction path, scored
-with MAE and excess absolute loss under three-bucket circuit-evaluation accounting.
-The slice ships the frozen surrogate-control family (feature-only, noisy-value-only,
-shrinkage, shuffled-noisy-value) and a surrogate alarm: a mitigation interpretation
-of any learned score is gated on those controls, and on this slice the alarm fires,
-so the ridge score is a plumbing checksum rather than evidence of mitigation.
+Status: the shipped slice runs five circuit families end to end: transverse-field
+Ising, QAOA-MaxCut, Heisenberg, random Clifford, and near-Clifford. It provides six
+noise families on the L1 to L4 grid, exact statevector and Stim labels, raw and ridge
+paths, and digital zero-noise extrapolation with a behavioral Mitiq cross-check. MAE
+and excess absolute loss use three-bucket circuit-evaluation accounting. The frozen
+surrogate controls (feature-only, noisy-value-only, shrinkage, and
+shuffled-noisy-value) and the surrogate alarm remain part of every run. The S1 to S6
+split grammar, CDR and vnCDR, and the remaining planned baselines arrive later.
 
 ## Quick Start
 
@@ -22,6 +22,9 @@ pip install -e .
 qem-bench generate --preset t0-smoke --out data/t0
 qem-bench run --data data/t0 --out results/t0
 ```
+
+Small integration presets are also available as `t0-micro`, `t0-qaoa-micro`,
+`t0-heisenberg-micro`, `t0-rc-micro`, and `t0-nc-micro`.
 
 `generate` writes a deterministic dataset (items plus a manifest with named seed
 streams and a canonical dataset hash). `run` trains the learned baseline on the train

@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import argparse
 
+from qem_bench.datasets.generate import PRESETS
+
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="qem-bench")
     sub = parser.add_subparsers(dest="command", required=True)
 
     gen = sub.add_parser("generate", help="generate a dataset from a preset")
-    gen.add_argument("--preset", required=True, choices=["t0-smoke", "t0-micro"])
+    gen.add_argument("--preset", required=True, choices=sorted(PRESETS))
     gen.add_argument("--out", required=True)
     gen.add_argument("--master-seed", type=int, default=None)
 

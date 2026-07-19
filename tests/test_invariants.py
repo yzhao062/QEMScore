@@ -15,7 +15,7 @@ from sklearn.model_selection import GroupKFold
 from qem_bench.baselines.ridge import RidgeMitigator
 from qem_bench.circuits.tfi import TFIParams, build_tfi_circuit
 from qem_bench.datasets.generate import dataset_hash, generate
-from qem_bench.datasets.schema import FEATURES
+from qem_bench.datasets.schema import FAMILY_STRATA, FEATURE_SPEC_VERSION, FEATURES
 from qem_bench.noise.models import BASIS_GATES, SEVERITY_GRID, build_noise_model
 from qem_bench.observables import z_expectation_from_counts, z_support_label
 from qem_bench.runner.run import run
@@ -28,6 +28,8 @@ def _rewrite_dataset(src, dst, mutate_row=None, mutate_manifest=None):
     items = [
         json.loads(line) for line in (dst / "items.jsonl").read_text().splitlines() if line
     ]
+    for item in items:
+        item.setdefault("stratum", FAMILY_STRATA[item["family"]])
     if mutate_row is not None:
         mutate_row(items)
     manifest = json.loads((dst / "manifest.json").read_text())
@@ -84,6 +86,7 @@ def test_z_labels_and_count_parity():
 def test_forbidden_fields_stay_out_of_features():
     forbidden = {
         "severity",
+        "stratum",
         "noise_family",
         "p1",
         "p2",
@@ -93,9 +96,46 @@ def test_forbidden_fields_stay_out_of_features():
         "sampler_seed",
         "circuit_seed",
         "measurement_group",
+        "label_method",
         "split",
     }
     assert forbidden.isdisjoint(set(FEATURES))
+
+
+def test_feature_spec_v1_is_the_frozen_ordered_contract():
+    assert FEATURE_SPEC_VERSION == "v1"
+    assert FEATURES == [
+        "noisy_expectation",
+        "log2_shots",
+        "n_qubits",
+        "family_tfi",
+        "family_qaoa",
+        "family_heisenberg",
+        "family_random_clifford",
+        "family_near_clifford",
+        "steps",
+        "j",
+        "h",
+        "jx",
+        "jy",
+        "jz",
+        "dt",
+        "qaoa_p",
+        "qaoa_edge_count",
+        "qaoa_gamma_0",
+        "qaoa_gamma_1",
+        "qaoa_beta_0",
+        "qaoa_beta_1",
+        "graph_path",
+        "graph_cycle",
+        "graph_erdos_renyi",
+        "graph_3_regular",
+        "rc_depth",
+        "nc_non_clifford_count",
+        "two_qubit_gates",
+        "transpiled_depth",
+        "obs_locality",
+    ]
 
 
 def test_cv_folds_are_circuit_disjoint(micro_dataset):
@@ -186,9 +226,34 @@ def test_run_rejects_false_label_evals(micro_dataset, tmp_path):
         run(tampered, tmp_path / "out3")
 
 
+def test_v1_runner_rejects_v0_feature_manifest(micro_dataset, tmp_path):
+    data, _ = micro_dataset
+
+    def downgrade_feature_spec(manifest):
+        manifest["feature_spec"] = {
+            "version": "v0",
+            "features": [
+                "noisy_expectation",
+                "log2_shots",
+                "n_qubits",
+                "steps",
+                "j",
+                "h",
+                "dt",
+                "two_qubit_gates",
+                "transpiled_depth",
+                "obs_locality",
+            ],
+        }
+
+    old_manifest = tmp_path / "v0-manifest"
+    _rewrite_dataset(data, old_manifest, mutate_manifest=downgrade_feature_spec)
+    with pytest.raises(ValueError, match="feature_spec"):
+        run(old_manifest, tmp_path / "out-v0")
+
+
 def test_run_rejects_foreign_label_method(micro_dataset, tmp_path):
-    """The v0 slice admits only statevector labels; a row declaring another method
-    must be rejected even when the manifest ledger still looks plausible."""
+    """A row declaring an unsupported method is rejected."""
     data, _ = micro_dataset
 
     def flip_method(items):
@@ -198,6 +263,39 @@ def test_run_rejects_foreign_label_method(micro_dataset, tmp_path):
     _rewrite_dataset(data, tampered, mutate_row=flip_method)
     with pytest.raises(ValueError, match="label_method"):
         run(tampered, tmp_path / "out4")
+
+
+def test_run_rejects_mixed_strata_with_headline_rule(micro_dataset, tmp_path):
+    data, _ = micro_dataset
+    changed_rows = 0
+
+    def mix_strata(items):
+        nonlocal changed_rows
+        group = items[0]["measurement_group"]
+        for item in items:
+            if item["measurement_group"] == group:
+                item["family"] = "random_clifford"
+                item["stratum"] = "clifford_control"
+                item["label_method"] = "stim"
+                item["depth"] = 2
+                changed_rows += 1
+
+    def repair_label_ledger(manifest):
+        manifest["generation_ledger"]["label_evals_statevector"] -= changed_rows
+        manifest["generation_ledger"]["label_evals_stim"] += changed_rows
+
+    tampered = tmp_path / "mixed-strata"
+    _rewrite_dataset(
+        data,
+        tampered,
+        mutate_row=mix_strata,
+        mutate_manifest=repair_label_ledger,
+    )
+    with pytest.raises(
+        ValueError,
+        match="Clifford control stratum is excluded from the continuous-regression headline",
+    ):
+        run(tampered, tmp_path / "out5")
 
 
 def test_cli_subprocess_determinism(tmp_path):

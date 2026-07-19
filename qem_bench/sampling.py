@@ -4,8 +4,9 @@ Measurement-group contract: all Z-type observables of one (circuit, noise, shots
 configuration share a single computational-basis measurement. The group is executed
 once, every observable expectation derives from the same counts, and the ledger
 charges the group's shots once. Every stochastic stage is seeded from the manifest:
-transpilation uses the circuit seed and the simulator uses the group's sampler seed,
-so a dataset regenerates bit-identically from its manifest.
+transpilation uses the circuit seed, while the simulator and any seeded mixed-noise
+profile use the group's sampler seed, so a dataset regenerates bit-identically from
+its manifest.
 """
 
 from __future__ import annotations
@@ -24,6 +25,8 @@ def sample_counts(
     shots: int,
     sampler_seed: int,
     transpile_seed: int,
+    *,
+    noise_family: str = "depolarizing_readout",
 ) -> tuple[dict[str, int], dict[str, int]]:
     """Execute one measurement group under noise; return (counts, structure features).
 
@@ -39,7 +42,12 @@ def sample_counts(
         seed_transpiler=int(transpile_seed % _MOD),
     )
     backend = AerSimulator(
-        noise_model=build_noise_model(severity),
+        noise_model=build_noise_model(
+            noise_family,
+            severity,
+            seed=sampler_seed,
+            n_qubits=tcirc.num_qubits,
+        ),
         seed_simulator=int(sampler_seed % _MOD),
     )
     counts = backend.run(tcirc, shots=shots).result().get_counts()

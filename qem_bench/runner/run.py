@@ -16,14 +16,23 @@ from qem_bench.baselines.controls import (
     ShuffledNoisyControl,
 )
 from qem_bench.baselines.ridge import RidgeMitigator
-from qem_bench.datasets.generate import dataset_hash, group_shots
+from qem_bench.baselines.zne import SCALE_FACTORS, ZNEMitigator
+from qem_bench.datasets.generate import (
+    dataset_hash,
+    frozen_item_stream_hash,
+    group_shots,
+)
 from qem_bench.datasets.schema import (
+    FAMILY_STRATA,
     FEATURE_SPEC_VERSION,
     FEATURES,
     validate_groups,
     validate_item,
 )
+from qem_bench.noise import SEVERITY_GRIDS
 from qem_bench.runner.metrics import method_metrics
+
+SUPPORTED_LABEL_METHODS = frozenset({"statevector", "stim"})
 
 
 def _load(data_dir: Path) -> tuple[list[dict], dict]:
@@ -35,12 +44,13 @@ def _load(data_dir: Path) -> tuple[list[dict], dict]:
     ]
     manifest = json.loads((data_dir / "manifest.json").read_text(encoding="utf-8"))
 
-    for item in items:
-        validate_item(item)
+    current_spec = {"version": FEATURE_SPEC_VERSION, "features": list(FEATURES)}
+    if manifest.get("feature_spec") != current_spec:
+        raise ValueError("dataset feature_spec does not match the installed code")
+
     item_ids = [item["item_id"] for item in items]
     if len(item_ids) != len(set(item_ids)):
         raise ValueError("dataset contains duplicate item_id values")
-    validate_groups(items)
 
     items.sort(key=lambda item: item["item_id"])
     actual_hash = dataset_hash(items)
@@ -50,23 +60,93 @@ def _load(data_dir: Path) -> tuple[list[dict], dict]:
             f"dataset hash mismatch: manifest={expected_hash}, items={actual_hash}"
         )
 
-    current_spec = {"version": FEATURE_SPEC_VERSION, "features": list(FEATURES)}
-    if manifest.get("feature_spec") != current_spec:
-        raise ValueError("dataset feature_spec does not match the installed code")
+    missing_stratum = [item for item in items if "stratum" not in item]
+    if missing_stratum:
+        frozen_hash = frozen_item_stream_hash(
+            manifest.get("preset"), manifest.get("config")
+        )
+        if frozen_hash is None or actual_hash != frozen_hash:
+            raise ValueError(
+                "item rows missing stratum outside the frozen "
+                "preset/config/dataset_hash allow-list"
+            )
+        for item in missing_stratum:
+            family = item.get("family")
+            if family not in FAMILY_STRATA:
+                raise ValueError(f"unknown circuit family {family!r}")
+            item["stratum"] = FAMILY_STRATA[family]
+
+    for item in items:
+        validate_item(item)
+    validate_groups(items)
+
+    row_noise_families = {item["noise_family"] for item in items}
+    if len(row_noise_families) != 1:
+        raise ValueError(
+            "item rows must contain exactly one noise_family; "
+            f"found {sorted(row_noise_families)!r}"
+        )
+    row_noise_family = next(iter(row_noise_families))
+    if row_noise_family not in SEVERITY_GRIDS:
+        raise ValueError(f"unknown row noise_family {row_noise_family!r}")
+
+    config = manifest.get("config")
+    manifest_noise_family = (
+        config.get("noise_family") if isinstance(config, dict) else None
+    )
+    if manifest_noise_family != row_noise_family:
+        raise ValueError(
+            "manifest config.noise_family does not match item rows: "
+            f"manifest={manifest_noise_family!r}, rows={row_noise_family!r}"
+        )
+
+    valid_severities = SEVERITY_GRIDS[row_noise_family]
+    invalid_severities = sorted(
+        {
+            item["severity"]
+            for item in items
+            if item["severity"] not in valid_severities
+        }
+    )
+    if invalid_severities:
+        raise ValueError(
+            f"item row severities are invalid for {row_noise_family}: "
+            f"{invalid_severities!r}"
+        )
+    if manifest.get("severity_grid") != valid_severities:
+        raise ValueError(
+            "manifest severity_grid does not match the installed registry for "
+            f"{row_noise_family}"
+        )
+    if manifest.get("severity_grids") != SEVERITY_GRIDS:
+        raise ValueError("manifest severity_grids does not match the installed registry")
 
     ledger = manifest.get("generation_ledger", {})
     if ledger.get("train_circuit_evals") != group_shots(items, "train") or ledger.get(
         "test_circuit_evals"
     ) != group_shots(items, "test"):
         raise ValueError("manifest generation ledger does not match item rows")
-    # Each row corresponds to exactly one exact-label call, and the v0 slice admits
-    # only statevector labels; the count is derived from the rows' declared method.
-    bad_methods = {it["label_method"] for it in items} - {"statevector"}
+    # Each row corresponds to one exact-label call. Derive and validate the count
+    # independently for every supported method.
+    row_methods = {item["label_method"] for item in items}
+    bad_methods = row_methods - SUPPORTED_LABEL_METHODS
     if bad_methods:
         raise ValueError(f"unsupported label_method values in items: {sorted(bad_methods)}")
-    statevector_rows = sum(1 for it in items if it["label_method"] == "statevector")
-    if ledger.get("label_evals_statevector") != statevector_rows:
-        raise ValueError("manifest label_evals_statevector does not match item rows")
+    label_counts = {
+        method: sum(item["label_method"] == method for item in items)
+        for method in sorted(SUPPORTED_LABEL_METHODS)
+    }
+    for method, expected in label_counts.items():
+        key = f"label_evals_{method}"
+        if ledger.get(key, 0) != expected:
+            raise ValueError(f"manifest {key} does not match item rows")
+
+    strata = {item["stratum"] for item in items}
+    if len(strata) != 1:
+        raise ValueError(
+            "the Clifford control stratum is excluded from the "
+            "continuous-regression headline; runner requires one stratum per dataset"
+        )
 
     counts = manifest.get("counts", {})
     expected_counts = {
@@ -112,6 +192,14 @@ def run(data_dir: str | Path, out_dir: str | Path) -> dict:
     test_group_evals = group_shots(items, "test")
 
     ridge = RidgeMitigator().fit(train)
+    zne = ZNEMitigator().fit(train)
+    zne_seed_stream = np.random.SeedSequence(
+        int(manifest["master_seed"]), spawn_key=(2,)
+    )
+    zne_predictions, zne_extra_per_group = zne.predict(
+        test, seed_stream=zne_seed_stream
+    )
+    zne_extra_evals = int(np.sum(zne_extra_per_group, dtype=np.int64))
 
     # Required surrogate and leakage controls (frozen design). Cost semantics:
     # feature-only and shrinkage consume no noisy measurements at all (their only
@@ -146,6 +234,19 @@ def run(data_dir: str | Path, out_dir: str | Path) -> dict:
             "role": "learned",
             "config": {"best_alpha": ridge.best_alpha_},
         },
+        "zne": {
+            "predictions": zne_predictions,
+            "ledger": _ledger(0, zne_extra_evals, test_group_evals, n_test),
+            "role": "qem-baseline",
+            "config": {
+                "scale_factors": list(SCALE_FACTORS),
+                "extrapolator": zne.extrapolator,
+                "scale_one": "reused stored noisy_expectation",
+                "fold_order": "optimization-level-1 transpile, then global fold",
+                "sharing": "one folded execution per measurement group and scale",
+                "seed_stream": "SeedSequence(master_seed, spawn_key=(2,))",
+            },
+        },
     }
     for name, (model, ledger, role) in controls.items():
         methods[name] = {
@@ -159,11 +260,19 @@ def run(data_dir: str | Path, out_dir: str | Path) -> dict:
         "dataset_hash": manifest["dataset_hash"],
         "preset": manifest["preset"],
         "feature_spec": manifest["feature_spec"],
+        "stratum": items[0]["stratum"],
         "n_train_items": len(train),
         "n_test_items": n_test,
-        "label_evals_statevector": manifest["generation_ledger"]["label_evals_statevector"],
+        "label_evals": {
+            method: int(
+                manifest["generation_ledger"].get(f"label_evals_{method}", 0)
+            )
+            for method in sorted(SUPPORTED_LABEL_METHODS)
+        },
         "methods": {},
     }
+    results["label_evals_statevector"] = results["label_evals"]["statevector"]
+    results["label_evals_stim"] = results["label_evals"]["stim"]
     for name, spec in methods.items():
         results["methods"][name] = {
             "metrics": method_metrics(np.asarray(spec["predictions"]), r, y),
@@ -203,11 +312,13 @@ def _print_table(results: dict) -> None:
     ]
     print(f"\ndataset {results['dataset_hash'][:12]}  preset {results['preset']}  "
           f"test items {results['n_test_items']}")
-    header = f"{'method':<11}{'role':<11}" + "".join(f"{label:>16}" for _, label in cols)
+    header = f"{'method':<11}{'role':<13}" + "".join(f"{label:>16}" for _, label in cols)
     print(header)
     for name, spec in results["methods"].items():
         met = spec["metrics"]
-        row = f"{name:<11}{spec['role']:<11}" + "".join(f"{met[key]:>16.6f}" for key, _ in cols)
+        row = f"{name:<11}{spec['role']:<13}" + "".join(
+            f"{met[key]:>16.6f}" for key, _ in cols
+        )
         print(row)
     print(f"\n{'method':<11}{'B_train':>12}{'B_extra':>12}{'B_pred':>12}{'total':>14}"
           f"{'per-test':>12}")
@@ -215,8 +326,10 @@ def _print_table(results: dict) -> None:
         led = spec["ledger"]
         print(f"{name:<11}{led['B_train']:>12}{led['B_extra']:>12}{led['B_pred']:>12}"
               f"{led['total']:>14}{led['amortized_per_test_item']:>12.1f}")
-    print(f"\nexact labels (statevector calls, logged separately): "
-          f"{results['label_evals_statevector']}")
+    label_summary = ", ".join(
+        f"{method}={count}" for method, count in results["label_evals"].items()
+    )
+    print(f"\nexact labels ({label_summary}; logged separately)")
     alarm = results["surrogate_alarm"]
     state = "TRIGGERED" if alarm["triggered"] else "clear"
     print(f"surrogate alarm: {state} (ridge MAE {alarm['ridge_mae']:.6f} vs "

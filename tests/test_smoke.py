@@ -40,10 +40,24 @@ def test_end_to_end(tmp_path):
     assert raw["excess_loss_total"] == 0.0
     assert raw["overcorrection_rate"] == 0.0
 
-    # All five methods and controls are present with a role tag.
-    for name in ("raw", "ridge", "feat-only", "noisy-only", "shrinkage", "shuf-noisy"):
+    # All methods and controls are present with a role tag.
+    for name in (
+        "raw",
+        "ridge",
+        "zne",
+        "feat-only",
+        "noisy-only",
+        "shrinkage",
+        "shuf-noisy",
+    ):
         assert name in results["methods"]
-        assert results["methods"][name]["role"] in ("baseline", "learned", "control", "diagnostic")
+        assert results["methods"][name]["role"] in (
+            "baseline",
+            "learned",
+            "qem-baseline",
+            "control",
+            "diagnostic",
+        )
 
     # Ledger conservation (measurement-group contract): circuit evaluations are
     # charged once per unique measurement group, never once per observable row.
@@ -66,6 +80,11 @@ def test_end_to_end(tmp_path):
     assert raw_ledger["B_train"] == 0
     assert raw_ledger["B_pred"] == test_evals
 
+    zne_ledger = results["methods"]["zne"]["ledger"]
+    assert zne_ledger["B_train"] == 0
+    assert zne_ledger["B_extra"] == 2 * test_evals
+    assert zne_ledger["B_pred"] == test_evals
+
     # Zero-measurement controls cost exactly zero circuit evaluations.
     assert results["methods"]["feat-only"]["ledger"]["total"] == 0
     assert results["methods"]["shrinkage"]["ledger"]["total"] == 0
@@ -74,7 +93,9 @@ def test_end_to_end(tmp_path):
     assert manifest["generation_ledger"]["train_circuit_evals"] == train_evals
     assert manifest["generation_ledger"]["test_circuit_evals"] == test_evals
     assert manifest["generation_ledger"]["label_evals_statevector"] == len(items)
+    assert manifest["generation_ledger"]["label_evals_stim"] == 0
     assert results["label_evals_statevector"] == len(items)
+    assert results["label_evals_stim"] == 0
 
     # The surrogate alarm is always reported.
     assert "surrogate_alarm" in results
