@@ -15,6 +15,24 @@ surrogate controls (feature-only, noisy-value-only, shrinkage, and
 shuffled-noisy-value) and the surrogate alarm remain part of every run. The S1 to S6
 split grammar, CDR and vnCDR, and the remaining planned baselines arrive later.
 
+## Where the Rest of the Project Lives
+
+This package is one of three repositories for the same effort. The protocol it
+implements is specified elsewhere, so read the design document before changing
+anything the paper depends on (split definitions, the measurement ledger, metric
+definitions, freeze rules).
+
+| Repository | Role |
+|---|---|
+| `qlab` (private hub) | Design authority: `directions/qem-bench/PAPER-ARCHITECTURE.md` is the protocol source of truth. Also holds the master `refs.bib`, the dated decision log, and archived design-panel records. |
+| `qem-bench` (this repo) | The implementation and its tests. |
+| `tmlr-2026-qem-bench` | The manuscript, an Overleaf-linked submodule inside the private `internal-writing` repository. |
+
+Two standing rules: protocol refinements made here are written back into
+`PAPER-ARCHITECTURE.md` rather than left to diverge, and bibliography entries flow
+hub-first (verify in `qlab/refs.bib`, then copy to the paper). The hub's `README.md`
+carries the full repository map and a from-scratch machine setup.
+
 ## Quick Start
 
 ```bash
