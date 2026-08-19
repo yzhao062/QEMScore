@@ -1,0 +1,175 @@
+name: dependency-drift
+
+on:
+  pull_request:
+    paths:
+      - .gitattributes
+      - .github/workflows/dependency-drift.yml
+      - pyproject.toml
+      - requirements/ci-py312.lock
+      - tools/assert_frozen_hashes.py
+      - tools/compare_dependency_drift.py
+      - tools/dependency_drift_snapshot.py
+      - tools/verify_ci_lock.py
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12.13"
+  PYTHONHASHSEED: "0"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  baseline_snapshot:
+    name: dependency-baseline-snapshot
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: baseline
+      - name: Detect baseline dependency contract
+        id: contract
+        working-directory: baseline
+        shell: pwsh
+        run: |
+          $required = @(
+            "requirements/ci-py312.lock",
+            "tools/verify_ci_lock.py",
+            "tools/dependency_drift_snapshot.py",
+            "tools/assert_frozen_hashes.py"
+          )
+          $missing = @($required | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
+          New-Item -ItemType Directory -Path .drift -Force | Out-Null
+          if ($missing.Count -eq 0) {
+            "available=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "available=false" >> $env:GITHUB_OUTPUT
+            $state = [ordered]@{
+              schema_version = "qem-bench-dependency-baseline-state-v1"
+              baseline_contract = "absent"
+              base_sha = "${{ github.event.pull_request.base.sha }}"
+              missing_paths = $missing
+            }
+            [System.IO.File]::WriteAllText(
+              (Join-Path $PWD ".drift/baseline-state.json"),
+              ($state | ConvertTo-Json -Depth 3) + "`n"
+            )
+          }
+      - uses: actions/setup-python@v6
+        if: steps.contract.outputs.available == 'true'
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: baseline/requirements/ci-py312.lock
+      - name: Install baseline lock
+        if: steps.contract.outputs.available == 'true'
+        working-directory: baseline
+        run: |
+          $lockDigest = python tools/verify_ci_lock.py --digest-only
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "QEM_BENCH_CI_LOCK_SHA256=$lockDigest" >> $env:GITHUB_ENV
+          python -m pip install --only-binary=:all: -r requirements/ci-py312.lock
+          python -m pip install --no-deps -e .
+          python -m pip check
+      - name: Generate baseline snapshot
+        if: steps.contract.outputs.available == 'true'
+        working-directory: baseline
+        run: |
+          qem-bench generate --preset t0-micro --out .drift/data/t0-micro
+          qem-bench generate --preset t0-smoke --out .drift/data/t0-smoke
+          python tools/dependency_drift_snapshot.py --dataset-root .drift/data --output .drift/baseline.json
+      - name: Assert baseline frozen hashes
+        if: steps.contract.outputs.available == 'true'
+        working-directory: baseline
+        run: python tools/assert_frozen_hashes.py --root .drift/data
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: dependency-baseline-snapshot
+          path: baseline/.drift
+          if-no-files-found: error
+          retention-days: 7
+
+  candidate_snapshot:
+    name: dependency-candidate-snapshot
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: candidate
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: candidate/requirements/ci-py312.lock
+      - name: Install candidate lock
+        working-directory: candidate
+        run: |
+          $lockDigest = python tools/verify_ci_lock.py --digest-only
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "QEM_BENCH_CI_LOCK_SHA256=$lockDigest" >> $env:GITHUB_ENV
+          python -m pip install --only-binary=:all: -r requirements/ci-py312.lock
+          python -m pip install --no-deps -e .
+          python -m pip check
+      - name: Generate candidate snapshot
+        working-directory: candidate
+        run: |
+          qem-bench generate --preset t0-micro --out .drift/data/t0-micro
+          qem-bench generate --preset t0-smoke --out .drift/data/t0-smoke
+          python tools/dependency_drift_snapshot.py --dataset-root .drift/data --output .drift/candidate.json
+      - name: Cross-check local ZNE against Mitiq
+        working-directory: candidate
+        run: >-
+          python -m pytest -q --strict-markers
+          tests/test_zne.py::test_mitiq_global_folding_and_richardson_crosscheck
+      - name: Assert candidate frozen hashes
+        if: always()
+        working-directory: candidate
+        run: python tools/assert_frozen_hashes.py --root .drift/data
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: dependency-candidate-snapshot
+          path: candidate/.drift/candidate.json
+          if-no-files-found: error
+          retention-days: 7
+
+  compare_snapshots:
+    name: dependency-structural-diff
+    if: always()
+    needs: [baseline_snapshot, candidate_snapshot]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/download-artifact@v7
+        with:
+          name: dependency-baseline-snapshot
+          path: .drift/baseline
+      - uses: actions/download-artifact@v7
+        with:
+          name: dependency-candidate-snapshot
+          path: .drift/candidate
+      - name: Compare structural outputs
+        run: >-
+          python tools/compare_dependency_drift.py
+          --baseline .drift/baseline/baseline.json
+          --baseline-state .drift/baseline/baseline-state.json
+          --candidate .drift/candidate/candidate.json
+          --output .drift/dependency-drift.md
+      - name: Publish structural diff summary
+        if: always()
+        run: cat .drift/dependency-drift.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: dependency-drift-report
+          path: .drift/dependency-drift.md
+          if-no-files-found: error
+          retention-days: 14

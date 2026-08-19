@@ -1,31 +1,72 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "qem-bench"
-version = "0.0.1.dev0"
+version = "0.1.0"
 description = "A controlled benchmark for distribution-shift reliability in learned quantum error mitigation"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "BSD-2-Clause" }
+license = "BSD-2-Clause"
+license-files = ["LICENSE"]
 authors = [{ name = "Yue Zhao", email = "yzhao010@usc.edu" }]
+keywords = [
+    "quantum error mitigation",
+    "distribution shift",
+    "machine learning",
+    "benchmarking",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
-    "numpy>=1.26",
-    "scikit-learn>=1.4",
-    "qiskit>=1.0",
-    "qiskit-aer>=0.15",
+    "numpy>=1.26,<2.3",
+    "scipy>=1.11,<2",
+    "scikit-learn>=1.4,<2",
+    "qiskit>=1.0,<3",
+    "qiskit-aer>=0.15,<0.18",
     "stim>=1.16,<2",
 ]
 
 [project.optional-dependencies]
+report = [
+    "matplotlib>=3.8,<4",
+]
 dev = [
-    "mitiq>=1.0,<2",
-    "pytest>=8",
+    "mitiq>=1,<1.1",
+    "pytest>=8,<9",
 ]
 
 [project.scripts]
 qem-bench = "qem_bench.cli:main"
 
+[project.urls]
+Homepage = "https://github.com/yzhao062/qem-bench"
+Repository = "https://github.com/yzhao062/qem-bench"
+Issues = "https://github.com/yzhao062/qem-bench/issues"
+
 [tool.setuptools.packages.find]
 include = ["qem_bench*"]
+
+[tool.setuptools.package-data]
+"qem_bench.noise" = ["data/*.json"]
+
+[tool.qem-bench.reproducibility]
+# These compatibility windows support ordinary installs. They do not protect frozen
+# hashes: qiskit>=1.0,<3 admits transpiler changes within the 2.5 release line.
+# CI and every headline command install this exact transitive lock first, then install
+# qem-bench editable with --no-deps. Artifact manifests must record the lock SHA-256.
+ci-lock = "requirements/ci-py312.lock"
+ci-lock-sha256 = "62687a209d6998887ea6d2ecc706d8b5fcaf1997bec38d0913cd688591dd3d85"
+
+[tool.pytest.ini_options]
+markers = [
+    "protocol(id): guarding test for a PROTOCOL-TRACE rule",
+]

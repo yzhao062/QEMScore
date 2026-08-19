@@ -1,0 +1,139 @@
+name: foundation-ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: foundation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12.13"
+  PYTHONHASHSEED: "0"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  CI_LOCK_PATH: "requirements/ci-py312.lock"
+  CI_LOCK_SHA256: "62687a209d6998887ea6d2ecc706d8b5fcaf1997bec38d0913cd688591dd3d85"
+
+jobs:
+  frozen_streams:
+    name: frozen-streams
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            requirements/ci-py312.lock
+      - name: Install locked environment
+        run: |
+          $lockDigest = python tools/verify_ci_lock.py --lock "${{ env.CI_LOCK_PATH }}" --expected-sha256 "${{ env.CI_LOCK_SHA256 }}" --digest-only
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "QEM_BENCH_CI_LOCK_SHA256=$lockDigest" >> $env:GITHUB_ENV
+          python -m pip install --only-binary=:all: -r "${{ env.CI_LOCK_PATH }}"
+          python -m pip install --no-deps -e .
+          python -m pip check
+      - name: Regenerate frozen item streams
+        run: |
+          qem-bench generate --preset t0-micro --out .ci/frozen/t0-micro
+          qem-bench generate --preset t0-smoke --out .ci/frozen/t0-smoke
+      - name: Assert frozen hashes
+        run: python tools/assert_frozen_hashes.py --root .ci/frozen
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: frozen-t0-streams
+          path: .ci/frozen
+          if-no-files-found: error
+          retention-days: 7
+
+  smoke_micro:
+    name: t0-smoke-and-micro
+    needs: frozen_streams
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            requirements/ci-py312.lock
+      - uses: actions/download-artifact@v7
+        with:
+          name: frozen-t0-streams
+          path: .ci/frozen
+      - name: Install locked environment
+        run: |
+          lock_digest="$(python tools/verify_ci_lock.py --lock "${{ env.CI_LOCK_PATH }}" --expected-sha256 "${{ env.CI_LOCK_SHA256 }}" --digest-only)"
+          echo "QEM_BENCH_CI_LOCK_SHA256=$lock_digest" >> "$GITHUB_ENV"
+          python -m pip install --only-binary=:all: -r "${{ env.CI_LOCK_PATH }}"
+          python -m pip install --no-deps -e .
+          python -m pip check
+      - name: Run fast regression suite
+        env:
+          QEM_BENCH_SKIP_MITIQ_REFERENCE: "1"
+        run: python -m pytest -q --strict-markers tests
+      - name: Run frozen T0 presets end to end
+        run: |
+          qem-bench run --data .ci/frozen/t0-micro --out .ci/results/t0-micro
+          qem-bench run --data .ci/frozen/t0-smoke --out .ci/results/t0-smoke
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: t0-results
+          path: .ci/results
+          if-no-files-found: warn
+          retention-days: 7
+
+  mitiq_reference:
+    name: mitiq-reference-crosscheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            requirements/ci-py312.lock
+      - name: Install locked dev environment
+        run: |
+          lock_digest="$(python tools/verify_ci_lock.py --lock "${{ env.CI_LOCK_PATH }}" --expected-sha256 "${{ env.CI_LOCK_SHA256 }}" --digest-only)"
+          echo "QEM_BENCH_CI_LOCK_SHA256=$lock_digest" >> "$GITHUB_ENV"
+          python -m pip install --only-binary=:all: -r "${{ env.CI_LOCK_PATH }}"
+          python -m pip install --no-deps -e .
+          python -m pip check
+      - name: Cross-check local ZNE against Mitiq
+        run: >-
+          python -m pytest -q --strict-markers
+          tests/test_zne.py::test_mitiq_global_folding_and_richardson_crosscheck
+
+  foundation_gate:
+    name: foundation-gate
+    if: always()
+    needs: [frozen_streams, smoke_micro, mitiq_reference]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every foundation job
+        shell: bash
+        run: |
+          test "${{ needs.frozen_streams.result }}" = success
+          test "${{ needs.smoke_micro.result }}" = success
+          test "${{ needs.mitiq_reference.result }}" = success

@@ -8,14 +8,21 @@ venv/
 build/
 dist/
 
-# Data and results (regenerable from manifests)
-data/
-results/
+# Data and results (regenerable from manifests).
+# Anchored to the repository root: an unanchored data/ also matches
+# qem_bench/noise/data/, which is shipped package data.
+/data/
+/results/
 
 # OS / editor
 .DS_Store
 .idea/
 .vscode/
+
+# Agent bootstrap local state
+/.agent-config/
+/agent-config.local.yaml
+/.claude/
 
 # Secrets
 .env

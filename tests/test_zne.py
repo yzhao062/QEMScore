@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import os
 
 import cirq
 import numpy as np
@@ -262,6 +263,10 @@ def _cirq_to_qiskit(circuit: cirq.Circuit) -> _MitiqCircuit:
     return _MitiqCircuit(qiskit_circuit)
 
 
+@pytest.mark.skipif(
+    os.environ.get("QEM_BENCH_SKIP_MITIQ_REFERENCE") == "1",
+    reason="Mitiq reference runs in its dedicated CI job",
+)
 def test_mitiq_global_folding_and_richardson_crosscheck():
     """Local B1 and installed Mitiq agree at 100,000 fixed-seed shots."""
     from mitiq.interface import register_mitiq_converters
