@@ -1,0 +1,20 @@
+\documentclass{article}
+\usepackage[margin=0.35in,landscape]{geometry}
+\usepackage{graphicx}
+\begin{document}
+\begin{table}[ht]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.2pt}
+\caption{Walking-skeleton results on shipped presets (t0-heisenberg-micro, t0-micro, t0-nc-micro, t0-qaoa-micro, t0-rc-micro, t0-smoke). MAE confidence intervals use a circuit-blocked bootstrap. Nominal and realized totals expose current budget inequality.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrrrrrrrrr}
+Method & Cells & Macro MAE [95\% CI] & MAE IQR & Rank & Macro RMSE & Harm mean & OCR & $B_{train}$ & $B_{extra}$ & $B_{pred}$ & Nominal total & Realized total & Test ratio & Eval./expect. \\
+\hline
+Raw & 26 & 0.1529 [0.1431, 0.1696] & [0.0452, 0.2043] & 2.12 & 0.1605 & 0.0000 & 0.000 & 0 & 0 & 80,896 & 80,896 & 80,896 & 1.0x & 652.4 \\
+Ridge & 26 & 0.0572 [0.0459, 0.0679] & [0.0458, 0.0750] & 1.58 & 0.0697 & 0.0162 & 0.378 & 123,904 & 0 & 80,896 & 204,800 & 204,800 & 1.0x & 652.4 \\
+Local digital ZNE & 26 & 0.1000 [0.0933, 0.1220] & [0.0485, 0.1143] & 2.31 & 0.1139 & 0.0245 & 0.404 & 0 & 161,792 & 80,896 & 80,896 & 242,688 & 3.0x & 1957.2 \\
+\end{tabular}}
+\par\vspace{2pt}\raggedright\tiny Run artifacts: c178b4e00a8b, 44677a7fabd1, bcb157b71660, 9fcc7a8779aa, f48f11ab53c6, 97a8909ffdf1. Full cell identifiers and numeric provenance are in \texttt{report-trace.json}. These shipped presets do not yet implement the S0 to S6 grammar.
+\end{table}
+\end{document}
