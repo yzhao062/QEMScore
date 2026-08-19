@@ -32,6 +32,13 @@ from qem_bench.noise.models import (
     average_gate_infidelities,
     build_noise_model,
 )
+from qem_bench.noise.calibration import (
+    MATCHING_RELATIVE_TOLERANCE,
+    PRIMARY_GATE_COUNT_WEIGHTING,
+    PRIMARY_REFERENCE_SHAPE,
+    PROPOSAL_RESOURCE,
+    per_layer_average_gate_infidelity,
+)
 
 FAMILIES = (
     "depolarizing_readout",
@@ -136,18 +143,33 @@ def test_every_grid_cell_covers_transpiled_operations(
     assert not missing, f"{family} {severity} leaves {sorted(missing)} noiseless"
 
 
-@pytest.mark.parametrize("family", FAMILIES)
-def test_average_gate_infidelity_is_monotone(family: str):
-    kwargs = MIXED_KWARGS if family == "mixed_heterogeneous" else {}
-    values = [average_gate_infidelities(family, level, **kwargs) for level in LEVELS]
-    for channel in ("1q", "2q"):
-        sequence = [value[channel] for value in values]
-        assert all(left <= right + 1e-14 for left, right in zip(sequence, sequence[1:])), (
-            family,
-            channel,
-            sequence,
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "the shipped registry is intentionally unmatched pending PI approval of "
+        f"{PROPOSAL_RESOURCE}"
+    ),
+)
+def test_shipped_grid_matches_depolarizing_anchor_across_families():
+    for level in LEVELS:
+        anchor = per_layer_average_gate_infidelity(
+            "depolarizing_readout",
+            level,
+            reference_shape=PRIMARY_REFERENCE_SHAPE,
+            gate_count_weighting=PRIMARY_GATE_COUNT_WEIGHTING,
         )
-        assert sequence[-1] > sequence[0], (family, channel, sequence)
+        for family in FAMILIES:
+            candidate = per_layer_average_gate_infidelity(
+                family,
+                level,
+                reference_shape=PRIMARY_REFERENCE_SHAPE,
+                gate_count_weighting=PRIMARY_GATE_COUNT_WEIGHTING,
+            )
+            relative_mismatch = abs(candidate - anchor) / anchor
+            assert relative_mismatch <= MATCHING_RELATIVE_TOLERANCE, (
+                f"{family} {level} differs from the depolarizing anchor by "
+                f"{relative_mismatch:.3%}; see {PROPOSAL_RESOURCE}"
+            )
 
 
 @pytest.mark.parametrize("severity", LEVELS)

@@ -1,0 +1,115 @@
+{
+  "schema": "qem-bench-severity-calibration-proposal-v1",
+  "status": "proposal_only_shipped_registry_unchanged",
+  "anchor_family": "depolarizing_readout",
+  "matching_relative_tolerance": 0.01,
+  "solver_relative_tolerance": 1e-10,
+  "reference_shape": {
+    "name": "six_qubit_random_clifford_brickwork_v1_seed1",
+    "basis": ["cx", "rz", "sx", "x"],
+    "gate_counts": {"cx": 3, "rz": 12, "sx": 6, "x": 1},
+    "logical_layers": 1,
+    "transpiler_optimization_level": 1,
+    "circuit_seed": 1,
+    "transpiler_seed": 1
+  },
+  "gate_count_weighting": {
+    "name": "error_bearing_transpiled_occurrences_v1",
+    "operation_weights": {"cx": 1.0, "rz": 0.0, "sx": 1.0, "x": 1.0},
+    "normalization": "sum_of_weighted_gate_counts"
+  },
+  "mixed_reference_profile": "uniform_component_jitter_expectation_v1",
+  "solved_grids": {
+    "depolarizing_readout": {
+      "L1": {"p1": 0.001, "p2": 0.01, "p_ro": 0.01},
+      "L2": {"p1": 0.003, "p2": 0.03, "p_ro": 0.03},
+      "L3": {"p1": 0.01, "p2": 0.06, "p_ro": 0.06},
+      "L4": {"p1": 0.02, "p2": 0.1, "p_ro": 0.1}
+    },
+    "dephasing_readout": {
+      "L1": {"lambda_1q": 0.0029977500000968574, "lambda_2q": 0.018705847477540373, "p_ro": 0.01},
+      "L2": {"lambda_1q": 0.008979750000871718, "lambda_2q": 0.05584883063100278, "p_ro": 0.03},
+      "L3": {"lambda_1q": 0.02977500000037253, "lambda_2q": 0.11087184553965926, "p_ro": 0.06},
+      "L4": {"lambda_1q": 0.05910000000149012, "lambda_2q": 0.18288655292708428, "p_ro": 0.1}
+    },
+    "amp_phase_damping_readout": {
+      "L1": {"amp_1q": 0.000999666555551812, "phase_1q": 0.000999666555551812, "amp_2q": 0.007034843319095672, "phase_2q": 0.0046898955460637805, "p_ro": 0.01},
+      "L2": {"amp_1q": 0.0026970204336103053, "phase_1q": 0.0035960272448137404, "amp_2q": 0.02112587162805721, "phase_2q": 0.014083914418704808, "p_ro": 0.03},
+      "L3": {"amp_1q": 0.008538528947159648, "phase_1q": 0.012807793420739472, "amp_2q": 0.04101519204676151, "phase_2q": 0.030761394035071134, "p_ro": 0.06},
+      "L4": {"amp_1q": 0.016233030846342443, "phase_1q": 0.02705505141057074, "amp_2q": 0.0675718231406063, "phase_2q": 0.053092146753333506, "p_ro": 0.1}
+    },
+    "coherent_overrotation": {
+      "L1": {"epsilon_1q": 0.029179201405495406, "epsilon_2q": 0.12347433240711689, "p_ro": 0.01},
+      "L2": {"epsilon_1q": 0.05055934862047434, "epsilon_2q": 0.21454256317019463, "p_ro": 0.03},
+      "L3": {"epsilon_1q": 0.09243336603790522, "epsilon_2q": 0.30488044610619547, "p_ro": 0.06},
+      "L4": {"epsilon_1q": 0.13097511522471905, "epsilon_2q": 0.3962120855152607, "p_ro": 0.1}
+    },
+    "correlated_crosstalk": {
+      "L1": {"p1": 0.0009999999999417925, "p2_ind": 0.0038572185020893813, "p2_corr": 0.0038572185020893813, "theta_zz": 0.0038572185020893813, "p_ro": 0.01},
+      "L2": {"p1": 0.002999999999825377, "p2_ind": 0.011639233781956136, "p2_corr": 0.011639233781956136, "theta_zz": 0.011639233781956136, "p_ro": 0.03},
+      "L3": {"p1": 0.01, "p2_ind": 0.023507325196405873, "p2_corr": 0.023507325196405873, "theta_zz": 0.0188058601571247, "p_ro": 0.06},
+      "L4": {"p1": 0.02, "p2_ind": 0.0396863707434386, "p2_corr": 0.0396863707434386, "theta_zz": 0.031749096594750885, "p_ro": 0.1}
+    },
+    "mixed_heterogeneous": {
+      "L1": {"component_scale": 1.0},
+      "L2": {"component_scale": 1.0},
+      "L3": {"component_scale": 1.0},
+      "L4": {"component_scale": 1.0}
+    }
+  },
+  "primary_matching_status": {
+    "depolarizing_readout": "matched",
+    "dephasing_readout": "matched",
+    "amp_phase_damping_readout": "matched",
+    "coherent_overrotation": "gate_count_metric_matched",
+    "correlated_crosstalk": "matched",
+    "mixed_heterogeneous": "matched_in_expectation"
+  },
+  "maximum_relative_primary_residual": {
+    "depolarizing_readout": 0.0,
+    "dephasing_readout": 9.729341175305588e-11,
+    "amp_phase_damping_readout": 7.432434297645804e-11,
+    "coherent_overrotation": 9.402309660011543e-11,
+    "correlated_crosstalk": 8.83891339749828e-11,
+    "mixed_heterogeneous": 0.003996592104789929
+  },
+  "relative_primary_residual": {
+    "depolarizing_readout": {
+      "L1": 0.0,
+      "L2": 0.0,
+      "L3": 0.0,
+      "L4": 0.0
+    },
+    "dephasing_readout": {
+      "L1": 5.7619674256240795e-11,
+      "L2": 9.008063170034539e-11,
+      "L3": 3.689756833402669e-11,
+      "L4": 1.4787841384567575e-11
+    },
+    "amp_phase_damping_readout": {
+      "L1": 6.853708973216714e-11,
+      "L2": 6.540663665947732e-11,
+      "L3": 5.90450890794948e-11,
+      "L4": 4.29833899170527e-11
+    },
+    "coherent_overrotation": {
+      "L1": 1.9645409764768883e-11,
+      "L2": 3.698575011072218e-11,
+      "L3": 5.547074237852331e-11,
+      "L4": 4.624361157654782e-13
+    },
+    "correlated_crosstalk": {
+      "L1": 8.432624256990642e-11,
+      "L2": 5.618013177173709e-11,
+      "L3": 2.078198724220215e-11,
+      "L4": 3.996520628559556e-11
+    },
+    "mixed_heterogeneous": {
+      "L1": 0.003941534528438633,
+      "L2": 0.0038247871076874606,
+      "L3": 0.0036740878507949366,
+      "L4": 0.0034787425995409715
+    }
+  },
+  "readout_matching": "Homogeneous p_ro equals the depolarizing anchor exactly. Mixed readout equals it in expectation over the uniform component and jitter law."
+}

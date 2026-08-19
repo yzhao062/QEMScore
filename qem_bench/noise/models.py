@@ -335,7 +335,7 @@ def build_noise_model(
     ``build_noise_model("L1")`` and ``build_noise_model(severity="L1")`` retain the
     original depolarizing-plus-readout behavior. The mixed family requires a caller
     supplied seed. Its ``n_qubits`` controls the qubits and directed CX pairs that
-    receive local errors; the default covers the paper design's 20-qubit cap.
+    receive local errors; the default covers circuits with up to 20 qubits.
     """
     family, severity = _resolve_family_severity(family, severity)
     if family == "mixed_heterogeneous":
