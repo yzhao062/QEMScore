@@ -45,11 +45,14 @@ from qem_bench.datasets.schema import (
     FEATURES,
     validate_item,
 )
+from qem_bench.datasets.splits import SplitSpec
 from qem_bench.labels.statevector import ideal_expectation as statevector_expectation
 from qem_bench.labels.stim_labels import ideal_expectation as stim_expectation
 from qem_bench.noise.models import DEFAULT_NOISE_FAMILY, SEVERITY_GRIDS
 from qem_bench.observables import z_expectation_from_counts, z_support_label
+from qem_bench.reproducibility import environment_contract
 from qem_bench.sampling import sample_counts
+from qem_bench.validation import LEGACY_SCHEMA_VERSION
 
 SEED_FORMULA = (
     "circuit stream: SeedSequence(master, spawn_key=(0, instance)); "
@@ -60,7 +63,7 @@ SEED_FORMULA = (
 )
 
 PRESETS: dict[str, dict] = {
-    # Paper-adjacent smoke tier: runs in minutes on a laptop.
+    # Extended smoke tier: runs in minutes on a laptop.
     "t0-smoke": {
         "master_seed": 20260719,
         "family": "tfi",
@@ -148,36 +151,16 @@ PRESETS: dict[str, dict] = {
     },
 }
 
-def _configuration_fingerprint(config: dict) -> str:
-    """Return the canonical representation used by the frozen-stream allow-list."""
-    return json.dumps(config, sort_keys=True, separators=(",", ":"))
+# These named fixtures retain their original item serializer. Their golden
+# hashes live only in tests and tools, never in production validation.
+LEGACY_FROZEN_PRESETS = frozenset({"t0-micro", "t0-smoke"})
 
 
-# These two exact item streams are frozen by D9. They predate the family-level
-# stratum field. Every configuration deviation produces ordinary v1 rows instead.
-FROZEN_ITEM_STREAMS: dict[tuple[str, str], str] = {
-    (
-        "t0-micro",
-        _configuration_fingerprint(
-            {**PRESETS["t0-micro"], "noise_family": DEFAULT_NOISE_FAMILY}
-        ),
-    ): "b9ed7863d6a1ce0d718907262d842e90e59c6eb7479a350837655bf542166bb7",
-    (
-        "t0-smoke",
-        _configuration_fingerprint(
-            {**PRESETS["t0-smoke"], "noise_family": DEFAULT_NOISE_FAMILY}
-        ),
-    ): "edf5837e0da10f1dc93151d5b29d1855f66ad76341ff6c28019096308f8fcdf3",
-}
-
-
-def frozen_item_stream_hash(preset_name: object, config: object) -> str | None:
-    """Return the D9 hash only for an exact frozen preset configuration."""
-    if not isinstance(preset_name, str) or not isinstance(config, dict):
-        return None
-    return FROZEN_ITEM_STREAMS.get(
-        (preset_name, _configuration_fingerprint(config))
-    )
+def _uses_frozen_legacy_serializer(preset_name: object, config: dict) -> bool:
+    if not isinstance(preset_name, str) or preset_name not in LEGACY_FROZEN_PRESETS:
+        return False
+    expected = {**PRESETS[preset_name], "noise_family": DEFAULT_NOISE_FAMILY}
+    return config == expected
 
 CircuitParams = (
     TFIParams
@@ -324,13 +307,33 @@ def group_shots(items: list[dict], split: str | None = None) -> int:
 
 
 def generate(
-    preset: str | dict,
+    preset: str | dict | SplitSpec,
     out_dir: str | Path,
     master_seed: int | None = None,
     *,
     noise_family: str | None = None,
 ) -> dict:
     """Generate a dataset directory and return its manifest."""
+    if isinstance(preset, str):
+        from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
+
+        if preset in SPLIT_PRESETS:
+            if noise_family is not None:
+                raise ValueError(
+                    "split-v2 noise families are declared by SplitSpec, not an override"
+                )
+            return generate_split(preset, out_dir, master_seed=master_seed)
+    elif isinstance(preset, SplitSpec) or (
+        isinstance(preset, dict) and "split_id" in preset
+    ):
+        from qem_bench.datasets.split_generate import generate_split
+
+        if noise_family is not None:
+            raise ValueError(
+                "split-v2 noise families are declared by SplitSpec, not an override"
+            )
+        return generate_split(preset, out_dir, master_seed=master_seed)
+
     cfg = dict(PRESETS[preset]) if isinstance(preset, str) else dict(preset)
     preset_name = preset if isinstance(preset, str) else cfg.get("name", "custom")
     if master_seed is not None:
@@ -369,9 +372,13 @@ def generate(
             f"unknown severities for {selected_noise_family}: {unknown_severities}"
         )
 
+    artifact_environment_contract = environment_contract()
     master = int(cfg["master_seed"])
     out = Path(out_dir)
-    out.mkdir(parents=True, exist_ok=True)
+    try:
+        out.mkdir(parents=True, exist_ok=False)
+    except FileExistsError as exc:
+        raise FileExistsError(f"dataset artifact path already exists: {out}") from exc
 
     n_total = cfg["n_train"] + cfg["n_test"]
     items: list[dict] = []
@@ -439,15 +446,13 @@ def generate(
             items.append(item)
 
     written_items = items
-    expected_frozen_hash = frozen_item_stream_hash(preset_name, cfg)
-    if expected_frozen_hash is not None:
+    if _uses_frozen_legacy_serializer(preset_name, cfg):
         compatible_items = []
         for item in items:
             compatible = dict(item)
             compatible.pop("stratum")
             compatible_items.append(compatible)
-        if dataset_hash(compatible_items) == expected_frozen_hash:
-            written_items = compatible_items
+        written_items = compatible_items
 
     lines = _canonical_lines(written_items)
     (out / "items.jsonl").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -458,6 +463,8 @@ def generate(
     import stim
 
     manifest = {
+        "dataset_schema_version": LEGACY_SCHEMA_VERSION,
+        "environment_contract": artifact_environment_contract,
         "preset": preset_name,
         "config": cfg,
         "master_seed": master,

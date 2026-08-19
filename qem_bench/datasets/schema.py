@@ -119,6 +119,38 @@ GROUP_INVARIANT_FIELDS: list[str] = [
     "transpiled_depth",
 ]
 
+_INTEGER_FIELD_MINIMUMS: dict[str, int] = {
+    "instance": 0,
+    "n_qubits": 1,
+    "circuit_seed": 0,
+    "obs_locality": 0,
+    "shots": 1,
+    "sampler_seed": 0,
+    "two_qubit_gates": 0,
+    "transpiled_depth": 0,
+    "replicate": 0,
+    "raw_circuit_evals": 1,
+}
+_FAMILY_INTEGER_FIELD_MINIMUMS: dict[str, dict[str, int]] = {
+    "tfi": {"steps": 1},
+    "qaoa": {"p": 1},
+    "heisenberg": {"steps": 1},
+    "random_clifford": {"depth": 1},
+    "near_clifford": {"depth": 1, "non_clifford_count": 0},
+}
+_FINITE_NUMBER_FIELDS: tuple[str, ...] = (
+    "noisy_expectation",
+    "noisy_stderr",
+    "ideal_expectation",
+)
+_FAMILY_FINITE_NUMBER_FIELDS: dict[str, tuple[str, ...]] = {
+    "tfi": ("j", "h", "dt"),
+    "qaoa": (),
+    "heisenberg": ("jx", "jy", "jz", "dt"),
+    "random_clifford": (),
+    "near_clifford": ("theta",),
+}
+
 
 def _freeze(value):
     if isinstance(value, dict):
@@ -126,6 +158,58 @@ def _freeze(value):
     if isinstance(value, (list, tuple)):
         return tuple(_freeze(nested) for nested in value)
     return value
+
+
+def _validate_integer_field(item: dict, field: str, minimum: int) -> None:
+    value = item[field]
+    item_id = item.get("item_id", "?")
+    if type(value) is not int:
+        raise ValueError(f"item {item_id} field {field} must be an integer")
+    if value < minimum:
+        bound = "positive" if minimum == 1 else "nonnegative"
+        raise ValueError(f"item {item_id} field {field} must be {bound}")
+
+
+def _validate_finite_number(item: dict, field: str, value) -> None:
+    item_id = item.get("item_id", "?")
+    if type(value) not in (int, float):
+        raise ValueError(f"item {item_id} field {field} must be a number")
+    if type(value) is float and not math.isfinite(value):
+        raise ValueError(f"item {item_id} field {field} must be finite")
+
+
+def _validate_numeric_fields(item: dict, family: str) -> None:
+    for field, minimum in _INTEGER_FIELD_MINIMUMS.items():
+        if field in item:
+            _validate_integer_field(item, field, minimum)
+    for field, minimum in _FAMILY_INTEGER_FIELD_MINIMUMS[family].items():
+        _validate_integer_field(item, field, minimum)
+    for field in _FINITE_NUMBER_FIELDS + _FAMILY_FINITE_NUMBER_FIELDS[family]:
+        _validate_finite_number(item, field, item[field])
+
+    if family != "qaoa":
+        return
+    edge_probability = item["edge_probability"]
+    if edge_probability is not None:
+        _validate_finite_number(item, "edge_probability", edge_probability)
+    for field in ("gammas", "betas"):
+        values = item[field]
+        if not isinstance(values, (list, tuple)):
+            raise ValueError(
+                f"item {item.get('item_id', '?')} field {field} must contain numbers"
+            )
+        for value in values:
+            _validate_finite_number(item, field, value)
+    edges = item["edges"]
+    if not isinstance(edges, (list, tuple)) or any(
+        not isinstance(edge, (list, tuple))
+        or len(edge) != 2
+        or any(type(endpoint) is not int for endpoint in edge)
+        for edge in edges
+    ):
+        raise ValueError(
+            f"item {item.get('item_id', '?')} field edges must contain integer pairs"
+        )
 
 
 def validate_item(item: dict) -> None:
@@ -143,6 +227,8 @@ def validate_item(item: dict) -> None:
         raise ValueError(
             f"item {item.get('item_id', '?')} missing {family} fields: {family_missing}"
         )
+
+    _validate_numeric_fields(item, family)
 
     stratum = item["stratum"]
     if stratum not in STRATA:
