@@ -51,6 +51,44 @@ def micro_dataset(tmp_path_factory):
     return data, manifest
 
 
+@pytest.mark.parametrize("value", (7.9, 7.0, True, "7"))
+def test_legacy_master_seed_requires_an_exact_nonnegative_integer(tmp_path, value):
+    out = tmp_path / "invalid-master-seed"
+    with pytest.raises(ValueError, match="master_seed must be a nonnegative integer"):
+        generate("t0-micro", out, master_seed=value)
+    assert not out.exists()
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("n_train", True, "n_train must be a nonnegative integer"),
+        ("n_test", 1.0, "n_test must be a nonnegative integer"),
+        ("shots", True, "shots must be a positive integer"),
+    ),
+)
+def test_legacy_integer_config_fields_require_exact_types(
+    tmp_path, field, value, message
+):
+    config = {
+        "master_seed": 7,
+        "family": "tfi",
+        "n_qubits": [3],
+        "steps": [1],
+        "dt": 0.2,
+        "n_train": 1,
+        "n_test": 0,
+        "shots": 16,
+        "severities": ["L1"],
+        "observables": ["z_mid"],
+    }
+    config[field] = value
+    out = tmp_path / field
+    with pytest.raises(ValueError, match=message):
+        generate(config, out)
+    assert not out.exists()
+
+
 def test_tfi_unitary_matches_first_order_product():
     """One Trotter step must equal exp(-i H_zz dt) then exp(-i H_x dt) for
     H = -J ZZ - h (X0 + X1) on two qubits."""
@@ -274,6 +312,8 @@ def test_run_rejects_mixed_strata_with_headline_rule(micro_dataset, tmp_path):
         group = items[0]["measurement_group"]
         for item in items:
             if item["measurement_group"] == group:
+                for field in ("steps", "j", "h", "dt"):
+                    item.pop(field)
                 item["family"] = "random_clifford"
                 item["stratum"] = "clifford_control"
                 item["label_method"] = "stim"
