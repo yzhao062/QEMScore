@@ -5,18 +5,34 @@ from __future__ import annotations
 import copy
 import importlib
 import json
+import math
 import shutil
 from dataclasses import replace
 
 import numpy as np
 import pytest
 
+from qem_bench.circuits.heisenberg import sample_heisenberg_params
+from qem_bench.circuits.near_clifford import sample_near_clifford_params
+from qem_bench.circuits.qaoa import sample_qaoa_params
+from qem_bench.circuits.random_clifford import sample_random_clifford_params
+from qem_bench.circuits.tfi import (
+    TFIParams,
+    build_tfi_circuit,
+    sample_tfi_params,
+)
 from qem_bench.datasets.generate import (
+    LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+    PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
     PRESETS,
+    _construct_legacy_source_observable_closure,
     _uses_frozen_legacy_serializer,
     generate,
 )
-from qem_bench.datasets.split_generate import generate_split
+from qem_bench.datasets.split_generate import (
+    _transpile_seed_from_circuit_id,
+    generate_split,
+)
 from qem_bench.datasets.splits import (
     SPLIT_ALLOWED_COUPLINGS,
     SPLIT_AXES,
@@ -24,9 +40,11 @@ from qem_bench.datasets.splits import (
     resolve_split_spec,
 )
 from qem_bench.noise.models import DEFAULT_NOISE_FAMILY
+from qem_bench.observables import z_support_label
 from qem_bench.reproducibility import CI_LOCK_SHA256, CI_LOCK_SHA256_ENV
 from qem_bench.runner.run import _load
 from qem_bench.validation import (
+    canonical_hash,
     canonical_item_lines,
     cell_item_stream_hashes,
     item_stream_hash,
@@ -34,6 +52,7 @@ from qem_bench.validation import (
     split_spec_hash,
     validate_axis_contract,
     validate_split_artifact,
+    validate_split_spec,
 )
 
 SPLIT_GOLDENS = {
@@ -43,17 +62,17 @@ SPLIT_GOLDENS = {
         ),
         "cell_hashes": {
             "cell-305b997a6ab380ec598ad1cc379ca0ce3d5f9b1d0e37e7046914d7cf71be67cd": (
-                "5ca3cc6958c220076719d4d4d356171e2b68f243cfabda7fb1d44b03d533217b"
+                "bbb2e786b040e446de9f0ec6e7bb73a4c0bbc552fdde46950d924b9bf1d19da0"
             ),
             "cell-6cf34780024766a1b3e2fcc11792bb74af7c8c780ef736e48db17d27dd9e3548": (
-                "96d11761b118cb7a0eda805623ea30b07a455f5778b5d3b63e16dd460eceddf1"
+                "226c2140cc0ab54ca4d797f1f86f7efdb09304af68fb19f296b0db7339e8b132"
             ),
             "cell-90d7f7101da1bdb2a2f1d2d8187d97ed92af0ded4191770cac8d13db351cac64": (
-                "494a1d556369bf6f9dea9fc6280bb4e0c9d4b1886ac1462e1e5c8b4f874be376"
+                "307fb8b36a9390f687e3b6fa9be6b7d7c4bb93b93b631c417b8903b70f604d4d"
             ),
         },
         "dataset_hash": (
-            "50aeecfb2d463cecb4ad5e6ecb0b49eada57278004155e4472fdccf8f14efe41"
+            "19fe93ba7b4f95a10c43d83362a52d48d1a4e8f3fcc63da75ffceea0c8599517"
         ),
     },
     "s1": {
@@ -62,17 +81,17 @@ SPLIT_GOLDENS = {
         ),
         "cell_hashes": {
             "cell-3990d025c00443b1560ad94adef7b044628d9b3c0a61128225f97a8545134143": (
-                "4e486a3dfbacf86f43d37dab5434fc47c5ecb8f18028368dc7c14f08a231d6ec"
+                "5929701b41c85ebba8518e6c2720e063f41be94af4a93e24bec3768e177a6e80"
             ),
             "cell-55fc45cb35526860e0b8f3e874cf49aec26be662bdd401162a37e845eb473e59": (
-                "f2ffd621c7beaa369114d9b54797458d3d3c1694a95922f1863d469cbece507e"
+                "312f966301d76c6c5fe109073fa113b2183d45b82e8cf5fd494bfa4faf01d057"
             ),
             "cell-aad90f0ed7c277258eb34edab5ac9665da9c3d5aee0271e4829bf0b7c563b6fd": (
-                "db86028a7d1938796b2664aff4c69c4a7a7f1cc14bd5bde4e2536fa5b237fc9a"
+                "ee8305347eced4c186b09a1f92b913b68af3a6bfe44a1a8898a0d2320fd25e9c"
             ),
         },
         "dataset_hash": (
-            "ae40bf2dba3d3263662aa6c6d07f7e0726b2663b352391e007be77222a688993"
+            "683262643447aec48c9404bedc6a552fe3a926e164f01b641865697e2b373d30"
         ),
     },
 }
@@ -141,6 +160,361 @@ def _single_family_generation_spec(
         role_counts={"train": 1, "validation": 1, "test": 1},
         family_parameters={family: family_parameters},
     )
+
+
+def _sampling_domain_cases(family):
+    parameters = {
+        "tfi": {"dt": 0.2},
+        "heisenberg": {"dt": 0.15},
+        "qaoa": {"graph_classes": ["path"]},
+        "random_clifford": {},
+        "near_clifford": {
+            "non_clifford_count": [1],
+            "theta": [0.3],
+        },
+    }[family]
+    baseline = {
+        "n_qubits": [4],
+        "depths": [1],
+        "parameters": parameters,
+    }
+    cases = []
+
+    def add(label, accepted, **updates):
+        domain = copy.deepcopy(baseline)
+        domain.update(updates)
+        cases.append((label, accepted, domain))
+
+    add("positive-control", True)
+    add("valid-depth-two", True, depths=[2])
+    add("empty-widths", False, n_qubits=[])
+    add("boolean-width", False, n_qubits=[True])
+    add("noninteger-width", False, n_qubits=[4.0])
+    add("empty-depths", False, depths=[])
+    add("zero-depth", False, depths=[0])
+    add("boolean-depth", False, depths=[True])
+    add("noninteger-depth", False, depths=[1.0])
+
+    if family == "tfi":
+        add("zero-width", False, n_qubits=[0])
+        add("unbounded-positive-width", True, n_qubits=[21])
+    elif family == "heisenberg":
+        add("width-below-family-bound", False, n_qubits=[1])
+        add("width-above-family-bound", False, n_qubits=[13])
+        for label, value in (
+            ("boolean-dt", False),
+            ("nonnumeric-dt", "invalid"),
+            ("zero-dt", 0.0),
+            ("negative-dt", -0.1),
+            ("nan-dt", math.nan),
+            ("infinite-dt", math.inf),
+        ):
+            add(label, False, parameters={"dt": value})
+    elif family == "qaoa":
+        add("width-below-family-bound", False, n_qubits=[1])
+        add("width-above-family-bound", False, n_qubits=[13])
+        add("unsupported-p", False, depths=[3])
+        add("empty-graph-classes", False, parameters={"graph_classes": []})
+        add(
+            "unknown-graph-class",
+            False,
+            parameters={"graph_classes": ["complete"]},
+        )
+        add(
+            "canonical-graph-alias",
+            True,
+            parameters={"graph_classes": ["erdos-renyi"]},
+        )
+        add(
+            "cycle-too-narrow",
+            False,
+            n_qubits=[2],
+            parameters={"graph_classes": ["cycle"]},
+        )
+        add(
+            "cycle-minimum-width",
+            True,
+            n_qubits=[3],
+            parameters={"graph_classes": ["cycle"]},
+        )
+        add(
+            "three-regular-odd-width",
+            False,
+            n_qubits=[5],
+            parameters={"graph_classes": ["3_regular"]},
+        )
+        add(
+            "partly-unreachable-three-regular-widths",
+            False,
+            n_qubits=[4, 5],
+            parameters={"graph_classes": ["3_regular"]},
+        )
+        add(
+            "three-regular-minimum-width",
+            True,
+            n_qubits=[4],
+            parameters={"graph_classes": ["3_regular"]},
+        )
+        for label, value in (
+            ("boolean-er-probability", False),
+            ("nonnumeric-er-probability", "invalid"),
+            ("negative-er-probability", -0.1),
+            ("oversized-er-probability", 2.0),
+            ("nan-er-probability", math.nan),
+            ("infinite-er-probability", math.inf),
+        ):
+            add(
+                label,
+                False,
+                parameters={
+                    "graph_classes": ["path"],
+                    "er_edge_probability": value,
+                },
+            )
+        for label, value in (
+            ("zero-er-probability", 0.0),
+            ("unit-er-probability", 1.0),
+        ):
+            add(
+                label,
+                True,
+                parameters={
+                    "graph_classes": ["path"],
+                    "er_edge_probability": value,
+                },
+            )
+    elif family == "random_clifford":
+        add("zero-width", False, n_qubits=[0])
+        add("width-above-family-bound", False, n_qubits=[21])
+        add("maximum-width", True, n_qubits=[20])
+    else:
+        add("zero-width", False, n_qubits=[0])
+        add("width-above-family-bound", False, n_qubits=[15])
+        add("maximum-width", True, n_qubits=[14])
+        for label, values in (
+            ("empty-insertion-counts", []),
+            ("zero-insertion-count", [0]),
+            ("boolean-insertion-count", [True]),
+            ("noninteger-insertion-count", [1.0]),
+            ("unreachable-insertion-count", [5]),
+            ("partly-unreachable-insertion-count", [1, 5]),
+        ):
+            add(
+                label,
+                False,
+                parameters={
+                    "non_clifford_count": values,
+                    "theta": [0.3],
+                },
+            )
+        add(
+            "maximum-reachable-insertion-count",
+            True,
+            parameters={"non_clifford_count": [4], "theta": [0.3]},
+        )
+        for label, values in (
+            ("empty-theta", []),
+            ("boolean-theta", [True]),
+            ("nonnumeric-theta", ["invalid"]),
+            ("nan-theta", [math.nan]),
+            ("infinite-theta", [math.inf]),
+            ("zero-clifford-theta", [0.0]),
+            ("quarter-turn-theta", [math.pi / 2.0]),
+            ("partly-clifford-theta", [0.3, math.pi / 2.0]),
+            ("negative-clifford-theta", [-math.pi]),
+            ("within-clifford-tolerance", [math.pi / 2.0 + 1e-13]),
+        ):
+            add(
+                label,
+                False,
+                parameters={
+                    "non_clifford_count": [1],
+                    "theta": values,
+                },
+            )
+        add(
+            "outside-clifford-tolerance",
+            True,
+            parameters={
+                "non_clifford_count": [1],
+                "theta": [math.pi / 2.0 + 1e-10],
+            },
+        )
+    return cases
+
+
+def _sampler_accepts_domain(family, domain):
+    rng = np.random.default_rng(11)
+    parameters = domain["parameters"]
+    common = {
+        "rng": rng,
+        "n_qubits_choices": domain["n_qubits"],
+        "instance": 0,
+        "circuit_seed": 0,
+    }
+    try:
+        if family == "tfi":
+            sample_tfi_params(
+                **common,
+                steps_choices=domain["depths"],
+                dt=parameters["dt"],
+            )
+        elif family == "heisenberg":
+            sample_heisenberg_params(
+                **common,
+                steps_choices=domain["depths"],
+                dt=parameters["dt"],
+            )
+        elif family == "qaoa":
+            sample_qaoa_params(
+                **common,
+                p_choices=domain["depths"],
+                graph_classes=parameters["graph_classes"],
+                er_edge_probability=parameters.get("er_edge_probability"),
+            )
+        elif family == "random_clifford":
+            sample_random_clifford_params(
+                **common,
+                depth_choices=domain["depths"],
+            )
+        else:
+            sample_near_clifford_params(
+                **common,
+                depth_choices=domain["depths"],
+                non_clifford_count_choices=parameters["non_clifford_count"],
+                theta_choices=parameters["theta"],
+            )
+    except ValueError:
+        return False
+    return True
+
+
+def _split_spec_accepts_domain(family, domain):
+    try:
+        spec = _single_family_generation_spec(family, domain["parameters"])
+        spec = replace(
+            spec,
+            fixed_axes={
+                **dict(spec.fixed_axes),
+                "family_native_depth": domain["depths"],
+            },
+            n_qubits=domain["n_qubits"],
+        )
+        validate_split_spec(spec)
+    except ValueError:
+        return False
+    return True
+
+
+@pytest.mark.parametrize(
+    "family",
+    ("tfi", "heisenberg", "qaoa", "random_clifford", "near_clifford"),
+)
+def test_split_spec_sampling_domains_are_at_least_as_strict_as_samplers(family):
+    sampler_refusals = set()
+    validator_refusals = set()
+    for label, expected_acceptance, domain in _sampling_domain_cases(family):
+        sampler_accepts = _sampler_accepts_domain(family, domain)
+        validator_accepts = _split_spec_accepts_domain(family, domain)
+        assert sampler_accepts is expected_acceptance, (family, label)
+        if not sampler_accepts:
+            sampler_refusals.add(label)
+        if not validator_accepts:
+            validator_refusals.add(label)
+        if label == "positive-control":
+            assert sampler_accepts
+            assert validator_accepts
+
+    assert sampler_refusals
+    assert sampler_refusals <= validator_refusals
+
+
+@pytest.mark.parametrize(
+    ("family", "family_parameters", "message"),
+    (
+        pytest.param(
+            "qaoa",
+            {"graph_classes": ["path"], "er_edge_probability": 2.0},
+            "er_edge_probability must be a number in",
+            id="qaoa-unused-er-probability",
+        ),
+        pytest.param(
+            "near_clifford",
+            {
+                "non_clifford_count": [1],
+                "theta": [0.3, math.pi / 2.0],
+            },
+            "theta choices must not contain Clifford",
+            id="near-clifford-partly-invalid-theta",
+        ),
+    ),
+)
+def test_fully_hashed_artifact_rejects_impossible_sampling_domain(
+    monkeypatch, tmp_path, family, family_parameters, message
+):
+    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    validation_module = importlib.import_module("qem_bench.validation")
+    with monkeypatch.context() as bypass:
+        bypass.setattr(validation_module, "validate_split_spec", lambda spec: None)
+        if family == "qaoa":
+
+            def permissive_sampler(
+                rng,
+                n_qubits_choices,
+                p_choices,
+                graph_classes,
+                instance,
+                circuit_seed,
+                er_edge_probability=None,
+            ):
+                del er_edge_probability
+                return sample_qaoa_params(
+                    rng,
+                    n_qubits_choices,
+                    p_choices,
+                    graph_classes,
+                    instance,
+                    circuit_seed,
+                )
+
+            bypass.setattr(
+                generate_module, "sample_qaoa_params", permissive_sampler
+            )
+        else:
+
+            def permissive_sampler(
+                rng,
+                n_qubits_choices,
+                depth_choices,
+                non_clifford_count_choices,
+                theta_choices,
+                instance,
+                circuit_seed,
+            ):
+                del theta_choices
+                return sample_near_clifford_params(
+                    rng,
+                    n_qubits_choices,
+                    depth_choices,
+                    non_clifford_count_choices,
+                    [0.3],
+                    instance,
+                    circuit_seed,
+                )
+
+            bypass.setattr(
+                generate_module,
+                "sample_near_clifford_params",
+                permissive_sampler,
+            )
+        data = tmp_path / family
+        generate_split(
+            _single_family_generation_spec(family, family_parameters),
+            data,
+        )
+
+    with pytest.raises(ValueError, match=message):
+        validate_split_artifact(data)
 
 
 @pytest.mark.parametrize("split_id", sorted(SPLIT_AXES))
@@ -287,6 +661,102 @@ def test_split_v2_is_byte_deterministic_and_seed_sensitive(tmp_path):
     assert changed["dataset_hash"] != first["dataset_hash"]
 
 
+def test_equivalent_local_instances_keep_distinct_execution_and_row_identity(
+    monkeypatch, tmp_path
+):
+    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    split_generate_module = importlib.import_module(
+        "qem_bench.datasets.split_generate"
+    )
+    transpile_seeds = []
+
+    def repeated_builder(cfg, rng, instance, circuit_seed):
+        del rng
+        params = TFIParams(
+            n_qubits=cfg["n_qubits"][0],
+            steps=cfg["steps"][0],
+            j=0.4,
+            h=0.7,
+            dt=cfg["dt"],
+            circuit_seed=circuit_seed,
+            instance=instance,
+        )
+        return params, build_tfi_circuit(params)
+
+    def capture_sample(
+        circuit,
+        severity,
+        shots,
+        sampler_seed,
+        transpile_seed,
+        *,
+        noise_family,
+    ):
+        del severity, sampler_seed, noise_family
+        transpile_seeds.append(transpile_seed)
+        return (
+            {"0" * circuit.num_qubits: shots},
+            {"two_qubit_gates": 0, "transpiled_depth": 1},
+        )
+
+    monkeypatch.setattr(
+        generate_module, "_sample_and_build_circuit", repeated_builder
+    )
+    monkeypatch.setattr(split_generate_module, "sample_counts", capture_sample)
+    spec = replace(
+        _spec("S0"),
+        fixed_axes={**dict(_spec("S0").fixed_axes), "shots": [16]},
+        n_qubits=[3],
+        role_counts={"train": 2, "validation": 1, "test": 1},
+    )
+    data = tmp_path / "equivalent-instances"
+    generate_split(spec, data)
+    items = [
+        json.loads(line)
+        for line in (data / "items.jsonl").read_text(encoding="utf-8").splitlines()
+        if line
+    ]
+    train = [item for item in items if item["split"] == "train"]
+
+    assert len(train) == 2
+    assert len({item["circuit_seed"] for item in train}) == 2
+    assert len({item["circuit_id"] for item in train}) == 1
+    assert len({item["measurement_group"] for item in train}) == 2
+    assert len({item["item_id"] for item in train}) == 2
+    for item in train:
+        descriptor = {
+            "cell_id": item["cell_id"],
+            "circuit_id": item["circuit_id"],
+            "instance": item["instance"],
+            "observable_id": item["observable_id"],
+            "replicate": item["replicate"],
+        }
+        assert item["item_id"] == f"item-{canonical_hash(descriptor)}"
+        assert f":i{item['instance']}:" in item["measurement_group"]
+
+    expected_transpile_seed = _transpile_seed_from_circuit_id(
+        train[0]["circuit_id"]
+    )
+    assert set(transpile_seeds) == {expected_transpile_seed}
+    assert _transpile_seed_from_circuit_id("circuit-" + "0" * 63 + "1") == 1
+    assert _transpile_seed_from_circuit_id("circuit-" + "0" * 63 + "2") == 2
+
+
+@pytest.mark.parametrize(
+    "circuit_id",
+    (
+        "not-a-circuit",
+        "circuit-deadbeef",
+        "circuit-" + "g" * 64,
+        "circuit-" + "A" * 64,
+        "circuit-" + "0" * 62 + "_1",
+    ),
+)
+def test_transpile_seed_rejects_noncanonical_circuit_ids(circuit_id):
+    with pytest.raises(ValueError, match="invalid canonical circuit ID"):
+        _transpile_seed_from_circuit_id(circuit_id)
+
+
 def test_split_v2_manifest_stores_declaration_resolution_and_valid_hash_chain(
     split_dataset,
 ):
@@ -297,8 +767,155 @@ def test_split_v2_manifest_stores_declaration_resolution_and_valid_hash_chain(
     assert manifest["split_spec"]["split_id"] == "S0"
     assert manifest["circuit_pools"]
     assert manifest["cells"]
+    assert manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] == {
+        "tfi": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+    }
     assert items
+    train_observables = {
+        (item["n_qubits"], item["pauli_label"])
+        for item in items
+        if item["split"] == "train"
+    }
+    test_observables = {
+        (item["n_qubits"], item["pauli_label"])
+        for item in items
+        if item["split"] == "test"
+    }
+    assert test_observables <= train_observables
     assert loaded_manifest["dataset_hash"] == manifest["dataset_hash"]
+
+
+def _legacy_observable_rows(widths, n_train):
+    rows = []
+    for instance, n_qubits in enumerate(widths):
+        mid = n_qubits // 2
+        labels = (
+            z_support_label(n_qubits, (mid,)),
+            z_support_label(n_qubits, (mid - 1, mid)),
+        )
+        for observable, pauli_label in zip(("z_mid", "zz_mid"), labels):
+            rows.append(
+                {
+                    "measurement_group": f"g{instance:02d}",
+                    "split": "train" if instance < n_train else "test",
+                    "n_qubits": n_qubits,
+                    "pauli_label": pauli_label,
+                    "observable": observable,
+                }
+            )
+    return rows
+
+
+def _role_observables(rows, role):
+    return {
+        (row["n_qubits"], row["pauli_label"])
+        for row in rows
+        if row["split"] == role
+    }
+
+
+def test_legacy_source_observable_closure_is_constructed_from_the_realization():
+    n_train = PRESETS["t0-rc-micro"]["n_train"]
+    widths = [4] * n_train + [3, 5, 6, 3, 5, 6]
+    rows = _legacy_observable_rows(widths, n_train)
+
+    assert _role_observables(rows, "test") - _role_observables(rows, "train")
+    _construct_legacy_source_observable_closure(
+        rows,
+        n_train=n_train,
+        split_name="t0-rc-construction-probe",
+    )
+
+    assert len(
+        {
+            row["measurement_group"]
+            for row in rows
+            if row["split"] == "train"
+        }
+    ) == n_train
+    assert _role_observables(rows, "test") <= _role_observables(rows, "train")
+
+
+def test_every_legacy_preset_is_source_observable_closed(tmp_path):
+    checked = set()
+    for preset in sorted(PRESETS):
+        data = tmp_path / preset
+        generate(preset, data)
+        rows = [
+            json.loads(line)
+            for line in (data / "items.jsonl")
+            .read_text(encoding="utf-8")
+            .splitlines()
+            if line
+        ]
+        missing = _role_observables(rows, "test") - _role_observables(
+            rows, "train"
+        )
+        assert not missing, (preset, sorted(missing))
+        checked.add(preset)
+
+    assert checked == set(PRESETS)
+
+
+def test_impossible_legacy_source_observable_closure_fails_closed():
+    rows = _legacy_observable_rows([3, 4, 5], n_train=1)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"split 'impossible-probe' is not source-observable closed; "
+            r"test observables absent from training: .*\(4, 'IZII'\).*"
+            r"\(5, 'IIZZI'\)"
+        ),
+    ):
+        _construct_legacy_source_observable_closure(
+            rows,
+            n_train=1,
+            split_name="impossible-probe",
+        )
+
+
+def test_split_v2_observable_extrapolation_cannot_emit_an_artifact(tmp_path):
+    spec = replace(
+        _spec("S5"),
+        fixed_axes={**dict(_spec("S5").fixed_axes), "shots": [16]},
+        n_qubits=[3],
+        role_counts={"train": 1, "validation": 1, "test": 1},
+    )
+    data = tmp_path / "nonclosed-s5"
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"split 'S5 \(s5-[0-9a-f]+\)' is not source-observable closed; "
+            r"test observables absent from training: \[\(3, 'IZZ'\)\]"
+        ),
+    ):
+        generate_split(spec, data)
+    assert not (data / "manifest.json").exists()
+    assert not (data / "items.jsonl").exists()
+
+
+def test_split_profile_generation_rejects_an_unknown_profile(
+    monkeypatch, tmp_path
+):
+    generation_module = importlib.import_module("qem_bench.datasets.generate")
+    monkeypatch.setattr(
+        generation_module,
+        "LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE",
+        "future-profile",
+    )
+    spec = replace(
+        _spec("S0"),
+        fixed_axes={**dict(_spec("S0").fixed_axes), "shots": [16]},
+        n_qubits=[3],
+        role_counts={"train": 1, "validation": 1, "test": 1},
+    )
+
+    with pytest.raises(
+        ValueError, match="unknown physical identity encoding profile"
+    ):
+        generate_split(spec, tmp_path / "unknown-profile")
 
 
 @pytest.mark.parametrize(

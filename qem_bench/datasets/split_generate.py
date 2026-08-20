@@ -69,6 +69,18 @@ def _seed_int(master: int, spawn_key: tuple[int, ...]) -> int:
     return int(sequence.generate_state(1, dtype=np.uint32)[0])
 
 
+def _transpile_seed_from_circuit_id(circuit_id: str) -> int:
+    prefix = "circuit-"
+    digest = circuit_id.removeprefix(prefix)
+    if (
+        not circuit_id.startswith(prefix)
+        or len(digest) != 64
+        or any(character not in "0123456789abcdef" for character in digest)
+    ):
+        raise ValueError(f"invalid canonical circuit ID {circuit_id!r}")
+    return int(digest, 16)
+
+
 def _write_sidecar(
     root: Path,
     category: str,
@@ -205,9 +217,24 @@ def generate_split(
     sidecar_hashes: dict[str, str] = {}
 
     from qem_bench.datasets.generate import (
+        LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+        PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
         _family_parameter_fields,
         _observable_support,
+        _require_source_observable_closure,
         _sample_and_build_circuit,
+        validate_physical_identity_encoding_profiles,
+    )
+
+    families = {pool.family for pool in resolved.circuit_pools}
+    physical_identity_encoding_profiles = (
+        validate_physical_identity_encoding_profiles(
+            {
+                family: LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+                for family in families
+            },
+            families=families,
+        )
     )
 
     circuits: dict[str, list[dict[str, Any]]] = {}
@@ -289,7 +316,9 @@ def generate_split(
                 severity=cell.severity,
                 shots=cell.shots,
                 sampler_seed=sampler_seed,
-                transpile_seed=int(circuit_record["circuit_seed"]),
+                transpile_seed=_transpile_seed_from_circuit_id(
+                    str(circuit_record["circuit_id"])
+                ),
                 noise_family=noise_family,
             )
             counts_descriptor = {
@@ -304,7 +333,7 @@ def generate_split(
             )
             group_id = (
                 f"{cell.cell_id}:{circuit_record['circuit_id']}:"
-                f"r{cell.replicate}:g0"
+                f"i{local_instance}:r{cell.replicate}:g0"
             )
 
             for observable in cell.observable_ids:
@@ -338,6 +367,7 @@ def generate_split(
                 item_descriptor = {
                     "cell_id": cell.cell_id,
                     "circuit_id": circuit_record["circuit_id"],
+                    "instance": local_instance,
                     "observable_id": observable,
                     "replicate": cell.replicate,
                 }
@@ -391,6 +421,10 @@ def generate_split(
                 validate_item(item, schema_version=SPLIT_SCHEMA_VERSION)
                 items.append(item)
 
+    _require_source_observable_closure(
+        items,
+        split_name=f"{spec.split_id} ({dataset_id})",
+    )
     items.sort(key=lambda item: item["item_id"])
     cell_hashes = cell_item_stream_hashes(items)
     pools_payload = [pool.to_dict() for pool in resolved.circuit_pools]
@@ -403,6 +437,9 @@ def generate_split(
     registry_configs = json.loads(canonical_json(SEVERITY_GRIDS))
     manifest = {
         "dataset_schema_version": SPLIT_SCHEMA_VERSION,
+        PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD: (
+            physical_identity_encoding_profiles
+        ),
         "environment_contract": artifact_environment_contract,
         "dataset_id": dataset_id,
         "preset": dataset_id if isinstance(split, str) else None,

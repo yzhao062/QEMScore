@@ -115,6 +115,63 @@ def _graph_edges(
     raise RuntimeError("failed to sample a simple 3-regular graph after 10000 pairings")
 
 
+def _eligible_qubit_choices(
+    graph_class: str, n_qubits_choices: tuple[int, ...]
+) -> tuple[int, ...]:
+    if graph_class == "cycle":
+        return tuple(n for n in n_qubits_choices if n >= 3)
+    if graph_class == "3_regular":
+        return tuple(n for n in n_qubits_choices if n >= 4 and n % 2 == 0)
+    return n_qubits_choices
+
+
+def validate_qaoa_sampling_domain(
+    n_qubits_choices: list[int],
+    p_choices: list[int],
+    graph_classes: list[str],
+    er_edge_probability: float | None = None,
+) -> None:
+    """Validate the authored choices consumed before QAOA draws."""
+    if not n_qubits_choices or any(
+        type(n) is not int or n < 2 or n > MAX_QUBITS
+        for n in n_qubits_choices
+    ):
+        raise ValueError(f"QAOA supports 2 to {MAX_QUBITS} qubits")
+    qubit_choices = tuple(n_qubits_choices)
+
+    if not p_choices or any(
+        type(depth) is not int or depth not in (1, 2) for depth in p_choices
+    ):
+        raise ValueError("QAOA p choices must be drawn from {1, 2}")
+
+    if er_edge_probability is not None and (
+        isinstance(er_edge_probability, (bool, np.bool_))
+        or not isinstance(
+            er_edge_probability, (int, float, np.integer, np.floating)
+        )
+        or not np.isfinite(er_edge_probability)
+        or not 0.0 <= er_edge_probability <= 1.0
+    ):
+        raise ValueError("er_edge_probability must be a number in [0, 1]")
+
+    classes = tuple(_canonical_graph_class(name) for name in graph_classes)
+    if not classes:
+        raise ValueError("graph_classes must not be empty")
+    for graph_class in classes:
+        if not _eligible_qubit_choices(graph_class, qubit_choices):
+            raise ValueError(
+                f"no n_qubits choice can realize graph class {graph_class!r}"
+            )
+    if any(
+        not any(
+            n_qubits in _eligible_qubit_choices(graph_class, qubit_choices)
+            for graph_class in classes
+        )
+        for n_qubits in qubit_choices
+    ):
+        raise ValueError("each n_qubits choice must be realizable by a graph class")
+
+
 def sample_qaoa_params(
     rng: np.random.Generator,
     n_qubits_choices: list[int],
@@ -131,46 +188,24 @@ def sample_qaoa_params(
     independently with that probability. The passed generator controls the graph,
     probability, and angles.
     """
-    if not n_qubits_choices or any(
-        type(n) is not int or n < 2 or n > MAX_QUBITS
-        for n in n_qubits_choices
-    ):
-        raise ValueError(f"QAOA supports 2 to {MAX_QUBITS} qubits")
+    validate_qaoa_sampling_domain(
+        n_qubits_choices,
+        p_choices,
+        graph_classes,
+        er_edge_probability,
+    )
     qubit_choices = tuple(n_qubits_choices)
-
-    if not p_choices or any(
-        type(depth) is not int or depth not in (1, 2) for depth in p_choices
-    ):
-        raise ValueError("QAOA p choices must be drawn from {1, 2}")
     depths = tuple(p_choices)
 
     if type(instance) is not int or instance < 0:
         raise ValueError("instance must be a nonnegative integer")
     if type(circuit_seed) is not int or circuit_seed < 0:
         raise ValueError("circuit_seed must be a nonnegative integer")
-    if er_edge_probability is not None and (
-        isinstance(er_edge_probability, (bool, np.bool_))
-        or not isinstance(
-            er_edge_probability, (int, float, np.integer, np.floating)
-        )
-        or not np.isfinite(er_edge_probability)
-        or not 0.0 <= er_edge_probability <= 1.0
-    ):
-        raise ValueError("er_edge_probability must be a number in [0, 1]")
 
     classes = tuple(_canonical_graph_class(name) for name in graph_classes)
-    if not classes:
-        raise ValueError("graph_classes must not be empty")
     graph_class = str(rng.choice(classes))
 
-    eligible_qubits = qubit_choices
-    if graph_class == "cycle":
-        eligible_qubits = tuple(n for n in qubit_choices if n >= 3)
-    elif graph_class == "3_regular":
-        eligible_qubits = tuple(n for n in qubit_choices if n >= 4 and n % 2 == 0)
-    if not eligible_qubits:
-        raise ValueError(f"no n_qubits choice can realize graph class {graph_class!r}")
-
+    eligible_qubits = _eligible_qubit_choices(graph_class, qubit_choices)
     n_qubits = int(rng.choice(eligible_qubits))
     p = int(rng.choice(depths))
     edge_probability: float | None = None
@@ -226,12 +261,13 @@ def build_qaoa_circuit(params: QAOAParams) -> QuantumCircuit:
         if canonical in seen_edges:
             raise ValueError(f"duplicate edge {canonical!r}")
         seen_edges.add(canonical)
+    canonical_edges = tuple(sorted(seen_edges))
 
     circ = QuantumCircuit(params.n_qubits)
     for q in range(params.n_qubits):
         circ.h(q)
     for layer in range(params.p):
-        for q0, q1 in params.edges:
+        for q0, q1 in canonical_edges:
             circ.rzz(2.0 * params.gammas[layer], q0, q1)
         for q in range(params.n_qubits):
             circ.rx(2.0 * params.betas[layer], q)

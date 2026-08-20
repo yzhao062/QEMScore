@@ -42,7 +42,14 @@ from qem_bench.budget import (
     method_budget,
     minimum_tier_constant,
 )
-from qem_bench.datasets.generate import dataset_hash, group_shots
+from qem_bench.datasets.generate import (
+    PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
+    UNKNOWN_IDENTITY_ENCODING_PROFILE,
+    dataset_hash,
+    group_shots,
+    legacy_physical_identity_encoding_profiles,
+    validate_physical_identity_encoding_profiles,
+)
 from qem_bench.datasets.schema import (
     FAMILY_STRATA,
     FEATURE_SPEC_VERSION,
@@ -145,6 +152,7 @@ RUN_IDENTITY_FIELDS = frozenset(
         "label_evals",
     }
 )
+RUN_PROFILE_FIELDS = frozenset({PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD})
 RUN_METHOD_FIELDS = frozenset(
     {
         "predictions",
@@ -283,6 +291,34 @@ def _adapt_legacy_v1_rows(items: list[dict]) -> None:
         item["stratum"] = FAMILY_STRATA[family]
 
 
+def _normalize_dataset_identity_encoding_profiles(
+    items: list[dict], manifest: dict
+) -> None:
+    families = {str(item["family"]) for item in items}
+    declared = PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD in manifest
+    if declared:
+        profiles = validate_physical_identity_encoding_profiles(
+            manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD],
+            families=families,
+        )
+    else:
+        profiles = {
+            family: UNKNOWN_IDENTITY_ENCODING_PROFILE
+            for family in sorted(families)
+        }
+
+    if declared and manifest["dataset_schema_version"] == LEGACY_SCHEMA_VERSION:
+        expected = legacy_physical_identity_encoding_profiles(
+            manifest.get("preset"), manifest.get("config")
+        )
+        if profiles != expected:
+            raise ValueError(
+                "legacy dataset physical identity encoding profiles do not match "
+                f"the generator serializer: declared={profiles}, expected={expected}"
+            )
+    manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = profiles
+
+
 def _load_legacy_v1(
     items: list[dict], manifest: dict
 ) -> tuple[list[dict], dict]:
@@ -386,6 +422,7 @@ def _load_legacy_v1(
         raise ValueError(
             f"manifest counts do not match item rows: manifest={counts}, rows={expected_counts}"
         )
+    _normalize_dataset_identity_encoding_profiles(items, manifest)
     return items, manifest
 
 
@@ -398,7 +435,9 @@ def _load(data_dir: Path) -> tuple[list[dict], dict]:
             "dataset_schema_version is required; migrate unversioned artifacts explicitly"
         )
     if version == SPLIT_SCHEMA_VERSION:
-        return validate_split_artifact(data_dir)
+        items, manifest = validate_split_artifact(data_dir)
+        _normalize_dataset_identity_encoding_profiles(items, manifest)
+        return items, manifest
     if version != LEGACY_SCHEMA_VERSION:
         raise ValueError(f"unsupported dataset_schema_version {version!r}")
 
@@ -1711,6 +1750,32 @@ def _is_lower_sha256(value: object, *, prefix: bool = False) -> bool:
     )
 
 
+def run_identity_encoding_profiles(
+    run_result: Mapping[str, object],
+) -> dict[str, str]:
+    """Return declared profiles or explicit unknowns for historical artifacts."""
+
+    items = run_result.get("test_items")
+    if not isinstance(items, list) or not items or any(
+        not isinstance(item, Mapping) or not isinstance(item.get("family"), str)
+        for item in items
+    ):
+        raise ValueError(
+            "run artifact identity encoding profiles require test item families"
+        )
+    families = {str(item["family"]) for item in items}
+    if PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD not in run_result:
+        return {
+            family: UNKNOWN_IDENTITY_ENCODING_PROFILE
+            for family in sorted(families)
+        }
+    return validate_physical_identity_encoding_profiles(
+        run_result[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD],
+        families=families,
+        allow_unknown=True,
+    )
+
+
 def _validate_run_contract_fields(
     run_result: Mapping[str, object], methods: Mapping[str, Mapping[str, object]]
 ) -> str:
@@ -1720,10 +1785,12 @@ def _validate_run_contract_fields(
             "unversioned qem-bench-run-v2 artifact requires explicit migration; "
             "dataset_schema_version is required"
         )
+    profile_declared = PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD in run_result
+    profile_fields = RUN_PROFILE_FIELDS if profile_declared else frozenset()
     if version == SPLIT_SCHEMA_VERSION:
-        expected_fields = RUN_COMMON_FIELDS | RUN_SPLIT_FIELDS
+        expected_fields = RUN_COMMON_FIELDS | RUN_SPLIT_FIELDS | profile_fields
     elif version == LEGACY_SCHEMA_VERSION:
-        expected_fields = RUN_COMMON_FIELDS
+        expected_fields = RUN_COMMON_FIELDS | profile_fields
     else:
         raise ValueError(f"unsupported run dataset_schema_version {version!r}")
     if set(run_result) != expected_fields:
@@ -1732,6 +1799,18 @@ def _validate_run_contract_fields(
         raise ValueError(
             f"{version} run artifact has invalid fields; "
             f"missing={missing}, extra={extra}"
+        )
+
+    if profile_declared:
+        value = run_result[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD]
+        if not isinstance(value, Mapping):
+            raise ValueError(
+                "run artifact physical identity encoding profiles must be an object"
+            )
+        validate_physical_identity_encoding_profiles(
+            value,
+            families=set(value),
+            allow_unknown=True,
         )
 
     for name, spec in methods.items():
@@ -1803,7 +1882,11 @@ def _validate_run_contract_fields(
 
     raw_config = methods["raw"]["config"]
     identity_metadata = raw_config.get(RUN_IDENTITY_CONFIG_KEY)
-    if not isinstance(identity_metadata, dict) or set(identity_metadata) != RUN_IDENTITY_FIELDS:
+    expected_identity_fields = RUN_IDENTITY_FIELDS | profile_fields
+    if (
+        not isinstance(identity_metadata, dict)
+        or set(identity_metadata) != expected_identity_fields
+    ):
         raise ValueError("run artifact lacks closed identity metadata")
     for name, spec in methods.items():
         if name != "raw" and RUN_IDENTITY_CONFIG_KEY in spec["config"]:
@@ -1820,6 +1903,10 @@ def _validate_run_contract_fields(
         "n_test_items": run_result.get("n_test_items"),
         "label_evals": label_evals,
     }
+    if profile_declared:
+        expected_identity[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = copy.deepcopy(
+            run_result[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD]
+        )
     _require_run_match(
         "methods.raw.config.run_artifact_identity",
         identity_metadata,
@@ -1851,6 +1938,7 @@ def validate_run_artifact(run_result: dict) -> dict:
     )
 
     items = _canonical_test_items(run_result)
+    run_identity_encoding_profiles(run_result)
     n_test = len(items)
     for name, spec in methods.items():
         _validate_ledger(name, spec["ledger"], n_test)
@@ -2049,6 +2137,9 @@ def run(
     run_identity = {
         "dataset_schema_version": manifest["dataset_schema_version"],
         "dataset_manifest_sha256": dataset_manifest_sha256,
+        PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD: copy.deepcopy(
+            manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD]
+        ),
         "feature_spec": manifest["feature_spec"],
         "stratum": items[0]["stratum"],
         "n_train_items": len(train),
@@ -2087,6 +2178,9 @@ def run(
         "environment_contract": run_environment_contract,
         "dataset_hash": manifest["dataset_hash"],
         "dataset_item_stream_hashes": item_stream_hashes,
+        PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD: copy.deepcopy(
+            manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD]
+        ),
         "test_items": test_items,
         "preset": manifest["preset"],
         "feature_spec": manifest["feature_spec"],

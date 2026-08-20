@@ -59,12 +59,22 @@ def _source_train_validation(items: list[dict]) -> tuple[list[dict], list[dict]]
 def test_reported_architectures_and_declared_unverified_defaults(legacy_v1_items):
     train, _ = _split(legacy_v1_items)
     forest = LiaoRandomForestMitigator(random_state=17).fit(train)
-    estimator = forest.estimator_
-    assert estimator.n_estimators == RANDOM_FOREST_TREES == 100
-    assert len(estimator.estimators_) == 100
-    assert estimator.criterion == "squared_error"
-    assert estimator.min_samples_split == 2
-    assert estimator.max_features == 1
+    estimators = forest.estimators_
+    observable_keys = {
+        (item["n_qubits"], item["pauli_label"]) for item in train
+    }
+    assert len(observable_keys) == 2
+    assert set(estimators) == observable_keys
+    trees = [
+        tree for estimator in estimators.values() for tree in estimator.estimators_
+    ]
+    assert len(trees) == RANDOM_FOREST_TREES * len(observable_keys) == 200
+    assert len({id(tree) for tree in trees}) == len(trees)
+    for estimator in estimators.values():
+        assert estimator.n_estimators == RANDOM_FOREST_TREES == 100
+        assert estimator.criterion == "squared_error"
+        assert estimator.min_samples_split == 2
+        assert estimator.max_features == 1
 
     mlp = LiaoMLPMitigator(random_state=17).fit(train)
     config = mlp.config_
@@ -114,6 +124,50 @@ def test_both_arms_train_and_predict_on_generated_legacy_v1(legacy_v1_items):
         assert np.all(np.isfinite(values))
         assert float(np.mean(np.abs(values - target))) >= 0.0
     assert raw_mae >= 0.0
+
+
+def test_random_forest_refuses_unseen_physical_observable(legacy_v1_items):
+    train, test = _split(legacy_v1_items)
+    model = LiaoRandomForestMitigator(random_state=11).fit(train)
+    unseen = dict(test[0])
+    unseen["pauli_label"] = "I" * unseen["n_qubits"]
+
+    combined = model.predict(test)
+    separate = np.asarray([model.predict([item])[0] for item in test])
+    assert np.array_equal(combined, separate)
+
+    with pytest.raises(ValueError, match="unseen observable"):
+        model.predict([unseen])
+
+
+@pytest.mark.parametrize(
+    "item",
+    [
+        {},
+        {"n_qubits": 3},
+        {"pauli_label": "IZI"},
+        {"n_qubits": True, "pauli_label": "Z"},
+        {"n_qubits": 0, "pauli_label": ""},
+        {"n_qubits": 3.0, "pauli_label": "IZI"},
+        {"n_qubits": 3, "pauli_label": 1},
+        {"n_qubits": 3, "pauli_label": "IZ"},
+        {"n_qubits": 3, "pauli_label": "IXI"},
+    ],
+)
+def test_physical_observable_key_fails_closed(item):
+    first_alias = {"n_qubits": 3, "pauli_label": "IZI", "observable": "z_mid"}
+    second_alias = {
+        "n_qubits": 3,
+        "pauli_label": "IZI",
+        "observable": "alias",
+        "observable_id": "other-alias",
+    }
+    assert liao_module._observable_key(first_alias) == liao_module._observable_key(
+        second_alias
+    ) == (3, "IZI")
+
+    with pytest.raises(ValueError):
+        liao_module._observable_key(item)
 
 
 @pytest.mark.parametrize(
@@ -249,7 +303,9 @@ def test_random_forest_hyperparameters_match_the_paper():
     from qem_bench.baselines.liao import LiaoRandomForestMitigator
 
     config = LiaoRandomForestMitigator(random_state=0).config_
-    assert config["n_estimators"] == 100
+    assert config["scope"] == "one-independent-forest-per-observable"
+    assert config["observable_key_fields"] == ["n_qubits", "pauli_label"]
+    assert config["n_estimators_per_observable"] == 100
     assert config["min_samples_split"] == 2
     assert config["criterion"] == "squared_error"
     assert type(config["max_features"]) is int, (

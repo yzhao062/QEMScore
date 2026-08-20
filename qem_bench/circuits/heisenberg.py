@@ -48,6 +48,30 @@ class HeisenbergParams:
         return asdict(self)
 
 
+def validate_heisenberg_sampling_domain(
+    n_qubits_choices: list[int],
+    steps_choices: list[int],
+    dt: float,
+) -> None:
+    """Validate the authored choices consumed before Heisenberg draws."""
+    if not n_qubits_choices or any(
+        type(n) is not int or n < 2 or n > MAX_QUBITS
+        for n in n_qubits_choices
+    ):
+        raise ValueError(f"Heisenberg supports 2 to {MAX_QUBITS} qubits")
+    if not steps_choices or any(
+        type(steps) is not int or steps < 1 for steps in steps_choices
+    ):
+        raise ValueError("steps_choices must contain positive integers")
+    if (
+        isinstance(dt, (bool, np.bool_))
+        or not isinstance(dt, (int, float, np.integer, np.floating))
+        or not np.isfinite(dt)
+        or dt <= 0.0
+    ):
+        raise ValueError("dt must be finite and positive")
+
+
 def sample_heisenberg_params(
     rng: np.random.Generator,
     n_qubits_choices: list[int],
@@ -57,25 +81,9 @@ def sample_heisenberg_params(
     circuit_seed: int,
 ) -> HeisenbergParams:
     """Draw one anisotropic chain configuration from the preset ranges."""
-    if not n_qubits_choices or any(
-        type(n) is not int or n < 2 or n > MAX_QUBITS
-        for n in n_qubits_choices
-    ):
-        raise ValueError(f"Heisenberg supports 2 to {MAX_QUBITS} qubits")
+    validate_heisenberg_sampling_domain(n_qubits_choices, steps_choices, dt)
     qubit_choices = tuple(n_qubits_choices)
-
-    if not steps_choices or any(
-        type(steps) is not int or steps < 1 for steps in steps_choices
-    ):
-        raise ValueError("steps_choices must contain positive integers")
     trotter_choices = tuple(steps_choices)
-    if (
-        isinstance(dt, (bool, np.bool_))
-        or not isinstance(dt, (int, float, np.integer, np.floating))
-        or not np.isfinite(dt)
-        or dt <= 0.0
-    ):
-        raise ValueError("dt must be finite and positive")
     if type(instance) is not int or instance < 0:
         raise ValueError("instance must be a nonnegative integer")
     if type(circuit_seed) is not int or circuit_seed < 0:

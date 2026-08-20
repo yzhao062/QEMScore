@@ -6,13 +6,22 @@ import copy
 import hashlib
 import json
 import re
+import shutil
 from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-from qem_bench.datasets.generate import generate
+from qem_bench.datasets.generate import (
+    LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+    LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
+    PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
+    UNKNOWN_IDENTITY_ENCODING_PROFILE,
+    generate,
+    validate_physical_identity_encoding_profiles,
+)
+from qem_bench.datasets.schema import FAMILY_STRATA
 from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
 from qem_bench.reports import generate_report
 from qem_bench.reports.generate import _load_runs, _merge_cell_records
@@ -191,6 +200,50 @@ def _resign_run_artifact(result):
     _rebuild_run_derived_results(result)
 
 
+def _write_legacy_run_variant(
+    source,
+    destination,
+    *,
+    dataset_hash,
+    preset,
+    family=None,
+    identity_profiles=None,
+):
+    result = json.loads(source.read_text(encoding="utf-8"))
+    result["dataset_hash"] = dataset_hash
+    result["dataset_item_stream_hashes"] = {"legacy-v1": dataset_hash}
+    result["preset"] = preset
+    if family is not None:
+        for item in result["test_items"]:
+            item["family"] = family
+    if identity_profiles is not None:
+        result[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = copy.deepcopy(
+            identity_profiles
+        )
+        result["methods"]["raw"]["config"]["run_artifact_identity"][
+            PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD
+        ] = copy.deepcopy(identity_profiles)
+    _resign_run_artifact(result)
+    assert validate_run_artifact(result) is result
+    destination.write_text(json.dumps(result), encoding="utf-8")
+
+
+def _write_historical_run_variant(
+    source, destination, *, dataset_hash, preset
+):
+    result = json.loads(source.read_text(encoding="utf-8"))
+    result["dataset_hash"] = dataset_hash
+    result["dataset_item_stream_hashes"] = {"legacy-v1": dataset_hash}
+    result["preset"] = preset
+    result.pop(PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD)
+    result["methods"]["raw"]["config"]["run_artifact_identity"].pop(
+        PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD
+    )
+    _resign_run_artifact(result)
+    assert validate_run_artifact(result) is result
+    destination.write_text(json.dumps(result), encoding="utf-8")
+
+
 @pytest.mark.protocol("QEM-P001")
 def test_pooled_diagnostic_differs_from_macro_on_unequal_cells():
     items = [_item(0, circuit="c0", severity="L1")]
@@ -333,6 +386,119 @@ def test_bootstrap_counts_cross_artifact_physical_circuits_once():
     assert interval.n_circuits == 2
 
 
+@pytest.mark.parametrize(
+    "stratum_source",
+    ("bootstrap_stratum_id", "circuit_pool_id", "family"),
+)
+def test_bootstrap_rejects_cross_artifact_circuits_split_by_every_stratum_source(
+    stratum_source,
+):
+    def source_items(source, artifact_index):
+        items = [
+            _item(0, circuit="physical-shared"),
+            _item(artifact_index + 1, circuit=f"physical-{artifact_index}"),
+        ]
+        for item in items:
+            if stratum_source == "family":
+                item.pop("circuit_pool_id")
+            item[stratum_source] = source
+        return items
+
+    def merged_records(second_source):
+        records = []
+        for artifact_index, source in enumerate(("source-a", second_source)):
+            items = source_items(source, artifact_index)
+            records.extend(
+                build_cell_records(
+                    "method",
+                    items,
+                    np.zeros(len(items)),
+                    np.zeros(len(items)),
+                    artifact_id=f"artifact-{artifact_index}",
+                    grouping="six-part",
+                )
+            )
+        return _merge_cell_records(records)
+
+    positive = circuit_blocked_bootstrap(
+        merged_records("source-a"),
+        metric="mae",
+        n_resamples=10,
+        seed=20260819,
+    )
+    assert positive.n_circuits == 3
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"physical circuits span bootstrap strata: "
+            r"\{'physical-shared': \['source-a', 'source-b'\]\}"
+        ),
+    ):
+        circuit_blocked_bootstrap(
+            merged_records("source-b"),
+            metric="mae",
+            n_resamples=10,
+            seed=20260819,
+        )
+
+
+@pytest.mark.parametrize("changed_identity", ("circuit_id", "bootstrap_stratum_id"))
+def test_paired_bootstrap_rejects_mismatched_block_identities(changed_identity):
+    items = [_item(index, circuit=f"physical-{index}") for index in range(2)]
+    left = build_cell_records(
+        "left",
+        items,
+        np.zeros(2),
+        np.zeros(2),
+        artifact_id="artifact",
+        grouping="six-part",
+    )
+    matching_reference = build_cell_records(
+        "reference",
+        items,
+        np.ones(2),
+        np.zeros(2),
+        artifact_id="artifact",
+        grouping="six-part",
+    )
+    positive = circuit_blocked_bootstrap(
+        left,
+        reference_records=matching_reference,
+        metric="mae",
+        n_resamples=10,
+        seed=20260819,
+    )
+    assert positive.paired is True
+    assert positive.n_circuits == 2
+
+    changed_items = copy.deepcopy(items)
+    if changed_identity == "circuit_id":
+        changed_items[0]["circuit_id"] = "physical-other"
+    else:
+        changed_items[0]["bootstrap_stratum_id"] = "other-stratum"
+    changed_reference = build_cell_records(
+        "reference",
+        changed_items,
+        np.ones(2),
+        np.zeros(2),
+        artifact_id="artifact",
+        grouping="six-part",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="paired bootstrap requires identical circuit and stratum identities",
+    ):
+        circuit_blocked_bootstrap(
+            left,
+            reference_records=changed_reference,
+            metric="mae",
+            n_resamples=10,
+            seed=20260819,
+        )
+
+
 def test_report_merge_namespaces_source_local_identifiers():
     records = []
     for artifact_id, prediction in (("artifact-a", 0.0), ("artifact-b", 1.0)):
@@ -455,10 +621,10 @@ def test_legacy_circuit_digest_canonicalizes_numeric_encodings_and_qaoa_edges():
         )
     }
     unit_digest = (
-        "circuit-049f094f1fcef3aa43a8d1a2070ad6371e21c34e2f88ac2c285e3675c84fefc9"
+        "circuit-fb751055544664e69b5cf3e425c352e2a968ecce207dbd73cf5c82bf0455362f"
     )
     zero_digest = (
-        "circuit-07b0c47b6857e06a90e13c2af7849fa59d79f5fba6dd46cdc6000835c1d047c3"
+        "circuit-a4f60181e1284fd121508f5684d984da61e9b366762e33227210b36d6f16cec5"
     )
     assert digests == {
         "1": unit_digest,
@@ -641,6 +807,201 @@ def report_schema_version_runs(tmp_path_factory):
     return root
 
 
+def test_legacy_manifest_declares_the_selected_serializer_profile(
+    report_schema_version_runs,
+    tmp_path,
+):
+    rounded_manifest = json.loads(
+        (report_schema_version_runs / "legacy-data" / "manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert rounded_manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] == {
+        "tfi": LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE
+    }
+    assert rounded_manifest["dataset_hash"] == (
+        "b9ed7863d6a1ce0d718907262d842e90e59c6eb7479a350837655bf542166bb7"
+    )
+
+    exact_manifest = generate(
+        copy.deepcopy(rounded_manifest["config"]),
+        tmp_path / "exact-legacy-data",
+    )
+    assert exact_manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] == {
+        "tfi": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+    }
+
+
+def test_declared_identity_profile_domain_is_closed_for_every_family():
+    candidates = (
+        LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+        LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
+        UNKNOWN_IDENTITY_ENCODING_PROFILE,
+        "future-profile",
+    )
+    accepted = 0
+    refused = 0
+    for family in sorted(FAMILY_STRATA):
+        for profile in candidates:
+            expected = profile == LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE or (
+                family == "tfi"
+                and profile == LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE
+            )
+            value = {family: profile}
+            if expected:
+                assert validate_physical_identity_encoding_profiles(
+                    value, families={family}
+                ) == value
+                accepted += 1
+            else:
+                with pytest.raises(ValueError, match="identity encoding profile"):
+                    validate_physical_identity_encoding_profiles(
+                        value, families={family}
+                    )
+                refused += 1
+
+    with pytest.raises(ValueError, match="unknown families"):
+        validate_physical_identity_encoding_profiles(
+            {"future-family": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE},
+            families={"future-family"},
+        )
+    with pytest.raises(ValueError, match="family names must be strings"):
+        validate_physical_identity_encoding_profiles(
+            {1: LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE},
+            families={"tfi"},
+        )
+    assert accepted == len(FAMILY_STRATA) + 1
+    assert refused == len(FAMILY_STRATA) * 3 - 1
+
+
+@pytest.mark.parametrize(
+    ("profiles", "message"),
+    (
+        (None, "profiles must be an object"),
+        ([], "profiles must be an object"),
+        ("legacy-binary64-v1", "profiles must be an object"),
+        (1, "profiles must be an object"),
+        (True, "profiles must be an object"),
+        ({}, "profile families do not match dataset families"),
+        (
+            {"future-family": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE},
+            "profiles contain unknown families",
+        ),
+        ({"tfi": "future-profile"}, "unknown physical identity encoding profile"),
+        ({"tfi": None}, "unknown physical identity encoding profile"),
+        (
+            {"tfi": UNKNOWN_IDENTITY_ENCODING_PROFILE},
+            "unknown physical identity encoding profile",
+        ),
+        (
+            {"qaoa": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE},
+            "profile families do not match dataset families",
+        ),
+        (
+            {
+                "tfi": LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
+                "qaoa": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+            },
+            "profile families do not match dataset families",
+        ),
+        (
+            {"tfi": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE},
+            "profiles do not match the generator serializer",
+        ),
+    ),
+    ids=(
+        "null-map",
+        "array-map",
+        "string-map",
+        "integer-map",
+        "boolean-map",
+        "missing-family",
+        "unknown-family",
+        "unknown-profile",
+        "non-string-profile",
+        "declared-unknown-profile",
+        "foreign-known-family",
+        "extra-known-family",
+        "wrong-allowed-profile",
+    ),
+)
+def test_legacy_dataset_loader_refuses_every_invalid_profile_class(
+    report_schema_version_runs,
+    tmp_path,
+    profiles,
+    message,
+):
+    source = report_schema_version_runs / "legacy-data"
+    data = tmp_path / "data"
+    shutil.copytree(source, data)
+    manifest_path = data / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = profiles
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match=message):
+        run(data, tmp_path / "run")
+
+
+def test_runner_binds_declared_profiles_and_refuses_resigned_profile_drift(
+    report_schema_version_runs,
+):
+    source = report_schema_version_runs / "legacy-run" / "results.json"
+    valid = json.loads(source.read_text(encoding="utf-8"))
+    assert validate_run_artifact(valid) is valid
+
+    drifted = copy.deepcopy(valid)
+    drifted[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = {
+        "tfi": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+    }
+    _resign_run_artifact(drifted)
+    with pytest.raises(
+        ValueError,
+        match="methods.raw.config.run_artifact_identity",
+    ):
+        validate_run_artifact(drifted)
+
+    invalid_profiles = (
+        {},
+        {"future-family": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE},
+        {"tfi": "future-profile"},
+        {"qaoa": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE},
+    )
+    refused = 0
+    for profiles in invalid_profiles:
+        invalid = copy.deepcopy(valid)
+        invalid[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = profiles
+        invalid["methods"]["raw"]["config"]["run_artifact_identity"][
+            PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD
+        ] = copy.deepcopy(profiles)
+        _resign_run_artifact(invalid)
+        with pytest.raises(ValueError, match="identity encoding profile"):
+            validate_run_artifact(invalid)
+        refused += 1
+    assert refused == len(invalid_profiles)
+
+
+def test_missing_dataset_profile_becomes_signed_unknown(
+    report_schema_version_runs,
+    tmp_path,
+):
+    source = report_schema_version_runs / "legacy-data"
+    data = tmp_path / "historical-data"
+    shutil.copytree(source, data)
+    manifest_path = data / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.pop(PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD)
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    result = run(data, tmp_path / "historical-run")
+    expected = {"tfi": UNKNOWN_IDENTITY_ENCODING_PROFILE}
+    assert result[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] == expected
+    assert result["methods"]["raw"]["config"]["run_artifact_identity"][
+        PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD
+    ] == expected
+    assert validate_run_artifact(result) is result
+
+
 def test_report_manifest_rejects_mixed_dataset_schema_versions(
     report_schema_version_runs,
 ):
@@ -672,6 +1033,150 @@ def test_report_manifest_accepts_one_dataset_schema_version(
     loaded = _load_runs(manifest, report_schema_version_runs)
 
     assert [item["dataset_schema_version"] for item in loaded] == ["legacy-v1"]
+
+
+def test_report_manifest_rejects_mixed_legacy_tfi_identity_encodings(
+    report_schema_version_runs,
+    tmp_path,
+):
+    source = report_schema_version_runs / "legacy-run" / "results.json"
+    _write_legacy_run_variant(
+        source,
+        tmp_path / "rounded.json",
+        dataset_hash="1" * 64,
+        preset="rounded-profile",
+        identity_profiles={
+            "tfi": LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE
+        },
+    )
+    _write_legacy_run_variant(
+        source,
+        tmp_path / "exact.json",
+        dataset_hash="2" * 64,
+        preset="exact-profile",
+        identity_profiles={
+            "tfi": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+        },
+    )
+    manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [{"results": "rounded.json"}, {"results": "exact.json"}],
+    }
+
+    with pytest.raises(ValueError) as error:
+        _load_runs(manifest, tmp_path)
+
+    assert str(error.value) == (
+        "report manifest cannot merge physical identity encoding profiles for "
+        "family 'tfi'; found ['legacy-binary64-v1', "
+        "'legacy-tfi-rounded-12-v1']"
+    )
+
+
+def test_report_manifest_accepts_each_legacy_tfi_identity_profile_and_ignores_others(
+    report_schema_version_runs,
+    tmp_path,
+):
+    source = report_schema_version_runs / "legacy-run" / "results.json"
+    profiles = {
+        "rounded": (
+            LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
+            ("1" * 64, "2" * 64),
+        ),
+        "exact": (
+            LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+            ("3" * 64, "4" * 64),
+        ),
+    }
+
+    for profile_name, (profile, hashes) in profiles.items():
+        paths = []
+        for index, dataset_hash in enumerate(hashes):
+            path = tmp_path / f"{profile_name}-{index}.json"
+            _write_legacy_run_variant(
+                source,
+                path,
+                dataset_hash=dataset_hash,
+                preset=f"{profile_name}-{index}",
+                identity_profiles={"tfi": profile},
+            )
+            paths.append(path)
+        manifest = {
+            "schema_version": "qem-bench-report-manifest-v1",
+            "runs": [{"results": path.name} for path in paths],
+        }
+        assert len(_load_runs(manifest, tmp_path)) == 2
+
+    for index, dataset_hash in enumerate(("5" * 64, "6" * 64)):
+        _write_legacy_run_variant(
+            source,
+            tmp_path / f"qaoa-{index}.json",
+            dataset_hash=dataset_hash,
+            preset=f"qaoa-{index}",
+            family="qaoa",
+            identity_profiles={
+                "qaoa": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+            },
+        )
+    non_tfi_manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [{"results": f"qaoa-{index}.json"} for index in range(2)],
+    }
+    assert len(_load_runs(non_tfi_manifest, tmp_path)) == 2
+
+
+@pytest.mark.parametrize("partner_profile", ("unknown", "declared"))
+def test_report_manifest_refuses_to_merge_missing_profiles(
+    report_schema_version_runs,
+    tmp_path,
+    partner_profile,
+):
+    source = report_schema_version_runs / "legacy-run" / "results.json"
+    first = tmp_path / "historical-0.json"
+    _write_historical_run_variant(
+        source,
+        first,
+        dataset_hash="7" * 64,
+        preset="historical-0",
+    )
+    single_manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [{"results": first.name}],
+    }
+    assert len(_load_runs(single_manifest, tmp_path)) == 1
+
+    partner = tmp_path / f"{partner_profile}.json"
+    if partner_profile == "unknown":
+        _write_historical_run_variant(
+            source,
+            partner,
+            dataset_hash="8" * 64,
+            preset="historical-1",
+        )
+        expected_profiles = "['unknown', 'unknown']"
+    else:
+        _write_legacy_run_variant(
+            source,
+            partner,
+            dataset_hash="9" * 64,
+            preset="declared",
+            identity_profiles={
+                "tfi": LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE
+            },
+        )
+        expected_profiles = "['legacy-tfi-rounded-12-v1', 'unknown']"
+    combined_manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [{"results": first.name}, {"results": partner.name}],
+    }
+
+    with pytest.raises(ValueError) as error:
+        _load_runs(combined_manifest, tmp_path)
+
+    assert str(error.value) == (
+        "report manifest cannot merge physical identity encoding profiles for "
+        f"family 'tfi'; found {expected_profiles}"
+    )
 
 
 def test_report_manifest_rejects_zero_runs(tmp_path):

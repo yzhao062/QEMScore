@@ -35,11 +35,12 @@ def circuit_blocked_bootstrap(
     n_resamples: int = 10_000,
     seed: int,
 ) -> BootstrapInterval:
-    """Bootstrap physical circuits within their source pools.
+    """Bootstrap physical circuits within their declared strata.
 
     A sampled circuit contributes all of its severity, observable, and cell rows.
     For paired method differences, the same circuit draws and item identities are
-    used for both methods.
+    used for both methods. A physical circuit spanning multiple strata is refused
+    because sampling it independently within each stratum would split the block.
     """
 
     if not 0 < confidence < 1:
@@ -47,24 +48,29 @@ def circuit_blocked_bootstrap(
     if n_resamples <= 0:
         raise ValueError("n_resamples must be positive")
     rows, grouping = _flatten(cell_records)
+    circuits = _stratified_circuits(rows)
     reference_by_item = None
     if reference_records is not None:
         reference_rows, reference_grouping = _flatten(reference_records)
         if reference_grouping != grouping:
             raise ValueError("paired bootstrap requires identical cell groupings")
+        _stratified_circuits(reference_rows)
         reference_by_item = {
             (row["artifact_id"], row["item_id"]): row for row in reference_rows
         }
         left_ids = {(row["artifact_id"], row["item_id"]) for row in rows}
         if left_ids != set(reference_by_item):
             raise ValueError("paired bootstrap requires identical artifact/item pairs")
-
-    circuits: dict[tuple[object, ...], dict[str, list[dict]]] = defaultdict(
-        lambda: defaultdict(list)
-    )
-    for row in rows:
-        stratum_key = (str(row["bootstrap_stratum_id"]),)
-        circuits[stratum_key][str(row["circuit_id"])].append(row)
+        if any(
+            _block_identity(row)
+            != _block_identity(
+                reference_by_item[(row["artifact_id"], row["item_id"])]
+            )
+            for row in rows
+        ):
+            raise ValueError(
+                "paired bootstrap requires identical circuit and stratum identities"
+            )
     n_circuits = sum(len(values) for values in circuits.values())
     if n_circuits < 2:
         raise ValueError("bootstrap requires at least two circuits")
@@ -113,6 +119,39 @@ def circuit_blocked_bootstrap(
         metric=metric,
         paired=reference_records is not None,
     )
+
+
+def _block_identity(row: Mapping[str, object]) -> tuple[str, str]:
+    return str(row["circuit_id"]), str(row["bootstrap_stratum_id"])
+
+
+def _stratified_circuits(
+    rows: Sequence[Mapping[str, object]],
+) -> dict[tuple[object, ...], dict[str, list[dict]]]:
+    rows_by_circuit: dict[str, list[dict]] = defaultdict(list)
+    strata_by_circuit: dict[str, set[str]] = defaultdict(set)
+    for row in rows:
+        circuit_id, stratum_id = _block_identity(row)
+        rows_by_circuit[circuit_id].append(dict(row))
+        strata_by_circuit[circuit_id].add(stratum_id)
+
+    split_circuits = {
+        circuit_id: sorted(strata)
+        for circuit_id, strata in sorted(strata_by_circuit.items())
+        if len(strata) != 1
+    }
+    if split_circuits:
+        raise ValueError(
+            f"physical circuits span bootstrap strata: {split_circuits}"
+        )
+
+    circuits: dict[tuple[object, ...], dict[str, list[dict]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for circuit_id, circuit_rows in rows_by_circuit.items():
+        stratum_key = (next(iter(strata_by_circuit[circuit_id])),)
+        circuits[stratum_key][circuit_id].extend(circuit_rows)
+    return circuits
 
 
 def _flatten(

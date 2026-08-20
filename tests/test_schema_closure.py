@@ -6,6 +6,7 @@ import importlib
 import json
 import math
 import shutil
+from itertools import combinations
 from pathlib import Path
 
 import numpy as np
@@ -34,6 +35,7 @@ from qem_bench.datasets.schema import (
     LEGACY_SCHEMA_VERSION,
     SPLIT_ITEM_FIELDS,
     SPLIT_SCHEMA_VERSION,
+    build_circuit_from_canonical_descriptor,
     canonical_physical_circuit_descriptor,
     canonical_physical_circuit_identity,
     validate_item,
@@ -495,6 +497,278 @@ def _build_circuit_record(record: dict):
             )
         )
     raise AssertionError(f"unknown family {family}")
+
+
+def _instruction_stream(circuit) -> tuple:
+    return tuple(
+        (
+            instruction.operation.name,
+            tuple(circuit.find_bit(qubit).index for qubit in instruction.qubits),
+            tuple(
+                0.0 if float(value) == 0.0 else float(value)
+                for value in instruction.operation.params
+            ),
+        )
+        for instruction in circuit.data
+    )
+
+
+def _record_from_descriptor(descriptor: dict) -> dict:
+    return {
+        "family": descriptor["family"],
+        "n_qubits": descriptor["n_qubits"],
+        "circuit_seed": descriptor["circuit_seed"],
+        **descriptor["parameters"],
+    }
+
+
+def _execution_control(record: dict) -> dict:
+    control = dict(record)
+    family = record["family"]
+    if family in {"tfi", "heisenberg"}:
+        control["steps"] += 1
+    elif family == "qaoa":
+        control["betas"] = [record["betas"][0] + 0.01, *record["betas"][1:]]
+    else:
+        control["depth"] += 1
+    return control
+
+
+@pytest.mark.parametrize("family", sorted(FAMILY_PRESETS))
+def test_realized_identity_round_trips_through_each_family_builder(family):
+    record = _circuit_record(family, 4, 1)
+    direct = _build_circuit_record(record)
+    descriptor, first_id = canonical_physical_circuit_identity(record)
+    first_rebuild = build_circuit_from_canonical_descriptor(descriptor)
+
+    second_descriptor, second_id = canonical_physical_circuit_identity(
+        _record_from_descriptor(descriptor)
+    )
+    second_rebuild = build_circuit_from_canonical_descriptor(second_descriptor)
+    direct_stream = _instruction_stream(direct)
+
+    assert direct_stream
+    assert second_descriptor == descriptor
+    assert _instruction_stream(first_rebuild) == direct_stream
+    assert _instruction_stream(second_rebuild) == direct_stream
+    assert second_id == first_id
+
+    control = _execution_control(record)
+    control_stream = _instruction_stream(_build_circuit_record(control))
+    _, control_id = canonical_physical_circuit_identity(control)
+    assert control_stream != direct_stream
+    assert control_id != first_id
+
+
+def _equivalent_program_cases():
+    tfi = _circuit_record("tfi", 3, 2)
+    heisenberg = _circuit_record("heisenberg", 3, 2)
+    qaoa = _circuit_record("qaoa", 4, 1)
+    random_clifford = _circuit_record("random_clifford", 1, 1)
+    random_clifford["circuit_seed"] = 0
+    near_clifford = _circuit_record("near_clifford", 1, 1)
+    near_clifford.update(circuit_seed=0, theta=math.pi / 7.0)
+    empty_qaoa = {
+        "family": "qaoa",
+        "n_qubits": 4,
+        "circuit_seed": 7,
+        "graph_class": "erdos_renyi",
+        "edges": [],
+        "p": 1,
+        "gammas": [0.4],
+        "betas": [0.3],
+        "edge_probability": 0.5,
+    }
+    return (
+        pytest.param(
+            tfi,
+            {**tfi, "circuit_seed": 18},
+            id="tfi-unused-seed",
+        ),
+        pytest.param(
+            tfi,
+            {**tfi, "j": 0.2, "h": 0.35, "dt": 0.4},
+            id="tfi-equal-builder-angles",
+        ),
+        pytest.param(
+            heisenberg,
+            {**heisenberg, "circuit_seed": 18},
+            id="heisenberg-unused-seed",
+        ),
+        pytest.param(
+            heisenberg,
+            {
+                **heisenberg,
+                "jx": 0.2,
+                "jy": 0.3,
+                "jz": 0.4,
+                "dt": 0.3,
+            },
+            id="heisenberg-equal-builder-angles",
+        ),
+        pytest.param(
+            qaoa,
+            {**qaoa, "edges": [[3, 2], [1, 0], [2, 1]]},
+            id="qaoa-edge-order-and-orientation",
+        ),
+        pytest.param(
+            qaoa,
+            {
+                **qaoa,
+                "graph_class": "erdos_renyi",
+                "edge_probability": 0.25,
+                "circuit_seed": 29,
+            },
+            id="qaoa-provenance-only-fields",
+        ),
+        pytest.param(
+            empty_qaoa,
+            {**empty_qaoa, "gammas": [0.5]},
+            id="qaoa-unused-empty-edge-gamma",
+        ),
+        pytest.param(
+            random_clifford,
+            {**random_clifford, "circuit_seed": 8},
+            id="random-clifford-seed-collision-0-8",
+        ),
+        pytest.param(
+            near_clifford,
+            {**near_clifford, "circuit_seed": 8},
+            id="near-clifford-seed-collision-0-8",
+        ),
+        pytest.param(
+            near_clifford,
+            {**near_clifford, "theta": math.pi / 5.0},
+            id="near-clifford-unused-t-theta",
+        ),
+    )
+
+
+@pytest.mark.parametrize(("first", "equivalent"), _equivalent_program_cases())
+def test_realized_identity_convergence_sweep(first, equivalent):
+    first_stream = _instruction_stream(_build_circuit_record(first))
+    equivalent_stream = _instruction_stream(_build_circuit_record(equivalent))
+    _, first_id = canonical_physical_circuit_identity(first)
+    _, equivalent_id = canonical_physical_circuit_identity(equivalent)
+
+    assert first != equivalent
+    assert equivalent_stream == first_stream
+    assert equivalent_id == first_id
+
+    control = _execution_control(first)
+    control_stream = _instruction_stream(_build_circuit_record(control))
+    _, control_id = canonical_physical_circuit_identity(control)
+    assert control_stream != first_stream
+    assert control_id != first_id
+
+
+def _separation_sweep_records(family: str) -> list[dict]:
+    if family == "tfi":
+        base = _circuit_record(family, 3, 1)
+        return [base, {**base, "j": 0.41}, {**base, "h": 0.71}]
+    if family == "heisenberg":
+        base = _circuit_record(family, 3, 1)
+        return [base, {**base, "jx": 0.41}, {**base, "jz": 0.81}]
+    if family == "qaoa":
+        empty = {
+            "family": "qaoa",
+            "n_qubits": 4,
+            "circuit_seed": 7,
+            "graph_class": "erdos_renyi",
+            "edges": [],
+            "p": 1,
+            "gammas": [0.4],
+            "betas": [0.3],
+            "edge_probability": 0.5,
+        }
+        return [
+            empty,
+            {**empty, "gammas": [0.5]},
+            {**empty, "betas": [0.31]},
+            {**empty, "edges": [[0, 1]]},
+        ]
+    if family == "random_clifford":
+        return [
+            {
+                "family": family,
+                "n_qubits": 1,
+                "depth": 1,
+                "circuit_seed": seed,
+            }
+            for seed in range(17)
+        ]
+    return [
+        {
+            "family": family,
+            "n_qubits": 1,
+            "depth": 1,
+            "non_clifford_count": 1,
+            "theta": theta,
+            "circuit_seed": seed,
+        }
+        for seed, theta in (
+            (0, math.pi / 7.0),
+            (0, math.pi / 5.0),
+            (1, math.pi / 7.0),
+            (2, math.pi / 7.0),
+            (5, math.pi / 7.0),
+            (5, math.pi / 5.0),
+            (8, math.pi / 7.0),
+        )
+    ]
+
+
+@pytest.mark.parametrize("family", sorted(FAMILY_PRESETS))
+def test_realized_identity_separation_sweep(family):
+    records = _separation_sweep_records(family)
+    streams = [
+        _instruction_stream(_build_circuit_record(record)) for record in records
+    ]
+    identities = [
+        canonical_physical_circuit_identity(record)[1] for record in records
+    ]
+    distinct_program_pairs = 0
+    equivalent_program_pairs = 0
+    for first, second in combinations(range(len(records)), 2):
+        if streams[first] == streams[second]:
+            equivalent_program_pairs += 1
+            assert identities[first] == identities[second], (family, first, second)
+            continue
+        distinct_program_pairs += 1
+        assert identities[first] != identities[second], (family, first, second)
+
+    assert distinct_program_pairs > 0
+    if family in {"qaoa", "near_clifford"}:
+        assert equivalent_program_pairs > 0
+        assert streams[0] == streams[1]
+        assert identities[0] == identities[1]
+    elif family == "random_clifford":
+        assert equivalent_program_pairs > 0
+
+
+@pytest.mark.parametrize(
+    ("edges", "message"),
+    (
+        (((0, 1), (1, 0)), "duplicate edge"),
+        (((0, 0),), "invalid edge"),
+        (((0, 4),), "invalid edge"),
+    ),
+)
+def test_qaoa_canonical_execution_retains_edge_validation(edges, message):
+    params = QAOAParams(
+        n_qubits=4,
+        graph_class="erdos_renyi",
+        edges=edges,
+        p=1,
+        gammas=(0.4,),
+        betas=(0.3,),
+        circuit_seed=7,
+        instance=0,
+        edge_probability=0.5,
+    )
+
+    with pytest.raises(ValueError, match=message):
+        build_qaoa_circuit(params)
 
 
 def _accepts(call) -> bool:

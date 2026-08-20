@@ -39,15 +39,11 @@ class TFIParams:
         return asdict(self)
 
 
-def sample_tfi_params(
-    rng: np.random.Generator,
+def validate_tfi_sampling_domain(
     n_qubits_choices: list[int],
     steps_choices: list[int],
-    dt: float,
-    instance: int,
-    circuit_seed: int,
-) -> TFIParams:
-    """Draw one circuit configuration from the preset ranges."""
+) -> None:
+    """Validate the authored choices consumed before TFI parameter draws."""
     if not n_qubits_choices or any(
         type(n_qubits) is not int or n_qubits < 1
         for n_qubits in n_qubits_choices
@@ -57,6 +53,18 @@ def sample_tfi_params(
         type(steps) is not int or steps < 1 for steps in steps_choices
     ):
         raise ValueError("steps_choices must contain positive integers")
+
+
+def sample_tfi_params(
+    rng: np.random.Generator,
+    n_qubits_choices: list[int],
+    steps_choices: list[int],
+    dt: float,
+    instance: int,
+    circuit_seed: int,
+) -> TFIParams:
+    """Draw one circuit configuration from the preset ranges."""
+    validate_tfi_sampling_domain(n_qubits_choices, steps_choices)
     if type(instance) is not int or instance < 0:
         raise ValueError("instance must be a nonnegative integer")
     if type(circuit_seed) is not int or circuit_seed < 0:

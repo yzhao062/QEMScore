@@ -70,16 +70,13 @@ class NearCliffordParams:
         return asdict(self)
 
 
-def sample_near_clifford_params(
-    rng: np.random.Generator,
+def validate_near_clifford_sampling_domain(
     n_qubits_choices: list[int],
     depth_choices: list[int],
     non_clifford_count_choices: list[int],
     theta_choices: list[float],
-    instance: int,
-    circuit_seed: int,
-) -> NearCliffordParams:
-    """Draw one near-Clifford configuration from the preset ranges."""
+) -> None:
+    """Validate the authored choices consumed before near-Clifford draws."""
     if not n_qubits_choices:
         raise ValueError("n_qubits_choices must not be empty")
     if not depth_choices:
@@ -122,6 +119,36 @@ def sample_near_clifford_params(
     ]
     if not eligible_qubits:
         raise ValueError("no n_qubits choice can realize an insertion count")
+    if len(eligible_qubits) != len(n_qubits_choices):
+        raise ValueError("each n_qubits choice must realize an insertion count")
+    if any(
+        not any(count <= n for n in n_qubits_choices)
+        for count in non_clifford_count_choices
+    ):
+        raise ValueError("each insertion count must be realizable by n_qubits choices")
+
+
+def sample_near_clifford_params(
+    rng: np.random.Generator,
+    n_qubits_choices: list[int],
+    depth_choices: list[int],
+    non_clifford_count_choices: list[int],
+    theta_choices: list[float],
+    instance: int,
+    circuit_seed: int,
+) -> NearCliffordParams:
+    """Draw one near-Clifford configuration from the preset ranges."""
+    validate_near_clifford_sampling_domain(
+        n_qubits_choices,
+        depth_choices,
+        non_clifford_count_choices,
+        theta_choices,
+    )
+    eligible_qubits = [
+        n
+        for n in n_qubits_choices
+        if any(count <= n for count in non_clifford_count_choices)
+    ]
     if type(instance) is not int or instance < 0:
         raise ValueError("instance must be a nonnegative integer")
     if type(circuit_seed) is not int or circuit_seed < 0:

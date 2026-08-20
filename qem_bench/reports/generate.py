@@ -9,8 +9,13 @@ from pathlib import Path
 
 import numpy as np
 
+from qem_bench.datasets.generate import UNKNOWN_IDENTITY_ENCODING_PROFILE
 from qem_bench.runner.metrics import pooled_method_metrics
-from qem_bench.runner.run import circuit_evaluation_ratio, validate_run_artifact
+from qem_bench.runner.run import (
+    circuit_evaluation_ratio,
+    run_identity_encoding_profiles,
+    validate_run_artifact,
+)
 from qem_bench.stats import circuit_blocked_bootstrap, macro_mean_iqr, mean_ranks
 
 HEADLINE_METHODS = ("raw", "ridge", "zne")
@@ -307,6 +312,21 @@ def _load_runs(
             "report manifest cannot mix dataset schema versions; "
             f"found {sorted(schema_versions)}"
         )
+    profiles_by_family: dict[str, list[str]] = {}
+    for run in runs:
+        for family, profile in run_identity_encoding_profiles(run).items():
+            profiles_by_family.setdefault(family, []).append(profile)
+    for family, profiles in sorted(profiles_by_family.items()):
+        if len(profiles) < 2:
+            continue
+        if (
+            UNKNOWN_IDENTITY_ENCODING_PROFILE in profiles
+            or len(set(profiles)) > 1
+        ):
+            raise ValueError(
+                "report manifest cannot merge physical identity encoding "
+                f"profiles for family {family!r}; found {sorted(profiles)}"
+            )
     return runs
 
 

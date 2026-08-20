@@ -64,14 +64,11 @@ class RandomCliffordParams:
         return asdict(self)
 
 
-def sample_random_clifford_params(
-    rng: np.random.Generator,
+def validate_random_clifford_sampling_domain(
     n_qubits_choices: list[int],
     depth_choices: list[int],
-    instance: int,
-    circuit_seed: int,
-) -> RandomCliffordParams:
-    """Draw one random Clifford configuration from the preset ranges."""
+) -> None:
+    """Validate the authored choices consumed before random-Clifford draws."""
     if not n_qubits_choices:
         raise ValueError("n_qubits_choices must not be empty")
     if not depth_choices:
@@ -86,6 +83,17 @@ def sample_random_clifford_params(
         )
     if any(type(depth) is not int or depth < 1 for depth in depth_choices):
         raise ValueError("all random Clifford depth choices must be positive")
+
+
+def sample_random_clifford_params(
+    rng: np.random.Generator,
+    n_qubits_choices: list[int],
+    depth_choices: list[int],
+    instance: int,
+    circuit_seed: int,
+) -> RandomCliffordParams:
+    """Draw one random Clifford configuration from the preset ranges."""
+    validate_random_clifford_sampling_domain(n_qubits_choices, depth_choices)
     if type(instance) is not int or instance < 0:
         raise ValueError("instance must be a nonnegative integer")
     if type(circuit_seed) is not int or circuit_seed < 0:

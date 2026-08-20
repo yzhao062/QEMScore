@@ -1,16 +1,19 @@
 import copy
 import hashlib
+import importlib
 import json
 import os
 import shutil
 import subprocess
 import sys
 from dataclasses import replace
+from itertools import product
 from pathlib import Path
 
 import pytest
 
 import qem_bench.validation as validation_module
+from qem_bench.circuits.qaoa import QAOAParams
 from qem_bench.datasets.generate import generate
 from qem_bench.datasets.schema import (
     LEGACY_SCHEMA_VERSION,
@@ -20,6 +23,7 @@ from qem_bench.datasets.schema import (
 )
 from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
 from qem_bench.datasets.splits import SplitSpec
+from qem_bench.observables import z_support_label
 from qem_bench.validation import (
     canonical_hash,
     canonical_item_lines,
@@ -69,6 +73,24 @@ def _write_sidecar(data: Path, category: str, value: dict) -> tuple[str, str]:
     return digest, relative
 
 
+def _refresh_sidecar_hashes(items: list[dict], manifest: dict) -> None:
+    reference_fields = (
+        ("circuit_sidecar", "circuit_hash"),
+        ("noise_sidecar", "noise_config_hash"),
+        ("observable_sidecar", "observable_hash"),
+        ("counts_sidecar", "counts_hash"),
+    )
+    manifest["sidecar_hashes"] = dict(
+        sorted(
+            {
+                item[path_field]: item[hash_field]
+                for item in items
+                for path_field, hash_field in reference_fields
+            }.items()
+        )
+    )
+
+
 def _rewrite_circuit_descriptor_and_all_hashes(
     data: Path, items: list[dict], manifest: dict, mutate
 ) -> dict:
@@ -103,11 +125,13 @@ def _rewrite_circuit_descriptor_and_all_hashes(
         item["counts_hash"] = counts_digest
         item["counts_sidecar"] = counts_relative
         item["measurement_group"] = (
-            f"{item['cell_id']}:{circuit_id}:r{item['replicate']}:g0"
+            f"{item['cell_id']}:{circuit_id}:"
+            f"i{item['instance']}:r{item['replicate']}:g0"
         )
         item_descriptor = {
             "cell_id": item["cell_id"],
             "circuit_id": circuit_id,
+            "instance": item["instance"],
             "observable_id": item["observable_id"],
             "replicate": item["replicate"],
         }
@@ -186,11 +210,13 @@ def _rewrite_circuit_rows_and_all_hashes(
         item["observable_hash"] = observable_digest
         item["observable_sidecar"] = observable_relative
         item["measurement_group"] = (
-            f"{item['cell_id']}:{circuit_id}:r{item['replicate']}:g0"
+            f"{item['cell_id']}:{circuit_id}:"
+            f"i{item['instance']}:r{item['replicate']}:g0"
         )
         item_descriptor = {
             "cell_id": item["cell_id"],
             "circuit_id": circuit_id,
+            "instance": item["instance"],
             "observable_id": item["observable_id"],
             "replicate": item["replicate"],
         }
@@ -950,3 +976,263 @@ def test_circuit_sidecar_is_closed_after_every_dependent_hash_is_recomputed(
         ValueError, match="circuit sidecar is not the exact canonical descriptor"
     ):
         validate_split_artifact(data)
+
+
+def test_rehashed_noise_sidecar_is_bound_to_installed_generator_registry(tmp_path):
+    data = tmp_path / "wrong-noise-registry"
+    generate_split("s0-t0-micro", data)
+    items, manifest = _load_artifact(data)
+    item = items[0]
+    old_relative = item["noise_sidecar"]
+    affected = [row for row in items if row["noise_sidecar"] == old_relative]
+    noise = json.loads((data / old_relative).read_text(encoding="utf-8"))
+
+    family = item["noise_family"]
+    severity = item["severity"]
+    forged_parameters = manifest["noise_registry"]["configs"][family][severity]
+    forged_parameters["p1"] = 0.5
+    manifest["noise_registry"]["hash"] = canonical_hash(
+        manifest["noise_registry"]["configs"]
+    )
+    noise["parameters"] = copy.deepcopy(forged_parameters)
+    digest, relative = _write_sidecar(data, "noise", noise)
+    for row in affected:
+        row["noise_config_hash"] = digest
+        row["noise_sidecar"] = relative
+    _refresh_sidecar_hashes(items, manifest)
+    _write_rehashed_artifact(data, items, manifest)
+
+    assert noise["parameters"] == forged_parameters
+    assert manifest["noise_registry"]["hash"] == canonical_hash(
+        manifest["noise_registry"]["configs"]
+    )
+    with pytest.raises(
+        ValueError,
+        match="noise_registry does not match the installed severity generator",
+    ):
+        validate_split_artifact(data)
+
+
+def test_rehashed_observable_support_is_derived_from_observable_id(
+    monkeypatch, tmp_path
+):
+    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    original_support = generate_module._observable_support
+
+    def moved_z_mid(name, params):
+        if name == "z_mid" and params.n_qubits == 3:
+            return (0,)
+        return original_support(name, params)
+
+    data = tmp_path / "wrong-observable-support"
+    with monkeypatch.context() as generation_injection:
+        generation_injection.setattr(
+            generate_module, "_observable_support", moved_z_mid
+        )
+        generate_split("s0-t0-micro", data)
+
+    items, _ = _load_artifact(data)
+    item = next(row for row in items if row["observable_id"] == "z_mid")
+    observable = json.loads(
+        (data / item["observable_sidecar"]).read_text(encoding="utf-8")
+    )
+    assert observable["support"] == [0]
+    assert item["pauli_label"] == "IIZ"
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"observable support disagrees with observable_id 'z_mid': "
+            r"actual=\[0\], expected=\[1\]"
+        ),
+    ):
+        validate_split_artifact(data)
+
+
+def test_rehashed_pauli_label_is_derived_from_observable_id(tmp_path):
+    data = tmp_path / "wrong-pauli-label"
+    generate_split("s0-t0-micro", data)
+    items, manifest = _load_artifact(data)
+    item = next(row for row in items if row["observable_id"] == "z_mid")
+    observable = json.loads(
+        (data / item["observable_sidecar"]).read_text(encoding="utf-8")
+    )
+    assert observable["support"] == [1]
+    assert item["pauli_label"] == "IZI"
+
+    observable["pauli_label"] = "ZII"
+    digest, relative = _write_sidecar(data, "observables", observable)
+    item["pauli_label"] = "ZII"
+    item["observable_hash"] = digest
+    item["observable_sidecar"] = relative
+    _refresh_sidecar_hashes(items, manifest)
+    _write_rehashed_artifact(data, items, manifest)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"pauli_label disagrees with observable_id 'z_mid': "
+            r"actual='ZII', expected='IZI'"
+        ),
+    ):
+        validate_split_artifact(data)
+
+
+def test_all_generator_defined_observable_ids_validate(tmp_path):
+    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    base = _single_family_spec("qaoa", {"graph_classes": ["path"]})
+    spec = replace(
+        base,
+        fixed_axes={
+            **dict(base.fixed_axes),
+            "observable_class": ["z_mid", "zz_mid", "zz_edge"],
+        },
+    )
+    data = tmp_path / "all-observables"
+    generate_split(spec, data)
+
+    items, _ = validate_split_artifact(data)
+    assert {item["observable_id"] for item in items} == {
+        "z_mid",
+        "zz_mid",
+        "zz_edge",
+    }
+    for item in items:
+        params = QAOAParams(
+            n_qubits=item["n_qubits"],
+            graph_class=item["graph_class"],
+            edges=tuple(tuple(edge) for edge in item["edges"]),
+            p=item["p"],
+            gammas=tuple(item["gammas"]),
+            betas=tuple(item["betas"]),
+            circuit_seed=item["circuit_seed"],
+            instance=item["instance"],
+            edge_probability=item["edge_probability"],
+        )
+        expected_support = generate_module._observable_support(
+            item["observable_id"], params
+        )
+        observable = json.loads(
+            (data / item["observable_sidecar"]).read_text(encoding="utf-8")
+        )
+        assert observable["support"] == list(expected_support)
+        assert item["pauli_label"] == z_support_label(
+            item["n_qubits"], expected_support
+        )
+        assert item["obs_locality"] == len(expected_support)
+
+
+@pytest.mark.parametrize(
+    ("family", "label_method"),
+    (
+        pytest.param("tfi", "statevector", id="tfi-statevector"),
+        pytest.param("qaoa", "statevector", id="qaoa-statevector"),
+        pytest.param("heisenberg", "statevector", id="heisenberg-statevector"),
+        pytest.param(
+            "near_clifford",
+            "statevector",
+            id="near-clifford-statevector",
+        ),
+        pytest.param("random_clifford", "stim", id="random-clifford-stim"),
+    ),
+)
+def test_rehashed_ground_truth_is_recomputed_by_every_family_label_generator(
+    family, label_method, monkeypatch, tmp_path
+):
+    split_generate_module = importlib.import_module(
+        "qem_bench.datasets.split_generate"
+    )
+    calls = 0
+    injected_label = 0.123456789012
+
+    def wrong_label(circuit, pauli_label):
+        nonlocal calls
+        calls += 1
+        return injected_label
+
+    monkeypatch.setattr(
+        split_generate_module, f"{label_method}_expectation", wrong_label
+    )
+    data = tmp_path / family
+    generate_split(
+        _single_family_spec(family, copy.deepcopy(_VALID_FAMILY_PARAMETERS[family])),
+        data,
+    )
+    items, _ = _load_artifact(data)
+    assert calls == len({item["circuit_id"] for item in items})
+    assert {item["label_method"] for item in items} == {label_method}
+    assert {item["ideal_expectation"] for item in items} == {injected_label}
+
+    with pytest.raises(
+        ValueError,
+        match=rf"ideal_expectation disagrees with {label_method} generator",
+    ):
+        validate_split_artifact(data)
+
+
+@pytest.mark.parametrize(
+    "artifact_name",
+    (
+        "tfi",
+        "heisenberg",
+        "qaoa-path",
+        "qaoa-fixed-er",
+        "random-clifford",
+        "near-clifford",
+    ),
+)
+def test_recomputed_labels_accept_every_unmodified_family_artifact(
+    authored_pool_artifacts, artifact_name
+):
+    items, _ = validate_split_artifact(authored_pool_artifacts[artifact_name])
+
+    assert items
+
+
+def test_pauli_label_and_locality_schema_matches_z_support_contract(tmp_path):
+    data = tmp_path / "pauli-schema"
+    generate_split("s0-t0-micro", data)
+    items, _ = _load_artifact(data)
+    template = items[0]
+
+    for n_qubits in range(1, 5):
+        for length in range(n_qubits + 2):
+            for characters in product("IZX", repeat=length):
+                pauli_label = "".join(characters)
+                candidate = {
+                    **template,
+                    "n_qubits": n_qubits,
+                    "pauli_label": pauli_label,
+                    "obs_locality": pauli_label.count("Z"),
+                }
+                valid = length == n_qubits and "X" not in pauli_label
+                if valid:
+                    validate_item(candidate, schema_version=SPLIT_SCHEMA_VERSION)
+                else:
+                    with pytest.raises(ValueError, match="field pauli_label"):
+                        validate_item(candidate, schema_version=SPLIT_SCHEMA_VERSION)
+
+    for invalid_label in (None, 1, True):
+        with pytest.raises(ValueError, match="field pauli_label"):
+            validate_item(
+                {
+                    **template,
+                    "pauli_label": invalid_label,
+                    "obs_locality": 0,
+                },
+                schema_version=SPLIT_SCHEMA_VERSION,
+            )
+
+    n_qubits = template["n_qubits"]
+    pauli_label = z_support_label(n_qubits, (n_qubits // 2,))
+    for obs_locality in (-1, 0, 1, 2, 3, 4, 1.0, True):
+        candidate = {
+            **template,
+            "pauli_label": pauli_label,
+            "obs_locality": obs_locality,
+        }
+        if obs_locality == 1 and type(obs_locality) is int:
+            validate_item(candidate, schema_version=SPLIT_SCHEMA_VERSION)
+        else:
+            with pytest.raises(ValueError, match="field obs_locality"):
+                validate_item(candidate, schema_version=SPLIT_SCHEMA_VERSION)

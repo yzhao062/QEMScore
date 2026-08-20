@@ -4,7 +4,8 @@ Measurement-group contract: all Z-type observables of one (circuit, noise, shots
 configuration share a single computational-basis measurement. The group is executed
 once, every observable expectation derives from the same counts, and the ledger
 charges the group's shots once. Every stochastic stage is seeded from the manifest:
-transpilation uses the circuit seed, while the simulator and any seeded mixed-noise
+legacy transpilation uses the circuit seed and split-v2 transpilation uses
+the canonical circuit digest, while the simulator and any seeded mixed-noise
 profile use the group's sampler seed, so a dataset regenerates bit-identically from
 its manifest.
 """

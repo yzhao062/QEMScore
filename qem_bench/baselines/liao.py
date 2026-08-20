@@ -1,12 +1,13 @@
 """Restricted-feature Liao-style ablation; not a reproduction of the
 published Liao et al. feature encoding and not the headline competitor.
 
-The architecture reported by Liao et al. fixes the random forest at 100 CART
-trees and the companion network at two width-64 ReLU hidden layers trained with
-MSE and Adam at learning rate 0.001 with batches of 32. The paper does not state
-the network epoch count, stopping rule, dropout, or weight decay. Their defaults
-below are qem-bench declarations, not reproduced settings from Liao et al. They
-remain constructor arguments so a run artifact can record any predeclared change.
+The architecture reported by Liao et al. fixes a separate random forest at 100
+CART trees for each observable and the companion network at two width-64 ReLU
+hidden layers trained with MSE and Adam at learning rate 0.001 with batches of
+32. The paper does not state the network epoch count, stopping rule, dropout, or
+weight decay. Their defaults below are qem-bench declarations, not reproduced
+settings from Liao et al. They remain constructor arguments so a run artifact
+can record any predeclared change.
 
 Both arms consume the versioned feature vector and already measured noisy
 expectations. They never execute a circuit. The runner must charge the unique
@@ -50,6 +51,7 @@ _ADAM_BETA_2 = 0.999
 _ADAM_EPSILON = 1e-8
 
 Item = Mapping[str, object]
+ObservableKey = tuple[int, str]
 
 
 def _items(items: Sequence[Item], label: str) -> list[Item]:
@@ -76,6 +78,23 @@ def _targets(items: Sequence[Item], label: str) -> np.ndarray:
     if targets.ndim != 1 or not np.all(np.isfinite(targets)):
         raise ValueError(f"{label} targets must be finite")
     return targets
+
+
+def _observable_key(item: Item) -> ObservableKey:
+    try:
+        n_qubits = item["n_qubits"]
+        pauli_label = item["pauli_label"]
+    except KeyError as exc:
+        raise ValueError("items require n_qubits and pauli_label") from exc
+    if isinstance(n_qubits, bool) or not isinstance(n_qubits, int) or n_qubits <= 0:
+        raise ValueError("item n_qubits must be a positive integer")
+    if (
+        not isinstance(pauli_label, str)
+        or len(pauli_label) != n_qubits
+        or set(pauli_label) - {"I", "Z"}
+    ):
+        raise ValueError("item pauli_label must be an n_qubits-long I/Z string")
+    return n_qubits, pauli_label
 
 
 def _group_cost(items: Sequence[Item]) -> int:
@@ -116,37 +135,50 @@ class LiaoRandomForestMitigator:
 
     def __init__(self, random_state: int = 0) -> None:
         self.random_state = random_state
-        self._model: RandomForestRegressor | None = None
+        self._models: dict[ObservableKey, RandomForestRegressor] = {}
 
     def fit(self, train_items: Sequence[Item]) -> "LiaoRandomForestMitigator":
-        x = _matrix(train_items, "train_items")
-        y = _targets(train_items, "train_items")
-        self._model = RandomForestRegressor(
-            n_estimators=RANDOM_FOREST_TREES,
-            criterion="squared_error",
-            min_samples_split=2,
-            # Integer 1, not float 1.0. Liao et al. Section IV.1.2 states
-            # "1 feature is considered when looking for the best split",
-            # so one feature per split matches this reported RF hyperparameter,
-            # unlike the scikit-learn default.
-            max_features=1,
-            random_state=self.random_state,
-            n_jobs=1,
-        )
-        self._model.fit(x, y)
+        self._models = {}
+        rows = _items(train_items, "train_items")
+        grouped: dict[ObservableKey, list[Item]] = {}
+        for item in rows:
+            grouped.setdefault(_observable_key(item), []).append(item)
+
+        models: dict[ObservableKey, RandomForestRegressor] = {}
+        for key in sorted(grouped):
+            group = grouped[key]
+            model = RandomForestRegressor(
+                n_estimators=RANDOM_FOREST_TREES,
+                criterion="squared_error",
+                min_samples_split=2,
+                # Integer 1, not float 1.0. Liao et al. Section IV.1.2 states
+                # "1 feature is considered when looking for the best split",
+                # so one feature per split matches this reported RF hyperparameter,
+                # unlike the scikit-learn default.
+                max_features=1,
+                random_state=self.random_state,
+                n_jobs=1,
+            )
+            model.fit(
+                _matrix(group, "train_items"), _targets(group, "train_items")
+            )
+            models[key] = model
+        self._models = models
         return self
 
     @property
-    def estimator_(self) -> RandomForestRegressor:
-        if self._model is None:
+    def estimators_(self) -> dict[ObservableKey, RandomForestRegressor]:
+        if not self._models:
             raise RuntimeError("fit first")
-        return self._model
+        return dict(self._models)
 
     @property
     def config_(self) -> dict[str, object]:
         return {
             "model": RANDOM_FOREST_NAME,
-            "n_estimators": RANDOM_FOREST_TREES,
+            "scope": "one-independent-forest-per-observable",
+            "observable_key_fields": ["n_qubits", "pauli_label"],
+            "n_estimators_per_observable": RANDOM_FOREST_TREES,
             "tree_algorithm": "CART",
             "criterion": "squared_error",
             "min_samples_split": 2,
@@ -155,7 +187,21 @@ class LiaoRandomForestMitigator:
         }
 
     def predict(self, items: Sequence[Item]) -> np.ndarray:
-        return np.asarray(self.estimator_.predict(_matrix(items, "items")), dtype=float)
+        rows = _items(items, "items")
+        if not self._models:
+            raise RuntimeError("fit first")
+        grouped_indices: dict[ObservableKey, list[int]] = {}
+        for index, item in enumerate(rows):
+            key = _observable_key(item)
+            if key not in self._models:
+                raise ValueError(f"unseen observable {key!r}")
+            grouped_indices.setdefault(key, []).append(index)
+
+        predictions = np.empty(len(rows), dtype=float)
+        for key, indices in grouped_indices.items():
+            group = [rows[index] for index in indices]
+            predictions[indices] = self._models[key].predict(_matrix(group, "items"))
+        return predictions
 
 
 @dataclass(frozen=True)

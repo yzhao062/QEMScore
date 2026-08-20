@@ -13,6 +13,23 @@ import json
 import math
 from collections.abc import Mapping
 
+from qiskit import QuantumCircuit
+
+from qem_bench.circuits.heisenberg import (
+    HeisenbergParams,
+    build_heisenberg_circuit,
+)
+from qem_bench.circuits.near_clifford import (
+    NearCliffordParams,
+    build_near_clifford_circuit,
+)
+from qem_bench.circuits.qaoa import QAOAParams, build_qaoa_circuit
+from qem_bench.circuits.random_clifford import (
+    RandomCliffordParams,
+    build_random_clifford_circuit,
+)
+from qem_bench.circuits.tfi import TFIParams, build_tfi_circuit
+
 FEATURE_SPEC_VERSION = "v1"
 LEGACY_SCHEMA_VERSION = "legacy-v1"
 SPLIT_SCHEMA_VERSION = "split-v2"
@@ -203,13 +220,6 @@ _CIRCUIT_FLOAT_FIELDS = {
     "random_clifford": set(),
     "near_clifford": {"theta"},
 }
-_CIRCUIT_PROVENANCE_FIELDS = {
-    "tfi": frozenset({"circuit_seed"}),
-    "qaoa": frozenset({"circuit_seed", "graph_class", "edge_probability"}),
-    "heisenberg": frozenset({"circuit_seed"}),
-    "random_clifford": frozenset(),
-    "near_clifford": frozenset(),
-}
 
 
 def _freeze(value):
@@ -379,6 +389,27 @@ def _validate_numeric_fields(item: dict, family: str) -> None:
             f"item {item_id} field noisy_stderr exceeds its shot bound"
         )
 
+    pauli_label = item["pauli_label"]
+    n_qubits = item["n_qubits"]
+    if (
+        not isinstance(pauli_label, str)
+        or len(pauli_label) != n_qubits
+        or set(pauli_label) - {"I", "Z"}
+    ):
+        raise ValueError(
+            f"item {item_id} field pauli_label must be an "
+            "n_qubits-long I/Z string"
+        )
+    obs_locality = item["obs_locality"]
+    if obs_locality > n_qubits:
+        raise ValueError(
+            f"item {item_id} field obs_locality must not exceed n_qubits"
+        )
+    if pauli_label.count("Z") != obs_locality:
+        raise ValueError(
+            f"item {item_id} field obs_locality disagrees with pauli_label"
+        )
+
 
 def _canonical_circuit_float(value: object) -> float:
     normalized = float(value)
@@ -438,27 +469,116 @@ def canonical_physical_circuit_descriptor(
     }
 
 
-def _canonical_executable_circuit_descriptor(
+def build_circuit_from_canonical_descriptor(
     descriptor: Mapping[str, object],
-) -> dict[str, object]:
-    family = str(descriptor["family"])
-    provenance_fields = _CIRCUIT_PROVENANCE_FIELDS[family]
-    parameters = descriptor["parameters"]
-    if not isinstance(parameters, Mapping):
-        raise ValueError("circuit descriptor parameters must be a mapping")
+) -> QuantumCircuit:
+    """Rebuild a canonical descriptor through the benchmark family builders."""
 
-    executable = {
-        "family": family,
-        "n_qubits": descriptor["n_qubits"],
-        "parameters": {
-            field: value
-            for field, value in parameters.items()
-            if field not in provenance_fields
-        },
+    expected_fields = {"family", "n_qubits", "parameters", "circuit_seed"}
+    actual_fields = set(descriptor)
+    if actual_fields != expected_fields:
+        raise ValueError(
+            "circuit descriptor fields must be exactly "
+            f"{sorted(expected_fields)!r}"
+        )
+    family = descriptor["family"]
+    if not isinstance(family, str) or family not in FAMILY_REQUIRED_FIELDS:
+        raise ValueError(f"unknown circuit family {family!r}")
+    raw_parameters = descriptor["parameters"]
+    if not isinstance(raw_parameters, Mapping):
+        raise ValueError("circuit descriptor parameters must be a mapping")
+    if set(raw_parameters) != set(FAMILY_REQUIRED_FIELDS[family]):
+        raise ValueError(
+            f"{family} circuit descriptor parameters must be exactly "
+            f"{sorted(FAMILY_REQUIRED_FIELDS[family])!r}"
+        )
+
+    canonical = canonical_physical_circuit_descriptor(
+        {
+            "family": family,
+            "n_qubits": descriptor["n_qubits"],
+            "circuit_seed": descriptor["circuit_seed"],
+            **raw_parameters,
+        }
+    )
+    if canonical != descriptor:
+        raise ValueError("circuit descriptor is not canonical")
+    parameters = canonical["parameters"]
+    common = {
+        "n_qubits": canonical["n_qubits"],
+        "circuit_seed": canonical["circuit_seed"],
+        "instance": 0,
     }
-    if "circuit_seed" not in provenance_fields:
-        executable["circuit_seed"] = descriptor["circuit_seed"]
-    return executable
+
+    if family == "tfi":
+        return build_tfi_circuit(
+            TFIParams(
+                **common,
+                steps=parameters["steps"],
+                j=parameters["j"],
+                h=parameters["h"],
+                dt=parameters["dt"],
+            )
+        )
+    if family == "qaoa":
+        return build_qaoa_circuit(
+            QAOAParams(
+                **common,
+                graph_class=parameters["graph_class"],
+                edges=tuple(tuple(edge) for edge in parameters["edges"]),
+                p=parameters["p"],
+                gammas=tuple(parameters["gammas"]),
+                betas=tuple(parameters["betas"]),
+                edge_probability=parameters["edge_probability"],
+            )
+        )
+    if family == "heisenberg":
+        return build_heisenberg_circuit(
+            HeisenbergParams(
+                **common,
+                steps=parameters["steps"],
+                jx=parameters["jx"],
+                jy=parameters["jy"],
+                jz=parameters["jz"],
+                dt=parameters["dt"],
+            )
+        )
+    if family == "random_clifford":
+        return build_random_clifford_circuit(
+            RandomCliffordParams(**common, depth=parameters["depth"])
+        )
+    return build_near_clifford_circuit(
+        NearCliffordParams(
+            **common,
+            depth=parameters["depth"],
+            non_clifford_count=parameters["non_clifford_count"],
+            theta=parameters["theta"],
+        )
+    )
+
+
+def _canonical_instruction_stream(
+    circuit: QuantumCircuit,
+) -> list[dict[str, object]]:
+    stream: list[dict[str, object]] = []
+    for instruction in circuit.data:
+        if instruction.clbits:
+            raise ValueError(
+                "physical-circuit identity does not support classical operands"
+            )
+        stream.append(
+            {
+                "name": instruction.operation.name,
+                "qubits": [
+                    circuit.find_bit(qubit).index for qubit in instruction.qubits
+                ],
+                "params": [
+                    _canonical_circuit_float(value)
+                    for value in instruction.operation.params
+                ],
+            }
+        )
+    return stream
 
 
 def canonical_physical_circuit_identity(
@@ -467,7 +587,11 @@ def canonical_physical_circuit_identity(
     """Return the provenance sidecar and executable-circuit identity."""
 
     descriptor = canonical_physical_circuit_descriptor(item)
-    executable = _canonical_executable_circuit_descriptor(descriptor)
+    circuit = build_circuit_from_canonical_descriptor(descriptor)
+    executable = {
+        "n_qubits": circuit.num_qubits,
+        "instructions": _canonical_instruction_stream(circuit),
+    }
     payload = json.dumps(
         executable,
         sort_keys=True,

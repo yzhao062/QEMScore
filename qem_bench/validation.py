@@ -6,16 +6,18 @@ import hashlib
 import json
 from collections import Counter
 from pathlib import Path
-from types import MappingProxyType
+from types import MappingProxyType, SimpleNamespace
 from typing import Any, Iterable, Mapping
 
 import numpy as np
 
 from qem_bench.budget import TIERS
+from qem_bench.circuits.qaoa import QAOAParams
 from qem_bench.datasets.schema import (
     FAMILY_LABEL_METHODS,
     FEATURE_SPEC_VERSION,
     FEATURES,
+    build_circuit_from_canonical_descriptor,
     canonical_physical_circuit_identity,
     validate_groups,
     validate_item,
@@ -30,7 +32,13 @@ from qem_bench.datasets.splits import (
     SplitSpec,
     resolve_split_spec,
 )
-from qem_bench.observables import z_expectation_from_counts
+from qem_bench.labels.statevector import ideal_expectation as statevector_expectation
+from qem_bench.labels.stim_labels import ideal_expectation as stim_expectation
+from qem_bench.observables import (
+    z_expectation_from_counts,
+    z_support_label,
+)
+from qem_bench.noise.models import SEVERITY_GRIDS
 from qem_bench.reproducibility import validate_environment_contract
 
 SPLIT_SCHEMA_VERSION = "split-v2"
@@ -321,6 +329,53 @@ def validate_split_spec(spec: SplitSpec | Mapping[str, Any]) -> None:
             raise ValueError(
                 "family_native_depth values must be positive integers"
             )
+
+    from qem_bench.circuits.heisenberg import (
+        validate_heisenberg_sampling_domain,
+    )
+    from qem_bench.circuits.near_clifford import (
+        validate_near_clifford_sampling_domain,
+    )
+    from qem_bench.circuits.qaoa import validate_qaoa_sampling_domain
+    from qem_bench.circuits.random_clifford import (
+        validate_random_clifford_sampling_domain,
+    )
+    from qem_bench.circuits.tfi import validate_tfi_sampling_domain
+
+    depths = list(_axis_values(spec, "family_native_depth", "source"))
+    for value in _axis_values(spec, "family_native_depth", "target"):
+        if value not in depths:
+            depths.append(value)
+    for family in sorted(families):
+        parameters = spec.family_parameters[family]
+        for n_qubits in spec.n_qubits:
+            widths = [n_qubits]
+            if family == "tfi":
+                validate_tfi_sampling_domain(widths, depths)
+            elif family == "heisenberg":
+                validate_heisenberg_sampling_domain(
+                    widths,
+                    depths,
+                    parameters["dt"],
+                )
+            elif family == "qaoa":
+                validate_qaoa_sampling_domain(
+                    widths,
+                    depths,
+                    parameters["graph_classes"],
+                    parameters.get("er_edge_probability"),
+                )
+            elif family == "random_clifford":
+                validate_random_clifford_sampling_domain(widths, depths)
+            elif family == "near_clifford":
+                validate_near_clifford_sampling_domain(
+                    widths,
+                    depths,
+                    parameters["non_clifford_count"],
+                    parameters["theta"],
+                )
+            else:
+                raise ValueError(f"unknown circuit family {family!r}")
 
     source_moved = tuple(spec.source_domain[moved_axis])
     target_moved = tuple(spec.target_domain[moved_axis])
@@ -751,6 +806,7 @@ def _validate_item_semantics(
         descriptor = {
             "cell_id": cell.cell_id,
             "circuit_id": item["circuit_id"],
+            "instance": instance,
             "observable_id": observable_id,
             "replicate": cell.replicate,
         }
@@ -760,7 +816,8 @@ def _validate_item_semantics(
                 f"item {item_id} has invalid item_id; expected {expected_item_id}"
             )
         expected_group = (
-            f"{cell.cell_id}:{item['circuit_id']}:r{cell.replicate}:g0"
+            f"{cell.cell_id}:{item['circuit_id']}:"
+            f"i{instance}:r{cell.replicate}:g0"
         )
         if item.get("measurement_group") != expected_group:
             raise ValueError(
@@ -793,11 +850,40 @@ def _validate_item_semantics(
         raise ValueError("split rows do not exactly populate the resolved cells")
 
 
+def _generator_observable_support(
+    item: Mapping[str, Any], descriptor: Mapping[str, Any]
+) -> tuple[int, ...]:
+    from qem_bench.datasets.generate import _observable_support
+
+    family = descriptor.get("family")
+    n_qubits = descriptor.get("n_qubits")
+    if family == "qaoa":
+        parameters = descriptor.get("parameters")
+        if not isinstance(parameters, Mapping):
+            raise ValueError("QAOA circuit parameters must be an object")
+        params: Any = QAOAParams(
+            n_qubits=n_qubits,
+            graph_class=parameters["graph_class"],
+            edges=tuple(tuple(edge) for edge in parameters["edges"]),
+            p=parameters["p"],
+            gammas=tuple(parameters["gammas"]),
+            betas=tuple(parameters["betas"]),
+            circuit_seed=descriptor["circuit_seed"],
+            instance=0,
+            edge_probability=parameters["edge_probability"],
+        )
+    else:
+        params = SimpleNamespace(n_qubits=n_qubits)
+    return tuple(_observable_support(item.get("observable_id"), params))
+
+
 def _validate_sidecar_semantics(
     items: list[dict],
     sidecars: Mapping[str, Mapping[str, Any]],
     registry: Mapping[str, Any],
 ) -> None:
+    circuit_cache: dict[str, Any] = {}
+    label_cache: dict[tuple[str, str, str], float] = {}
     for item in items:
         item_id = str(item["item_id"])
         circuit = sidecars[str(item["circuit_sidecar"])]
@@ -841,10 +927,62 @@ def _validate_sidecar_semantics(
                 raise ValueError(
                     f"item {item_id} observable sidecar disagrees on {sidecar_field}"
                 )
-        support = observable.get("support")
-        if not isinstance(support, list) or item.get("obs_locality") != len(support):
+        try:
+            expected_support = _generator_observable_support(item, expected_circuit)
+            expected_pauli = z_support_label(
+                int(expected_circuit["n_qubits"]), expected_support
+            )
+        except (KeyError, TypeError, ValueError) as exc:
             raise ValueError(
-                f"item {item_id} observable sidecar disagrees on obs_locality"
+                f"item {item_id} observable_id {item.get('observable_id')!r} "
+                f"is not defined for family {item.get('family')!r}: {exc}"
+            ) from exc
+        support = observable.get("support")
+        if support != list(expected_support):
+            raise ValueError(
+                f"item {item_id} observable support disagrees with observable_id "
+                f"{item['observable_id']!r}: actual={support!r}, "
+                f"expected={list(expected_support)!r}"
+            )
+        if item.get("pauli_label") != expected_pauli:
+            raise ValueError(
+                f"item {item_id} pauli_label disagrees with observable_id "
+                f"{item['observable_id']!r}: actual={item.get('pauli_label')!r}, "
+                f"expected={expected_pauli!r}"
+            )
+        if item.get("obs_locality") != len(expected_support):
+            raise ValueError(
+                f"item {item_id} obs_locality disagrees with observable_id "
+                f"{item['observable_id']!r}: actual={item.get('obs_locality')!r}, "
+                f"expected={len(expected_support)!r}"
+            )
+
+        circuit_id = str(item["circuit_id"])
+        if circuit_id not in circuit_cache:
+            circuit_cache[circuit_id] = build_circuit_from_canonical_descriptor(
+                expected_circuit
+            )
+        label_method = str(item["label_method"])
+        label_key = (circuit_id, expected_pauli, label_method)
+        if label_key not in label_cache:
+            if label_method == "statevector":
+                ideal = statevector_expectation(
+                    circuit_cache[circuit_id], expected_pauli
+                )
+            elif label_method == "stim":
+                ideal = stim_expectation(circuit_cache[circuit_id], expected_pauli)
+            else:
+                raise ValueError(
+                    f"item {item_id} has unsupported label_method {label_method!r}"
+                )
+            label_cache[label_key] = round(float(ideal), 12)
+        expected_ideal = label_cache[label_key]
+        if item.get("ideal_expectation") != expected_ideal:
+            raise ValueError(
+                f"item {item_id} ideal_expectation disagrees with "
+                f"{label_method} generator: "
+                f"actual={item.get('ideal_expectation')!r}, "
+                f"expected={expected_ideal!r}"
             )
 
         counts_sidecar = sidecars[str(item["counts_sidecar"])]
@@ -863,7 +1001,7 @@ def _validate_sidecar_semantics(
                 f"item {item_id} counts sidecar total does not equal shots"
             )
         noisy, stderr = z_expectation_from_counts(
-            counts, tuple(support), item["shots"]
+            counts, expected_support, item["shots"]
         )
         if item.get("noisy_expectation") != round(noisy, 12):
             raise ValueError(
@@ -994,11 +1132,17 @@ def validate_split_artifact(data_dir: str | Path) -> tuple[list[dict], dict]:
     if referenced_sidecars != stored_sidecars:
         raise ValueError("row sidecar references do not match manifest sidecar_hashes")
 
+    registry_configs = json.loads(canonical_json(SEVERITY_GRIDS))
+    expected_registry = {
+        "version": "severity-grid-v1",
+        "hash": canonical_hash(registry_configs),
+        "configs": registry_configs,
+    }
     registry = manifest.get("noise_registry")
-    if not isinstance(registry, dict) or canonical_hash(
-        registry.get("configs")
-    ) != registry.get("hash"):
-        raise ValueError("noise_registry hash does not match embedded configs")
+    if registry != expected_registry:
+        raise ValueError(
+            "noise_registry does not match the installed severity generator"
+        )
     root_resolved = root.resolve()
     actual_sidecars: dict[str, str] = {}
     sidecar_payloads: dict[str, Mapping[str, Any]] = {}

@@ -16,6 +16,7 @@ from __future__ import annotations
 import hashlib
 import json
 import platform
+from collections.abc import Mapping
 from pathlib import Path
 from types import MappingProxyType
 
@@ -168,6 +169,26 @@ _FROZEN_LEGACY_CONFIGURATIONS = MappingProxyType(
 )
 LEGACY_FROZEN_PRESETS = frozenset(_FROZEN_LEGACY_CONFIGURATIONS)
 
+PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD = (
+    "physical_identity_encoding_profiles"
+)
+LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE = "legacy-binary64-v1"
+LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE = "legacy-tfi-rounded-12-v1"
+UNKNOWN_IDENTITY_ENCODING_PROFILE = "unknown"
+PHYSICAL_IDENTITY_ENCODING_PROFILE_DOMAINS = MappingProxyType(
+    {
+        family: frozenset(
+            (
+                LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+                LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
+            )
+            if family == "tfi"
+            else (LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,)
+        )
+        for family in FAMILY_STRATA
+    }
+)
+
 
 def _uses_frozen_legacy_serializer(preset_name: object, config: dict) -> bool:
     if not isinstance(preset_name, str) or preset_name not in LEGACY_FROZEN_PRESETS:
@@ -179,6 +200,84 @@ def _uses_frozen_legacy_serializer(preset_name: object, config: dict) -> bool:
         allow_nan=False,
     )
     return actual == _FROZEN_LEGACY_CONFIGURATIONS[preset_name]
+
+
+def validate_physical_identity_encoding_profiles(
+    value: object,
+    *,
+    families: set[str] | frozenset[str],
+    allow_unknown: bool = False,
+) -> dict[str, str]:
+    """Validate and canonically order a closed per-family profile map."""
+
+    expected_families = set(families)
+    unknown_expected = expected_families - set(
+        PHYSICAL_IDENTITY_ENCODING_PROFILE_DOMAINS
+    )
+    if unknown_expected:
+        raise ValueError(
+            "physical identity encoding profiles contain unknown families: "
+            f"{sorted(unknown_expected)}"
+        )
+    if not expected_families:
+        raise ValueError(
+            "physical identity encoding profiles require at least one family"
+        )
+    if not isinstance(value, Mapping):
+        raise ValueError("physical identity encoding profiles must be an object")
+    if any(not isinstance(family, str) for family in value):
+        raise ValueError(
+            "physical identity encoding profile family names must be strings"
+        )
+    actual_families = set(value)
+    unknown_declared = actual_families - set(
+        PHYSICAL_IDENTITY_ENCODING_PROFILE_DOMAINS
+    )
+    if unknown_declared:
+        raise ValueError(
+            "physical identity encoding profiles contain unknown families: "
+            f"{sorted(unknown_declared)}"
+        )
+    if actual_families != expected_families:
+        raise ValueError(
+            "physical identity encoding profile families do not match dataset "
+            f"families: declared={sorted(actual_families)}, "
+            f"dataset={sorted(expected_families)}"
+        )
+
+    profiles = {}
+    for family in sorted(expected_families):
+        profile = value[family]
+        allowed = PHYSICAL_IDENTITY_ENCODING_PROFILE_DOMAINS[family]
+        if not isinstance(profile, str) or (
+            profile not in allowed
+            and not (allow_unknown and profile == UNKNOWN_IDENTITY_ENCODING_PROFILE)
+        ):
+            raise ValueError(
+                "unknown physical identity encoding profile for family "
+                f"{family!r}: {profile!r}; expected one of {sorted(allowed)}"
+            )
+        profiles[family] = profile
+    return profiles
+
+
+def legacy_physical_identity_encoding_profiles(
+    preset_name: object, config: object
+) -> dict[str, str]:
+    """Return the profile selected by the legacy generator serializer."""
+
+    if not isinstance(config, Mapping):
+        raise ValueError("legacy dataset config must be an object")
+    canonical_config = dict(config)
+    family = canonical_config.get("family")
+    if family not in PHYSICAL_IDENTITY_ENCODING_PROFILE_DOMAINS:
+        raise ValueError(f"unknown circuit family {family!r}")
+    profile = (
+        LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE
+        if _uses_frozen_legacy_serializer(preset_name, canonical_config)
+        else LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+    )
+    return {str(family): profile}
 
 CircuitParams = (
     TFIParams
@@ -332,6 +431,94 @@ def group_shots(items: list[dict], split: str | None = None) -> int:
     return sum(seen.values())
 
 
+def _physical_observables(items: list[dict], role: str) -> set[tuple[int, str]]:
+    return {
+        (item["n_qubits"], item["pauli_label"])
+        for item in items
+        if item["split"] == role
+    }
+
+
+def _require_source_observable_closure(
+    items: list[dict], *, split_name: str
+) -> None:
+    missing = sorted(
+        _physical_observables(items, "test")
+        - _physical_observables(items, "train")
+    )
+    if missing:
+        raise ValueError(
+            f"split {split_name!r} is not source-observable closed; "
+            f"test observables absent from training: {missing!r}"
+        )
+
+
+def _construct_legacy_source_observable_closure(
+    items: list[dict], *, n_train: int, split_name: str
+) -> None:
+    if not (
+        _physical_observables(items, "test")
+        - _physical_observables(items, "train")
+    ):
+        return
+
+    rows_by_group: dict[str, list[dict]] = {}
+    for item in items:
+        rows_by_group.setdefault(str(item["measurement_group"]), []).append(item)
+    observables_by_group = {
+        group: {
+            (item["n_qubits"], item["pauli_label"])
+            for item in rows
+        }
+        for group, rows in rows_by_group.items()
+    }
+    original_train = {
+        group
+        for group, rows in rows_by_group.items()
+        if rows[0]["split"] == "train"
+    }
+
+    uncovered = set().union(*observables_by_group.values())
+    selected: list[str] = []
+    while uncovered and len(selected) < n_train:
+        candidates = [
+            group
+            for group in rows_by_group
+            if group not in selected and observables_by_group[group] & uncovered
+        ]
+        group = min(
+            candidates,
+            key=lambda candidate: (
+                -len(observables_by_group[candidate] & uncovered),
+                candidate not in original_train,
+                candidate,
+            ),
+        )
+        selected.append(group)
+        uncovered -= observables_by_group[group]
+
+    if uncovered:
+        _require_source_observable_closure(items, split_name=split_name)
+
+    for group in sorted(original_train):
+        if len(selected) == n_train:
+            break
+        if group not in selected:
+            selected.append(group)
+    for group in sorted(rows_by_group):
+        if len(selected) == n_train:
+            break
+        if group not in selected:
+            selected.append(group)
+
+    selected_groups = set(selected)
+    for group, rows in rows_by_group.items():
+        role = "train" if group in selected_groups else "test"
+        for item in rows:
+            item["split"] = role
+    _require_source_observable_closure(items, split_name=split_name)
+
+
 def generate(
     preset: str | dict | SplitSpec,
     out_dir: str | Path,
@@ -410,7 +597,13 @@ def generate(
 
     artifact_environment_contract = environment_contract()
     master = cfg["master_seed"]
-    frozen_legacy_serializer = _uses_frozen_legacy_serializer(preset_name, cfg)
+    physical_identity_encoding_profiles = (
+        legacy_physical_identity_encoding_profiles(preset_name, cfg)
+    )
+    frozen_legacy_serializer = (
+        physical_identity_encoding_profiles[family]
+        == LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE
+    )
     out = Path(out_dir)
     try:
         out.mkdir(parents=True, exist_ok=False)
@@ -487,6 +680,13 @@ def generate(
             validate_item(item, schema_version=LEGACY_SCHEMA_VERSION)
             items.append(item)
 
+    _construct_legacy_source_observable_closure(
+        items,
+        n_train=cfg["n_train"],
+        split_name=str(preset_name),
+    )
+    _require_source_observable_closure(items, split_name=str(preset_name))
+
     written_items = items
     if frozen_legacy_serializer:
         compatible_items = []
@@ -506,6 +706,9 @@ def generate(
 
     manifest = {
         "dataset_schema_version": LEGACY_SCHEMA_VERSION,
+        PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD: (
+            physical_identity_encoding_profiles
+        ),
         "environment_contract": artifact_environment_contract,
         "preset": preset_name,
         "config": cfg,

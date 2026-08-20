@@ -179,7 +179,9 @@ def test_legacy_v1_result_is_identical_to_pre_split_runner(tmp_path):
         "liao": {
             "model": "random_forest",
             "tree_algorithm": "CART",
-            "n_estimators": 100,
+            "scope": "one-independent-forest-per-observable",
+            "observable_key_fields": ["n_qubits", "pauli_label"],
+            "n_estimators_per_observable": 100,
             "criterion": "squared_error",
             "min_samples_split": 2,
             "max_features": 1,
