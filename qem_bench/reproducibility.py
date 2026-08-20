@@ -6,7 +6,7 @@ import os
 import re
 from collections.abc import Mapping
 
-CI_LOCK_SHA256 = "62687a209d6998887ea6d2ecc706d8b5fcaf1997bec38d0913cd688591dd3d85"
+CI_LOCK_SHA256 = "20ce2461bc2e6f70e14eeb0feaf3fe7e3cb9e9af75031da04671eab99c2bfd70"
 CI_LOCK_SHA256_ENV = "QEM_BENCH_CI_LOCK_SHA256"
 _SHA256 = re.compile(r"[0-9a-f]{64}")
 
