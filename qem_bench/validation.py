@@ -6,12 +6,17 @@ import hashlib
 import json
 from collections import Counter
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Iterable, Mapping
 
+import numpy as np
+
+from qem_bench.budget import TIERS
 from qem_bench.datasets.schema import (
     FAMILY_LABEL_METHODS,
     FEATURE_SPEC_VERSION,
     FEATURES,
+    canonical_physical_circuit_identity,
     validate_groups,
     validate_item,
 )
@@ -30,6 +35,34 @@ from qem_bench.reproducibility import validate_environment_contract
 
 SPLIT_SCHEMA_VERSION = "split-v2"
 LEGACY_SCHEMA_VERSION = "legacy-v1"
+SPLIT_SEED_FORMULA = (
+    "circuit: SeedSequence(master_seed, spawn_key=tuple(pool_seed_key) + "
+    "(0, local_instance)); sampler: SeedSequence(master_seed, "
+    "spawn_key=tuple(cell_seed_key) + "
+    "(1, local_instance, replicate, measurement_basis_group))"
+)
+_FAMILY_DEPTH_FIELDS = {
+    "tfi": "steps",
+    "qaoa": "p",
+    "heisenberg": "steps",
+    "random_clifford": "depth",
+    "near_clifford": "depth",
+}
+_FAMILY_PARAMETER_KEY_CONTRACT = MappingProxyType(
+    {
+        "tfi": (frozenset({"dt"}), frozenset()),
+        "heisenberg": (frozenset({"dt"}), frozenset()),
+        "qaoa": (
+            frozenset({"graph_classes"}),
+            frozenset({"er_edge_probability"}),
+        ),
+        "random_clifford": (frozenset(), frozenset()),
+        "near_clifford": (
+            frozenset({"non_clifford_count", "theta"}),
+            frozenset(),
+        ),
+    }
+)
 
 
 def _plain(value: Any) -> Any:
@@ -181,6 +214,11 @@ def _number_values(values: Iterable[Any], axis: str) -> tuple[float, ...]:
     return numbers
 
 
+def _split_seed(master_seed: int, spawn_key: tuple[int, ...]) -> int:
+    sequence = np.random.SeedSequence(master_seed, spawn_key=spawn_key)
+    return int(sequence.generate_state(1, dtype=np.uint32)[0])
+
+
 def validate_split_spec(spec: SplitSpec | Mapping[str, Any]) -> None:
     """Validate one declaration against the closed S0 to S6 grammar."""
     if not isinstance(spec, SplitSpec):
@@ -232,6 +270,11 @@ def validate_split_spec(spec: SplitSpec | Mapping[str, Any]) -> None:
         raise ValueError("replicates must contain nonnegative integers")
     if spec.test_group_shot_budget is not None and spec.test_group_shot_budget < 1:
         raise ValueError("test_group_shot_budget must be positive when declared")
+    if (
+        spec.budget_tier is not None
+        and spec.budget_tier.upper() not in TIERS
+    ):
+        raise ValueError(f"unknown budget_tier {spec.budget_tier!r}")
 
     expected_couplings = SPLIT_ALLOWED_COUPLINGS[spec.split_id]
     if spec.allowed_couplings != expected_couplings:
@@ -240,25 +283,44 @@ def validate_split_spec(spec: SplitSpec | Mapping[str, Any]) -> None:
             f"{list(expected_couplings)}"
         )
 
-    families = set(_axis_values(spec, "circuit_family", "source")) | set(
-        _axis_values(spec, "circuit_family", "target")
-    )
+    families = {
+        str(value)
+        for value in (
+            *_axis_values(spec, "circuit_family", "source"),
+            *_axis_values(spec, "circuit_family", "target"),
+        )
+    }
     if set(spec.family_parameters) != families:
         raise ValueError(
             "family_parameters must contain exactly the declared circuit families; "
-            f"families={sorted(str(value) for value in families)}"
+            f"families={sorted(families)}"
         )
+    unknown_families = sorted(families - set(_FAMILY_PARAMETER_KEY_CONTRACT))
+    if unknown_families:
+        raise ValueError(f"unknown circuit families: {unknown_families}")
+    for family in sorted(families):
+        parameters = spec.family_parameters[family]
+        if not isinstance(parameters, Mapping):
+            raise ValueError(f"family_parameters[{family!r}] must be a mapping")
+        required, optional = _FAMILY_PARAMETER_KEY_CONTRACT[family]
+        actual = set(parameters)
+        missing = sorted(required - actual)
+        extra = sorted(actual - required - optional)
+        if missing or extra:
+            raise ValueError(
+                f"family_parameters[{family!r}] has invalid fields; "
+                f"missing={missing}, extra={extra}"
+            )
 
     for domain in ("source", "target"):
-        shots = _number_values(_axis_values(spec, "shots", domain), "shots")
-        if any(value < 1 or not value.is_integer() for value in shots):
+        shots = _axis_values(spec, "shots", domain)
+        if any(type(value) is not int or value < 1 for value in shots):
             raise ValueError("shots values must be positive integers")
-        depths = _number_values(
-            _axis_values(spec, "family_native_depth", domain),
-            "family_native_depth",
-        )
-        if any(value < 1 for value in depths):
-            raise ValueError("family_native_depth values must be positive")
+        depths = _axis_values(spec, "family_native_depth", domain)
+        if any(type(value) is not int or value < 1 for value in depths):
+            raise ValueError(
+                "family_native_depth values must be positive integers"
+            )
 
     source_moved = tuple(spec.source_domain[moved_axis])
     target_moved = tuple(spec.target_domain[moved_axis])
@@ -510,11 +572,87 @@ def _file_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+_GRAPH_CLASS_ALIASES = {
+    "path": "path",
+    "cycle": "cycle",
+    "erdos_renyi": "erdos_renyi",
+    "erdos-renyi": "erdos_renyi",
+    "3_regular": "3_regular",
+    "3-regular": "3_regular",
+}
+
+
+def _declared_float(value: object, *, field: str) -> float:
+    if type(value) not in (int, float) or not np.isfinite(value):
+        raise ValueError(f"split parameter {field} must be a finite number")
+    normalized = float(value)
+    return 0.0 if normalized == 0.0 else normalized
+
+
+def _pool_parameter_mismatches(
+    item: Mapping[str, Any], pool: Any
+) -> dict[str, tuple[Any, Any]]:
+    grid = pool.parameter_grid
+    mismatches: dict[str, tuple[Any, Any]] = {}
+    required, optional = _FAMILY_PARAMETER_KEY_CONTRACT[pool.family]
+    required_grid = required | {"n_qubits", _FAMILY_DEPTH_FIELDS[pool.family]}
+    actual_grid = set(grid)
+    missing = sorted(required_grid - actual_grid)
+    extra = sorted(actual_grid - required_grid - optional)
+    if missing or extra:
+        mismatches["parameter_grid.fields"] = (
+            sorted(actual_grid),
+            {"missing": missing, "extra": extra},
+        )
+        return mismatches
+    if pool.family in {"tfi", "heisenberg"}:
+        if _declared_float(item["dt"], field="dt") != _declared_float(
+            grid["dt"], field="dt"
+        ):
+            mismatches["parameter_grid.dt"] = (item["dt"], grid["dt"])
+    elif pool.family == "qaoa":
+        declared = {
+            _GRAPH_CLASS_ALIASES[str(value)] for value in grid["graph_classes"]
+        }
+        if item["graph_class"] not in declared:
+            mismatches["parameter_grid.graph_classes"] = (
+                item["graph_class"],
+                sorted(declared),
+            )
+        fixed_probability = grid.get("er_edge_probability")
+        if (
+            item["graph_class"] == "erdos_renyi"
+            and fixed_probability is not None
+            and _declared_float(item["edge_probability"], field="edge_probability")
+            != _declared_float(fixed_probability, field="er_edge_probability")
+        ):
+            mismatches["parameter_grid.er_edge_probability"] = (
+                item["edge_probability"],
+                fixed_probability,
+            )
+    elif pool.family == "near_clifford":
+        declared_counts = set(grid["non_clifford_count"])
+        if item["non_clifford_count"] not in declared_counts:
+            mismatches["parameter_grid.non_clifford_count"] = (
+                item["non_clifford_count"],
+                sorted(declared_counts),
+            )
+        declared_thetas = {
+            _declared_float(value, field="theta") for value in grid["theta"]
+        }
+        if _declared_float(item["theta"], field="theta") not in declared_thetas:
+            mismatches["parameter_grid.theta"] = (
+                item["theta"],
+                sorted(declared_thetas),
+            )
+    return mismatches
+
+
 def _validate_item_semantics(
     items: list[dict], manifest: Mapping[str, Any], expected_resolution: Any
 ) -> None:
     for item in items:
-        validate_item(item)
+        validate_item(item, schema_version=manifest["dataset_schema_version"])
         if item.get("dataset_schema_version") != SPLIT_SCHEMA_VERSION:
             raise ValueError(
                 f"item {item.get('item_id', '?')} has invalid "
@@ -528,6 +666,19 @@ def _validate_item_semantics(
     }
     if manifest.get("feature_spec") != expected_feature_spec:
         raise ValueError("manifest feature_spec does not match the row schema")
+
+    master_seed = manifest.get("master_seed")
+    if type(master_seed) is not int or master_seed < 0:
+        raise ValueError("split-v2 manifest master_seed must be a nonnegative integer")
+    expected_seed_scheme = {
+        "version": "split-v1",
+        "master_seed": master_seed,
+        "formula": SPLIT_SEED_FORMULA,
+    }
+    if canonical_json(manifest.get("seed_scheme")) != canonical_json(
+        expected_seed_scheme
+    ):
+        raise ValueError("split-v2 manifest seed_scheme does not match master_seed")
 
     cells_by_id = {
         cell.cell_id: cell for cell in expected_resolution.cells
@@ -544,6 +695,8 @@ def _validate_item_semantics(
         if cell is None:
             raise ValueError(f"item {item_id} names an unknown cell")
         pool = pools_by_id[cell.circuit_pool_id]
+        instance = item.get("instance")
+        valid_instance = type(instance) is int and 0 <= instance < pool.n_instances
         expected = {
             "split_id": expected_resolution.spec.split_id,
             "split_axis": expected_resolution.spec.split_axis,
@@ -562,13 +715,25 @@ def _validate_item_semantics(
             "noise_family": cell.axis_values["noise_family"],
             "feature_spec_id": FEATURE_SPEC_VERSION,
             "raw_circuit_evals": cell.shots,
+            _FAMILY_DEPTH_FIELDS[pool.family]: cell.axis_values[
+                "family_native_depth"
+            ],
         }
+        if valid_instance:
+            expected["circuit_seed"] = _split_seed(
+                master_seed, tuple(pool.pool_seed_key) + (0, instance)
+            )
+            expected["sampler_seed"] = _split_seed(
+                master_seed,
+                tuple(cell.cell_seed_key) + (1, instance, cell.replicate, 0),
+            )
         mismatches = {}
         for field, value in expected.items():
             expected_value = _plain(value)
             actual_value = item.get(field)
             if canonical_json(actual_value) != canonical_json(expected_value):
                 mismatches[field] = (actual_value, expected_value)
+        mismatches.update(_pool_parameter_mismatches(item, pool))
         expected_axes = cell.to_dict()["axis_values"]
         if canonical_json(item.get("axis_values")) != canonical_json(expected_axes):
             mismatches["axis_values"] = (item.get("axis_values"), expected_axes)
@@ -578,8 +743,7 @@ def _validate_item_semantics(
         if item.get("observable") != observable_id:
             mismatches["observable"] = (item.get("observable"), observable_id)
 
-        instance = item.get("instance")
-        if type(instance) is not int or not 0 <= instance < pool.n_instances:
+        if not valid_instance:
             mismatches["instance"] = (instance, f"0 to {pool.n_instances - 1}")
         if mismatches:
             raise ValueError(f"item {item_id} disagrees with its cell: {mismatches}")
@@ -637,25 +801,14 @@ def _validate_sidecar_semantics(
     for item in items:
         item_id = str(item["item_id"])
         circuit = sidecars[str(item["circuit_sidecar"])]
-        expected_circuit = {
-            "family": item["family"],
-            "n_qubits": item["n_qubits"],
-            "circuit_seed": item["circuit_seed"],
-        }
-        for field, expected in expected_circuit.items():
-            if circuit.get(field) != expected:
-                raise ValueError(
-                    f"item {item_id} circuit sidecar disagrees on {field}"
-                )
-        parameters = circuit.get("parameters")
-        if not isinstance(parameters, dict):
-            raise ValueError(f"item {item_id} circuit sidecar parameters are invalid")
-        for field, expected in parameters.items():
-            if item.get(field) != expected:
-                raise ValueError(
-                    f"item {item_id} circuit sidecar disagrees on parameter {field}"
-                )
-        expected_circuit_id = f"circuit-{canonical_hash(circuit)}"
+        expected_circuit, expected_circuit_id = (
+            canonical_physical_circuit_identity(item)
+        )
+        if canonical_json(circuit) != canonical_json(expected_circuit):
+            raise ValueError(
+                f"item {item_id} circuit sidecar is not the exact "
+                "canonical descriptor"
+            )
         if item["circuit_id"] != expected_circuit_id:
             raise ValueError(f"item {item_id} circuit_id does not match its sidecar")
 
@@ -745,13 +898,13 @@ def validate_split_artifact(data_dir: str | Path) -> tuple[list[dict], dict]:
         raise ValueError("dataset contains duplicate item_id values")
 
     spec = SplitSpec.from_dict(manifest["split_spec"])
-    validate_split_spec(spec)
     actual_spec_hash = split_spec_hash(spec)
     if manifest.get("split_spec_hash") != actual_spec_hash:
         raise ValueError(
             "split_spec_hash mismatch: "
             f"manifest={manifest.get('split_spec_hash')}, actual={actual_spec_hash}"
         )
+    validate_split_spec(spec)
 
     expected_resolution = resolve_split_spec(spec)
     expected_pools = [pool.to_dict() for pool in expected_resolution.circuit_pools]
@@ -772,19 +925,11 @@ def validate_split_artifact(data_dir: str | Path) -> tuple[list[dict], dict]:
     if stored_cells_without_hashes != expected_cells:
         raise ValueError("resolved cells do not match split_spec")
     validate_axis_contract(spec, cells)
-    _validate_item_semantics(items, manifest, expected_resolution)
 
-    actual_counts = _split_counts(items)
-    if manifest.get("counts") != actual_counts:
-        raise ValueError(
-            f"manifest counts do not match rows: actual={actual_counts}"
-        )
-    actual_ledger = _split_generation_ledger(items)
-    if manifest.get("generation_ledger") != actual_ledger:
-        raise ValueError(
-            "manifest generation_ledger does not match row-derived accounting"
-        )
-
+    # Integrity before semantics. An unrehashed mutation must fail the hash
+    # chain rather than a row-semantic check, so tampering is reported as
+    # tampering. A fully rehashed row passes integrity here and is then caught
+    # by validate_item, which is where an impossible value belongs.
     actual_cell_hashes = cell_item_stream_hashes(items)
     if actual_cell_hashes != stored_cell_hashes:
         differing = sorted(
@@ -802,6 +947,26 @@ def validate_split_artifact(data_dir: str | Path) -> tuple[list[dict], dict]:
         raise ValueError(
             f"items_hash mismatch: manifest={manifest.get('items_hash')}, "
             f"actual={actual_items_hash}"
+        )
+
+    _validate_item_semantics(items, manifest, expected_resolution)
+
+    actual_counts = _split_counts(items)
+    if manifest.get("counts") != actual_counts:
+        raise ValueError(
+            f"manifest counts do not match rows: actual={actual_counts}"
+        )
+    actual_ledger = _split_generation_ledger(items)
+    if manifest.get("generation_ledger") != actual_ledger:
+        raise ValueError(
+            "manifest generation_ledger does not match row-derived accounting"
+        )
+    declared_test_cap = spec.test_group_shot_budget
+    actual_test_cost = actual_ledger["circuit_evals_by_role"]["test"]
+    if declared_test_cap is not None and actual_test_cost > declared_test_cap:
+        raise ValueError(
+            "test circuit-evaluation budget exceeded: "
+            f"declared={declared_test_cap}, actual={actual_test_cost}"
         )
 
     stored_sidecars = manifest.get("sidecar_hashes")
@@ -874,6 +1039,7 @@ def validate_split_artifact(data_dir: str | Path) -> tuple[list[dict], dict]:
 
 __all__ = [
     "LEGACY_SCHEMA_VERSION",
+    "SPLIT_SEED_FORMULA",
     "SPLIT_SCHEMA_VERSION",
     "canonical_hash",
     "canonical_item_lines",

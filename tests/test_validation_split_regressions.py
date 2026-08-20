@@ -2,6 +2,7 @@ import copy
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 from dataclasses import replace
@@ -9,16 +10,25 @@ from pathlib import Path
 
 import pytest
 
+import qem_bench.validation as validation_module
 from qem_bench.datasets.generate import generate
-from qem_bench.datasets.schema import validate_item
+from qem_bench.datasets.schema import (
+    LEGACY_SCHEMA_VERSION,
+    SPLIT_SCHEMA_VERSION,
+    canonical_physical_circuit_identity,
+    validate_item,
+)
 from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
+from qem_bench.datasets.splits import SplitSpec
 from qem_bench.validation import (
+    canonical_hash,
     canonical_item_lines,
     canonical_json,
     cell_item_stream_hashes,
     item_stream_hash,
     split_dataset_hash,
     validate_split_artifact,
+    validate_split_spec,
 )
 
 
@@ -46,6 +56,451 @@ def _write_rehashed_artifact(data: Path, items: list[dict], manifest: dict) -> N
     )
     (data / "manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+    )
+
+
+def _write_sidecar(data: Path, category: str, value: dict) -> tuple[str, str]:
+    payload = (canonical_json(value) + "\n").encode("utf-8")
+    digest = hashlib.sha256(payload).hexdigest()
+    relative = (Path("sidecars") / category / f"{digest}.json").as_posix()
+    path = data / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+    return digest, relative
+
+
+def _rewrite_circuit_descriptor_and_all_hashes(
+    data: Path, items: list[dict], manifest: dict, mutate
+) -> dict:
+    old_circuit_relative = items[0]["circuit_sidecar"]
+    affected = [
+        item for item in items if item["circuit_sidecar"] == old_circuit_relative
+    ]
+    descriptor = json.loads(
+        (data / old_circuit_relative).read_text(encoding="utf-8")
+    )
+    mutate(descriptor)
+    circuit_digest, circuit_relative = _write_sidecar(
+        data, "circuits", descriptor
+    )
+    circuit_id = f"circuit-{canonical_hash(descriptor)}"
+
+    counts_updates = {}
+    for old_counts_relative in {
+        item["counts_sidecar"] for item in affected
+    }:
+        counts = json.loads(
+            (data / old_counts_relative).read_text(encoding="utf-8")
+        )
+        counts["circuit_id"] = circuit_id
+        counts_updates[old_counts_relative] = _write_sidecar(data, "counts", counts)
+
+    for item in affected:
+        item["circuit_id"] = circuit_id
+        item["circuit_hash"] = circuit_digest
+        item["circuit_sidecar"] = circuit_relative
+        counts_digest, counts_relative = counts_updates[item["counts_sidecar"]]
+        item["counts_hash"] = counts_digest
+        item["counts_sidecar"] = counts_relative
+        item["measurement_group"] = (
+            f"{item['cell_id']}:{circuit_id}:r{item['replicate']}:g0"
+        )
+        item_descriptor = {
+            "cell_id": item["cell_id"],
+            "circuit_id": circuit_id,
+            "observable_id": item["observable_id"],
+            "replicate": item["replicate"],
+        }
+        item["item_id"] = f"item-{canonical_hash(item_descriptor)}"
+
+    manifest["sidecar_hashes"].pop(old_circuit_relative)
+    manifest["sidecar_hashes"][circuit_relative] = circuit_digest
+    for old_counts_relative, (counts_digest, counts_relative) in counts_updates.items():
+        manifest["sidecar_hashes"].pop(old_counts_relative)
+        manifest["sidecar_hashes"][counts_relative] = counts_digest
+    manifest["sidecar_hashes"] = dict(sorted(manifest["sidecar_hashes"].items()))
+    _write_rehashed_artifact(data, items, manifest)
+    return descriptor
+
+
+def _rewrite_circuit_rows_and_all_hashes(
+    data: Path, items: list[dict], manifest: dict, mutate
+) -> None:
+    old_circuit_relative = items[0]["circuit_sidecar"]
+    affected = [
+        item for item in items if item["circuit_sidecar"] == old_circuit_relative
+    ]
+    for item in affected:
+        mutate(item)
+
+    descriptor, circuit_id = canonical_physical_circuit_identity(affected[0])
+    for item in affected[1:]:
+        sibling_descriptor, sibling_id = canonical_physical_circuit_identity(item)
+        assert sibling_descriptor == descriptor
+        assert sibling_id == circuit_id
+    circuit_digest, circuit_relative = _write_sidecar(
+        data, "circuits", descriptor
+    )
+
+    counts_updates = {}
+    for old_counts_relative in {
+        item["counts_sidecar"] for item in affected
+    }:
+        counts = json.loads(
+            (data / old_counts_relative).read_text(encoding="utf-8")
+        )
+        counts["circuit_id"] = circuit_id
+        counts_updates[old_counts_relative] = _write_sidecar(data, "counts", counts)
+
+    observable_updates = {}
+    for item in affected:
+        old_observable_relative = item["observable_sidecar"]
+        key = (
+            old_observable_relative,
+            item["n_qubits"],
+            item["pauli_label"],
+        )
+        if key not in observable_updates:
+            observable = json.loads(
+                (data / old_observable_relative).read_text(encoding="utf-8")
+            )
+            observable["n_qubits"] = item["n_qubits"]
+            observable["pauli_label"] = item["pauli_label"]
+            observable_updates[key] = _write_sidecar(
+                data, "observables", observable
+            )
+
+    for item in affected:
+        item["circuit_id"] = circuit_id
+        item["circuit_hash"] = circuit_digest
+        item["circuit_sidecar"] = circuit_relative
+        counts_digest, counts_relative = counts_updates[item["counts_sidecar"]]
+        item["counts_hash"] = counts_digest
+        item["counts_sidecar"] = counts_relative
+        observable_key = (
+            item["observable_sidecar"],
+            item["n_qubits"],
+            item["pauli_label"],
+        )
+        observable_digest, observable_relative = observable_updates[observable_key]
+        item["observable_hash"] = observable_digest
+        item["observable_sidecar"] = observable_relative
+        item["measurement_group"] = (
+            f"{item['cell_id']}:{circuit_id}:r{item['replicate']}:g0"
+        )
+        item_descriptor = {
+            "cell_id": item["cell_id"],
+            "circuit_id": circuit_id,
+            "observable_id": item["observable_id"],
+            "replicate": item["replicate"],
+        }
+        item["item_id"] = f"item-{canonical_hash(item_descriptor)}"
+
+    reference_fields = (
+        ("circuit_sidecar", "circuit_hash"),
+        ("noise_sidecar", "noise_config_hash"),
+        ("observable_sidecar", "observable_hash"),
+        ("counts_sidecar", "counts_hash"),
+    )
+    manifest["sidecar_hashes"] = dict(
+        sorted(
+            {
+                item[path_field]: item[hash_field]
+                for item in items
+                for path_field, hash_field in reference_fields
+            }.items()
+        )
+    )
+    _write_rehashed_artifact(data, items, manifest)
+
+
+def _single_family_spec(
+    family: str, family_parameters: dict, *, n_qubits: int = 4
+) -> SplitSpec:
+    return SplitSpec(
+        split_id="S0",
+        source_domain={"circuit_instance": ["sampled"]},
+        target_domain={"circuit_instance": ["sampled"]},
+        fixed_axes={
+            "noise_family": ["depolarizing_readout"],
+            "noise_strength": ["L1"],
+            "circuit_family": [family],
+            "family_native_depth": [1],
+            "observable_class": ["z_mid"],
+            "shots": [16],
+        },
+        n_qubits=[n_qubits],
+        role_counts={"train": 1, "validation": 1, "test": 1},
+        family_parameters={family: family_parameters},
+    )
+
+
+_VALID_FAMILY_PARAMETERS = {
+    "tfi": {"dt": 0.2},
+    "heisenberg": {"dt": 0.15},
+    "qaoa": {"graph_classes": ["path"]},
+    "random_clifford": {},
+    "near_clifford": {
+        "non_clifford_count": [1],
+        "theta": [0.4487989505128276],
+    },
+}
+
+
+@pytest.mark.parametrize(
+    ("family", "field", "value"),
+    (
+        pytest.param("tfi", "j", [999.0], id="tfi-j"),
+        pytest.param("tfi", "h", [999.0], id="tfi-h"),
+        pytest.param("heisenberg", "jx", [999.0], id="heisenberg-jx"),
+        pytest.param("heisenberg", "jy", [999.0], id="heisenberg-jy"),
+        pytest.param("heisenberg", "jz", [999.0], id="heisenberg-jz"),
+        pytest.param("qaoa", "graph_class", "path", id="qaoa-graph-class"),
+        pytest.param("qaoa", "edges", [[0, 1]], id="qaoa-edges"),
+        pytest.param(
+            "qaoa", "edge_probability", 0.4, id="qaoa-edge-probability"
+        ),
+        pytest.param("qaoa", "gammas", [0.1], id="qaoa-gammas"),
+        pytest.param("qaoa", "betas", [0.1], id="qaoa-betas"),
+    ),
+)
+def test_family_parameter_maps_reject_sampled_output_fields(family, field, value):
+    parameters = {**copy.deepcopy(_VALID_FAMILY_PARAMETERS[family]), field: value}
+
+    with pytest.raises(
+        ValueError,
+        match=rf"family_parameters\['{family}'\].*extra=\['{field}'\]",
+    ):
+        validate_split_spec(_single_family_spec(family, parameters))
+
+
+@pytest.mark.parametrize("family", sorted(_VALID_FAMILY_PARAMETERS))
+def test_every_family_parameter_map_rejects_an_unknown_field(family):
+    parameters = {
+        **copy.deepcopy(_VALID_FAMILY_PARAMETERS[family]),
+        "unknown_knob": "ignored",
+    }
+
+    with pytest.raises(
+        ValueError,
+        match=rf"family_parameters\['{family}'\].*extra=\['unknown_knob'\]",
+    ):
+        validate_split_spec(_single_family_spec(family, parameters))
+
+
+@pytest.mark.parametrize(
+    ("family", "parameters", "missing"),
+    (
+        pytest.param("tfi", {}, "dt", id="tfi-dt"),
+        pytest.param("heisenberg", {}, "dt", id="heisenberg-dt"),
+        pytest.param("qaoa", {}, "graph_classes", id="qaoa-graph-classes"),
+        pytest.param(
+            "near_clifford",
+            {"theta": [0.4487989505128276]},
+            "non_clifford_count",
+            id="near-clifford-count",
+        ),
+        pytest.param(
+            "near_clifford",
+            {"non_clifford_count": [1]},
+            "theta",
+            id="near-clifford-theta",
+        ),
+    ),
+)
+def test_family_parameter_maps_require_every_generator_input(
+    family, parameters, missing
+):
+    with pytest.raises(
+        ValueError,
+        match=rf"family_parameters\['{family}'\].*missing=\['{missing}'\]",
+    ):
+        validate_split_spec(_single_family_spec(family, parameters))
+
+
+def test_reviewer_unknown_knob_artifact_is_rejected(monkeypatch, tmp_path):
+    parameters = {
+        **_VALID_FAMILY_PARAMETERS["tfi"],
+        "j": [999.0],
+        "unknown_knob": "ignored",
+    }
+    spec = _single_family_spec("tfi", parameters, n_qubits=3)
+    data = tmp_path / "reviewer-unknown-knob"
+
+    with monkeypatch.context() as generation_bypass:
+        generation_bypass.setattr(
+            validation_module, "validate_split_spec", lambda spec: None
+        )
+        manifest = generate_split(spec, data)
+
+    items, _ = _load_artifact(data)
+    assert all(
+        {"j", "unknown_knob"} <= set(pool["parameter_grid"])
+        for pool in manifest["circuit_pools"]
+    )
+    assert all(item["j"] != 999.0 for item in items)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"family_parameters\['tfi'\] has invalid fields; "
+            r"missing=\[\], extra=\['j', 'unknown_knob'\]"
+        ),
+    ):
+        validate_split_artifact(data)
+
+
+@pytest.fixture(scope="module")
+def authored_pool_artifacts(tmp_path_factory):
+    root = tmp_path_factory.mktemp("authored-pool-artifacts")
+    cases = {
+        "tfi": _single_family_spec("tfi", {"dt": 0.2}),
+        "heisenberg": _single_family_spec("heisenberg", {"dt": 0.15}),
+        "qaoa-path": _single_family_spec(
+            "qaoa", {"graph_classes": ["path"]}
+        ),
+        "qaoa-fixed-er": _single_family_spec(
+            "qaoa",
+            {"graph_classes": ["erdos_renyi"], "er_edge_probability": 0.4},
+        ),
+        "random-clifford": _single_family_spec("random_clifford", {}),
+        "near-clifford": _single_family_spec(
+            "near_clifford",
+            {
+                "non_clifford_count": [1],
+                "theta": [0.4487989505128276],
+            },
+        ),
+    }
+    artifacts = {}
+    for name, spec in cases.items():
+        data = root / name
+        generate_split(spec, data)
+        artifacts[name] = data
+    return artifacts
+
+
+def _set_unauthorized_authored_value(item: dict, field: str) -> None:
+    if field == "n_qubits":
+        old_n_qubits = item[field]
+        item[field] = old_n_qubits + 1
+        item["pauli_label"] = f"I{item['pauli_label']}"
+        if item["family"] == "qaoa" and item["graph_class"] == "path":
+            item["edges"] = [*item["edges"], [old_n_qubits - 1, old_n_qubits]]
+    elif field in {"steps", "depth"}:
+        item[field] = 2
+    elif field == "p":
+        item[field] = 2
+        item["gammas"] = [*item["gammas"], 0.1]
+        item["betas"] = [*item["betas"], 0.1]
+    elif field == "dt":
+        item[field] = 0.3
+    elif field == "graph_class":
+        item[field] = "cycle"
+        item["edges"] = [*item["edges"], [0, item["n_qubits"] - 1]]
+    elif field == "edge_probability":
+        item[field] = 0.5
+    elif field == "non_clifford_count":
+        item[field] = 2
+    elif field == "theta":
+        item[field] = 0.6283185307179586
+    else:
+        raise AssertionError(f"unhandled authored field {field}")
+
+
+_UNAUTHORIZED_AUTHORED_FIELDS = (
+    pytest.param("tfi", "n_qubits", "n_qubits", id="tfi-width"),
+    pytest.param("tfi", "steps", "steps", id="tfi-depth"),
+    pytest.param("tfi", "dt", "parameter_grid.dt", id="tfi-dt"),
+    pytest.param("heisenberg", "n_qubits", "n_qubits", id="heisenberg-width"),
+    pytest.param("heisenberg", "steps", "steps", id="heisenberg-depth"),
+    pytest.param(
+        "heisenberg", "dt", "parameter_grid.dt", id="heisenberg-dt"
+    ),
+    pytest.param("qaoa-path", "n_qubits", "n_qubits", id="qaoa-width"),
+    pytest.param("qaoa-path", "p", "p", id="qaoa-depth"),
+    pytest.param(
+        "qaoa-path",
+        "graph_class",
+        "parameter_grid.graph_classes",
+        id="qaoa-graph-class",
+    ),
+    pytest.param(
+        "qaoa-fixed-er",
+        "edge_probability",
+        "parameter_grid.er_edge_probability",
+        id="qaoa-fixed-er-probability",
+    ),
+    pytest.param(
+        "random-clifford", "n_qubits", "n_qubits", id="random-clifford-width"
+    ),
+    pytest.param(
+        "random-clifford", "depth", "depth", id="random-clifford-depth"
+    ),
+    pytest.param(
+        "near-clifford", "n_qubits", "n_qubits", id="near-clifford-width"
+    ),
+    pytest.param(
+        "near-clifford", "depth", "depth", id="near-clifford-depth"
+    ),
+    pytest.param(
+        "near-clifford",
+        "non_clifford_count",
+        "parameter_grid.non_clifford_count",
+        id="near-clifford-insertion-count",
+    ),
+    pytest.param(
+        "near-clifford",
+        "theta",
+        "parameter_grid.theta",
+        id="near-clifford-theta",
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    ("artifact_name", "field", "mismatch_field"),
+    _UNAUTHORIZED_AUTHORED_FIELDS,
+)
+def test_rehashed_rows_reject_values_outside_the_authored_pool_grid(
+    tmp_path,
+    authored_pool_artifacts,
+    artifact_name,
+    field,
+    mismatch_field,
+):
+    data = tmp_path / artifact_name
+    shutil.copytree(authored_pool_artifacts[artifact_name], data)
+    items, manifest = _load_artifact(data)
+    _rewrite_circuit_rows_and_all_hashes(
+        data,
+        items,
+        manifest,
+        lambda item: _set_unauthorized_authored_value(item, field),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=rf"disagrees with its cell.*{mismatch_field}",
+    ):
+        validate_split_artifact(data)
+
+
+def _old_subset_sidecar_check(item: dict, circuit: dict) -> bool:
+    expected_top_level = {
+        "family": item["family"],
+        "n_qubits": item["n_qubits"],
+        "circuit_seed": item["circuit_seed"],
+    }
+    parameters = circuit.get("parameters")
+    return (
+        all(
+            circuit.get(field) == expected
+            for field, expected in expected_top_level.items()
+        )
+        and isinstance(parameters, dict)
+        and all(item.get(field) == expected for field, expected in parameters.items())
+        and item["circuit_id"] == f"circuit-{canonical_hash(circuit)}"
     )
 
 
@@ -125,6 +580,45 @@ def test_fractional_integer_declarations_are_rejected(field, value, message):
         replace(SPLIT_PRESETS["s0-t0-micro"], **{field: value})
 
 
+@pytest.mark.parametrize("value", (1.9, 1.0, True))
+def test_family_native_depth_requires_an_exact_positive_integer(tmp_path, value):
+    base = SPLIT_PRESETS["s0-t0-micro"]
+    spec = replace(
+        base,
+        fixed_axes={
+            **dict(base.fixed_axes),
+            "family_native_depth": [value],
+        },
+    )
+
+    with pytest.raises(
+        ValueError, match="family_native_depth values must be positive integers"
+    ):
+        generate_split(spec, tmp_path / "fractional-depth")
+
+
+@pytest.mark.parametrize("value", (512.0, True))
+def test_shots_axis_requires_an_exact_positive_integer(value):
+    base = SPLIT_PRESETS["s0-t0-micro"]
+    spec = replace(
+        base,
+        fixed_axes={**dict(base.fixed_axes), "shots": [value]},
+    )
+
+    with pytest.raises(ValueError, match="shots values must be positive integers"):
+        validate_split_spec(spec)
+
+
+@pytest.mark.parametrize("value", (7.9, 7.0, True, "7"))
+def test_split_master_seed_requires_an_exact_nonnegative_integer(tmp_path, value):
+    with pytest.raises(
+        ValueError, match="master_seed must be a nonnegative integer"
+    ):
+        generate_split(
+            SPLIT_PRESETS["s0-t0-micro"], tmp_path / "invalid-seed", value
+        )
+
+
 @pytest.mark.parametrize(
     ("field", "value", "message"),
     (
@@ -145,6 +639,27 @@ def test_fractional_integer_declarations_are_rejected(field, value, message):
 def test_boolean_integer_declarations_are_rejected(field, value, message):
     with pytest.raises(ValueError, match=message):
         replace(SPLIT_PRESETS["s0-t0-micro"], **{field: value})
+
+
+def test_unknown_authored_budget_tier_is_rejected():
+    spec = replace(SPLIT_PRESETS["s0-t0-micro"], budget_tier="unknown")
+
+    with pytest.raises(ValueError, match="unknown budget_tier 'unknown'"):
+        validate_split_spec(spec)
+
+
+def test_authored_test_group_shot_budget_binds_realized_test_cost(tmp_path):
+    data = tmp_path / "test-budget"
+    spec = replace(
+        SPLIT_PRESETS["s0-t0-micro"], test_group_shot_budget=1
+    )
+    generate_split(spec, data)
+
+    with pytest.raises(
+        ValueError,
+        match="test circuit-evaluation budget exceeded: declared=1, actual=1024",
+    ):
+        validate_split_artifact(data)
 
 
 @pytest.mark.parametrize("value", (float("nan"), float("inf"), float("-inf")))
@@ -172,6 +687,77 @@ def test_schema_invalid_rows_are_rejected_after_all_hashes_are_recomputed(tmp_pa
         ValueError,
         match="family 'tfi' requires stratum 'continuous_regression'",
     ):
+        validate_split_artifact(data)
+
+
+@pytest.mark.protocol("QEM-P004")
+def test_result_only_fields_are_rejected_after_all_hashes_are_recomputed(tmp_path):
+    data = tmp_path / "result-fields"
+    generate("s0-t0-micro", data)
+    original_items, original_manifest = _load_artifact(data)
+    excluded = (
+        ("prediction", 0.0),
+        ("residual", 0.0),
+        ("accept", True),
+        ("method", "raw"),
+        ("mae", 0.0),
+        ("wall_clock_seconds", 1.0),
+    )
+
+    for field, value in excluded:
+        items = copy.deepcopy(original_items)
+        manifest = copy.deepcopy(original_manifest)
+        items[0][field] = value
+        _write_rehashed_artifact(data, items, manifest)
+        with pytest.raises(ValueError, match=rf"unsupported fields: \['{field}'\]"):
+            validate_split_artifact(data)
+
+
+def test_realized_family_depth_matches_the_declared_cell_depth(tmp_path):
+    data = tmp_path / "depth-mismatch"
+    generate("s0-t0-micro", data)
+    items, manifest = _load_artifact(data)
+    group = items[0]["measurement_group"]
+    for item in items:
+        if item["measurement_group"] == group:
+            item["steps"] += 1
+    _write_rehashed_artifact(data, items, manifest)
+
+    with pytest.raises(ValueError, match="disagrees with its cell.*steps"):
+        validate_split_artifact(data)
+
+
+@pytest.mark.protocol("QEM-P006")
+def test_split_manifest_seed_contract_is_recomputed(tmp_path):
+    data = tmp_path / "seed-contract"
+    generate("s0-t0-micro", data)
+    _, original = _load_artifact(data)
+    manifest_path = data / "manifest.json"
+
+    changed_seed = copy.deepcopy(original)
+    changed_seed["master_seed"] = 8
+    changed_seed["seed_scheme"]["master_seed"] = 8
+    manifest_path.write_text(
+        json.dumps(changed_seed, indent=2) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="disagrees with its cell.*circuit_seed"):
+        validate_split_artifact(data)
+
+    negative_seed = copy.deepcopy(original)
+    negative_seed["master_seed"] = -1
+    negative_seed["seed_scheme"]["master_seed"] = -1
+    manifest_path.write_text(
+        json.dumps(negative_seed, indent=2) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="master_seed must be a nonnegative integer"):
+        validate_split_artifact(data)
+
+    wrong_scheme = copy.deepcopy(original)
+    wrong_scheme["seed_scheme"]["formula"] = "unbound"
+    manifest_path.write_text(
+        json.dumps(wrong_scheme, indent=2) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="seed_scheme does not match master_seed"):
         validate_split_artifact(data)
 
 
@@ -221,7 +807,7 @@ def test_validate_item_rejects_wrong_numeric_types_and_nonfinite_values(tmp_path
     for field in integer_fields:
         mutated = {**item, field: float(item[field])}
         with pytest.raises(ValueError, match=rf"field {field} must be an integer"):
-            validate_item(mutated)
+            validate_item(mutated, schema_version=SPLIT_SCHEMA_VERSION)
 
     finite_fields = (
         "noisy_expectation",
@@ -234,7 +820,7 @@ def test_validate_item_rejects_wrong_numeric_types_and_nonfinite_values(tmp_path
     for field in finite_fields:
         mutated = {**item, field: float("inf")}
         with pytest.raises(ValueError, match=rf"field {field} must be finite"):
-            validate_item(mutated)
+            validate_item(mutated, schema_version=SPLIT_SCHEMA_VERSION)
 
 
 def test_validate_item_checks_qaoa_nested_numeric_fields(tmp_path):
@@ -243,7 +829,7 @@ def test_validate_item_checks_qaoa_nested_numeric_fields(tmp_path):
     items, _ = _load_artifact(data)
     item = items[0]
 
-    validate_item(item)
+    validate_item(item, schema_version=LEGACY_SCHEMA_VERSION)
 
     mutations = (
         ("p", float(item["p"]), "field p must be an integer"),
@@ -255,7 +841,7 @@ def test_validate_item_checks_qaoa_nested_numeric_fields(tmp_path):
     for field, value, message in mutations:
         mutated = {**item, field: value}
         with pytest.raises(ValueError, match=message):
-            validate_item(mutated)
+            validate_item(mutated, schema_version=LEGACY_SCHEMA_VERSION)
 
 
 @pytest.mark.parametrize(
@@ -271,7 +857,15 @@ def test_row_to_cell_mismatches_survive_hash_recomputation(
     data = tmp_path / field
     generate("s0-t0-micro", data)
     items, manifest = _load_artifact(data)
-    items[0][field] = value
+    # Pick a row whose current value differs from the one being written, so the
+    # mutation is always a real change. Row order follows the identity hash and
+    # is not stable, so items[0] may already hold the value under test.
+    target = next(
+        (item for item in items if item[field] != value),
+        None,
+    )
+    assert target is not None, f"every row already has {field}={value!r}"
+    target[field] = value
     _write_rehashed_artifact(data, items, manifest)
 
     with pytest.raises(ValueError, match=message):
@@ -327,6 +921,32 @@ def test_sidecar_semantics_are_checked_after_all_hashes_are_recomputed(tmp_path)
     _write_rehashed_artifact(data, items, manifest)
 
     with pytest.raises(
-        ValueError, match="circuit sidecar disagrees on n_qubits"
+        ValueError, match="circuit sidecar is not the exact canonical descriptor"
+    ):
+        validate_split_artifact(data)
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    (
+        lambda descriptor: descriptor["parameters"].pop("h"),
+        lambda descriptor: descriptor["parameters"].__setitem__("extra", None),
+    ),
+    ids=("deleted-required-parameter", "added-null-parameter"),
+)
+def test_circuit_sidecar_is_closed_after_every_dependent_hash_is_recomputed(
+    tmp_path, mutate
+):
+    data = tmp_path / "closed-circuit-sidecar"
+    generate("s0-t0-micro", data)
+    items, manifest = _load_artifact(data)
+    descriptor = _rewrite_circuit_descriptor_and_all_hashes(
+        data, items, manifest, mutate
+    )
+
+    assert _old_subset_sidecar_check(items[0], descriptor)
+
+    with pytest.raises(
+        ValueError, match="circuit sidecar is not the exact canonical descriptor"
     ):
         validate_split_artifact(data)

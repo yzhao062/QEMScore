@@ -17,6 +17,7 @@ import hashlib
 import json
 import platform
 from pathlib import Path
+from types import MappingProxyType
 
 import numpy as np
 
@@ -152,15 +153,32 @@ PRESETS: dict[str, dict] = {
 }
 
 # These named fixtures retain their original item serializer. Their golden
-# hashes live only in tests and tools, never in production validation.
-LEGACY_FROZEN_PRESETS = frozenset({"t0-micro", "t0-smoke"})
+# hashes live only in tests and tools, never in production validation. The
+# strings detach serializer selection from later mutations of the public table.
+_FROZEN_LEGACY_CONFIGURATIONS = MappingProxyType(
+    {
+        name: json.dumps(
+            {**PRESETS[name], "noise_family": DEFAULT_NOISE_FAMILY},
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        for name in ("t0-micro", "t0-smoke")
+    }
+)
+LEGACY_FROZEN_PRESETS = frozenset(_FROZEN_LEGACY_CONFIGURATIONS)
 
 
 def _uses_frozen_legacy_serializer(preset_name: object, config: dict) -> bool:
     if not isinstance(preset_name, str) or preset_name not in LEGACY_FROZEN_PRESETS:
         return False
-    expected = {**PRESETS[preset_name], "noise_family": DEFAULT_NOISE_FAMILY}
-    return config == expected
+    actual = json.dumps(
+        config,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+    return actual == _FROZEN_LEGACY_CONFIGURATIONS[preset_name]
 
 CircuitParams = (
     TFIParams
@@ -253,8 +271,8 @@ def _family_parameter_fields(params: CircuitParams) -> dict:
     if isinstance(params, TFIParams):
         return {
             "steps": params.steps,
-            "j": round(params.j, 12),
-            "h": round(params.h, 12),
+            "j": params.j,
+            "h": params.h,
             "dt": params.dt,
         }
     if isinstance(params, QAOAParams):
@@ -281,6 +299,14 @@ def _family_parameter_fields(params: CircuitParams) -> dict:
         "non_clifford_count": params.non_clifford_count,
         "theta": params.theta,
     }
+
+
+def _frozen_legacy_parameter_fields(params: CircuitParams) -> dict:
+    fields = _family_parameter_fields(params)
+    if isinstance(params, TFIParams):
+        fields["j"] = round(params.j, 12)
+        fields["h"] = round(params.h, 12)
+    return fields
 
 
 def _canonical_lines(items: list[dict]) -> list[str]:
@@ -337,7 +363,9 @@ def generate(
     cfg = dict(PRESETS[preset]) if isinstance(preset, str) else dict(preset)
     preset_name = preset if isinstance(preset, str) else cfg.get("name", "custom")
     if master_seed is not None:
-        cfg["master_seed"] = int(master_seed)
+        if type(master_seed) is not int or master_seed < 0:
+            raise ValueError("master_seed must be a nonnegative integer")
+        cfg["master_seed"] = master_seed
     if noise_family is not None:
         cfg["noise_family"] = str(noise_family)
 
@@ -372,8 +400,17 @@ def generate(
             f"unknown severities for {selected_noise_family}: {unknown_severities}"
         )
 
+    if type(cfg["master_seed"]) is not int or cfg["master_seed"] < 0:
+        raise ValueError("master_seed must be a nonnegative integer")
+    for field, minimum in (("n_train", 0), ("n_test", 0), ("shots", 1)):
+        value = cfg[field]
+        if type(value) is not int or value < minimum:
+            bound = "positive" if minimum == 1 else "nonnegative"
+            raise ValueError(f"{field} must be a {bound} integer")
+
     artifact_environment_contract = environment_contract()
-    master = int(cfg["master_seed"])
+    master = cfg["master_seed"]
+    frozen_legacy_serializer = _uses_frozen_legacy_serializer(preset_name, cfg)
     out = Path(out_dir)
     try:
         out.mkdir(parents=True, exist_ok=False)
@@ -392,6 +429,11 @@ def generate(
         )
         params, circuit = _sample_and_build_circuit(
             cfg, rng, instance, circuit_seed
+        )
+        parameter_fields = (
+            _frozen_legacy_parameter_fields(params)
+            if frozen_legacy_serializer
+            else _family_parameter_fields(params)
         )
         severity = cfg["severities"][instance % len(cfg["severities"])]
 
@@ -441,12 +483,12 @@ def generate(
                 "two_qubit_gates": structure["two_qubit_gates"],
                 "transpiled_depth": structure["transpiled_depth"],
             }
-            item.update(_family_parameter_fields(params))
-            validate_item(item)
+            item.update(parameter_fields)
+            validate_item(item, schema_version=LEGACY_SCHEMA_VERSION)
             items.append(item)
 
     written_items = items
-    if _uses_frozen_legacy_serializer(preset_name, cfg):
+    if frozen_legacy_serializer:
         compatible_items = []
         for item in items:
             compatible = dict(item)

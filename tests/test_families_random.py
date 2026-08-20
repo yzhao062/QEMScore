@@ -83,6 +83,97 @@ def test_random_clifford_sampling_and_build_are_seeded():
     )
 
 
+@pytest.mark.parametrize("value", (2.9, 2.0, True))
+@pytest.mark.parametrize("family", ("random_clifford", "near_clifford"))
+def test_random_family_samplers_reject_non_exact_integer_depths(family, value):
+    common = {
+        "rng": np.random.default_rng(1),
+        "n_qubits_choices": [4],
+        "depth_choices": [value],
+        "instance": 0,
+        "circuit_seed": 0,
+    }
+    if family == "random_clifford":
+        with pytest.raises(ValueError, match="depth choices"):
+            sample_random_clifford_params(**common)
+    else:
+        with pytest.raises(ValueError, match="depth choices"):
+            sample_near_clifford_params(
+                **common,
+                non_clifford_count_choices=[1],
+                theta_choices=[np.pi / 7],
+            )
+
+
+@pytest.mark.parametrize(
+    ("sampler", "kwargs", "message"),
+    (
+        (
+            sample_random_clifford_params,
+            {"n_qubits_choices": [4.0], "depth_choices": [2]},
+            "qubit choices",
+        ),
+        (
+            sample_near_clifford_params,
+            {
+                "n_qubits_choices": [True],
+                "depth_choices": [2],
+                "non_clifford_count_choices": [1],
+                "theta_choices": [np.pi / 7],
+            },
+            "qubit choices",
+        ),
+        (
+            sample_near_clifford_params,
+            {
+                "n_qubits_choices": [4],
+                "depth_choices": [2],
+                "non_clifford_count_choices": [1.9],
+                "theta_choices": [np.pi / 7],
+            },
+            "insertion counts",
+        ),
+    ),
+)
+def test_random_family_samplers_reject_other_non_exact_integer_choices(
+    sampler, kwargs, message
+):
+    with pytest.raises(ValueError, match=message):
+        sampler(
+            np.random.default_rng(1),
+            **kwargs,
+            instance=0,
+            circuit_seed=0,
+        )
+
+
+@pytest.mark.parametrize("field", ("instance", "circuit_seed"))
+@pytest.mark.parametrize("value", (2.5, 2.0, True))
+def test_random_family_samplers_reject_non_exact_integer_identifiers(field, value):
+    kwargs = {
+        "n_qubits_choices": [4],
+        "depth_choices": [2],
+        "instance": 0,
+        "circuit_seed": 0,
+    }
+    kwargs[field] = value
+    with pytest.raises(ValueError, match=field):
+        sample_random_clifford_params(np.random.default_rng(1), **kwargs)
+
+
+def test_near_clifford_sampler_rejects_boolean_theta():
+    with pytest.raises(ValueError, match="theta choices"):
+        sample_near_clifford_params(
+            np.random.default_rng(1),
+            n_qubits_choices=[4],
+            depth_choices=[2],
+            non_clifford_count_choices=[1],
+            theta_choices=[True],
+            instance=0,
+            circuit_seed=0,
+        )
+
+
 @pytest.mark.parametrize(("n_qubits", "depth"), [(3, 2), (4, 5), (7, 3)])
 def test_random_family_instruction_counts_match_parameters(n_qubits, depth):
     base_count = depth * (n_qubits + n_qubits // 2)

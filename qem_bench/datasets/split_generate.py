@@ -15,6 +15,7 @@ from qem_bench.datasets.schema import (
     FAMILY_LABEL_METHODS,
     FEATURE_SPEC_VERSION,
     FEATURES,
+    canonical_physical_circuit_identity,
     validate_item,
 )
 from qem_bench.datasets.splits import (
@@ -29,6 +30,7 @@ from qem_bench.observables import z_expectation_from_counts, z_support_label
 from qem_bench.reproducibility import environment_contract
 from qem_bench.sampling import sample_counts
 from qem_bench.validation import (
+    SPLIT_SEED_FORMULA,
     SPLIT_SCHEMA_VERSION,
     canonical_hash,
     canonical_item_lines,
@@ -37,13 +39,6 @@ from qem_bench.validation import (
     item_stream_hash,
     split_dataset_hash,
     split_spec_hash,
-)
-
-SPLIT_SEED_FORMULA = (
-    "circuit: SeedSequence(master_seed, spawn_key=tuple(pool_seed_key) + "
-    "(0, local_instance)); sampler: SeedSequence(master_seed, "
-    "spawn_key=tuple(cell_seed_key) + "
-    "(1, local_instance, replicate, measurement_basis_group))"
 )
 
 
@@ -192,9 +187,11 @@ def generate_split(
         spec_digest = split_spec_hash(spec)
         dataset_id = f"{spec.split_id.lower()}-{spec_digest[:12]}"
         default_master_seed = 7
-    master = default_master_seed if master_seed is None else int(master_seed)
+    if master_seed is not None and type(master_seed) is not int:
+        raise ValueError("master_seed must be a nonnegative integer")
+    master = default_master_seed if master_seed is None else master_seed
     if master < 0:
-        raise ValueError("master_seed must be nonnegative")
+        raise ValueError("master_seed must be a nonnegative integer")
 
     artifact_environment_contract = environment_contract()
     out = Path(out_dir)
@@ -227,12 +224,14 @@ def generate_split(
                 cfg, rng, local_instance, circuit_seed
             )
             parameter_fields = _family_parameter_fields(params)
-            descriptor = {
-                "family": pool.family,
-                "n_qubits": params.n_qubits,
-                "parameters": parameter_fields,
-                "circuit_seed": circuit_seed,
-            }
+            descriptor, circuit_id = canonical_physical_circuit_identity(
+                {
+                    "family": pool.family,
+                    "n_qubits": params.n_qubits,
+                    "circuit_seed": circuit_seed,
+                    **parameter_fields,
+                }
+            )
             circuit_hash, circuit_sidecar = _write_sidecar(
                 out, "circuits", descriptor, sidecar_hashes
             )
@@ -242,7 +241,7 @@ def generate_split(
                     "params": params,
                     "parameter_fields": parameter_fields,
                     "circuit_seed": circuit_seed,
-                    "circuit_id": f"circuit-{canonical_hash(descriptor)}",
+                    "circuit_id": circuit_id,
                     "circuit_hash": circuit_hash,
                     "circuit_sidecar": circuit_sidecar,
                     "local_instance": local_instance,
@@ -389,7 +388,7 @@ def generate_split(
                     "transpiled_depth": structure["transpiled_depth"],
                 }
                 item.update(circuit_record["parameter_fields"])
-                validate_item(item)
+                validate_item(item, schema_version=SPLIT_SCHEMA_VERSION)
                 items.append(item)
 
     items.sort(key=lambda item: item["item_id"])

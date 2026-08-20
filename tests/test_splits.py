@@ -11,7 +11,11 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from qem_bench.datasets.generate import generate
+from qem_bench.datasets.generate import (
+    PRESETS,
+    _uses_frozen_legacy_serializer,
+    generate,
+)
 from qem_bench.datasets.split_generate import generate_split
 from qem_bench.datasets.splits import (
     SPLIT_ALLOWED_COUPLINGS,
@@ -19,6 +23,7 @@ from qem_bench.datasets.splits import (
     SplitSpec,
     resolve_split_spec,
 )
+from qem_bench.noise.models import DEFAULT_NOISE_FAMILY
 from qem_bench.reproducibility import CI_LOCK_SHA256, CI_LOCK_SHA256_ENV
 from qem_bench.runner.run import _load
 from qem_bench.validation import (
@@ -38,17 +43,17 @@ SPLIT_GOLDENS = {
         ),
         "cell_hashes": {
             "cell-305b997a6ab380ec598ad1cc379ca0ce3d5f9b1d0e37e7046914d7cf71be67cd": (
-                "a0635a8d51e50b7dfb1f1ac8357c4a98e6a0ad2e0ac55a4dec091e051dacf38b"
+                "5ca3cc6958c220076719d4d4d356171e2b68f243cfabda7fb1d44b03d533217b"
             ),
             "cell-6cf34780024766a1b3e2fcc11792bb74af7c8c780ef736e48db17d27dd9e3548": (
-                "3b12dc004b0a41fa425bc465b5a5f8431ed791f77371c2e63fc3ad565130aa2b"
+                "96d11761b118cb7a0eda805623ea30b07a455f5778b5d3b63e16dd460eceddf1"
             ),
             "cell-90d7f7101da1bdb2a2f1d2d8187d97ed92af0ded4191770cac8d13db351cac64": (
-                "86cd67a4511ac36aa38aa9a6a4c74256b0d050b4a5b56045aec801763d245dfb"
+                "494a1d556369bf6f9dea9fc6280bb4e0c9d4b1886ac1462e1e5c8b4f874be376"
             ),
         },
         "dataset_hash": (
-            "4499f0cf0bf91356f1c6850c0a84081a3324a7adf78c6020c3e81c8fc6992823"
+            "50aeecfb2d463cecb4ad5e6ecb0b49eada57278004155e4472fdccf8f14efe41"
         ),
     },
     "s1": {
@@ -57,17 +62,17 @@ SPLIT_GOLDENS = {
         ),
         "cell_hashes": {
             "cell-3990d025c00443b1560ad94adef7b044628d9b3c0a61128225f97a8545134143": (
-                "00378ff3d75ddaae10ed282ff364c2a8be3f923cfe7b26169407810bbce7ea0e"
+                "4e486a3dfbacf86f43d37dab5434fc47c5ecb8f18028368dc7c14f08a231d6ec"
             ),
             "cell-55fc45cb35526860e0b8f3e874cf49aec26be662bdd401162a37e845eb473e59": (
-                "d760611cc97748a8d830369a1eb68b09a16b56da802b04bb562949cd94642b1e"
+                "f2ffd621c7beaa369114d9b54797458d3d3c1694a95922f1863d469cbece507e"
             ),
             "cell-aad90f0ed7c277258eb34edab5ac9665da9c3d5aee0271e4829bf0b7c563b6fd": (
-                "e63bd1562cc0e367b12c288ef799fad9f87c63846d4bf1f6615a893c39b5ebab"
+                "db86028a7d1938796b2664aff4c69c4a7a7f1cc14bd5bde4e2536fa5b237fc9a"
             ),
         },
         "dataset_hash": (
-            "8514a1572290c0cd42d795e6044511cae5cfb88fc70579efd84d066c7ae5f204"
+            "ae40bf2dba3d3263662aa6c6d07f7e0726b2663b352391e007be77222a688993"
         ),
     },
 }
@@ -117,6 +122,27 @@ def _spec(split_id: str) -> SplitSpec:
     )
 
 
+def _single_family_generation_spec(
+    family: str, family_parameters: dict
+) -> SplitSpec:
+    return SplitSpec(
+        split_id="S0",
+        source_domain={"circuit_instance": ["sampled"]},
+        target_domain={"circuit_instance": ["sampled"]},
+        fixed_axes={
+            "noise_family": ["depolarizing_readout"],
+            "noise_strength": ["L1"],
+            "circuit_family": [family],
+            "family_native_depth": [1],
+            "observable_class": ["z_mid"],
+            "shots": [16],
+        },
+        n_qubits=[4],
+        role_counts={"train": 1, "validation": 1, "test": 1},
+        family_parameters={family: family_parameters},
+    )
+
+
 @pytest.mark.parametrize("split_id", sorted(SPLIT_AXES))
 def test_closed_grammar_resolves_each_split(split_id):
     resolved = resolve_split_spec(_spec(split_id))
@@ -153,6 +179,7 @@ def test_two_axis_change_is_rejected_clearly():
         validate_axis_contract(resolved.spec, cells)
 
 
+@pytest.mark.protocol("QEM-P003")
 def test_source_only_validation_is_enforced():
     resolved = resolve_split_spec(_spec("S2"))
     cells = list(resolved.cells)
@@ -272,6 +299,83 @@ def test_split_v2_manifest_stores_declaration_resolution_and_valid_hash_chain(
     assert manifest["cells"]
     assert items
     assert loaded_manifest["dataset_hash"] == manifest["dataset_hash"]
+
+
+@pytest.mark.parametrize(
+    (
+        "family",
+        "family_parameters",
+        "sampled_fields",
+        "pool_parameter_fields",
+    ),
+    (
+        pytest.param(
+            "tfi",
+            {"dt": 0.2},
+            {"j", "h"},
+            {"dt", "n_qubits", "steps"},
+            id="tfi",
+        ),
+        pytest.param(
+            "heisenberg",
+            {"dt": 0.15},
+            {"jx", "jy", "jz"},
+            {"dt", "n_qubits", "steps"},
+            id="heisenberg",
+        ),
+        pytest.param(
+            "qaoa",
+            {"graph_classes": ["erdos_renyi"]},
+            {"edges", "gammas", "betas", "edge_probability"},
+            {"graph_classes", "n_qubits", "p"},
+            id="qaoa-sampled-er-probability",
+        ),
+        pytest.param(
+            "qaoa",
+            {"graph_classes": ["erdos_renyi"], "er_edge_probability": 0.4},
+            {"edges", "gammas", "betas", "edge_probability"},
+            {"er_edge_probability", "graph_classes", "n_qubits", "p"},
+            id="qaoa-fixed-er-probability",
+        ),
+        pytest.param(
+            "random_clifford",
+            {},
+            set(),
+            {"depth", "n_qubits"},
+            id="random-clifford",
+        ),
+        pytest.param(
+            "near_clifford",
+            {
+                "non_clifford_count": [1, 2],
+                "theta": [0.4487989505128276, 0.6283185307179586],
+            },
+            set(),
+            {"depth", "n_qubits", "non_clifford_count", "theta"},
+            id="near-clifford",
+        ),
+    ),
+)
+def test_fresh_generation_for_every_family_obeys_pool_binding(
+    tmp_path,
+    family,
+    family_parameters,
+    sampled_fields,
+    pool_parameter_fields,
+):
+    data = tmp_path / family
+    manifest = generate_split(
+        _single_family_generation_spec(family, family_parameters), data
+    )
+
+    items, loaded_manifest = validate_split_artifact(data)
+
+    assert len(items) == 3
+    assert {item["family"] for item in items} == {family}
+    assert loaded_manifest["dataset_hash"] == manifest["dataset_hash"]
+    for pool in manifest["circuit_pools"]:
+        assert sampled_fields.isdisjoint(pool["parameter_grid"])
+        assert set(pool["parameter_grid"]) == pool_parameter_fields
 
 
 def test_split_dataset_identity_is_environment_independent(monkeypatch, tmp_path):
@@ -471,6 +575,97 @@ def test_legacy_schema_is_explicit_and_has_no_runtime_hash_allow_list(tmp_path):
     assert manifest["dataset_schema_version"] == "legacy-v1"
     assert not hasattr(generation_module, "FROZEN_ITEM_STREAMS")
     assert not hasattr(generation_module, "_configuration_fingerprint")
+
+
+def _configuration_leaves(value, path=()):
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            yield from _configuration_leaves(nested, (*path, key))
+    elif isinstance(value, list):
+        for index, nested in enumerate(value):
+            yield from _configuration_leaves(nested, (*path, index))
+    else:
+        yield path, value
+
+
+def _set_configuration_leaf(value, path, replacement):
+    target = value
+    for component in path[:-1]:
+        target = target[component]
+    target[path[-1]] = replacement
+
+
+def _different_configuration_value(value):
+    if isinstance(value, bool):
+        return not value
+    if isinstance(value, int):
+        return value + 1
+    if isinstance(value, float):
+        return value + 0.125
+    if isinstance(value, str):
+        return f"{value}-mutated"
+    raise AssertionError(f"missing mutation for configuration value {value!r}")
+
+
+@pytest.mark.parametrize("preset", ("t0-micro", "t0-smoke"))
+def test_frozen_serializer_snapshot_covers_every_configuration_field(preset):
+    canonical = {
+        **copy.deepcopy(PRESETS[preset]),
+        "noise_family": DEFAULT_NOISE_FAMILY,
+    }
+    assert _uses_frozen_legacy_serializer(preset, canonical)
+
+    for field in canonical:
+        missing = copy.deepcopy(canonical)
+        missing.pop(field)
+        assert not _uses_frozen_legacy_serializer(preset, missing), field
+
+    leaf_paths = list(_configuration_leaves(canonical))
+    assert {path[0] for path, _ in leaf_paths} == set(canonical)
+    for path, value in leaf_paths:
+        mutated = copy.deepcopy(canonical)
+        _set_configuration_leaf(
+            mutated, path, _different_configuration_value(value)
+        )
+        assert not _uses_frozen_legacy_serializer(preset, mutated), path
+
+    extra = {**canonical, "unknown_knob": "ignored"}
+    assert not _uses_frozen_legacy_serializer(preset, extra)
+
+
+def test_nested_public_preset_mutation_selects_exact_serializer(tmp_path):
+    steps = PRESETS["t0-micro"]["steps"]
+    original_first_step = steps[0]
+    try:
+        steps[0] += 2
+        config = {
+            **PRESETS["t0-micro"],
+            "noise_family": DEFAULT_NOISE_FAMILY,
+        }
+        assert not _uses_frozen_legacy_serializer("t0-micro", config)
+
+        data = tmp_path / "nested-preset-mutation"
+        manifest = generate("t0-micro", data)
+        items = [
+            json.loads(line)
+            for line in (data / "items.jsonl")
+            .read_text(encoding="utf-8")
+            .splitlines()
+            if line
+        ]
+
+        assert manifest["config"]["steps"] == steps
+        assert manifest["dataset_hash"] != (
+            "b9ed7863d6a1ce0d718907262d842e90e59c6eb7479a350837655bf542166bb7"
+        )
+        assert all(item["stratum"] == "continuous_regression" for item in items)
+        assert any(
+            item["j"] != round(item["j"], 12)
+            or item["h"] != round(item["h"], 12)
+            for item in items
+        )
+    finally:
+        steps[0] = original_first_step
 
 
 def test_unversioned_artifact_is_rejected(tmp_path):

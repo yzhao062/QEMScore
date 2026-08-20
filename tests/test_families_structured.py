@@ -15,6 +15,7 @@ from qem_bench.circuits.qaoa import (
     build_qaoa_circuit,
     sample_qaoa_params,
 )
+from qem_bench.circuits.tfi import sample_tfi_params
 
 
 I = np.eye(2, dtype=complex)
@@ -105,6 +106,95 @@ def test_qaoa_sampling_and_build_are_deterministic(graph_class):
             degrees[q0] += 1
             degrees[q1] += 1
         assert degrees == [3] * first.n_qubits
+
+
+@pytest.mark.parametrize("value", (1.9, 1.0, True))
+def test_qaoa_sampling_rejects_non_exact_integer_depths(value):
+    with pytest.raises(ValueError, match="QAOA p choices"):
+        sample_qaoa_params(
+            np.random.default_rng(1),
+            n_qubits_choices=[4],
+            p_choices=[value],
+            graph_classes=["path"],
+            instance=0,
+            circuit_seed=0,
+        )
+
+
+@pytest.mark.parametrize(
+    ("sampler", "kwargs", "message"),
+    (
+        (
+            sample_tfi_params,
+            {"n_qubits_choices": [3.0], "steps_choices": [1], "dt": 0.2},
+            "n_qubits_choices",
+        ),
+        (
+            sample_tfi_params,
+            {"n_qubits_choices": [3], "steps_choices": [True], "dt": 0.2},
+            "steps_choices",
+        ),
+        (
+            sample_heisenberg_params,
+            {"n_qubits_choices": [3.9], "steps_choices": [1], "dt": 0.2},
+            "Heisenberg supports",
+        ),
+        (
+            sample_heisenberg_params,
+            {"n_qubits_choices": [3], "steps_choices": [1.0], "dt": 0.2},
+            "steps_choices",
+        ),
+        (
+            sample_qaoa_params,
+            {
+                "n_qubits_choices": [True],
+                "p_choices": [1],
+                "graph_classes": ["path"],
+            },
+            "QAOA supports",
+        ),
+    ),
+)
+def test_structured_samplers_reject_other_non_exact_integer_choices(
+    sampler, kwargs, message
+):
+    with pytest.raises(ValueError, match=message):
+        sampler(
+            np.random.default_rng(1),
+            **kwargs,
+            instance=0,
+            circuit_seed=0,
+        )
+
+
+@pytest.mark.parametrize("field", ("instance", "circuit_seed"))
+@pytest.mark.parametrize("value", (2.5, 2.0, True))
+def test_structured_samplers_reject_non_exact_integer_identifiers(field, value):
+    kwargs = {
+        "n_qubits_choices": [3],
+        "steps_choices": [1],
+        "dt": 0.2,
+        "instance": 0,
+        "circuit_seed": 0,
+    }
+    kwargs[field] = value
+    with pytest.raises(ValueError, match=field):
+        sample_tfi_params(np.random.default_rng(1), **kwargs)
+
+
+def test_qaoa_builder_rejects_non_integer_edge_endpoints():
+    params = QAOAParams(
+        n_qubits=2,
+        graph_class="path",
+        edges=((0, 1.0),),
+        p=1,
+        gammas=(0.2,),
+        betas=(0.3,),
+        circuit_seed=0,
+        instance=0,
+    )
+    with pytest.raises(ValueError, match="endpoints must be integers"):
+        build_qaoa_circuit(params)
 
 
 def test_three_regular_sampler_reaches_distinct_topologies():

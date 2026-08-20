@@ -34,6 +34,16 @@ class HeisenbergParams:
     circuit_seed: int
     instance: int
 
+    def __post_init__(self) -> None:
+        if type(self.n_qubits) is not int:
+            raise ValueError("n_qubits must be an integer")
+        if type(self.steps) is not int:
+            raise ValueError("steps must be an integer")
+        if type(self.circuit_seed) is not int or self.circuit_seed < 0:
+            raise ValueError("circuit_seed must be a nonnegative integer")
+        if type(self.instance) is not int or self.instance < 0:
+            raise ValueError("instance must be a nonnegative integer")
+
     def to_dict(self) -> dict:
         return asdict(self)
 
@@ -47,17 +57,29 @@ def sample_heisenberg_params(
     circuit_seed: int,
 ) -> HeisenbergParams:
     """Draw one anisotropic chain configuration from the preset ranges."""
-    qubit_choices = tuple(int(n) for n in n_qubits_choices)
-    if not qubit_choices:
-        raise ValueError("n_qubits_choices must not be empty")
-    if any(n < 2 or n > MAX_QUBITS for n in qubit_choices):
+    if not n_qubits_choices or any(
+        type(n) is not int or n < 2 or n > MAX_QUBITS
+        for n in n_qubits_choices
+    ):
         raise ValueError(f"Heisenberg supports 2 to {MAX_QUBITS} qubits")
+    qubit_choices = tuple(n_qubits_choices)
 
-    trotter_choices = tuple(int(steps) for steps in steps_choices)
-    if not trotter_choices or any(steps < 1 for steps in trotter_choices):
+    if not steps_choices or any(
+        type(steps) is not int or steps < 1 for steps in steps_choices
+    ):
         raise ValueError("steps_choices must contain positive integers")
-    if not np.isfinite(dt) or dt <= 0.0:
+    trotter_choices = tuple(steps_choices)
+    if (
+        isinstance(dt, (bool, np.bool_))
+        or not isinstance(dt, (int, float, np.integer, np.floating))
+        or not np.isfinite(dt)
+        or dt <= 0.0
+    ):
         raise ValueError("dt must be finite and positive")
+    if type(instance) is not int or instance < 0:
+        raise ValueError("instance must be a nonnegative integer")
+    if type(circuit_seed) is not int or circuit_seed < 0:
+        raise ValueError("circuit_seed must be a nonnegative integer")
 
     return HeisenbergParams(
         n_qubits=int(rng.choice(qubit_choices)),

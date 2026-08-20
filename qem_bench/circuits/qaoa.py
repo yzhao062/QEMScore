@@ -45,6 +45,16 @@ class QAOAParams:
     instance: int
     edge_probability: float | None = None
 
+    def __post_init__(self) -> None:
+        if type(self.n_qubits) is not int:
+            raise ValueError("n_qubits must be an integer")
+        if type(self.p) is not int:
+            raise ValueError("p must be an integer")
+        if type(self.circuit_seed) is not int or self.circuit_seed < 0:
+            raise ValueError("circuit_seed must be a nonnegative integer")
+        if type(self.instance) is not int or self.instance < 0:
+            raise ValueError("instance must be a nonnegative integer")
+
     def to_dict(self) -> dict:
         return asdict(self)
 
@@ -121,15 +131,32 @@ def sample_qaoa_params(
     independently with that probability. The passed generator controls the graph,
     probability, and angles.
     """
-    qubit_choices = tuple(int(n) for n in n_qubits_choices)
-    if not qubit_choices:
-        raise ValueError("n_qubits_choices must not be empty")
-    if any(n < 2 or n > MAX_QUBITS for n in qubit_choices):
+    if not n_qubits_choices or any(
+        type(n) is not int or n < 2 or n > MAX_QUBITS
+        for n in n_qubits_choices
+    ):
         raise ValueError(f"QAOA supports 2 to {MAX_QUBITS} qubits")
+    qubit_choices = tuple(n_qubits_choices)
 
-    depths = tuple(int(depth) for depth in p_choices)
-    if not depths or any(depth not in (1, 2) for depth in depths):
+    if not p_choices or any(
+        type(depth) is not int or depth not in (1, 2) for depth in p_choices
+    ):
         raise ValueError("QAOA p choices must be drawn from {1, 2}")
+    depths = tuple(p_choices)
+
+    if type(instance) is not int or instance < 0:
+        raise ValueError("instance must be a nonnegative integer")
+    if type(circuit_seed) is not int or circuit_seed < 0:
+        raise ValueError("circuit_seed must be a nonnegative integer")
+    if er_edge_probability is not None and (
+        isinstance(er_edge_probability, (bool, np.bool_))
+        or not isinstance(
+            er_edge_probability, (int, float, np.integer, np.floating)
+        )
+        or not np.isfinite(er_edge_probability)
+        or not 0.0 <= er_edge_probability <= 1.0
+    ):
+        raise ValueError("er_edge_probability must be a number in [0, 1]")
 
     classes = tuple(_canonical_graph_class(name) for name in graph_classes)
     if not classes:
@@ -190,7 +217,9 @@ def build_qaoa_circuit(params: QAOAParams) -> QuantumCircuit:
     for edge in params.edges:
         if len(edge) != 2:
             raise ValueError(f"invalid edge {edge!r}")
-        q0, q1 = (int(edge[0]), int(edge[1]))
+        if any(type(endpoint) is not int for endpoint in edge):
+            raise ValueError(f"invalid edge {edge!r}; endpoints must be integers")
+        q0, q1 = edge
         if q0 == q1 or not (0 <= q0 < params.n_qubits and 0 <= q1 < params.n_qubits):
             raise ValueError(f"invalid edge {edge!r} for {params.n_qubits} qubits")
         canonical = _canonical_edge(q0, q1)

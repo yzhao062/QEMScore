@@ -25,6 +25,16 @@ class TFIParams:
     circuit_seed: int
     instance: int
 
+    def __post_init__(self) -> None:
+        if type(self.n_qubits) is not int or self.n_qubits < 1:
+            raise ValueError("n_qubits must be a positive integer")
+        if type(self.steps) is not int or self.steps < 1:
+            raise ValueError("steps must be a positive integer")
+        if type(self.circuit_seed) is not int or self.circuit_seed < 0:
+            raise ValueError("circuit_seed must be a nonnegative integer")
+        if type(self.instance) is not int or self.instance < 0:
+            raise ValueError("instance must be a nonnegative integer")
+
     def to_dict(self) -> dict:
         return asdict(self)
 
@@ -38,6 +48,20 @@ def sample_tfi_params(
     circuit_seed: int,
 ) -> TFIParams:
     """Draw one circuit configuration from the preset ranges."""
+    if not n_qubits_choices or any(
+        type(n_qubits) is not int or n_qubits < 1
+        for n_qubits in n_qubits_choices
+    ):
+        raise ValueError("n_qubits_choices must contain positive integers")
+    if not steps_choices or any(
+        type(steps) is not int or steps < 1 for steps in steps_choices
+    ):
+        raise ValueError("steps_choices must contain positive integers")
+    if type(instance) is not int or instance < 0:
+        raise ValueError("instance must be a nonnegative integer")
+    if type(circuit_seed) is not int or circuit_seed < 0:
+        raise ValueError("circuit_seed must be a nonnegative integer")
+
     return TFIParams(
         n_qubits=int(rng.choice(n_qubits_choices)),
         steps=int(rng.choice(steps_choices)),

@@ -40,6 +40,14 @@ class RandomCliffordParams:
     instance: int
 
     def __post_init__(self) -> None:
+        if type(self.n_qubits) is not int:
+            raise ValueError("random Clifford n_qubits must be an integer")
+        if type(self.depth) is not int:
+            raise ValueError("random Clifford depth must be an integer")
+        if type(self.circuit_seed) is not int:
+            raise ValueError("circuit_seed must be an integer")
+        if type(self.instance) is not int:
+            raise ValueError("instance must be an integer")
         if not 1 <= self.n_qubits <= MAX_RANDOM_CLIFFORD_QUBITS:
             raise ValueError(
                 f"random Clifford n_qubits must be in "
@@ -68,18 +76,25 @@ def sample_random_clifford_params(
         raise ValueError("n_qubits_choices must not be empty")
     if not depth_choices:
         raise ValueError("depth_choices must not be empty")
-    if any(not 1 <= n <= MAX_RANDOM_CLIFFORD_QUBITS for n in n_qubits_choices):
+    if any(
+        type(n) is not int or not 1 <= n <= MAX_RANDOM_CLIFFORD_QUBITS
+        for n in n_qubits_choices
+    ):
         raise ValueError(
             f"all random Clifford qubit choices must be in "
             f"[1, {MAX_RANDOM_CLIFFORD_QUBITS}]"
         )
-    if any(depth < 1 for depth in depth_choices):
+    if any(type(depth) is not int or depth < 1 for depth in depth_choices):
         raise ValueError("all random Clifford depth choices must be positive")
+    if type(instance) is not int or instance < 0:
+        raise ValueError("instance must be a nonnegative integer")
+    if type(circuit_seed) is not int or circuit_seed < 0:
+        raise ValueError("circuit_seed must be a nonnegative integer")
     return RandomCliffordParams(
         n_qubits=int(rng.choice(n_qubits_choices)),
         depth=int(rng.choice(depth_choices)),
-        circuit_seed=int(circuit_seed),
-        instance=int(instance),
+        circuit_seed=circuit_seed,
+        instance=instance,
     )
 
 

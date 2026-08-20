@@ -33,6 +33,16 @@ class NearCliffordParams:
     instance: int
 
     def __post_init__(self) -> None:
+        if type(self.n_qubits) is not int:
+            raise ValueError("near-Clifford n_qubits must be an integer")
+        if type(self.depth) is not int:
+            raise ValueError("near-Clifford depth must be an integer")
+        if type(self.non_clifford_count) is not int:
+            raise ValueError("near-Clifford insertion count must be an integer")
+        if type(self.circuit_seed) is not int:
+            raise ValueError("circuit_seed must be an integer")
+        if type(self.instance) is not int:
+            raise ValueError("instance must be an integer")
         if not 1 <= self.n_qubits <= MAX_NEAR_CLIFFORD_QUBITS:
             raise ValueError(
                 f"near-Clifford n_qubits must be in "
@@ -78,17 +88,27 @@ def sample_near_clifford_params(
         raise ValueError("non_clifford_count_choices must not be empty")
     if not theta_choices:
         raise ValueError("theta_choices must not be empty")
-    if any(not 1 <= n <= MAX_NEAR_CLIFFORD_QUBITS for n in n_qubits_choices):
+    if any(
+        type(n) is not int or not 1 <= n <= MAX_NEAR_CLIFFORD_QUBITS
+        for n in n_qubits_choices
+    ):
         raise ValueError(
             f"all near-Clifford qubit choices must be in "
             f"[1, {MAX_NEAR_CLIFFORD_QUBITS}]"
         )
-    if any(depth < 1 for depth in depth_choices):
+    if any(type(depth) is not int or depth < 1 for depth in depth_choices):
         raise ValueError("all near-Clifford depth choices must be positive")
-    if any(count < 1 for count in non_clifford_count_choices):
+    if any(
+        type(count) is not int or count < 1
+        for count in non_clifford_count_choices
+    ):
         raise ValueError("all near-Clifford insertion counts must be positive")
     for theta in theta_choices:
-        if not math.isfinite(theta):
+        if (
+            isinstance(theta, (bool, np.bool_))
+            or not isinstance(theta, (int, float, np.integer, np.floating))
+            or not math.isfinite(theta)
+        ):
             raise ValueError("all theta choices must be finite")
         quarter_turns = theta / (math.pi / 2.0)
         if math.isclose(
@@ -102,6 +122,10 @@ def sample_near_clifford_params(
     ]
     if not eligible_qubits:
         raise ValueError("no n_qubits choice can realize an insertion count")
+    if type(instance) is not int or instance < 0:
+        raise ValueError("instance must be a nonnegative integer")
+    if type(circuit_seed) is not int or circuit_seed < 0:
+        raise ValueError("circuit_seed must be a nonnegative integer")
     n_qubits = int(rng.choice(eligible_qubits))
     eligible_counts = [count for count in non_clifford_count_choices if count <= n_qubits]
     return NearCliffordParams(
@@ -109,8 +133,8 @@ def sample_near_clifford_params(
         depth=int(rng.choice(depth_choices)),
         non_clifford_count=int(rng.choice(eligible_counts)),
         theta=float(rng.choice(theta_choices)),
-        circuit_seed=int(circuit_seed),
-        instance=int(instance),
+        circuit_seed=circuit_seed,
+        instance=instance,
     )
 
 
