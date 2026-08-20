@@ -9,6 +9,8 @@ from collections.abc import Mapping, Sequence
 
 import numpy as np
 
+from qem_bench.datasets.schema import canonical_physical_circuit_identity
+
 PHYS_BOUND = 1.0 + 1e-9
 
 DEFAULT_CELL_GROUPING = "six-part"
@@ -29,6 +31,37 @@ CELL_GROUPINGS: dict[str, tuple[str, ...]] = {
         "severity",
     ),
 }
+
+
+def normalized_bootstrap_ids(item: Mapping[str, object]) -> tuple[str, str]:
+    """Resolve the physical circuit and stratum a row belongs to.
+
+    The bootstrap must block on the physical circuit rather than on the
+    measurement execution, so these two identifiers decide how observations are
+    grouped and therefore how wide the reported interval is. The run artifact
+    identity projection stores the resolved values, so this resolution lives in
+    one place and cannot drift between the runner and the metrics layer.
+    """
+
+    circuit_id = item.get("circuit_id")
+    if circuit_id is None:
+        circuit_id = _legacy_physical_circuit_id(item)
+    stratum_id = item.get("bootstrap_stratum_id")
+    if stratum_id is None:
+        stratum_id = item.get("circuit_pool_id", item["family"])
+    return str(circuit_id), str(stratum_id)
+
+
+def _legacy_physical_circuit_id(item: Mapping[str, object]) -> str:
+    """Derive the shared physical-circuit identity from a legacy row."""
+
+    try:
+        _, circuit_id = canonical_physical_circuit_identity(item)
+    except ValueError as exc:
+        raise ValueError(
+            f"cannot determine physical circuit from legacy row; {exc}"
+        ) from exc
+    return circuit_id
 
 
 def excess_absolute_loss(m: np.ndarray, r: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -91,9 +124,11 @@ def build_cell_records(
         items, predictions, raw_predictions, strict=True
     ):
         ideal = float(item["ideal_expectation"])
+        circuit_id, bootstrap_stratum_id = normalized_bootstrap_ids(item)
         item_values = {
             "item_id": str(item["item_id"]),
-            "circuit_id": str(item["measurement_group"]),
+            "circuit_id": str(circuit_id),
+            "bootstrap_stratum_id": str(bootstrap_stratum_id),
             "split": str(item["split"]),
             "family": str(item["family"]),
             "stratum": str(item["stratum"]),

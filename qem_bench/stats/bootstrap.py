@@ -35,11 +35,11 @@ def circuit_blocked_bootstrap(
     n_resamples: int = 10_000,
     seed: int,
 ) -> BootstrapInterval:
-    """Bootstrap circuits within non-observable strata and preserve sibling rows.
+    """Bootstrap physical circuits within their source pools.
 
-    A sampled circuit contributes all of its observable rows. For paired method
-    differences, the same circuit draws and item identities are used for both
-    methods.
+    A sampled circuit contributes all of its severity, observable, and cell rows.
+    For paired method differences, the same circuit draws and item identities are
+    used for both methods.
     """
 
     if not 0 < confidence < 1:
@@ -63,14 +63,8 @@ def circuit_blocked_bootstrap(
         lambda: defaultdict(list)
     )
     for row in rows:
-        stratum_key = (
-            row["artifact_id"],
-            row["split"],
-            row["family"],
-            row["noise_family"],
-            row["severity"],
-        )
-        circuits[stratum_key][row["circuit_id"]].append(row)
+        stratum_key = (str(row["bootstrap_stratum_id"]),)
+        circuits[stratum_key][str(row["circuit_id"])].append(row)
     n_circuits = sum(len(values) for values in circuits.values())
     if n_circuits < 2:
         raise ValueError("bootstrap requires at least two circuits")
@@ -135,7 +129,7 @@ def _flatten(
         cell_key = tuple((field, key[field]) for field in record["key_fields"])
         for item in record["items"]:
             row = dict(item)
-            row["artifact_id"] = str(record["artifact_id"])
+            row["artifact_id"] = str(item.get("artifact_id", record["artifact_id"]))
             row["cell_key"] = cell_key
             flattened.append(row)
     return flattened, next(iter(groupings))

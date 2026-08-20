@@ -9,6 +9,7 @@ from pathlib import Path
 
 import numpy as np
 
+from qem_bench.runner.metrics import pooled_method_metrics
 from qem_bench.runner.run import circuit_evaluation_ratio, validate_run_artifact
 from qem_bench.stats import circuit_blocked_bootstrap, macro_mean_iqr, mean_ranks
 
@@ -30,9 +31,12 @@ def generate_report(
     manifest_bytes = manifest_path.read_bytes()
     manifest = json.loads(manifest_bytes)
     resolved_manifest_path = manifest_path.resolve()
-    runs = _load_runs(manifest, resolved_manifest_path.parent)
-    if not runs:
-        raise ValueError("report manifest contains no runs")
+    source_runs: list[dict] = []
+    runs = _load_runs(
+        manifest,
+        resolved_manifest_path.parent,
+        source_runs=source_runs,
+    )
     methods = tuple(methods)
     if len(set(methods)) != len(methods) or not methods:
         raise ValueError("methods must be a nonempty unique sequence")
@@ -44,11 +48,13 @@ def generate_report(
     output = Path(out_dir)
     output.mkdir(parents=True, exist_ok=True)
     all_records = {
-        method: [
-            record
-            for run in runs
-            for record in run["methods"][method]["cell_records"]
-        ]
+        method: _merge_cell_records(
+            [
+                record
+                for run in runs
+                for record in run["methods"][method]["cell_records"]
+            ]
+        )
         for method in methods
     }
     ranks = mean_ranks(
@@ -62,6 +68,7 @@ def generate_report(
         "source_manifest_sha256": (
             "sha256:" + hashlib.sha256(manifest_bytes).hexdigest()
         ),
+        "source_runs": source_runs,
         "artifacts": [run["artifact_id"] for run in runs],
         "table1": {},
         "figure1": {"points": []},
@@ -110,7 +117,13 @@ def generate_report(
             "n_expectations": n_expectations,
         }
         cell_ids = [str(record["cell_id"]) for record in records]
-        artifact_ids = sorted({str(record["artifact_id"]) for record in records})
+        artifact_ids = sorted(
+            {
+                str(artifact_id)
+                for record in records
+                for artifact_id in record["source_artifact_ids"]
+            }
+        )
         trace["table1"][method] = {
             "cell_ids": cell_ids,
             "artifact_ids": artifact_ids,
@@ -134,19 +147,166 @@ def generate_report(
     return {"table1": table_path, "figure1": figure_path, "trace": trace_path}
 
 
-def _load_runs(manifest: Mapping[str, object], base_dir: Path) -> list[dict]:
+def _merge_cell_records(
+    records: Sequence[Mapping[str, object]],
+) -> list[dict]:
+    """Merge source records into stable declared cells for report statistics."""
+
+    if not records:
+        raise ValueError("at least one cell record is required")
+    source_artifact_ids = sorted({str(record["artifact_id"]) for record in records})
+    source_set_payload = json.dumps(
+        {
+            "schema": "qem-bench-report-source-set-v1",
+            "artifact_ids": source_artifact_ids,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    report_artifact_id = "sha256:" + hashlib.sha256(source_set_payload).hexdigest()
+
+    grouped: dict[tuple[object, ...], dict] = {}
+    for record in records:
+        artifact_id = str(record["artifact_id"])
+        grouping = str(record["grouping"])
+        key_fields = tuple(str(field) for field in record["key_fields"])
+        key = dict(record["key"])
+        signature = (
+            grouping,
+            key_fields,
+            json.dumps(key, sort_keys=True, separators=(",", ":")),
+        )
+        merged = grouped.setdefault(
+            signature,
+            {
+                "grouping": grouping,
+                "key_fields": key_fields,
+                "key": key,
+                "source_artifact_ids": set(),
+                "items": [],
+            },
+        )
+        merged["source_artifact_ids"].add(artifact_id)
+        for source_item in record["items"]:
+            item = dict(source_item)
+            item["artifact_id"] = artifact_id
+            item["item_id"] = _source_scoped_id(artifact_id, item["item_id"])
+            item["circuit_id"] = str(item["circuit_id"])
+            merged["items"].append(item)
+
+    merged_records = []
+    for signature in sorted(grouped, key=repr):
+        merged = grouped[signature]
+        items = sorted(
+            merged["items"],
+            key=lambda item: (str(item["artifact_id"]), str(item["item_id"])),
+        )
+        predictions = np.asarray([item["prediction"] for item in items], dtype=float)
+        raw_predictions = np.asarray(
+            [item["raw_prediction"] for item in items], dtype=float
+        )
+        targets = np.asarray([item["target"] for item in items], dtype=float)
+        cell_payload = json.dumps(
+            {
+                "grouping": merged["grouping"],
+                "key_fields": list(merged["key_fields"]),
+                "key": merged["key"],
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        merged_records.append(
+            {
+                "cell_id": "sha256:" + hashlib.sha256(cell_payload).hexdigest(),
+                "artifact_id": report_artifact_id,
+                "source_artifact_ids": sorted(merged["source_artifact_ids"]),
+                "grouping": merged["grouping"],
+                "key_fields": list(merged["key_fields"]),
+                "key": merged["key"],
+                "metrics": pooled_method_metrics(
+                    predictions, raw_predictions, targets
+                ),
+                "circuit_ids": sorted({item["circuit_id"] for item in items}),
+                "item_ids": [item["item_id"] for item in items],
+                "items": items,
+            }
+        )
+    return merged_records
+
+
+def _source_scoped_id(artifact_id: str, identifier: object) -> str:
+    return f"{artifact_id}/{identifier}"
+
+
+def _load_runs(
+    manifest: Mapping[str, object],
+    base_dir: Path,
+    *,
+    source_runs: list[dict] | None = None,
+) -> list[dict]:
     if manifest.get("schema_version") != "qem-bench-report-manifest-v1":
         raise ValueError("unsupported report manifest schema_version")
+    entries = manifest.get("runs", [])
+    if not isinstance(entries, list):
+        raise ValueError("report manifest runs must be an array")
+    resolved_base = base_dir.resolve()
     runs = []
-    for entry in manifest.get("runs", ()):
-        path = Path(entry["results"])
-        if not path.is_absolute():
-            path = base_dir / path
+    artifact_ids: set[str] = set()
+    for entry in entries:
+        if not isinstance(entry, Mapping):
+            raise ValueError("report manifest run entries must be objects")
+        declared = entry.get("results")
+        if not isinstance(declared, str) or not declared:
+            raise ValueError("report manifest run results must be nonempty paths")
+        relative_path = Path(declared)
+        if relative_path.is_absolute() or relative_path.drive:
+            raise ValueError("report manifest run results paths must be relative")
+        display_path = relative_path.as_posix()
         try:
-            run = validate_run_artifact(json.loads(path.read_text(encoding="utf-8")))
+            resolved_path = (resolved_base / relative_path).resolve()
+            resolved_path.relative_to(resolved_base)
+        except (OSError, ValueError) as exc:
+            raise ValueError(
+                f"report run result path escapes manifest directory: {display_path}"
+            ) from exc
+        try:
+            payload = resolved_path.read_bytes()
+        except OSError as exc:
+            raise ValueError(
+                f"invalid runner result at {display_path}: unable to read result"
+            ) from exc
+        try:
+            run = validate_run_artifact(json.loads(payload))
         except (KeyError, TypeError, ValueError) as exc:
-            raise ValueError(f"invalid runner result at {path}: {exc}") from exc
+            raise ValueError(
+                f"invalid runner result at {display_path}: {exc}"
+            ) from exc
+        artifact_id = str(run["artifact_id"])
+        if artifact_id in artifact_ids:
+            raise ValueError(
+                f"report manifest contains duplicate run artifact_id {artifact_id!r}"
+            )
+        artifact_ids.add(artifact_id)
         runs.append(run)
+        if source_runs is not None:
+            source_runs.append(
+                {
+                    "path": display_path,
+                    "sha256": "sha256:" + hashlib.sha256(payload).hexdigest(),
+                    "artifact_id": artifact_id,
+                }
+            )
+    if not runs:
+        raise ValueError("report manifest contains no runs")
+    schema_versions = {
+        str(run["dataset_schema_version"])
+        for run in runs
+    }
+    if len(schema_versions) != 1:
+        raise ValueError(
+            "report manifest cannot mix dataset schema versions; "
+            f"found {sorted(schema_versions)}"
+        )
     return runs
 
 

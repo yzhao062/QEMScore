@@ -5,14 +5,17 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
 import pytest
 
 from qem_bench.datasets.generate import generate
+from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
 from qem_bench.reports import generate_report
-from qem_bench.reports.generate import _load_runs
+from qem_bench.reports.generate import _load_runs, _merge_cell_records
 from qem_bench.runner.metrics import (
     CELL_GROUPINGS,
     DEFAULT_CELL_GROUPING,
@@ -40,20 +43,85 @@ from qem_bench.stats import (
     wilcoxon_rank_sums,
 )
 from qem_bench.stats.plots import critical_difference_diagram
+from qem_bench.validation import validate_split_artifact
 
 
-def _item(index, *, circuit, severity="L1", observable="z_mid"):
+def _item(
+    index,
+    *,
+    circuit,
+    severity="L1",
+    observable="z_mid",
+    measurement_group=None,
+):
     return {
         "item_id": f"item-{index}",
-        "measurement_group": circuit,
+        "measurement_group": measurement_group or circuit,
+        "circuit_id": circuit,
+        "circuit_pool_id": "pool-tfi-test",
         "split": "test",
         "family": "tfi",
+        "instance": index,
         "stratum": "continuous_regression",
         "noise_family": "depolarizing_readout",
         "severity": severity,
         "observable": observable,
         "ideal_expectation": 0.0,
     }
+
+
+def _legacy_item(*, circuit_seed=17, j=0.5):
+    return {
+        "item_id": "tfi-0003-z_mid",
+        "measurement_group": "tfi-0003-g0",
+        "split": "test",
+        "family": "tfi",
+        "instance": 3,
+        "n_qubits": 4,
+        "circuit_seed": circuit_seed,
+        "steps": 2,
+        "j": j,
+        "h": 0.75,
+        "dt": 0.1,
+        "stratum": "continuous_regression",
+        "noise_family": "depolarizing_readout",
+        "severity": "L1",
+        "shots": 256,
+        "sampler_seed": 101,
+        "observable": "z_mid",
+        "ideal_expectation": 0.0,
+    }
+
+
+def _legacy_qaoa_item(edges):
+    item = _legacy_item()
+    for field in ("steps", "j", "h", "dt"):
+        item.pop(field)
+    item.update(
+        {
+            "family": "qaoa",
+            "n_qubits": 3,
+            "p": 1,
+            "graph_class": "path",
+            "edges": edges,
+            "edge_probability": None,
+            "gammas": [0.25],
+            "betas": [0.5],
+        }
+    )
+    return item
+
+
+def _derived_circuit_id(item):
+    records = build_cell_records(
+        "method",
+        [item],
+        np.array([0.0]),
+        np.zeros(1),
+        artifact_id="identity-probe",
+        grouping="six-part",
+    )
+    return records[0]["circuit_ids"][0]
 
 
 def _rebuild_run_derived_results(result):
@@ -113,9 +181,17 @@ def _expected_run_artifact_id(result):
         result["methods"],
         dataset_environment_contract=result["dataset_environment_contract"],
         environment_contract=result["environment_contract"],
+        role_assignment=result.get("role_assignment"),
+        budget=result.get("budget"),
     )
 
 
+def _resign_run_artifact(result):
+    result["artifact_id"] = _expected_run_artifact_id(result)
+    _rebuild_run_derived_results(result)
+
+
+@pytest.mark.protocol("QEM-P001")
 def test_pooled_diagnostic_differs_from_macro_on_unequal_cells():
     items = [_item(0, circuit="c0", severity="L1")]
     items.extend(_item(i, circuit=f"c{i}", severity="L2") for i in range(1, 4))
@@ -131,6 +207,279 @@ def test_pooled_diagnostic_differs_from_macro_on_unequal_cells():
     )
     assert all(record["artifact_id"] == "artifact" for record in records)
     assert all(record["items"] for record in records)
+
+
+@pytest.mark.protocol("QEM-P002")
+def test_bootstrap_blocks_split_physical_circuits_across_severities(tmp_path):
+    base_spec = SPLIT_PRESETS["s0-t0-micro"]
+    fixed_axes = {
+        axis: list(values) for axis, values in base_spec.fixed_axes.items()
+    }
+    fixed_axes["noise_strength"] = ["L1", "L2"]
+    data = tmp_path / "split"
+    generate_split(replace(base_spec, fixed_axes=fixed_axes), data)
+    generated, manifest = validate_split_artifact(data)
+    items = [item for item in generated if item["split"] == "test"]
+
+    assert manifest["dataset_schema_version"] == "split-v2"
+    assert len({item["measurement_group"] for item in items}) == 4
+    assert len({item["circuit_id"] for item in items}) == 2
+    assert {item["severity"] for item in items} == {"L1", "L2"}
+    records = build_cell_records(
+        "method",
+        items,
+        np.linspace(-0.5, 0.5, len(items)),
+        np.zeros(len(items)),
+        artifact_id="artifact-split",
+        grouping="six-part",
+    )
+    interval = circuit_blocked_bootstrap(
+        records, metric="mae", n_resamples=100, seed=20260819
+    )
+
+    assert interval.n_circuits == 2
+    assert {
+        item["circuit_id"] for record in records for item in record["items"]
+    } == {item["circuit_id"] for item in items}
+
+
+def test_report_estimand_is_invariant_to_artifact_partition():
+    items = [_item(index, circuit=f"physical-{index}") for index in range(4)]
+    predictions = np.array([0.0, 1.0, 1.0, 1.0])
+    one_artifact = build_cell_records(
+        "method",
+        items,
+        predictions,
+        np.zeros(4),
+        artifact_id="artifact-one",
+        grouping="six-part",
+    )
+    two_artifacts = build_cell_records(
+        "method",
+        items[:1],
+        predictions[:1],
+        np.zeros(1),
+        artifact_id="artifact-a",
+        grouping="six-part",
+    ) + build_cell_records(
+        "method",
+        items[1:],
+        predictions[1:],
+        np.zeros(3),
+        artifact_id="artifact-b",
+        grouping="six-part",
+    )
+
+    assert macro_mean_iqr(one_artifact)["mae"]["mean"] == pytest.approx(0.75)
+    assert macro_mean_iqr(two_artifacts)["mae"]["mean"] == pytest.approx(0.5)
+
+    merged_one = _merge_cell_records(one_artifact)
+    merged_two = _merge_cell_records(two_artifacts)
+    one_mean = macro_mean_iqr(merged_one)["mae"]["mean"]
+    two_mean = macro_mean_iqr(merged_two)["mae"]["mean"]
+    one_interval = circuit_blocked_bootstrap(
+        merged_one, metric="mae", n_resamples=100, seed=20260819
+    )
+    two_interval = circuit_blocked_bootstrap(
+        merged_two, metric="mae", n_resamples=100, seed=20260819
+    )
+
+    assert len(merged_one) == len(merged_two) == 1
+    assert one_mean == pytest.approx(0.75)
+    assert two_mean == pytest.approx(one_mean)
+    assert one_interval.estimate == pytest.approx(one_mean)
+    assert two_interval.estimate == pytest.approx(one_mean)
+    assert (one_interval.lower, one_interval.upper) == (0.25, 1.0)
+    assert (two_interval.lower, two_interval.upper) == (
+        one_interval.lower,
+        one_interval.upper,
+    )
+    assert len(set(merged_two[0]["item_ids"])) == 4
+    assert len(set(merged_two[0]["circuit_ids"])) == 4
+
+
+def test_bootstrap_counts_cross_artifact_physical_circuits_once():
+    first_severity = [
+        _item(index, circuit=f"physical-{index}", severity="L1")
+        for index in range(2)
+    ]
+    second_severity = [
+        _item(index + 2, circuit=f"physical-{index}", severity="L2")
+        for index in range(2)
+    ]
+    records = build_cell_records(
+        "method",
+        first_severity,
+        np.array([0.0, 1.0]),
+        np.zeros(2),
+        artifact_id="artifact-l1",
+        grouping="six-part",
+    ) + build_cell_records(
+        "method",
+        second_severity,
+        np.array([0.25, 0.75]),
+        np.zeros(2),
+        artifact_id="artifact-l2",
+        grouping="six-part",
+    )
+
+    interval = circuit_blocked_bootstrap(
+        _merge_cell_records(records),
+        metric="mae",
+        n_resamples=100,
+        seed=20260819,
+    )
+
+    assert interval.n_circuits == 2
+
+
+def test_report_merge_namespaces_source_local_identifiers():
+    records = []
+    for artifact_id, prediction in (("artifact-a", 0.0), ("artifact-b", 1.0)):
+        records.extend(
+            build_cell_records(
+                "method",
+                [_item(0, circuit="physical-local")],
+                np.array([prediction]),
+                np.zeros(1),
+                artifact_id=artifact_id,
+                grouping="six-part",
+            )
+        )
+
+    merged = _merge_cell_records(records)
+
+    assert len(merged) == 1
+    assert len(set(merged[0]["item_ids"])) == 2
+    assert merged[0]["circuit_ids"] == ["physical-local"]
+    assert {item["artifact_id"] for item in merged[0]["items"]} == {
+        "artifact-a",
+        "artifact-b",
+    }
+
+
+def test_legacy_circuit_digest_prevents_cross_dataset_collisions_and_refuses_gaps():
+    first = _legacy_item(circuit_seed=17, j=0.5)
+    second = _legacy_item(circuit_seed=29, j=0.8)
+    assert f"{first['family']}:{first['instance']}" == (
+        f"{second['family']}:{second['instance']}"
+    )
+
+    records = build_cell_records(
+        "method",
+        [first],
+        np.array([0.0]),
+        np.zeros(1),
+        artifact_id="legacy-dataset-a",
+        grouping="six-part",
+    ) + build_cell_records(
+        "method",
+        [second],
+        np.array([1.0]),
+        np.zeros(1),
+        artifact_id="legacy-dataset-b",
+        grouping="six-part",
+    )
+    same_circuit_new_execution = dict(first)
+    same_circuit_new_execution.update(
+        {
+            "item_id": "other-item",
+            "measurement_group": "other-group",
+            "noise_family": "amplitude_phase_damping",
+            "severity": "L2",
+            "shots": 4096,
+            "sampler_seed": 999,
+        }
+    )
+    same_circuit_records = build_cell_records(
+        "method",
+        [same_circuit_new_execution],
+        np.array([0.0]),
+        np.zeros(1),
+        artifact_id="legacy-dataset-c",
+        grouping="six-part",
+    )
+    merged = _merge_cell_records(records)
+    interval = circuit_blocked_bootstrap(
+        merged, metric="mae", n_resamples=100, seed=20260819
+    )
+
+    assert records[0]["circuit_ids"] == same_circuit_records[0]["circuit_ids"]
+    assert len(merged[0]["circuit_ids"]) == 2
+    assert interval.n_circuits == 2
+
+    incomplete = dict(first)
+    incomplete.pop("h")
+    with pytest.raises(
+        ValueError,
+        match=r"cannot determine physical circuit.*missing circuit fields: \['h'\]",
+    ):
+        build_cell_records(
+            "method",
+            [incomplete],
+            np.array([0.0]),
+            np.zeros(1),
+            artifact_id="legacy-incomplete",
+            grouping="six-part",
+        )
+
+    null_parameter = dict(first)
+    null_parameter["h"] = None
+    with pytest.raises(
+        ValueError,
+        match=r"cannot determine physical circuit.*missing circuit fields: \['h'\]",
+    ):
+        build_cell_records(
+            "method",
+            [null_parameter],
+            np.array([0.0]),
+            np.zeros(1),
+            artifact_id="legacy-null",
+            grouping="six-part",
+        )
+
+
+def test_legacy_circuit_digest_canonicalizes_numeric_encodings_and_qaoa_edges():
+    def probe(j):
+        item = _legacy_item(circuit_seed=1, j=j)
+        item["h"] = 0.5
+        return _derived_circuit_id(item)
+
+    digests = {
+        label: probe(value)
+        for label, value in (
+            ("1", 1),
+            ("1.0", 1.0),
+            ("0.0", 0.0),
+            ("-0.0", -0.0),
+        )
+    }
+    unit_digest = (
+        "circuit-049f094f1fcef3aa43a8d1a2070ad6371e21c34e2f88ac2c285e3675c84fefc9"
+    )
+    zero_digest = (
+        "circuit-07b0c47b6857e06a90e13c2af7849fa59d79f5fba6dd46cdc6000835c1d047c3"
+    )
+    assert digests == {
+        "1": unit_digest,
+        "1.0": unit_digest,
+        "0.0": zero_digest,
+        "-0.0": zero_digest,
+    }
+    assert _derived_circuit_id(
+        _legacy_qaoa_item([[0, 1], [1, 2]])
+    ) == _derived_circuit_id(_legacy_qaoa_item([[2, 1], [1, 0]]))
+
+
+def test_legacy_and_split_routes_derive_the_same_physical_circuit_id(tmp_path):
+    data = tmp_path / "shared-circuit-identity"
+    generate("s0-t0-micro", data)
+    items, _ = validate_split_artifact(data)
+    split_item = items[0]
+    legacy_projection = dict(split_item)
+    legacy_projection.pop("circuit_id")
+
+    assert _derived_circuit_id(legacy_projection) == split_item["circuit_id"]
 
 
 def test_cell_grouping_parameter_keeps_both_declared_options():
@@ -278,6 +627,86 @@ def test_ood_counterexample_keeps_rejected_formula_visible():
     assert rejected["degradation"]["S1"] == pytest.approx(9.0)
 
 
+@pytest.fixture(scope="module")
+def report_schema_version_runs(tmp_path_factory):
+    root = tmp_path_factory.mktemp("report-schema-version-runs")
+    legacy_data = root / "legacy-data"
+    generate("t0-micro", legacy_data)
+    run(legacy_data, root / "legacy-run")
+
+    split_data = root / "split-data"
+    split_spec = replace(SPLIT_PRESETS["s0-t0-micro"], budget_tier="H")
+    generate_split(split_spec, split_data)
+    run(split_data, root / "split-run")
+    return root
+
+
+def test_report_manifest_rejects_mixed_dataset_schema_versions(
+    report_schema_version_runs,
+):
+    manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [
+            {"results": "legacy-run/results.json"},
+            {"results": "split-run/results.json"},
+        ],
+    }
+
+    with pytest.raises(ValueError) as error:
+        _load_runs(manifest, report_schema_version_runs)
+
+    assert str(error.value) == (
+        "report manifest cannot mix dataset schema versions; "
+        "found ['legacy-v1', 'split-v2']"
+    )
+
+
+def test_report_manifest_accepts_one_dataset_schema_version(
+    report_schema_version_runs,
+):
+    manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [{"results": "legacy-run/results.json"}],
+    }
+
+    loaded = _load_runs(manifest, report_schema_version_runs)
+
+    assert [item["dataset_schema_version"] for item in loaded] == ["legacy-v1"]
+
+
+def test_report_manifest_rejects_zero_runs(tmp_path):
+    manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [],
+    }
+
+    with pytest.raises(ValueError, match="^report manifest contains no runs$"):
+        _load_runs(manifest, tmp_path)
+
+
+def test_report_manifest_rejects_missing_dataset_schema_version(
+    report_schema_version_runs,
+):
+    source = report_schema_version_runs / "legacy-run" / "results.json"
+    unversioned = json.loads(source.read_text(encoding="utf-8"))
+    unversioned.pop("dataset_schema_version")
+    path = report_schema_version_runs / "missing-version.json"
+    path.write_text(json.dumps(unversioned), encoding="utf-8")
+    manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [{"results": path.name}],
+    }
+
+    with pytest.raises(ValueError) as error:
+        _load_runs(manifest, report_schema_version_runs)
+
+    assert str(error.value) == (
+        "invalid runner result at missing-version.json: unversioned "
+        "qem-bench-run-v2 artifact requires explicit migration; "
+        "dataset_schema_version is required"
+    )
+
+
 def test_reports_render_tex_pdf_and_trace_real_cells(tmp_path):
     data = tmp_path / "data"
     results_dir = tmp_path / "results"
@@ -345,6 +774,152 @@ def test_report_loader_rejects_tampered_metrics_but_accepts_valid_run(tmp_path):
         json.dumps(tampered), encoding="utf-8"
     )
     with pytest.raises(ValueError, match="derived result mismatch"):
+        _load_runs(manifest, tmp_path)
+
+
+@pytest.mark.protocol("QEM-P005")
+def test_run_validator_rejects_resigned_invalid_ledgers(tmp_path):
+    data = tmp_path / "data"
+    generate("t0-micro", data)
+    valid = run(data, tmp_path / "results")
+    mutations = (
+        (
+            lambda spec: spec.__setitem__("ledger", []),
+            "ledger must be an object",
+        ),
+        (
+            lambda spec: spec["ledger"].__setitem__("B_train", -1),
+            "ledger B_train must be a nonnegative integer",
+        ),
+        (
+            lambda spec: spec["ledger"].pop("B_extra"),
+            "ledger B_extra must be a nonnegative integer",
+        ),
+        (
+            lambda spec: spec["ledger"].__setitem__("unexpected", 0),
+            "ledger does not match its buckets",
+        ),
+        (
+            lambda spec: spec["ledger"].__setitem__(
+                "B_pred", float(spec["ledger"]["B_pred"])
+            ),
+            "ledger B_pred must be a nonnegative integer",
+        ),
+        (
+            lambda spec: spec["ledger"].__setitem__("B_pred", True),
+            "ledger B_pred must be a nonnegative integer",
+        ),
+    )
+    derived_fields = (
+        "total",
+        "amortized_per_test_item",
+        "nominal_test_total",
+        "realized_test_total",
+        "nominal_total",
+        "test_budget_ratio",
+        "circuit_evals_per_mitigated_expectation",
+    )
+
+    for mutate, message in mutations:
+        tampered = copy.deepcopy(valid)
+        mutate(tampered["methods"]["raw"])
+        _resign_run_artifact(tampered)
+        with pytest.raises(ValueError, match=message):
+            validate_run_artifact(tampered)
+
+    for field in derived_fields:
+        tampered = copy.deepcopy(valid)
+        tampered["methods"]["raw"]["ledger"][field] = -1
+        _resign_run_artifact(tampered)
+        with pytest.raises(ValueError, match="ledger does not match its buckets"):
+            validate_run_artifact(tampered)
+
+    nonfinite = copy.deepcopy(valid)
+    nonfinite["methods"]["raw"]["ledger"]["test_budget_ratio"] = float("nan")
+    with pytest.raises(ValueError, match="ledger is not canonical JSON"):
+        validate_run_artifact(nonfinite)
+
+
+def test_report_errors_keep_relative_portable_run_paths(monkeypatch, tmp_path):
+    work = tmp_path / "path-leak"
+    work.mkdir()
+    (work / "bad.json").write_text(
+        json.dumps({"schema_version": "unsupported"}), encoding="utf-8"
+    )
+    (work / "manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "qem-bench-report-manifest-v1",
+                "runs": [{"results": "bad.json"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(work)
+
+    with pytest.raises(ValueError) as error:
+        generate_report("manifest.json", "report", bootstrap_resamples=1)
+
+    message = str(error.value)
+    assert message == (
+        "invalid runner result at bad.json: unsupported runner result schema_version"
+    )
+    assert str(work.resolve()) not in message
+    assert re.search(r"[A-Za-z]:[\\/]", message) is None
+
+    (work / "manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "qem-bench-report-manifest-v1",
+                "runs": [{"results": "missing.json"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError) as missing_error:
+        generate_report("manifest.json", "report", bootstrap_resamples=1)
+    missing_message = str(missing_error.value)
+    assert missing_message == (
+        "invalid runner result at missing.json: unable to read result"
+    )
+    assert str(work.resolve()) not in missing_message
+    assert re.search(r"[A-Za-z]:[\\/]", missing_message) is None
+
+
+def test_report_manifest_rejects_absolute_and_escaping_run_paths(tmp_path):
+    manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [{"results": str((tmp_path / "absolute.json").resolve())}],
+    }
+    with pytest.raises(
+        ValueError, match="report manifest run results paths must be relative"
+    ):
+        _load_runs(manifest, tmp_path)
+
+    manifest["runs"] = [{"results": "../outside.json"}]
+    with pytest.raises(ValueError) as error:
+        _load_runs(manifest, tmp_path / "manifest-dir")
+    assert str(error.value) == (
+        "report run result path escapes manifest directory: ../outside.json"
+    )
+
+
+def test_report_manifest_rejects_duplicate_run_artifact_ids(monkeypatch, tmp_path):
+    artifact = {"artifact_id": "sha256:duplicate"}
+    for filename in ("first.json", "second.json"):
+        (tmp_path / filename).write_text(json.dumps(artifact), encoding="utf-8")
+    monkeypatch.setattr(
+        "qem_bench.reports.generate.validate_run_artifact", lambda value: value
+    )
+    manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [
+            {"results": "first.json"},
+            {"results": "second.json"},
+        ],
+    }
+
+    with pytest.raises(ValueError, match="duplicate run artifact_id"):
         _load_runs(manifest, tmp_path)
 
 
