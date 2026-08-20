@@ -10,7 +10,7 @@ from enum import Enum
 from typing import Iterable, NamedTuple
 
 
-TIERS = {"L": 10_000, "M": 100_000, "H": 1_000_000}
+TIERS = {"L": 2_500_000, "M": 25_000_000, "H": 250_000_000}
 
 
 class Method(str, Enum):
@@ -29,6 +29,9 @@ ROSTER = tuple(Method)
 class TierMode(str, Enum):
     SPLIT_CAPS = "split-caps"
     COMBINED_CAP = "combined-cap"
+
+
+PAPER_TIER_MODE = TierMode.COMBINED_CAP
 
 
 class BudgetInputs(NamedTuple):
@@ -80,7 +83,7 @@ class Budget(NamedTuple):
 
 
 class TierPair(NamedTuple):
-    """Explicit caps for both unresolved readings of a tier pair."""
+    """Explicit caps for both supported readings of a tier pair."""
 
     training_cap: int
     test_cap: int
@@ -135,6 +138,17 @@ class TierRequirement(NamedTuple):
     statistical_base: int
     split_joint: int
     combined_joint: int
+
+
+class CampaignBudget(NamedTuple):
+    """Combined-cap allocation over ``paired-budget-cell-v1`` descriptors."""
+
+    tier: str
+    width: int
+    paired_budget_cell_count: int
+    methods: tuple[Method, ...]
+    per_method_paired_budget_cell_cap: int
+    total_circuit_evaluations: int
 
 
 def _validate_integer(name: str, value: int, *, minimum: int) -> None:
@@ -278,4 +292,50 @@ def minimum_tier_constant(
         statistical,
         max(split_method, statistical),
         max(combined_method, statistical),
+    )
+
+
+def campaign_budget(
+    tier: str,
+    width: int,
+    paired_budget_cell_count: int,
+    methods: Iterable[Method | str] = ROSTER,
+) -> CampaignBudget:
+    """Allocate the tier cap by method and ``paired-budget-cell-v1`` descriptor.
+
+    The paper allocates the combined tier cap to every selected method in every
+    paired budget cell. ``paired_budget_cell_count`` is the number of runner
+    ``paired-budget-cell-v1`` descriptors, not the number of six-part report
+    cells. The tier is not a campaign-total cap. Width is recorded explicitly
+    but does not enter the circuit-evaluation formulas. Runtime conversion is
+    machine-specific and belongs outside this module.
+    """
+
+    _validate_integer("width", width, minimum=1)
+    _validate_integer(
+        "paired_budget_cell_count", paired_budget_cell_count, minimum=1
+    )
+    try:
+        tier_name = tier.upper()
+    except AttributeError as exc:
+        raise ValueError("tier must be a string") from exc
+    tier_pair = TierPair.declared(tier_name)
+    if isinstance(methods, (str, bytes)):
+        raise ValueError("methods must be a nonempty iterable of methods")
+    try:
+        normalized_methods = tuple(Method(value) for value in methods)
+    except TypeError as exc:
+        raise ValueError("methods must be a nonempty iterable of methods") from exc
+    if not normalized_methods:
+        raise ValueError("methods must be a nonempty iterable of methods")
+    if len(set(normalized_methods)) != len(normalized_methods):
+        raise ValueError("methods must not contain duplicates")
+    total = tier_pair.combined_cap * paired_budget_cell_count * len(normalized_methods)
+    return CampaignBudget(
+        tier_name,
+        width,
+        paired_budget_cell_count,
+        normalized_methods,
+        tier_pair.combined_cap,
+        total,
     )
