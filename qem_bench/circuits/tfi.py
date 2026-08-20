@@ -42,6 +42,7 @@ class TFIParams:
 def validate_tfi_sampling_domain(
     n_qubits_choices: list[int],
     steps_choices: list[int],
+    dt: float,
 ) -> None:
     """Validate the authored choices consumed before TFI parameter draws."""
     if not n_qubits_choices or any(
@@ -53,6 +54,12 @@ def validate_tfi_sampling_domain(
         type(steps) is not int or steps < 1 for steps in steps_choices
     ):
         raise ValueError("steps_choices must contain positive integers")
+    if (
+        isinstance(dt, (bool, np.bool_))
+        or not isinstance(dt, (int, float, np.integer, np.floating))
+        or not np.isfinite(dt)
+    ):
+        raise ValueError("dt must be a finite number")
 
 
 def sample_tfi_params(
@@ -64,7 +71,7 @@ def sample_tfi_params(
     circuit_seed: int,
 ) -> TFIParams:
     """Draw one circuit configuration from the preset ranges."""
-    validate_tfi_sampling_domain(n_qubits_choices, steps_choices)
+    validate_tfi_sampling_domain(n_qubits_choices, steps_choices, dt)
     if type(instance) is not int or instance < 0:
         raise ValueError("instance must be a nonnegative integer")
     if type(circuit_seed) is not int or circuit_seed < 0:
@@ -75,7 +82,7 @@ def sample_tfi_params(
         steps=int(rng.choice(steps_choices)),
         j=float(rng.uniform(0.2, 1.2)),
         h=float(rng.uniform(0.2, 1.2)),
-        dt=dt,
+        dt=float(dt),
         circuit_seed=circuit_seed,
         instance=instance,
     )

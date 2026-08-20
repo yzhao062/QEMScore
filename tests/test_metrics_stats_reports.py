@@ -23,6 +23,7 @@ from qem_bench.datasets.generate import (
 )
 from qem_bench.datasets.schema import FAMILY_STRATA
 from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
+from qem_bench.datasets.splits import SplitSpec
 from qem_bench.reports import generate_report
 from qem_bench.reports.generate import _load_runs, _merge_cell_records
 from qem_bench.runner.metrics import (
@@ -33,6 +34,7 @@ from qem_bench.runner.metrics import (
     pooled_method_metrics,
 )
 from qem_bench.runner.run import (
+    _load,
     _dataset_item_stream_hashes,
     _run_artifact_id,
     run,
@@ -906,7 +908,7 @@ def test_declared_identity_profile_domain_is_closed_for_every_family():
         ),
         (
             {"tfi": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE},
-            "profiles do not match the generator serializer",
+            "identity fields do not match the declared serializer profile",
         ),
     ),
     ids=(
@@ -941,6 +943,101 @@ def test_legacy_dataset_loader_refuses_every_invalid_profile_class(
 
     with pytest.raises(ValueError, match=message):
         run(data, tmp_path / "run")
+
+
+def test_legacy_dataset_loader_refuses_coordinated_tfi_profile_relabels(
+    report_schema_version_runs,
+    tmp_path,
+):
+    rounded_data = report_schema_version_runs / "legacy-data"
+    rounded_manifest = json.loads(
+        (rounded_data / "manifest.json").read_text(encoding="utf-8")
+    )
+    exact_data = tmp_path / "exact-data"
+    generate(copy.deepcopy(rounded_manifest["config"]), exact_data)
+
+    _, loaded_rounded = _load(rounded_data)
+    _, loaded_exact = _load(exact_data)
+    assert loaded_rounded[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] == {
+        "tfi": LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE
+    }
+    assert loaded_exact[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] == {
+        "tfi": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+    }
+
+    relabels = (
+        (
+            rounded_data,
+            "custom",
+            LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+        ),
+        (
+            exact_data,
+            "t0-micro",
+            LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
+        ),
+    )
+    for index, (source, preset, profile) in enumerate(relabels):
+        data = tmp_path / f"relabel-{index}"
+        shutil.copytree(source, data)
+        manifest_path = data / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["preset"] = preset
+        manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = {"tfi": profile}
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+        with pytest.raises(
+            ValueError,
+            match="identity fields do not match the declared serializer profile",
+        ):
+            _load(data)
+
+
+def test_disjoint_family_s3_run_projects_profiles_to_test_families(tmp_path):
+    spec = SplitSpec(
+        split_id="S3",
+        source_domain={"circuit_family": ["tfi"]},
+        target_domain={"circuit_family": ["qaoa"]},
+        fixed_axes={
+            "noise_family": ["depolarizing_readout"],
+            "noise_strength": ["L1"],
+            "family_native_depth": [1],
+            "observable_class": ["z_mid"],
+            "shots": [16],
+        },
+        n_qubits=[3],
+        role_counts={"train": 1, "validation": 1, "test": 1},
+        family_parameters={
+            "tfi": {"dt": 0.2},
+            "qaoa": {"graph_classes": ["path"]},
+        },
+        allowed_couplings=("family_native_parameters",),
+        budget_tier="H",
+    )
+    data = tmp_path / "data"
+    manifest = generate_split(spec, data)
+    result = run(data, tmp_path / "run")
+
+    assert manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] == {
+        "qaoa": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+        "tfi": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
+    }
+    expected_run_profiles = {
+        "qaoa": LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+    }
+    assert {item["family"] for item in result["test_items"]} == {"qaoa"}
+    assert result[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] == expected_run_profiles
+    assert result["methods"]["raw"]["config"]["run_artifact_identity"][
+        PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD
+    ] == expected_run_profiles
+    assert validate_run_artifact(result) is result
+
+    report_manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [{"results": "run/results.json"}],
+    }
+    loaded = _load_runs(report_manifest, tmp_path)
+    assert [run["artifact_id"] for run in loaded] == [result["artifact_id"]]
 
 
 def test_runner_binds_declared_profiles_and_refuses_resigned_profile_drift(

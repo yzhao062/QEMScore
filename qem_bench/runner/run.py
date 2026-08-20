@@ -42,12 +42,13 @@ from qem_bench.budget import (
     method_budget,
     minimum_tier_constant,
 )
+from qem_bench.circuits.tfi import sample_tfi_params
 from qem_bench.datasets.generate import (
+    LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
     PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
     UNKNOWN_IDENTITY_ENCODING_PROFILE,
     dataset_hash,
     group_shots,
-    legacy_physical_identity_encoding_profiles,
     validate_physical_identity_encoding_profiles,
 )
 from qem_bench.datasets.schema import (
@@ -291,6 +292,56 @@ def _adapt_legacy_v1_rows(items: list[dict]) -> None:
         item["stratum"] = FAMILY_STRATA[family]
 
 
+def _validate_legacy_tfi_profile_rows(
+    items: list[dict], manifest: Mapping[str, object], profile: str
+) -> None:
+    config = manifest["config"]
+    master = int(config["master_seed"])
+    rows_by_instance: dict[int, list[dict]] = {}
+    for item in items:
+        rows_by_instance.setdefault(int(item["instance"]), []).append(item)
+
+    for instance, rows in sorted(rows_by_instance.items()):
+        spawn_key = (0, instance)
+        circuit_seed = int(
+            np.random.SeedSequence(master, spawn_key=spawn_key).generate_state(
+                1, dtype=np.uint32
+            )[0]
+        )
+        rng = np.random.default_rng(
+            np.random.SeedSequence(master, spawn_key=spawn_key)
+        )
+        params = sample_tfi_params(
+            rng,
+            list(config["n_qubits"]),
+            list(config["steps"]),
+            config["dt"],
+            instance,
+            circuit_seed,
+        )
+        j = params.j
+        h = params.h
+        if profile == LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE:
+            j = round(j, 12)
+            h = round(h, 12)
+        expected = {
+            "n_qubits": params.n_qubits,
+            "steps": params.steps,
+            "j": j,
+            "h": h,
+            "dt": params.dt,
+            "circuit_seed": params.circuit_seed,
+        }
+        if any(
+            any(row[field] != value for field, value in expected.items())
+            for row in rows
+        ):
+            raise ValueError(
+                "legacy TFI identity fields do not match the declared "
+                f"serializer profile {profile!r} at instance {instance}"
+            )
+
+
 def _normalize_dataset_identity_encoding_profiles(
     items: list[dict], manifest: dict
 ) -> None:
@@ -307,15 +358,12 @@ def _normalize_dataset_identity_encoding_profiles(
             for family in sorted(families)
         }
 
-    if declared and manifest["dataset_schema_version"] == LEGACY_SCHEMA_VERSION:
-        expected = legacy_physical_identity_encoding_profiles(
-            manifest.get("preset"), manifest.get("config")
-        )
-        if profiles != expected:
-            raise ValueError(
-                "legacy dataset physical identity encoding profiles do not match "
-                f"the generator serializer: declared={profiles}, expected={expected}"
-            )
+    if (
+        declared
+        and manifest["dataset_schema_version"] == LEGACY_SCHEMA_VERSION
+        and "tfi" in profiles
+    ):
+        _validate_legacy_tfi_profile_rows(items, manifest, profiles["tfi"])
     manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = profiles
 
 
@@ -2081,6 +2129,15 @@ def run(
         raise ValueError("dataset must contain both train and test items")
     if split_v2 and not validation:
         raise ValueError("split-v2 dataset must contain validation items")
+    test_families = {str(item["family"]) for item in test}
+    test_identity_profiles = validate_physical_identity_encoding_profiles(
+        {
+            family: manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD][family]
+            for family in test_families
+        },
+        families=test_families,
+        allow_unknown=True,
+    )
     strata = {item["stratum"] for item in items}
     if len(strata) != 1:
         raise ValueError(
@@ -2138,7 +2195,7 @@ def run(
         "dataset_schema_version": manifest["dataset_schema_version"],
         "dataset_manifest_sha256": dataset_manifest_sha256,
         PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD: copy.deepcopy(
-            manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD]
+            test_identity_profiles
         ),
         "feature_spec": manifest["feature_spec"],
         "stratum": items[0]["stratum"],
@@ -2179,7 +2236,7 @@ def run(
         "dataset_hash": manifest["dataset_hash"],
         "dataset_item_stream_hashes": item_stream_hashes,
         PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD: copy.deepcopy(
-            manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD]
+            test_identity_profiles
         ),
         "test_items": test_items,
         "preset": manifest["preset"],

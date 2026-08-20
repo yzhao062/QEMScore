@@ -26,6 +26,7 @@ from qem_bench.datasets.generate import (
     PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
     PRESETS,
     _construct_legacy_source_observable_closure,
+    _require_source_observable_closure,
     _uses_frozen_legacy_serializer,
     generate,
 )
@@ -34,6 +35,7 @@ from qem_bench.datasets.split_generate import (
     generate_split,
 )
 from qem_bench.datasets.splits import (
+    ROLES,
     SPLIT_ALLOWED_COUPLINGS,
     SPLIT_AXES,
     SplitSpec,
@@ -776,12 +778,9 @@ def test_split_v2_manifest_stores_declaration_resolution_and_valid_hash_chain(
         for item in items
         if item["split"] == "train"
     }
-    test_observables = {
-        (item["n_qubits"], item["pauli_label"])
-        for item in items
-        if item["split"] == "test"
-    }
-    assert test_observables <= train_observables
+    for role in ROLES:
+        if role != "train":
+            assert _role_observables(items, role) <= train_observables
     assert loaded_manifest["dataset_hash"] == manifest["dataset_hash"]
 
 
@@ -812,6 +811,29 @@ def _role_observables(rows, role):
         for row in rows
         if row["split"] == role
     }
+
+
+@pytest.mark.parametrize(
+    "prediction_role", tuple(role for role in ROLES if role != "train")
+)
+def test_source_observable_closure_covers_every_prediction_role(prediction_role):
+    rows = [
+        {"split": "train", "n_qubits": 3, "pauli_label": "IZZ"},
+        {"split": prediction_role, "n_qubits": 3, "pauli_label": "ZII"},
+    ]
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"split 'prediction-role-probe' is not source-observable closed; "
+            rf"prediction observables absent from training: "
+            rf"\{{'{prediction_role}': \[\(3, 'ZII'\)\]\}}"
+        ),
+    ):
+        _require_source_observable_closure(
+            rows,
+            split_name="prediction-role-probe",
+        )
 
 
 def test_legacy_source_observable_closure_is_constructed_from_the_realization():
@@ -864,7 +886,8 @@ def test_impossible_legacy_source_observable_closure_fails_closed():
         ValueError,
         match=(
             r"split 'impossible-probe' is not source-observable closed; "
-            r"test observables absent from training: .*\(4, 'IZII'\).*"
+            r"prediction observables absent from training: "
+            r"\{'test': .*\(4, 'IZII'\).*"
             r"\(5, 'IIZZI'\)"
         ),
     ):
@@ -888,7 +911,8 @@ def test_split_v2_observable_extrapolation_cannot_emit_an_artifact(tmp_path):
         ValueError,
         match=(
             r"split 'S5 \(s5-[0-9a-f]+\)' is not source-observable closed; "
-            r"test observables absent from training: \[\(3, 'IZZ'\)\]"
+            r"prediction observables absent from training: "
+            r"\{'test': \[\(3, 'IZZ'\)\]\}"
         ),
     ):
         generate_split(spec, data)

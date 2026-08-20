@@ -351,7 +351,7 @@ def validate_split_spec(spec: SplitSpec | Mapping[str, Any]) -> None:
         for n_qubits in spec.n_qubits:
             widths = [n_qubits]
             if family == "tfi":
-                validate_tfi_sampling_domain(widths, depths)
+                validate_tfi_sampling_domain(widths, depths, parameters["dt"])
             elif family == "heisenberg":
                 validate_heisenberg_sampling_domain(
                     widths,
@@ -1168,6 +1168,15 @@ def validate_split_artifact(data_dir: str | Path) -> tuple[list[dict], dict]:
         sidecar_payloads[relative] = payload
 
     _validate_sidecar_semantics(items, sidecar_payloads, registry)
+
+    # Local import: generate.py imports validation.py, so a module-level import
+    # here would close the cycle. Ordering matters and is deliberate. An
+    # unrehashed edit fails the hash chain, a rehashed but sidecar-inconsistent
+    # edit fails sidecar semantics, and only a fully consistent artifact reaches
+    # the closure check, which is the case this catches.
+    from qem_bench.datasets.generate import _require_source_observable_closure
+
+    _require_source_observable_closure(items, split_name=spec.split_id)
 
     actual_dataset_hash = split_dataset_hash(
         spec_hash=actual_spec_hash,

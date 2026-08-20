@@ -47,7 +47,7 @@ from qem_bench.datasets.schema import (
     FEATURES,
     validate_item,
 )
-from qem_bench.datasets.splits import SplitSpec
+from qem_bench.datasets.splits import ROLES, SplitSpec
 from qem_bench.labels.statevector import ideal_expectation as statevector_expectation
 from qem_bench.labels.stim_labels import ideal_expectation as stim_expectation
 from qem_bench.noise.models import DEFAULT_NOISE_FAMILY, SEVERITY_GRIDS
@@ -442,14 +442,18 @@ def _physical_observables(items: list[dict], role: str) -> set[tuple[int, str]]:
 def _require_source_observable_closure(
     items: list[dict], *, split_name: str
 ) -> None:
-    missing = sorted(
-        _physical_observables(items, "test")
-        - _physical_observables(items, "train")
-    )
+    training = _physical_observables(items, "train")
+    missing = {}
+    for role in ROLES:
+        if role == "train":
+            continue
+        absent = _physical_observables(items, role) - training
+        if absent:
+            missing[role] = sorted(absent)
     if missing:
         raise ValueError(
             f"split {split_name!r} is not source-observable closed; "
-            f"test observables absent from training: {missing!r}"
+            f"prediction observables absent from training: {missing!r}"
         )
 
 

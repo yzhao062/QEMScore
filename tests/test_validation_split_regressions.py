@@ -10,10 +10,12 @@ from dataclasses import replace
 from itertools import product
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 import qem_bench.validation as validation_module
 from qem_bench.circuits.qaoa import QAOAParams
+from qem_bench.circuits.tfi import sample_tfi_params
 from qem_bench.datasets.generate import generate
 from qem_bench.datasets.schema import (
     LEGACY_SCHEMA_VERSION,
@@ -22,7 +24,7 @@ from qem_bench.datasets.schema import (
     validate_item,
 )
 from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
-from qem_bench.datasets.splits import SplitSpec
+from qem_bench.datasets.splits import SplitSpec, resolve_split_spec
 from qem_bench.observables import z_support_label
 from qem_bench.validation import (
     canonical_hash,
@@ -271,6 +273,64 @@ _VALID_FAMILY_PARAMETERS = {
         "theta": [0.4487989505128276],
     },
 }
+
+
+@pytest.mark.parametrize(
+    "dt",
+    (
+        pytest.param(True, id="bool"),
+        pytest.param(np.bool_(True), id="numpy-bool"),
+        pytest.param("0.2", id="string"),
+        pytest.param(float("nan"), id="nan"),
+        pytest.param(float("inf"), id="positive-infinity"),
+        pytest.param(float("-inf"), id="negative-infinity"),
+    ),
+)
+def test_tfi_sampler_rejects_invalid_dt(dt):
+    with pytest.raises(ValueError, match="dt must be a finite number"):
+        sample_tfi_params(
+            np.random.default_rng(1),
+            n_qubits_choices=[3],
+            steps_choices=[1],
+            dt=dt,
+            instance=0,
+            circuit_seed=0,
+        )
+
+
+@pytest.mark.parametrize(
+    "dt",
+    (
+        pytest.param(True, id="bool"),
+        pytest.param(np.bool_(True), id="numpy-bool"),
+        pytest.param("0.2", id="string"),
+    ),
+)
+def test_tfi_dt_domain_is_shared_by_spec_validator_and_resolver(dt):
+    spec = _single_family_spec("tfi", {"dt": dt}, n_qubits=3)
+
+    for check in (validate_split_spec, resolve_split_spec):
+        with pytest.raises(ValueError, match="dt must be a finite number"):
+            check(spec)
+
+
+@pytest.mark.parametrize("dt", (0, -0.2), ids=("zero", "negative"))
+def test_tfi_finite_nonpositive_dt_is_accepted_and_normalized(dt):
+    spec = _single_family_spec("tfi", {"dt": dt}, n_qubits=3)
+
+    validate_split_spec(spec)
+    resolve_split_spec(spec)
+    params = sample_tfi_params(
+        np.random.default_rng(1),
+        n_qubits_choices=[3],
+        steps_choices=[1],
+        dt=dt,
+        instance=0,
+        circuit_seed=0,
+    )
+
+    assert params.dt == float(dt)
+    assert type(params.dt) is float
 
 
 @pytest.mark.parametrize(
