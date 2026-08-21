@@ -527,9 +527,24 @@ def _load_legacy_v1(
     circuit_cache: dict[str, Any] = {}
     label_cache: dict[tuple[str, str, str], float] = {}
     profiles = manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD]
+
+    def replayed_descriptor_for(item: Mapping[str, object]) -> dict | None:
+        if (
+            item["family"] != "tfi"
+            or profiles["tfi"] == UNKNOWN_IDENTITY_ENCODING_PROFILE
+        ):
+            return None
+        instance = int(item["instance"])
+        if instance not in exact_tfi_descriptors:
+            raise ValueError(
+                f"legacy TFI instance {instance} lacks its replayed circuit descriptor"
+            )
+        return exact_tfi_descriptors[instance]
+
     for item in items:
-        descriptor = exact_tfi_descriptors.get(int(item["instance"]))
-        if item["family"] != "tfi" or descriptor is None:
+        replayed_descriptor = replayed_descriptor_for(item)
+        descriptor = replayed_descriptor
+        if descriptor is None:
             descriptor = canonical_physical_circuit_descriptor(item)
         _validate_realized_row_semantics(
             item,
@@ -545,6 +560,13 @@ def _load_legacy_v1(
         items,
         split_name=str(manifest.get("preset")),
     )
+    for item in items:
+        replayed_descriptor = replayed_descriptor_for(item)
+        if replayed_descriptor is None:
+            continue
+        item["n_qubits"] = replayed_descriptor["n_qubits"]
+        item["circuit_seed"] = replayed_descriptor["circuit_seed"]
+        item.update(copy.deepcopy(replayed_descriptor["parameters"]))
     return items, manifest
 
 

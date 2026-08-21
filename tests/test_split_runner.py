@@ -98,7 +98,7 @@ def test_budget_preflight_hard_fails_before_method_execution(
     assert not (out / "results.json").exists()
 
 
-def test_legacy_v1_result_is_identical_to_pre_split_runner(tmp_path):
+def test_legacy_v1_result_regression(tmp_path):
     data = tmp_path / "data"
     manifest = generate("t0-micro", data)
     results = run(data, tmp_path / "run")
@@ -221,7 +221,7 @@ def test_legacy_v1_result_is_identical_to_pre_split_runner(tmp_path):
         for name, spec in results["methods"].items()
     } == {name: (12, 4) for name in results["methods"]}
     assert digest == (
-        "2508da04ee376a27894523d26b879ac41d510f04344a50f231cdab6e8368c210"
+        "775d2fb47e446bf593d60b54038d98c4a1df208fe6f4d37f592984af81871952"
     )
     assert results["methods"]["liao"]["config"]["feature_fidelity"] == {
         "status": "restricted-feature-ablation",

@@ -6,6 +6,7 @@ import hashlib
 import importlib
 import json
 import math
+import os
 import shutil
 from itertools import combinations
 from pathlib import Path
@@ -14,6 +15,7 @@ import numpy as np
 import pytest
 from qiskit.quantum_info import Operator
 
+from qem_bench.baselines.zne import _rebuild_circuit
 from qem_bench.circuits import (
     HeisenbergParams,
     NearCliffordParams,
@@ -45,6 +47,7 @@ from qem_bench.datasets.schema import (
 from qem_bench.datasets.splits import SplitSpec
 from qem_bench.noise.models import DEFAULT_NOISE_FAMILY
 from qem_bench.observables import z_expectation_from_counts
+from qem_bench.runner.metrics import normalized_bootstrap_ids
 from qem_bench.runner.run import _load
 from qem_bench.validation import (
     canonical_json,
@@ -62,6 +65,24 @@ FAMILY_PRESETS = {
     "random_clifford": "t0-rc-micro",
     "near_clifford": "t0-nc-micro",
 }
+FROZEN_LEGACY_TFI_SERIALIZERS = (
+    (
+        "t0-micro",
+        "b9ed7863d6a1ce0d718907262d842e90e59c6eb7479a350837655bf542166bb7",
+        {
+            "\n": "66bc8396bf64ffa1ebd9261d6f4ddd6d22475d4dc6f9a9e6d5508a75128e1734",
+            "\r\n": "d9511bfe3dc967c64539106605de1a25c045bea7b06dc21a4cf25b0852f876b7",
+        },
+    ),
+    (
+        "t0-smoke",
+        "edf5837e0da10f1dc93151d5b29d1855f66ad76341ff6c28019096308f8fcdf3",
+        {
+            "\n": "c1d0c1cbeb58ccd9f5408ed11de68dc73c71613eb79790836487b6c7655f538a",
+            "\r\n": "efc65065361df3a348f8572a03d24e59d58c058e67c2b313d65d254d2598ec8d",
+        },
+    ),
+)
 ALL_FAMILY_FIELDS = frozenset(
     field for fields in FAMILY_REQUIRED_FIELDS.values() for field in fields
 )
@@ -546,6 +567,107 @@ def test_split_tfi_descriptor_reconstructs_the_producing_operator(
         Operator(rebuilt).data,
         Operator(produced[(row["instance"], row["circuit_seed"])]).data,
     )
+
+
+@pytest.mark.parametrize(
+    ("preset", "expected_dataset_hash", "expected_items_sha256_by_newline"),
+    FROZEN_LEGACY_TFI_SERIALIZERS,
+    ids=("t0-micro", "t0-smoke"),
+)
+def test_frozen_legacy_tfi_replay_reaches_every_physical_consumer(
+    monkeypatch,
+    tmp_path,
+    preset,
+    expected_dataset_hash,
+    expected_items_sha256_by_newline,
+):
+    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    original_builder = generate_module._sample_and_build_circuit
+    produced = {}
+
+    def capture_builder(cfg, rng, instance, circuit_seed):
+        params, circuit = original_builder(cfg, rng, instance, circuit_seed)
+        produced[instance] = (params, circuit)
+        return params, circuit
+
+    monkeypatch.setattr(
+        generate_module, "_sample_and_build_circuit", capture_builder
+    )
+    data = tmp_path / preset
+    manifest = generate(preset, data)
+    items_path = data / "items.jsonl"
+    serialized_bytes = items_path.read_bytes()
+    serialized_items, _ = _read_artifact(data)
+
+    assert manifest["dataset_hash"] == expected_dataset_hash
+    assert hashlib.sha256(serialized_bytes).hexdigest() == (
+        expected_items_sha256_by_newline[os.linesep]
+    )
+    for item in serialized_items:
+        params, _ = produced[item["instance"]]
+        assert item["j"] == round(params.j, 12)
+        assert item["h"] == round(params.h, 12)
+        assert item["j"] != params.j or item["h"] != params.h
+
+    loaded_items, loaded_manifest = _load(data)
+    assert loaded_manifest["dataset_hash"] == expected_dataset_hash
+    assert items_path.read_bytes() == serialized_bytes
+    serialized_by_id = {item["item_id"]: item for item in serialized_items}
+    checked_instances = set()
+    for item in loaded_items:
+        params, producer_circuit = produced[item["instance"]]
+        exact_record = {
+            "family": "tfi",
+            "n_qubits": params.n_qubits,
+            "circuit_seed": params.circuit_seed,
+            **_family_parameter_fields(params),
+        }
+        expected_descriptor, expected_circuit_id = (
+            canonical_physical_circuit_identity(exact_record)
+        )
+        serialized_circuit_id = canonical_physical_circuit_identity(
+            serialized_by_id[item["item_id"]]
+        )[1]
+
+        assert canonical_physical_circuit_descriptor(item) == expected_descriptor
+        assert normalized_bootstrap_ids(item)[0] == expected_circuit_id
+        assert serialized_circuit_id != expected_circuit_id
+        if item["instance"] in checked_instances:
+            continue
+        checked_instances.add(item["instance"])
+        assert (
+            build_circuit_from_canonical_descriptor(expected_descriptor)
+            == producer_circuit
+        )
+        assert _rebuild_circuit(item) == producer_circuit
+
+    assert checked_instances == set(produced)
+
+
+def test_declared_legacy_tfi_profile_fails_closed_without_replay(
+    monkeypatch, tmp_path
+):
+    run_module = importlib.import_module("qem_bench.runner.run")
+    original_replay = run_module._validate_legacy_tfi_profile_rows
+
+    def omit_first_descriptor(items, manifest, profile):
+        descriptors = original_replay(items, manifest, profile)
+        descriptors.pop(min(descriptors))
+        return descriptors
+
+    data = tmp_path / "data"
+    generate("t0-micro", data)
+    monkeypatch.setattr(
+        run_module,
+        "_validate_legacy_tfi_profile_rows",
+        omit_first_descriptor,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="legacy TFI instance 0 lacks its replayed circuit descriptor",
+    ):
+        _load(data)
 
 
 def _circuit_record(family: str, n_qubits: int, depth: int) -> dict:
