@@ -7,8 +7,12 @@ import hashlib
 import json
 from pathlib import Path
 
-from qem_bench.baselines.zne import SCALE_FACTORS, fold_for_execution
-from qem_bench.circuits.tfi import TFIParams, build_tfi_circuit
+from qem_bench.baselines.zne import (
+    SCALE_FACTORS,
+    _rebuild_circuit,
+    fold_for_execution,
+)
+from qem_bench.runner.run import _load
 
 PRESETS = ("t0-micro", "t0-smoke")
 
@@ -39,27 +43,9 @@ def _canonical_circuit(circuit: object) -> dict:
     }
 
 
-def _tfi_from_item(item: dict) -> object:
-    params = TFIParams(
-        n_qubits=int(item["n_qubits"]),
-        steps=int(item["steps"]),
-        j=float(item["j"]),
-        h=float(item["h"]),
-        dt=float(item["dt"]),
-        circuit_seed=int(item["circuit_seed"]),
-        instance=int(item["instance"]),
-    )
-    return build_tfi_circuit(params)
-
-
 def _snapshot_preset(root: Path, preset: str) -> tuple[dict, dict]:
     preset_root = root / preset
-    manifest = json.loads((preset_root / "manifest.json").read_text(encoding="utf-8"))
-    items = [
-        json.loads(line)
-        for line in (preset_root / "items.jsonl").read_text(encoding="utf-8").splitlines()
-        if line
-    ]
+    items, manifest = _load(preset_root)
     structures = {
         item["item_id"]: {
             "measurement_group": item["measurement_group"],
@@ -76,7 +62,7 @@ def _snapshot_preset(root: Path, preset: str) -> tuple[dict, dict]:
     for group, item in sorted(representatives.items()):
         if item["family"] != "tfi":
             raise ValueError(f"frozen drift snapshot does not support {item['family']!r}")
-        logical = _tfi_from_item(item)
+        logical = _rebuild_circuit(item)
         for scale in SCALE_FACTORS:
             circuit = fold_for_execution(logical, scale, int(item["circuit_seed"]))
             canonical = _canonical_circuit(circuit)

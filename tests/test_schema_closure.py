@@ -644,6 +644,93 @@ def test_frozen_legacy_tfi_replay_reaches_every_physical_consumer(
     assert checked_instances == set(produced)
 
 
+def test_dependency_drift_snapshot_folds_loaded_recovered_tfi(
+    monkeypatch, tmp_path
+):
+    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    snapshot_module = importlib.import_module("tools.dependency_drift_snapshot")
+    original_builder = generate_module._sample_and_build_circuit
+    original_rebuild = snapshot_module._rebuild_circuit
+    original_fold = snapshot_module.fold_for_execution
+    produced = {}
+    rebuild_inputs = []
+    fold_inputs = []
+
+    def capture_builder(cfg, rng, instance, circuit_seed):
+        params, circuit = original_builder(cfg, rng, instance, circuit_seed)
+        produced[instance] = circuit
+        return params, circuit
+
+    def capture_rebuild(item):
+        logical = original_rebuild(item)
+        rebuild_inputs.append((item["measurement_group"], dict(item), logical))
+        return logical
+
+    def capture_fold(logical, scale_factor, transpile_seed):
+        fold_inputs.append((logical, scale_factor, transpile_seed))
+        return original_fold(logical, scale_factor, transpile_seed)
+
+    monkeypatch.setattr(
+        generate_module, "_sample_and_build_circuit", capture_builder
+    )
+    monkeypatch.setattr(snapshot_module, "_rebuild_circuit", capture_rebuild)
+    monkeypatch.setattr(snapshot_module, "fold_for_execution", capture_fold)
+
+    preset = "t0-micro"
+    expected_dataset_hash = FROZEN_LEGACY_TFI_SERIALIZERS[0][1]
+    expected_items_sha256 = FROZEN_LEGACY_TFI_SERIALIZERS[0][2][os.linesep]
+    root = tmp_path / "data"
+    preset_root = root / preset
+    manifest = generate(preset, preset_root)
+    items_path = preset_root / "items.jsonl"
+    serialized_bytes = items_path.read_bytes()
+    serialized_items, _ = _read_artifact(preset_root)
+    loaded_items, _ = _load(preset_root)
+    loaded_representatives = {}
+    serialized_representatives = {}
+    for item in loaded_items:
+        loaded_representatives.setdefault(item["measurement_group"], item)
+    for item in serialized_items:
+        serialized_representatives.setdefault(item["measurement_group"], item)
+
+    dataset_snapshot, folded = snapshot_module._snapshot_preset(root, preset)
+
+    assert manifest["dataset_hash"] == expected_dataset_hash
+    assert hashlib.sha256(serialized_bytes).hexdigest() == expected_items_sha256
+    assert dataset_snapshot["dataset_hash"] == expected_dataset_hash
+    assert items_path.read_bytes() == serialized_bytes
+    assert json.loads(
+        (preset_root / "manifest.json").read_text(encoding="utf-8")
+    )["dataset_hash"] == expected_dataset_hash
+    assert [group for group, _, _ in rebuild_inputs] == sorted(
+        loaded_representatives
+    )
+    assert len(fold_inputs) == len(folded) == len(rebuild_inputs) * len(
+        snapshot_module.SCALE_FACTORS
+    )
+
+    for rebuild_index, (group, item, logical) in enumerate(rebuild_inputs):
+        loaded_item = loaded_representatives[group]
+        serialized_item = serialized_representatives[group]
+        expected_descriptor = canonical_physical_circuit_descriptor(loaded_item)
+        assert item == loaded_item
+        assert canonical_physical_circuit_descriptor(item) == expected_descriptor
+        assert (
+            canonical_physical_circuit_descriptor(serialized_item)
+            != expected_descriptor
+        )
+        assert logical == produced[item["instance"]]
+        for scale_index, scale_factor in enumerate(snapshot_module.SCALE_FACTORS):
+            fold_index = (
+                rebuild_index * len(snapshot_module.SCALE_FACTORS) + scale_index
+            )
+            folded_logical, folded_scale, folded_seed = fold_inputs[fold_index]
+            assert folded_logical is logical
+            assert folded_scale == scale_factor
+            assert folded_seed == item["circuit_seed"]
+            assert f"{preset}/{group}/scale-{scale_factor}" in folded
+
+
 def test_declared_legacy_tfi_profile_fails_closed_without_replay(
     monkeypatch, tmp_path
 ):
