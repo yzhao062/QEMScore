@@ -1,8 +1,18 @@
 {
   "schema_version": "qem-bench-run-v2",
-  "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+  "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
   "analysis_contract": {
-    "metric_schema": "qem-bench-cell-metrics-v1",
+    "metric_schema": "qem-bench-cell-metrics-v2",
+    "aggregation": {
+      "sums_and_means": "CPython math.fsum over binary64 values",
+      "quantiles": "Hyndman-Fan type 7 linear interpolation",
+      "standard_error": "two-pass sample variance with math.fsum, ddof=1"
+    },
+    "derived_result_comparison": {
+      "float_leaves": "exact finite binary64 bit pattern",
+      "other_leaves": "exact type and value",
+      "containers": "exact type, keys, lengths, and sequence order"
+    },
     "cell_groupings": {
       "six-part": [
         "method",
@@ -261,8 +271,8 @@
       "cell_grouping": "six-part",
       "cell_records": [
         {
-          "cell_id": "sha256:f41347f7d797d73cf478a6dc664eb41620c311bd4fbf12b70b5b44e89d6c92cc",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:26611956093a718a6ca00459bee06f2210636a0c9605fdb1dc6bb284ff64ba45",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -362,8 +372,8 @@
           ]
         },
         {
-          "cell_id": "sha256:b740c9541a20084c8ab385df3e5bb4d7d6146e884a11c3f6ee7417d64e72be32",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:6876c8abfb5139ae774dd873379581bf18aa73f7c3709507df9403d0ad03c480",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -463,8 +473,8 @@
           ]
         },
         {
-          "cell_id": "sha256:1a4cc49889ce64945c788b5884f9a13a5550e4949de9075e97908596d1e71e7d",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:36ed0d93414cf591d4e3dc67b7ea827653f3ca791af9bf98172ad03b5b53ff81",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -564,8 +574,8 @@
           ]
         },
         {
-          "cell_id": "sha256:5f550afbd9d0db7d7137d83085d926a0c469f5313985f5e25aafd1afc5c620dc",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:807fdc79161469a8f601376ba11caedbb56d4e9d77388614a2a891e7c412c5cb",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -668,9 +678,9 @@
       "macro": {
         "mae": {
           "mean": 0.373310404639,
-          "q1": 0.25072719639933333,
+          "q1": 0.2507271963993333,
           "median": 0.3603538888123333,
-          "q3": 0.482937097052,
+          "q3": 0.48293709705200005,
           "n_cells": 4
         },
         "rmse": {
@@ -682,9 +692,9 @@
         },
         "signed_bias": {
           "mean": -0.373310404639,
-          "q1": -0.482937097052,
+          "q1": -0.48293709705200005,
           "median": -0.3603538888123333,
-          "q3": -0.25072719639933333,
+          "q3": -0.2507271963993333,
           "n_cells": 4
         },
         "excess_loss_total": {
@@ -737,7 +747,7 @@
       },
       "pooled_diagnostic": {
         "mae": 0.37331040463899995,
-        "rmse": 0.4073810533874231,
+        "rmse": 0.40738105338742303,
         "signed_bias": -0.37331040463899995,
         "excess_loss_total": 0.0,
         "excess_loss_mean": 0.0,
@@ -752,9 +762,9 @@
           "macro": {
             "mae": {
               "mean": 0.373310404639,
-              "q1": 0.25072719639933333,
+              "q1": 0.2507271963993333,
               "median": 0.3603538888123333,
-              "q3": 0.482937097052,
+              "q3": 0.48293709705200005,
               "n_cells": 4
             },
             "rmse": {
@@ -766,9 +776,9 @@
             },
             "signed_bias": {
               "mean": -0.373310404639,
-              "q1": -0.482937097052,
+              "q1": -0.48293709705200005,
               "median": -0.3603538888123333,
-              "q3": -0.25072719639933333,
+              "q3": -0.2507271963993333,
               "n_cells": 4
             },
             "excess_loss_total": {
@@ -827,19 +837,19 @@
               "mean": 0.373310404639,
               "q1": 0.30338564960616665,
               "median": 0.373310404639,
-              "q3": 0.44323515967183336,
+              "q3": 0.4432351596718334,
               "n_cells": 2
             },
             "rmse": {
               "mean": 0.3839228403323842,
-              "q1": 0.3158005691390346,
+              "q1": 0.31580056913903465,
               "median": 0.3839228403323842,
               "q3": 0.4520451115257338,
               "n_cells": 2
             },
             "signed_bias": {
               "mean": -0.373310404639,
-              "q1": -0.44323515967183336,
+              "q1": -0.4432351596718334,
               "median": -0.373310404639,
               "q3": -0.30338564960616665,
               "n_cells": 2
@@ -978,8 +988,8 @@
       "cell_grouping": "six-part",
       "cell_records": [
         {
-          "cell_id": "sha256:ebbd04387896e342f749fd70c70093404d625e1407b4b0d43912ddc1e7980f23",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:0b1e3b806c9a86e9e50c25aa1a6b5d525b81cfed02e1f6eb4d96ce30bc05897f",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -1079,8 +1089,8 @@
           ]
         },
         {
-          "cell_id": "sha256:e02cda9c9d44195e91c1453703823cb5ea7fcac3a636dd42af12e9547db7e473",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:b0d28f51a957238e8a039b9921f1118fd38bcdffef820b56e5d018ef20c7b87a",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -1180,8 +1190,8 @@
           ]
         },
         {
-          "cell_id": "sha256:d9db20b06f8f405e7b188ba8526bedd8caebf12f78b2a02acb4ee778ac377f24",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:263fc335285ee1e42ab694d5fba46c222f98b829885c1b55e38a91168e4b351d",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -1281,8 +1291,8 @@
           ]
         },
         {
-          "cell_id": "sha256:02494a4f1526776c3d35b167743f8e58efe1c38d38230b45abe9f35c020679b9",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:471a7568cf1b79efe7f3b1c4da34b0f72aab61c0ddc58b6a7d403645f4a78705",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -1544,14 +1554,14 @@
               "mean": 0.042817556659909474,
               "q1": 0.02936097573832952,
               "median": 0.042817556659909474,
-              "q3": 0.05627413758148943,
+              "q3": 0.056274137581489435,
               "n_cells": 2
             },
             "rmse": {
               "mean": 0.05818039177501272,
               "q1": 0.0397779989719851,
               "median": 0.05818039177501272,
-              "q3": 0.07658278457804035,
+              "q3": 0.07658278457804034,
               "n_cells": 2
             },
             "signed_bias": {
@@ -1646,8 +1656,8 @@
       "cell_grouping": "six-part",
       "cell_records": [
         {
-          "cell_id": "sha256:1e16c616407ccc4c71d8153b3e5e62cb749dceb03e746b176ca796427ab422d9",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:cb8fb4750777ad7097a34f2fe08a594181739a5b38b5156b27b55a469a487872",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -1747,8 +1757,8 @@
           ]
         },
         {
-          "cell_id": "sha256:aef48296a4f537816da61992deeee852187dfb9278da4feffdf3596e8b921982",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:a245100309c999827e58693e32f5cbfe901332308b48a21b0a268abb3f117230",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -1848,8 +1858,8 @@
           ]
         },
         {
-          "cell_id": "sha256:abd1442fbf9f48922d0c4fb8105ec93e03bffaf67526ee5bf8b8552d7a83948d",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:e9f15965af974ab355efe52822dcf4edd321203fe311292abe992a99cd40850c",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -1949,8 +1959,8 @@
           ]
         },
         {
-          "cell_id": "sha256:7752b263ff6cc1f6c9a2e1f6950bcba1dc23765cc2ba14683a235b726af7f57f",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:46381622ba9e0fbd940deb1caa58dd4c10d680d5fdae5d5da253bb25f9487092",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -2053,7 +2063,7 @@
       "macro": {
         "mae": {
           "mean": 0.149371632297,
-          "q1": 0.09441537718233334,
+          "q1": 0.09441537718233332,
           "median": 0.1365583158956667,
           "q3": 0.19151457101033337,
           "n_cells": 4
@@ -2066,7 +2076,7 @@
           "n_cells": 4
         },
         "signed_bias": {
-          "mean": -0.14060369890983332,
+          "mean": -0.14060369890983335,
           "q1": -0.19151457101033337,
           "median": -0.1365583158956667,
           "q3": -0.08564744379516666,
@@ -2111,7 +2121,7 @@
       "metrics": {
         "mae": 0.149371632297,
         "rmse": 0.1609585966097554,
-        "signed_bias": -0.14060369890983332,
+        "signed_bias": -0.14060369890983335,
         "excess_loss_total": 0.0,
         "excess_loss_mean": 0.0,
         "excess_loss_max": 0.0,
@@ -2121,9 +2131,9 @@
         "n_cells": 4
       },
       "pooled_diagnostic": {
-        "mae": 0.14937163229699998,
+        "mae": 0.149371632297,
         "rmse": 0.18317478179832855,
-        "signed_bias": -0.1406036989098333,
+        "signed_bias": -0.14060369890983335,
         "excess_loss_total": 0.0,
         "excess_loss_mean": 0.0,
         "excess_loss_max": 0.0,
@@ -2137,7 +2147,7 @@
           "macro": {
             "mae": {
               "mean": 0.149371632297,
-              "q1": 0.09441537718233334,
+              "q1": 0.09441537718233332,
               "median": 0.1365583158956667,
               "q3": 0.19151457101033337,
               "n_cells": 4
@@ -2150,7 +2160,7 @@
               "n_cells": 4
             },
             "signed_bias": {
-              "mean": -0.14060369890983332,
+              "mean": -0.14060369890983335,
               "q1": -0.19151457101033337,
               "median": -0.1365583158956667,
               "q3": -0.08564744379516666,
@@ -2195,7 +2205,7 @@
           "headline_metrics": {
             "mae": 0.149371632297,
             "rmse": 0.1609585966097554,
-            "signed_bias": -0.14060369890983332,
+            "signed_bias": -0.14060369890983335,
             "excess_loss_total": 0.0,
             "excess_loss_mean": 0.0,
             "excess_loss_max": 0.0,
@@ -2323,8 +2333,8 @@
       "cell_grouping": "six-part",
       "cell_records": [
         {
-          "cell_id": "sha256:7abb617389b06cfaa7f37aea3bdf1ed7b98ee040ffd213158d5febcb60ce61d6",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:422b126e309dfd728c08393f761541e8c73aab8535196959835718577f5c0a2f",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -2424,8 +2434,8 @@
           ]
         },
         {
-          "cell_id": "sha256:75c2fe08f91033f092e19e028a3715481cedc585f4f3029e567835eb88ea3fb0",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:37b3c2213807a4da6c44cb689a22b2cc0b08add23c2342b94384c21e348d4c73",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -2525,8 +2535,8 @@
           ]
         },
         {
-          "cell_id": "sha256:6472d8efc063deb97d717ef9c275234b9d349c3ee7ce9cd2ead42cc1150f54ab",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:9c4ce561cd1dbf2f13707c292c9c7953d2b71f2c767dcddec5539629cfc72d9d",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -2626,8 +2636,8 @@
           ]
         },
         {
-          "cell_id": "sha256:1feee045f349fbca35dba2ddda5124a1547df1cfdfb42354ab49498bb12e0133",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:e6c04fd08ca94933b7857a762cf33bf95d489607a02a9fd47a0aeac54be05dc0",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -2730,9 +2740,9 @@
       "macro": {
         "mae": {
           "mean": 0.03660802860186676,
-          "q1": 0.0139088106262442,
+          "q1": 0.013908810626244198,
           "median": 0.030291500657486703,
-          "q3": 0.05299071863310926,
+          "q3": 0.052990718633109266,
           "n_cells": 4
         },
         "rmse": {
@@ -2744,9 +2754,9 @@
         },
         "signed_bias": {
           "mean": 0.03467483705204851,
-          "q1": 0.009617667736494546,
+          "q1": 0.009617667736494548,
           "median": 0.027933549317555297,
-          "q3": 0.05299071863310926,
+          "q3": 0.052990718633109266,
           "n_cells": 4
         },
         "excess_loss_total": {
@@ -2814,9 +2824,9 @@
           "macro": {
             "mae": {
               "mean": 0.03660802860186676,
-              "q1": 0.0139088106262442,
+              "q1": 0.013908810626244198,
               "median": 0.030291500657486703,
-              "q3": 0.05299071863310926,
+              "q3": 0.052990718633109266,
               "n_cells": 4
             },
             "rmse": {
@@ -2828,9 +2838,9 @@
             },
             "signed_bias": {
               "mean": 0.03467483705204851,
-              "q1": 0.009617667736494546,
+              "q1": 0.009617667736494548,
               "median": 0.027933549317555297,
-              "q3": 0.05299071863310926,
+              "q3": 0.052990718633109266,
               "n_cells": 4
             },
             "excess_loss_total": {
@@ -3011,8 +3021,8 @@
       "cell_grouping": "six-part",
       "cell_records": [
         {
-          "cell_id": "sha256:5da71c872a2aeefb54cca5cd41c9e9a56bb0826d582fb753a8274d8ce693e0f0",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:74a29ef782578e8bb50fc079f71b2a4ebb271bb32260816e2f56dd30cb4d4c64",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -3112,8 +3122,8 @@
           ]
         },
         {
-          "cell_id": "sha256:38c4354786e1478f3269a077e9d51693fb7e064accb7e097eeca1ea40b8ca6de",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:4c28e24a659c40656829bded6919f815ac784b5910a0d9402ff99ad2c7f84e35",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -3213,8 +3223,8 @@
           ]
         },
         {
-          "cell_id": "sha256:00a612ec443c063685401e5e378ca581c082894a796e08cb6d1704f2cb112428",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:9838051ab1427e3cd86b68690a70729d2cdf194141846916226e304cfed5cedb",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -3314,8 +3324,8 @@
           ]
         },
         {
-          "cell_id": "sha256:669f51186e087285a261d8090fad9322f22f8cebcd60e2089a4cc7d65358a677",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:b26f78a330c72eb6e838f313e880c73426f37330a3795926e8b264df9e7b78d1",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -3335,7 +3345,7 @@
           },
           "metrics": {
             "mae": 0.0546641896737586,
-            "rmse": 0.0727314768872927,
+            "rmse": 0.07273147688729271,
             "signed_bias": 0.0546641896737586,
             "excess_loss_total": 0.0,
             "excess_loss_mean": 0.0,
@@ -3418,23 +3428,23 @@
       "macro": {
         "mae": {
           "mean": 0.042348395845476845,
-          "q1": 0.017290543211772542,
+          "q1": 0.017290543211772546,
           "median": 0.036390423864687625,
-          "q3": 0.06144827649839193,
+          "q3": 0.06144827649839192,
           "n_cells": 4
         },
         "rmse": {
           "mean": 0.057098498072208556,
-          "q1": 0.023454168342083324,
-          "median": 0.04879756298941384,
-          "q3": 0.08244189271953907,
+          "q1": 0.023454168342083328,
+          "median": 0.048797562989413845,
+          "q3": 0.08244189271953908,
           "n_cells": 4
         },
         "signed_bias": {
           "mean": 0.03875487525547238,
           "q1": 0.009615374852552844,
           "median": 0.03230877609547239,
-          "q3": 0.06144827649839193,
+          "q3": 0.06144827649839192,
           "n_cells": 4
         },
         "excess_loss_total": {
@@ -3487,7 +3497,7 @@
       },
       "pooled_diagnostic": {
         "mae": 0.042348395845476845,
-        "rmse": 0.0684219682154535,
+        "rmse": 0.06842196821545352,
         "signed_bias": 0.03875487525547238,
         "excess_loss_total": 0.0,
         "excess_loss_mean": 0.0,
@@ -3502,23 +3512,23 @@
           "macro": {
             "mae": {
               "mean": 0.042348395845476845,
-              "q1": 0.017290543211772542,
+              "q1": 0.017290543211772546,
               "median": 0.036390423864687625,
-              "q3": 0.06144827649839193,
+              "q3": 0.06144827649839192,
               "n_cells": 4
             },
             "rmse": {
               "mean": 0.057098498072208556,
-              "q1": 0.023454168342083324,
-              "median": 0.04879756298941384,
-              "q3": 0.08244189271953907,
+              "q1": 0.023454168342083328,
+              "median": 0.048797562989413845,
+              "q3": 0.08244189271953908,
               "n_cells": 4
             },
             "signed_bias": {
               "mean": 0.03875487525547238,
               "q1": 0.009615374852552844,
               "median": 0.03230877609547239,
-              "q3": 0.06144827649839193,
+              "q3": 0.06144827649839192,
               "n_cells": 4
             },
             "excess_loss_total": {
@@ -3591,7 +3601,7 @@
               "mean": 0.038754875255472374,
               "q1": 0.02401613122169594,
               "median": 0.038754875255472374,
-              "q3": 0.05349361928924881,
+              "q3": 0.05349361928924882,
               "n_cells": 2
             },
             "excess_loss_total": {
@@ -3677,8 +3687,8 @@
       "cell_grouping": "six-part",
       "cell_records": [
         {
-          "cell_id": "sha256:9b90427c17274cce7a8a78b572d2e26081c7002fe4e418a1f12889953674b518",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:d1c41fb0c5ae4581db0f03c0e2358063f65fa2d39fb58a634c68c0230bea3d50",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -3778,8 +3788,8 @@
           ]
         },
         {
-          "cell_id": "sha256:dc97d56bde93b19e56ab20a7dc6b9ca0e645a01e52e00c76477f4318db35e1a9",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:4746b738598008f6ed7bd2ef47bc033606bee35a51977fda32e1beb08d62935c",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -3799,7 +3809,7 @@
           },
           "metrics": {
             "mae": 0.014170305918221623,
-            "rmse": 0.014956321777961634,
+            "rmse": 0.014956321777961636,
             "signed_bias": 0.008163587603478573,
             "excess_loss_total": 0.0,
             "excess_loss_mean": 0.0,
@@ -3879,8 +3889,8 @@
           ]
         },
         {
-          "cell_id": "sha256:69571783c4143d739f095cc6971d71fa8e417b0ded624afdc4df184fc40f32eb",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:ee4346465dfab313593c7a35ff57e48cc0233daabd82b8aa1b95c0d10be620b5",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -3980,8 +3990,8 @@
           ]
         },
         {
-          "cell_id": "sha256:e4d09dfb8a6eb9d14211a6a21afdd2192c0ca7aa1fc7b4018268cbf1fdd3e487",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:81ca7852677c4c1014908d6a67a5f7fcd3df3958046ef835898a7b6c4f6cac60",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -4001,7 +4011,7 @@
           },
           "metrics": {
             "mae": 0.045992478029443805,
-            "rmse": 0.060256238212910554,
+            "rmse": 0.06025623821291056,
             "signed_bias": 0.04516985290122096,
             "excess_loss_total": 0.0,
             "excess_loss_mean": 0.0,
@@ -4086,11 +4096,11 @@
           "mean": 0.038507385406480854,
           "q1": 0.015052071681464543,
           "median": 0.03066923581599466,
-          "q3": 0.05412454954101097,
+          "q3": 0.054124549541010966,
           "n_cells": 4
         },
         "rmse": {
-          "mean": 0.04943076255946527,
+          "mean": 0.049430762559465276,
           "q1": 0.01899732207277235,
           "median": 0.040300280191976574,
           "q3": 0.0707337206786695,
@@ -4141,7 +4151,7 @@
       },
       "metrics": {
         "mae": 0.038507385406480854,
-        "rmse": 0.04943076255946527,
+        "rmse": 0.049430762559465276,
         "signed_bias": 0.0352818383697431,
         "excess_loss_total": 0.0,
         "excess_loss_mean": 0.0,
@@ -4170,11 +4180,11 @@
               "mean": 0.038507385406480854,
               "q1": 0.015052071681464543,
               "median": 0.03066923581599466,
-              "q3": 0.05412454954101097,
+              "q3": 0.054124549541010966,
               "n_cells": 4
             },
             "rmse": {
-              "mean": 0.04943076255946527,
+              "mean": 0.049430762559465276,
               "q1": 0.01899732207277235,
               "median": 0.040300280191976574,
               "q3": 0.0707337206786695,
@@ -4225,7 +4235,7 @@
           },
           "headline_metrics": {
             "mae": 0.038507385406480854,
-            "rmse": 0.04943076255946527,
+            "rmse": 0.049430762559465276,
             "signed_bias": 0.0352818383697431,
             "excess_loss_total": 0.0,
             "excess_loss_mean": 0.0,
@@ -4243,7 +4253,7 @@
               "mean": 0.038507385406480854,
               "q1": 0.026632767583432214,
               "median": 0.038507385406480854,
-              "q3": 0.0503820032295295,
+              "q3": 0.050382003229529494,
               "n_cells": 2
             },
             "rmse": {
@@ -4343,8 +4353,8 @@
       "cell_grouping": "six-part",
       "cell_records": [
         {
-          "cell_id": "sha256:0e825222afe48f20b205656c6f0dfa4580ab033c97eb75177714b08129a38fd5",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:05ebd3be3c2a04cd289737b522f384867fe5446cea5ee388155c628724c48d08",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -4444,8 +4454,8 @@
           ]
         },
         {
-          "cell_id": "sha256:c7afd434926b44c8e34d5fe6748ee795dd26a3e46041f0fe93aa85fc2b559462",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:13055cb4fd20e861e72aa705070f1f07e08ff4e94b7b847366979bfe734b8eca",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -4545,8 +4555,8 @@
           ]
         },
         {
-          "cell_id": "sha256:08a282a81bf3027905a19f18a7fa9d89e2652ed9ac4c41f49be03f39da2aa061",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:f5c9e203f2f4610ff7672e5612163f3b77cd2b1154daaf42ddb6e469087a2245",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -4566,7 +4576,7 @@
           },
           "metrics": {
             "mae": 0.07748435410463335,
-            "rmse": 0.10028898467103826,
+            "rmse": 0.10028898467103825,
             "signed_bias": 0.07296702877656684,
             "excess_loss_total": 0.0,
             "excess_loss_mean": 0.0,
@@ -4646,8 +4656,8 @@
           ]
         },
         {
-          "cell_id": "sha256:70f4f6c531fd92b94c9bb9ae7c23053469b7a366db44aaa89868b618fd0520cf",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:7fc3fbdf1ac87a6c0e7c67a3cb0dbe9e38d2d4f75e467c44748088dfef7eb0ca",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -4752,12 +4762,12 @@
           "mean": 0.037862961052300054,
           "q1": 0.01471731596463341,
           "median": 0.03028352196896674,
-          "q3": 0.053429167056633385,
+          "q3": 0.05342916705663338,
           "n_cells": 4
         },
         "rmse": {
           "mean": 0.04851707351793886,
-          "q1": 0.019437277227056918,
+          "q1": 0.01943727722705692,
           "median": 0.039558877024689666,
           "q3": 0.06863867331557161,
           "n_cells": 4
@@ -4766,7 +4776,7 @@
           "mean": 0.034532361870233536,
           "q1": 0.012937236261900215,
           "median": 0.028086262710233546,
-          "q3": 0.04968138831856687,
+          "q3": 0.049681388318566874,
           "n_cells": 4
         },
         "excess_loss_total": {
@@ -4836,12 +4846,12 @@
               "mean": 0.037862961052300054,
               "q1": 0.01471731596463341,
               "median": 0.03028352196896674,
-              "q3": 0.053429167056633385,
+              "q3": 0.05342916705663338,
               "n_cells": 4
             },
             "rmse": {
               "mean": 0.04851707351793886,
-              "q1": 0.019437277227056918,
+              "q1": 0.01943727722705692,
               "median": 0.039558877024689666,
               "q3": 0.06863867331557161,
               "n_cells": 4
@@ -4850,7 +4860,7 @@
               "mean": 0.034532361870233536,
               "q1": 0.012937236261900215,
               "median": 0.028086262710233546,
-              "q3": 0.04968138831856687,
+              "q3": 0.049681388318566874,
               "n_cells": 4
             },
             "excess_loss_total": {
@@ -4909,7 +4919,7 @@
               "mean": 0.037862961052300054,
               "q1": 0.026070660208800063,
               "median": 0.037862961052300054,
-              "q3": 0.04965526189580005,
+              "q3": 0.049655261895800044,
               "n_cells": 2
             },
             "rmse": {
@@ -4923,7 +4933,7 @@
               "mean": 0.034532361870233536,
               "q1": 0.02307690856973354,
               "median": 0.034532361870233536,
-              "q3": 0.045987815170733526,
+              "q3": 0.04598781517073353,
               "n_cells": 2
             },
             "excess_loss_total": {
@@ -5009,8 +5019,8 @@
       "cell_grouping": "six-part",
       "cell_records": [
         {
-          "cell_id": "sha256:572ab7a7311af95c978a3ce3335957b69505b74ae81620c17b787cfd3e54d80c",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:9f62348f7018d2d7ffa2167971659eb38763f012e8bd9e22e3ba5722d585e2cc",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -5110,8 +5120,8 @@
           ]
         },
         {
-          "cell_id": "sha256:bb72302c28a301009ce256da5a037bb3c56bbbb11e4799abb165ce99d1d6527e",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:6ee3001359f7cee56861023eb66f6462be37d287c0e56187ac69a0a4053a1a3e",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -5211,8 +5221,8 @@
           ]
         },
         {
-          "cell_id": "sha256:2396223f26cc01ec8c92768e37bc165d74834a709065722ed25da1a27a1c1547",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:d1ac431c4b7c70b82118536b73fb7f8dda7d7494be8835d99c422dc627ba6f90",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -5312,8 +5322,8 @@
           ]
         },
         {
-          "cell_id": "sha256:758522c05713f8f8f9d01e7854ad81bef10aea67b54d652ceffc44499a50871b",
-          "artifact_id": "sha256:ebc4b7d806d139dcfe0bfd9367c6631d6716460ae89f4c4c49658da34add5482",
+          "cell_id": "sha256:44638ed1d1381df03d73e5ee710d0a149ebdf883fdb296b40841a45cb92ecb14",
+          "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
           "grouping": "six-part",
           "key_fields": [
             "method",
@@ -5416,14 +5426,14 @@
       "macro": {
         "mae": {
           "mean": 0.039456340451416404,
-          "q1": 0.015603190316147802,
+          "q1": 0.0156031903161478,
           "median": 0.03254027894087108,
           "q3": 0.05639342907613969,
           "n_cells": 4
         },
         "rmse": {
           "mean": 0.055298861012798836,
-          "q1": 0.024077001791051888,
+          "q1": 0.02407700179105189,
           "median": 0.04695636332946118,
           "q3": 0.07817822255120813,
           "n_cells": 4
@@ -5500,14 +5510,14 @@
           "macro": {
             "mae": {
               "mean": 0.039456340451416404,
-              "q1": 0.015603190316147802,
+              "q1": 0.0156031903161478,
               "median": 0.03254027894087108,
               "q3": 0.05639342907613969,
               "n_cells": 4
             },
             "rmse": {
               "mean": 0.055298861012798836,
-              "q1": 0.024077001791051888,
+              "q1": 0.02407700179105189,
               "median": 0.04695636332946118,
               "q3": 0.07817822255120813,
               "n_cells": 4
@@ -5580,9 +5590,9 @@
             },
             "rmse": {
               "mean": 0.056544691266837324,
-              "q1": 0.03960001924489919,
+              "q1": 0.0396000192448992,
               "median": 0.056544691266837324,
-              "q3": 0.07348936328877545,
+              "q3": 0.07348936328877546,
               "n_cells": 2
             },
             "signed_bias": {

@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping, Sequence
 
-import numpy as np
+TYPE7_QUANTILE_METHOD = "Hyndman-Fan type 7 linear interpolation"
 
 
 def macro_mean_iqr(
@@ -19,14 +20,26 @@ def macro_mean_iqr(
     for name in metric_names:
         if name == "n_items":
             continue
-        values = np.asarray(
-            [float(record["metrics"][name]) for record in cell_records], dtype=float
-        )
+        values = [float(record["metrics"][name]) for record in cell_records]
+        ordered = sorted(0.0 if value == 0.0 else value for value in values)
         summaries[name] = {
-            "mean": float(np.mean(values)),
-            "q1": float(np.quantile(values, 0.25)),
-            "median": float(np.median(values)),
-            "q3": float(np.quantile(values, 0.75)),
+            "mean": math.fsum(values) / len(values),
+            "q1": _type7_quantile(ordered, 1, 4),
+            "median": _type7_quantile(ordered, 1, 2),
+            "q3": _type7_quantile(ordered, 3, 4),
             "n_cells": len(values),
         }
     return summaries
+
+
+def _type7_quantile(
+    ordered: Sequence[float], numerator: int, denominator: int
+) -> float:
+    scaled_rank = (len(ordered) - 1) * numerator
+    lower_index, remainder = divmod(scaled_rank, denominator)
+    lower = ordered[lower_index]
+    if remainder == 0:
+        return lower
+    upper = ordered[lower_index + 1]
+    upper_weight = remainder / denominator
+    return math.fsum(((1.0 - upper_weight) * lower, upper_weight * upper))

@@ -6,6 +6,7 @@ import copy
 import hashlib
 import importlib
 import json
+import math
 import re
 import shutil
 from dataclasses import replace
@@ -38,6 +39,7 @@ from qem_bench.runner.metrics import (
 from qem_bench.runner.run import (
     _load,
     _dataset_item_stream_hashes,
+    _require_run_match,
     _run_artifact_id,
     run,
     validate_run_artifact,
@@ -267,6 +269,110 @@ def test_pooled_diagnostic_differs_from_macro_on_unequal_cells():
     )
     assert all(record["artifact_id"] == "artifact" for record in records)
     assert all(record["items"] for record in records)
+
+
+def test_per_item_squared_error_uses_binary64_multiplication():
+    item = _item(0, circuit="c0")
+    item["ideal_expectation"] = float.fromhex("0x1.05ed03a081072p-2")
+    prediction = float.fromhex("0x1.28dc1b3795f45p-6")
+    records = build_cell_records(
+        "method",
+        [item],
+        np.array([prediction]),
+        np.zeros(1),
+        artifact_id="artifact",
+    )
+    row = records[0]["items"][0]
+
+    assert row["signed_error"].hex() == "-0x1.e6be83da0f4fbp-3"
+    assert row["squared_error"].hex() == "0x1.cebbf533f6dd1p-5"
+    assert row["squared_error"] == row["signed_error"] * row["signed_error"]
+
+
+def test_metric_reductions_are_exact_on_adversarial_binary64_inputs():
+    positive = np.array([1e16, 1.0, 1.0])
+    positive_metrics = pooled_method_metrics(
+        positive, np.zeros(3), np.zeros(3)
+    )
+    expected_total = math.fsum(positive)
+
+    assert float(np.sum(positive)) == 1e16
+    assert expected_total == 1.0000000000000002e16
+    assert positive_metrics["excess_loss_total"] == expected_total
+
+    signed = np.array([1e16, 1.0, 1.0, -1e16])
+    signed_metrics = pooled_method_metrics(signed, signed, np.zeros(4))
+    reversed_metrics = pooled_method_metrics(
+        signed[::-1], signed[::-1], np.zeros(4)
+    )
+
+    assert float(np.mean(signed)) == 0.0
+    assert signed_metrics["signed_bias"].hex() == float(0.5).hex()
+    assert reversed_metrics["signed_bias"].hex() == float(0.5).hex()
+
+    cell_records = [
+        {
+            "metrics": {
+                "mae": abs(value),
+                "rmse": abs(value),
+                "signed_bias": value,
+                "excess_loss_total": total,
+                "excess_loss_mean": 0.0,
+                "excess_loss_max": 0.0,
+                "overcorrection_rate": 0.0,
+                "physicality_violation_rate": 0.0,
+                "n_items": 1,
+            }
+        }
+        for value, total in zip(
+            signed, (1e16, 1.0, 1.0, 0.0), strict=True
+        )
+    ]
+    assert headline_metrics(cell_records)["signed_bias"].hex() == float(0.5).hex()
+    assert headline_metrics(cell_records)["excess_loss_total"] == expected_total
+    assert macro_mean_iqr(cell_records)["signed_bias"]["mean"].hex() == (
+        float(0.5).hex()
+    )
+
+
+def test_macro_quantiles_pin_hyndman_fan_type7_linear_interpolation():
+    records = [
+        {"metrics": {"probe": value, "n_items": 1}}
+        for value in (100.0, 0.0, 20.0, 10.0)
+    ]
+    expected = {
+        "mean": 32.5,
+        "q1": 7.5,
+        "median": 15.0,
+        "q3": 40.0,
+        "n_cells": 4,
+    }
+
+    assert macro_mean_iqr(records)["probe"] == expected
+    assert macro_mean_iqr(list(reversed(records)))["probe"] == expected
+
+
+def test_run_match_requires_exact_typed_values():
+    expected = {
+        "metric": 0.123456789,
+        "count": 1,
+        "identifier": "cell-1",
+        "flags": [False],
+    }
+    _require_run_match("identical", copy.deepcopy(expected), expected)
+
+    rejected = (
+        {**expected, "metric": math.nextafter(expected["metric"], math.inf)},
+        {**expected, "count": 1.0},
+        {**expected, "identifier": "cell-2"},
+        {**expected, "flags": [0]},
+        {**expected, "extra": None},
+    )
+    for actual in rejected:
+        with pytest.raises(ValueError, match="derived result mismatch"):
+            _require_run_match("strict-leaf", actual, expected)
+    with pytest.raises(ValueError, match="derived result mismatch"):
+        _require_run_match("nonfinite", float("nan"), float("nan"))
 
 
 @pytest.mark.protocol("QEM-P002")
@@ -1539,9 +1645,27 @@ def test_report_loader_rejects_tampered_metrics_but_accepts_valid_run(tmp_path):
     assert validate_run_artifact(results) is results
     assert _load_runs(manifest, tmp_path)[0]["artifact_id"] == results["artifact_id"]
     assert results["analysis_contract"]["metric_schema"] == (
-        "qem-bench-cell-metrics-v1"
+        "qem-bench-cell-metrics-v2"
     )
+    assert results["analysis_contract"]["aggregation"] == {
+        "sums_and_means": "CPython math.fsum over binary64 values",
+        "quantiles": "Hyndman-Fan type 7 linear interpolation",
+        "standard_error": "two-pass sample variance with math.fsum, ddof=1",
+    }
+    assert results["analysis_contract"]["derived_result_comparison"] == {
+        "float_leaves": "exact finite binary64 bit pattern",
+        "other_leaves": "exact type and value",
+        "containers": "exact type, keys, lengths, and sequence order",
+    }
     assert len(results["methods"]["raw"]["predictions"]) == results["n_test_items"]
+
+    one_ulp = copy.deepcopy(results)
+    metric = one_ulp["methods"]["raw"]["metrics"]["mae"]
+    one_ulp["methods"]["raw"]["metrics"]["mae"] = math.nextafter(
+        metric, math.inf
+    )
+    with pytest.raises(ValueError, match=r"methods\.raw\.metrics"):
+        validate_run_artifact(one_ulp)
 
     tampered = copy.deepcopy(results)
     tampered["methods"]["raw"]["metrics"]["mae"] = 999.0

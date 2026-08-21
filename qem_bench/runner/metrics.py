@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 
@@ -12,6 +13,7 @@ import numpy as np
 from qem_bench.datasets.schema import canonical_physical_circuit_identity
 
 PHYS_BOUND = 1.0 + 1e-9
+EXACT_SUMMATION_METHOD = "CPython math.fsum over binary64 values"
 
 DEFAULT_CELL_GROUPING = "six-part"
 CELL_GROUPINGS: dict[str, tuple[str, ...]] = {
@@ -124,6 +126,8 @@ def build_cell_records(
         items, predictions, raw_predictions, strict=True
     ):
         ideal = float(item["ideal_expectation"])
+        signed_error = float(prediction - ideal)
+        raw_error = float(raw_prediction - ideal)
         circuit_id, bootstrap_stratum_id = normalized_bootstrap_ids(item)
         item_values = {
             "item_id": str(item["item_id"]),
@@ -138,11 +142,11 @@ def build_cell_records(
             "prediction": float(prediction),
             "raw_prediction": float(raw_prediction),
             "target": ideal,
-            "absolute_error": float(abs(prediction - ideal)),
-            "squared_error": float((prediction - ideal) ** 2),
-            "signed_error": float(prediction - ideal),
-            "excess_absolute_loss": float(
-                max(0.0, abs(prediction - ideal) - abs(raw_prediction - ideal))
+            "absolute_error": abs(signed_error),
+            "squared_error": signed_error * signed_error,
+            "signed_error": signed_error,
+            "excess_absolute_loss": max(
+                0.0, abs(signed_error) - abs(raw_error)
             ),
             "physicality_violation": bool(abs(prediction) > PHYS_BOUND),
         }
@@ -193,18 +197,18 @@ def headline_metrics(cell_records: Sequence[Mapping[str, object]]) -> dict:
     metrics = [record["metrics"] for record in cell_records]
 
     def macro(name: str) -> float:
-        return float(np.mean([float(metric[name]) for metric in metrics]))
+        return _exact_mean([float(metric[name]) for metric in metrics])
 
     return {
         "mae": macro("mae"),
         "rmse": macro("rmse"),
         "signed_bias": macro("signed_bias"),
-        "excess_loss_total": float(
-            sum(float(metric["excess_loss_total"]) for metric in metrics)
+        "excess_loss_total": _exact_sum(
+            [float(metric["excess_loss_total"]) for metric in metrics]
         ),
         "excess_loss_mean": macro("excess_loss_mean"),
-        "excess_loss_max": float(
-            max(float(metric["excess_loss_max"]) for metric in metrics)
+        "excess_loss_max": _finite_maximum(
+            [float(metric["excess_loss_max"]) for metric in metrics]
         ),
         "overcorrection_rate": macro("overcorrection_rate"),
         "physicality_violation_rate": macro("physicality_violation_rate"),
@@ -226,19 +230,36 @@ def _validated_arrays(
     return arrays
 
 
+def _exact_sum(values: Sequence[float] | np.ndarray) -> float:
+    return math.fsum(float(value) for value in values)
+
+
+def _exact_mean(values: Sequence[float] | np.ndarray) -> float:
+    if not len(values):
+        raise ValueError("mean requires at least one value")
+    return _exact_sum(values) / len(values)
+
+
+def _finite_maximum(values: Sequence[float] | np.ndarray) -> float:
+    result = max(float(value) for value in values)
+    return 0.0 if result == 0.0 else result
+
+
 def _metrics_from_arrays(m: np.ndarray, r: np.ndarray, y: np.ndarray) -> dict:
     m, r, y = _validated_arrays(m, r, y)
     err = m - y
     h = excess_absolute_loss(m, r, y)
     return {
-        "mae": float(np.mean(np.abs(err))),
-        "rmse": float(np.sqrt(np.mean(err**2))),
-        "signed_bias": float(np.mean(err)),
-        "excess_loss_total": float(np.sum(h)),
-        "excess_loss_mean": float(np.mean(h)),
-        "excess_loss_max": float(np.max(h)),
-        "overcorrection_rate": float(np.mean(h > 0)),
-        "physicality_violation_rate": float(np.mean(np.abs(m) > PHYS_BOUND)),
+        "mae": _exact_mean(np.abs(err)),
+        "rmse": math.sqrt(_exact_mean(err * err)),
+        "signed_bias": _exact_mean(err),
+        "excess_loss_total": _exact_sum(h),
+        "excess_loss_mean": _exact_mean(h),
+        "excess_loss_max": _finite_maximum(h),
+        "overcorrection_rate": sum(bool(value) for value in h > 0) / len(h),
+        "physicality_violation_rate": (
+            sum(bool(value) for value in np.abs(m) > PHYS_BOUND) / len(m)
+        ),
         "n_items": int(len(y)),
     }
 
@@ -246,6 +267,7 @@ def _metrics_from_arrays(m: np.ndarray, r: np.ndarray, y: np.ndarray) -> dict:
 __all__ = [
     "CELL_GROUPINGS",
     "DEFAULT_CELL_GROUPING",
+    "EXACT_SUMMATION_METHOD",
     "PHYS_BOUND",
     "build_cell_records",
     "excess_absolute_loss",

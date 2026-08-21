@@ -130,7 +130,7 @@ def test_legacy_v1_result_regression(tmp_path):
     assert manifest["dataset_schema_version"] == "legacy-v1"
     assert results["schema_version"] == "qem-bench-run-v2"
     assert results["analysis_contract"]["metric_schema"] == (
-        "qem-bench-cell-metrics-v1"
+        "qem-bench-cell-metrics-v2"
     )
     assert len({item["circuit_id"] for item in results["test_items"]}) == 6
     assert all(

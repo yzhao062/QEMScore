@@ -10,6 +10,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -68,14 +69,17 @@ from qem_bench.reproducibility import (
     validate_environment_contract,
 )
 from qem_bench.runner.metrics import (
-    normalized_bootstrap_ids,
     CELL_GROUPINGS,
     DEFAULT_CELL_GROUPING,
+    EXACT_SUMMATION_METHOD,
+    _exact_mean,
+    _exact_sum,
     build_cell_records,
     headline_metrics,
+    normalized_bootstrap_ids,
     pooled_method_metrics,
 )
-from qem_bench.stats.descriptive import macro_mean_iqr
+from qem_bench.stats.descriptive import TYPE7_QUANTILE_METHOD, macro_mean_iqr
 from qem_bench.validation import (
     LEGACY_SCHEMA_VERSION,
     SPLIT_SCHEMA_VERSION,
@@ -84,7 +88,8 @@ from qem_bench.validation import (
 )
 
 SUPPORTED_LABEL_METHODS = frozenset({"statevector", "stim"})
-METRIC_SCHEMA = "qem-bench-cell-metrics-v1"
+METRIC_SCHEMA = "qem-bench-cell-metrics-v2"
+STANDARD_ERROR_METHOD = "two-pass sample variance with math.fsum, ddof=1"
 SURROGATE_ALARM_NOTE = (
     "triggered means the learned model shows no measured incremental value "
     "from the noisy measurement on this slice; treat its score as a "
@@ -753,20 +758,25 @@ def _validation_candidate_record(
                 "validation items require circuit_id or measurement_group"
             )
         by_circuit.setdefault(key, []).append(float(error))
-    circuit_mae = np.asarray(
-        [np.mean(values) for _, values in sorted(by_circuit.items())], dtype=float
-    )
-    standard_error = (
-        float(np.std(circuit_mae, ddof=1) / np.sqrt(len(circuit_mae)))
-        if len(circuit_mae) > 1
-        else 0.0
-    )
+    circuit_mae = [
+        _exact_mean(values) for _, values in sorted(by_circuit.items())
+    ]
+    macro_mae = _exact_mean(circuit_mae)
+    if len(circuit_mae) > 1:
+        squared_deviations = []
+        for value in circuit_mae:
+            deviation = value - macro_mae
+            squared_deviations.append(deviation * deviation)
+        sample_variance = _exact_sum(squared_deviations) / (len(circuit_mae) - 1)
+        standard_error = math.sqrt(sample_variance) / math.sqrt(len(circuit_mae))
+    else:
+        standard_error = 0.0
     return {
         "alpha": float(alpha),
-        "macro_mae": float(np.mean(circuit_mae)),
+        "macro_mae": macro_mae,
         "standard_error": standard_error,
-        "excess_absolute_loss_total": float(
-            np.sum(errors - np.abs(raw - targets), dtype=float)
+        "excess_absolute_loss_total": _exact_sum(
+            errors - np.abs(raw - targets)
         ),
         "estimator": estimator,
     }
@@ -960,7 +970,7 @@ class _ZNERunnerMethod:
         return MethodOutput(
             predictions,
             0,
-            int(np.sum(extra_per_group, dtype=np.int64)),
+            sum(int(value) for value in extra_per_group),
             group_shots(test_items),
             config,
         )
@@ -1496,6 +1506,16 @@ def _run_artifact_id(
 def _analysis_contract() -> dict:
     return {
         "metric_schema": METRIC_SCHEMA,
+        "aggregation": {
+            "sums_and_means": EXACT_SUMMATION_METHOD,
+            "quantiles": TYPE7_QUANTILE_METHOD,
+            "standard_error": STANDARD_ERROR_METHOD,
+        },
+        "derived_result_comparison": {
+            "float_leaves": "exact finite binary64 bit pattern",
+            "other_leaves": "exact type and value",
+            "containers": "exact type, keys, lengths, and sequence order",
+        },
         "cell_groupings": {
             name: list(fields) for name, fields in CELL_GROUPINGS.items()
         },
@@ -1560,8 +1580,40 @@ def _canonical_test_items(run_result: Mapping[str, object]) -> list[dict]:
 
 
 def _require_run_match(label: str, actual: object, expected: object) -> None:
-    if actual != expected:
+    if not _run_values_match(actual, expected):
         raise ValueError(f"run artifact derived result mismatch: {label}")
+
+
+def _run_values_match(actual: object, expected: object) -> bool:
+    if type(actual) is not type(expected):
+        return False
+    if isinstance(expected, float):
+        return (
+            math.isfinite(actual)
+            and math.isfinite(expected)
+            and actual.hex() == expected.hex()
+        )
+    if isinstance(expected, dict):
+        if len(actual) != len(expected) or not _same_typed_keys(actual, expected):
+            return False
+        return all(
+            _run_values_match(actual[key], value)
+            for key, value in expected.items()
+        )
+    if isinstance(expected, (list, tuple)):
+        return len(actual) == len(expected) and all(
+            _run_values_match(left, right)
+            for left, right in zip(actual, expected, strict=True)
+        )
+    return actual == expected
+
+
+def _same_typed_keys(actual: dict, expected: dict) -> bool:
+    actual_keys = list(actual)
+    return all(
+        any(type(left) is type(right) and left == right for left in actual_keys)
+        for right in expected
+    )
 
 
 def _surrogate_alarm(methods: Mapping[str, Mapping[str, object]]) -> dict:
