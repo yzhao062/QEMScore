@@ -989,6 +989,16 @@ def _validate_sidecar_semantics(
     sidecars: Mapping[str, Mapping[str, Any]],
     registry: Mapping[str, Any],
 ) -> None:
+    counts_reference_by_group: dict[object, tuple[object, object]] = {}
+    for item in items:
+        group = item["measurement_group"]
+        reference = (item.get("counts_hash"), item.get("counts_sidecar"))
+        previous = counts_reference_by_group.setdefault(group, reference)
+        if previous != reference:
+            raise ValueError(
+                f"measurement group {group} references multiple counts draws"
+            )
+
     circuit_cache: dict[str, Any] = {}
     label_cache: dict[tuple[str, str, str], float] = {}
     for item in items:
@@ -1068,6 +1078,16 @@ def _validate_sidecar_semantics(
             type(count) is not int or count < 0 for count in counts.values()
         ):
             raise ValueError(f"item {item_id} counts sidecar has invalid counts")
+        for outcome in counts:
+            if (
+                not isinstance(outcome, str)
+                or len(outcome) != item["n_qubits"]
+                or set(outcome) - {"0", "1"}
+            ):
+                raise ValueError(
+                    f"item {item_id} counts sidecar has an invalid outcome "
+                    f"{outcome!r}"
+                )
         if sum(counts.values()) != item["shots"]:
             raise ValueError(
                 f"item {item_id} counts sidecar total does not equal shots"

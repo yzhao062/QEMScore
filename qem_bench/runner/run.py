@@ -297,6 +297,30 @@ def _adapt_legacy_v1_rows(items: list[dict]) -> None:
         item["stratum"] = FAMILY_STRATA[family]
 
 
+def _validate_legacy_seed_rows(items: list[dict], master_seed: int) -> None:
+    expected_by_instance: dict[int, tuple[int, int]] = {}
+    for item in items:
+        instance = item["instance"]
+        if instance not in expected_by_instance:
+            expected_by_instance[instance] = tuple(
+                int(
+                    np.random.SeedSequence(
+                        master_seed, spawn_key=(stream_index, instance)
+                    ).generate_state(1, dtype=np.uint32)[0]
+                )
+                for stream_index in (0, 1)
+            )
+        expected_seeds = expected_by_instance[instance]
+        for stream_index, field in enumerate(("circuit_seed", "sampler_seed")):
+            expected = expected_seeds[stream_index]
+            if item[field] != expected:
+                raise ValueError(
+                    f"legacy item {item['item_id']!r} {field} does not match "
+                    "the installed seed formula: "
+                    f"stored={item[field]}, expected={expected}"
+                )
+
+
 def _validate_legacy_tfi_profile_rows(
     items: list[dict], manifest: Mapping[str, object], profile: str
 ) -> dict[int, dict[str, object]]:
@@ -410,6 +434,7 @@ def _load_legacy_v1(
         # dataset_schema_version key at all, so read it from the constant.
         validate_item(item, schema_version=LEGACY_SCHEMA_VERSION)
     validate_groups(items)
+    _validate_legacy_seed_rows(items, master_seed)
     invalid_roles = sorted(
         {str(item["split"]) for item in items} - {"train", "test"}
     )

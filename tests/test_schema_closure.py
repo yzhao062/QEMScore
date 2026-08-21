@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib
 import json
 import math
@@ -29,6 +30,7 @@ from qem_bench.datasets.generate import (
     _family_parameter_fields,
     dataset_hash,
     generate,
+    group_shots,
 )
 from qem_bench.datasets.schema import (
     FAMILY_REQUIRED_FIELDS,
@@ -42,8 +44,10 @@ from qem_bench.datasets.schema import (
 )
 from qem_bench.datasets.splits import SplitSpec
 from qem_bench.noise.models import DEFAULT_NOISE_FAMILY
+from qem_bench.observables import z_expectation_from_counts
 from qem_bench.runner.run import _load
 from qem_bench.validation import (
+    canonical_json,
     canonical_item_lines,
     cell_item_stream_hashes,
     item_stream_hash,
@@ -108,6 +112,34 @@ def _write_split_artifact(data: Path, items: list[dict], manifest: dict) -> None
         items_hash=manifest["items_hash"],
     )
     _write_manifest(data, manifest)
+
+
+def _write_counts_sidecar(data: Path, descriptor: dict) -> tuple[str, str]:
+    payload = (canonical_json(descriptor) + "\n").encode("utf-8")
+    digest = hashlib.sha256(payload).hexdigest()
+    relative = (Path("sidecars") / "counts" / f"{digest}.json").as_posix()
+    path = data / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+    return digest, relative
+
+
+def _refresh_split_sidecar_hashes(items: list[dict], manifest: dict) -> None:
+    reference_fields = (
+        ("circuit_sidecar", "circuit_hash"),
+        ("noise_sidecar", "noise_config_hash"),
+        ("observable_sidecar", "observable_hash"),
+        ("counts_sidecar", "counts_hash"),
+    )
+    manifest["sidecar_hashes"] = dict(
+        sorted(
+            {
+                item[path_field]: item[hash_field]
+                for item in items
+                for path_field, hash_field in reference_fields
+            }.items()
+        )
+    )
 
 
 @pytest.fixture(scope="module")
@@ -255,6 +287,114 @@ def _mutate_and_rehash(
             items_hash=manifest["items_hash"],
         )
     return loader, data
+
+
+def test_fully_rehashed_split_group_rejects_distinct_counts_draws(
+    schema_artifacts, tmp_path
+):
+    data = tmp_path / "split-distinct-counts-draws"
+    shutil.copytree(schema_artifacts["split-tfi"], data)
+    items, manifest = _read_artifact(data)
+    rows_by_group: dict[str, list[dict]] = {}
+    for item in items:
+        rows_by_group.setdefault(item["measurement_group"], []).append(item)
+    siblings = next(rows for rows in rows_by_group.values() if len(rows) > 1)
+    target = siblings[0]
+
+    counts_descriptor = json.loads(
+        (data / target["counts_sidecar"]).read_text(encoding="utf-8")
+    )
+    outcome = "0" * target["n_qubits"]
+    if counts_descriptor["counts"] == {outcome: target["shots"]}:
+        outcome = "1" * target["n_qubits"]
+    counts_descriptor["counts"] = {outcome: target["shots"]}
+    counts_hash, counts_sidecar = _write_counts_sidecar(data, counts_descriptor)
+    assert (counts_hash, counts_sidecar) != (
+        target["counts_hash"],
+        target["counts_sidecar"],
+    )
+
+    observable = json.loads(
+        (data / target["observable_sidecar"]).read_text(encoding="utf-8")
+    )
+    noisy, stderr = z_expectation_from_counts(
+        counts_descriptor["counts"], tuple(observable["support"]), target["shots"]
+    )
+    target["counts_hash"] = counts_hash
+    target["counts_sidecar"] = counts_sidecar
+    target["noisy_expectation"] = round(noisy, 12)
+    target["noisy_stderr"] = round(stderr, 12)
+    _refresh_split_sidecar_hashes(items, manifest)
+    _write_split_artifact(data, items, manifest)
+
+    with pytest.raises(
+        ValueError, match="measurement group .* references multiple counts draws"
+    ):
+        validate_split_artifact(data)
+
+
+@pytest.mark.parametrize(
+    ("digit", "width_delta"),
+    (("2", 0), ("0", -1), ("0", 1)),
+    ids=("nonbinary", "short", "long"),
+)
+def test_fully_rehashed_split_counts_reject_invalid_outcome_key(
+    schema_artifacts, tmp_path, digit, width_delta
+):
+    data = tmp_path / f"split-invalid-counts-{digit}-{width_delta}"
+    shutil.copytree(schema_artifacts["split-tfi"], data)
+    items, manifest = _read_artifact(data)
+    old_counts_sidecar = items[0]["counts_sidecar"]
+    affected = [
+        item for item in items if item["counts_sidecar"] == old_counts_sidecar
+    ]
+    counts_descriptor = json.loads(
+        (data / old_counts_sidecar).read_text(encoding="utf-8")
+    )
+    outcome = digit * (affected[0]["n_qubits"] + width_delta)
+    counts_descriptor["counts"] = {outcome: affected[0]["shots"]}
+    counts_hash, counts_sidecar = _write_counts_sidecar(data, counts_descriptor)
+    for item in affected:
+        item["counts_hash"] = counts_hash
+        item["counts_sidecar"] = counts_sidecar
+        item["noisy_expectation"] = 1.0
+        item["noisy_stderr"] = 0.0
+    _refresh_split_sidecar_hashes(items, manifest)
+    _write_split_artifact(data, items, manifest)
+
+    with pytest.raises(ValueError, match="counts sidecar has an invalid outcome"):
+        validate_split_artifact(data)
+
+
+@pytest.mark.parametrize("family", sorted(FAMILY_PRESETS))
+def test_fully_rehashed_legacy_execution_cannot_span_measurement_groups(
+    schema_artifacts, tmp_path, family
+):
+    data = tmp_path / f"legacy-split-group-{family}"
+    shutil.copytree(schema_artifacts["legacy"][family], data)
+    items, manifest = _read_artifact(data)
+    rows_by_group: dict[str, list[dict]] = {}
+    for item in items:
+        rows_by_group.setdefault(item["measurement_group"], []).append(item)
+    siblings = next(rows for rows in rows_by_group.values() if len(rows) > 1)
+    target = siblings[0]
+    target["measurement_group"] = f"{target['measurement_group']}-duplicate-draw"
+
+    manifest["counts"]["measurement_groups"] = len(
+        {item["measurement_group"] for item in items}
+    )
+    manifest["generation_ledger"]["train_circuit_evals"] = group_shots(
+        items, "train"
+    )
+    manifest["generation_ledger"]["test_circuit_evals"] = group_shots(
+        items, "test"
+    )
+    _write_legacy_artifact(data, items, manifest)
+
+    with pytest.raises(
+        ValueError, match="execution configuration .* spans measurement groups"
+    ):
+        _load(data)
 
 
 @pytest.mark.parametrize("family", sorted(FAMILY_PRESETS))

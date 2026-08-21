@@ -839,6 +839,56 @@ def test_legacy_manifest_declares_the_selected_serializer_profile(
     }
 
 
+@pytest.mark.parametrize("family", sorted(FAMILY_STRATA))
+@pytest.mark.parametrize(
+    ("stream_index", "stream_field"),
+    ((0, "circuit_seed"), (1, "sampler_seed")),
+)
+def test_legacy_loader_recomputes_every_family_seed_stream(
+    monkeypatch,
+    tmp_path,
+    family,
+    stream_index,
+    stream_field,
+):
+    preset_by_family = {
+        "tfi": "t0-micro",
+        "qaoa": "t0-qaoa-micro",
+        "heisenberg": "t0-heisenberg-micro",
+        "random_clifford": "t0-rc-micro",
+        "near_clifford": "t0-nc-micro",
+    }
+    assert set(preset_by_family) == set(FAMILY_STRATA)
+    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    config = copy.deepcopy(generate_module.PRESETS[preset_by_family[family]])
+    config.update(
+        {
+            "name": f"legacy-{family}-{stream_field}-probe",
+            "n_train": 1,
+            "n_test": 0,
+            "shots": 16,
+        }
+    )
+    original_seed_int = generate_module._seed_int
+
+    def shifted_seed_int(master, spawn_key):
+        seed = original_seed_int(master, spawn_key)
+        if spawn_key[0] == stream_index:
+            return (seed + 1) % (2**32)
+        return seed
+
+    data = tmp_path / "data"
+    with monkeypatch.context() as generation_patch:
+        generation_patch.setattr(generate_module, "_seed_int", shifted_seed_int)
+        generate(config, data)
+
+    with pytest.raises(
+        ValueError,
+        match=rf"legacy item .* {stream_field} does not match the installed seed formula",
+    ):
+        _load(data)
+
+
 def test_declared_identity_profile_domain_is_closed_for_every_family():
     candidates = (
         LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,

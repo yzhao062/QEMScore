@@ -643,11 +643,40 @@ def validate_item(item: dict, *, schema_version: str) -> None:
         )
 
 
+def _measurement_execution_key(item: Mapping[str, object]) -> tuple[object, ...]:
+    """Return the generator coordinates of one shared counts draw."""
+    if item.get("dataset_schema_version") == SPLIT_SCHEMA_VERSION:
+        return (
+            SPLIT_SCHEMA_VERSION,
+            item["cell_id"],
+            item["circuit_id"],
+            item["instance"],
+            item["replicate"],
+        )
+    return LEGACY_SCHEMA_VERSION, item["family"], item["instance"]
+
+
 def validate_groups(items: list[dict]) -> None:
-    """Reject rows whose measurement group is internally inconsistent."""
+    """Require rows to share a group exactly when they share an execution key."""
     by_group: dict[str, list[dict]] = {}
+    execution_by_group: dict[object, tuple[object, ...]] = {}
+    group_by_execution: dict[tuple[object, ...], object] = {}
     for item in items:
-        by_group.setdefault(item["measurement_group"], []).append(item)
+        group = item["measurement_group"]
+        by_group.setdefault(group, []).append(item)
+        execution = _measurement_execution_key(item)
+        previous_execution = execution_by_group.setdefault(group, execution)
+        if previous_execution != execution:
+            raise ValueError(
+                f"measurement group {group!r} spans execution configurations "
+                f"{previous_execution!r} and {execution!r}"
+            )
+        previous = group_by_execution.setdefault(execution, group)
+        if previous != group:
+            raise ValueError(
+                f"execution configuration {execution!r} spans measurement groups "
+                f"{previous!r} and {group!r}"
+            )
     for group, rows in by_group.items():
         family_fields = FAMILY_REQUIRED_FIELDS[rows[0]["family"]]
         for field in GROUP_INVARIANT_FIELDS + family_fields:
