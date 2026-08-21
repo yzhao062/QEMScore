@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import importlib
 import json
 import re
 import shutil
@@ -13,6 +14,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from qem_bench.circuits.tfi import TFIParams, build_tfi_circuit
 from qem_bench.datasets.generate import (
     LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
     LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
@@ -23,7 +25,7 @@ from qem_bench.datasets.generate import (
 )
 from qem_bench.datasets.schema import FAMILY_STRATA
 from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
-from qem_bench.datasets.splits import SplitSpec
+from qem_bench.datasets.splits import ROLES, SplitSpec, resolve_split_spec
 from qem_bench.reports import generate_report
 from qem_bench.reports.generate import _load_runs, _merge_cell_records
 from qem_bench.runner.metrics import (
@@ -54,7 +56,10 @@ from qem_bench.stats import (
     wilcoxon_rank_sums,
 )
 from qem_bench.stats.plots import critical_difference_diagram
-from qem_bench.validation import validate_split_artifact
+from qem_bench.validation import (
+    _validate_split_tfi_profile_rows,
+    validate_split_artifact,
+)
 
 
 def _item(
@@ -991,6 +996,125 @@ def test_legacy_dataset_loader_refuses_coordinated_tfi_profile_relabels(
             match="identity fields do not match the declared serializer profile",
         ):
             _load(data)
+
+
+def test_split_tfi_profile_replay_covers_every_role_pool_and_report_boundary(
+    monkeypatch,
+    tmp_path,
+):
+    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    original = generate_module._sample_and_build_circuit
+    spec = replace(SPLIT_PRESETS["s0-t0-micro"], budget_tier="H")
+
+    exact_data = tmp_path / "exact-data"
+    generate_split(spec, exact_data)
+
+    def rounded_sample(cfg, rng, instance, circuit_seed):
+        params, circuit = original(cfg, rng, instance, circuit_seed)
+        if isinstance(params, TFIParams):
+            params = replace(params, j=round(params.j, 12), h=round(params.h, 12))
+            circuit = build_tfi_circuit(params)
+        return params, circuit
+
+    rounded_data = tmp_path / "rounded-data"
+    with monkeypatch.context() as generation_patch:
+        generation_patch.setattr(
+            generate_module,
+            "_sample_and_build_circuit",
+            rounded_sample,
+        )
+        generate_split(spec, rounded_data)
+    rounded_manifest_path = rounded_data / "manifest.json"
+    rounded_manifest = json.loads(
+        rounded_manifest_path.read_text(encoding="utf-8")
+    )
+    rounded_manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = {
+        "tfi": LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE
+    }
+    rounded_manifest_path.write_text(
+        json.dumps(rounded_manifest, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    exact_items, exact_manifest = validate_split_artifact(exact_data)
+    rounded_items, rounded_manifest = validate_split_artifact(rounded_data)
+    resolution = resolve_split_spec(spec)
+    expected_draws = {
+        (pool.split, pool.circuit_pool_id, instance)
+        for pool in resolution.circuit_pools
+        if pool.family == "tfi"
+        for instance in range(pool.n_instances)
+    }
+    for rows in (exact_items, rounded_items):
+        observed_draws = {
+            (item["split"], item["circuit_pool_id"], item["instance"])
+            for item in rows
+            if item["family"] == "tfi"
+        }
+        assert observed_draws == expected_draws
+    assert {role for role, _, _ in expected_draws} == set(ROLES)
+
+    for pool in resolution.circuit_pools:
+        if pool.family != "tfi":
+            continue
+        altered = copy.deepcopy(exact_items)
+        target_rows = [
+            item
+            for item in altered
+            if item["circuit_pool_id"] == pool.circuit_pool_id
+            and item["instance"] == 0
+        ]
+        assert target_rows
+        rounded_j = round(target_rows[0]["j"], 12)
+        assert rounded_j != target_rows[0]["j"]
+        for item in target_rows:
+            item["j"] = rounded_j
+        with pytest.raises(
+            ValueError,
+            match=(
+                r"split TFI identity fields do not match the declared "
+                rf"serializer profile .* for pool '{pool.circuit_pool_id}', instance 0"
+            ),
+        ):
+            _validate_split_tfi_profile_rows(
+                altered,
+                exact_manifest,
+                resolution,
+            )
+
+    relabels = (
+        (exact_data, LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE),
+        (rounded_data, LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE),
+    )
+    for index, (source, profile) in enumerate(relabels):
+        data = tmp_path / f"relabel-{index}"
+        shutil.copytree(source, data)
+        manifest_path = data / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = {"tfi": profile}
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with pytest.raises(
+            ValueError,
+            match="split TFI identity fields do not match the declared serializer profile",
+        ):
+            validate_split_artifact(data)
+
+    exact_run = run(exact_data, tmp_path / "exact-run")
+    rounded_run = run(rounded_data, tmp_path / "rounded-run")
+    assert validate_run_artifact(exact_run) is exact_run
+    assert validate_run_artifact(rounded_run) is rounded_run
+    report_manifest = {
+        "schema_version": "qem-bench-report-manifest-v1",
+        "runs": [
+            {"results": "exact-run/results.json"},
+            {"results": "rounded-run/results.json"},
+        ],
+    }
+    with pytest.raises(
+        ValueError,
+        match="report manifest cannot merge physical identity encoding profiles",
+    ):
+        _load_runs(report_manifest, tmp_path)
 
 
 def test_disjoint_family_s3_run_projects_profiles_to_test_families(tmp_path):

@@ -874,7 +874,114 @@ def _generator_observable_support(
         )
     else:
         params = SimpleNamespace(n_qubits=n_qubits)
-    return tuple(_observable_support(item.get("observable_id"), params))
+    observable_id = item.get("observable_id")
+    if observable_id is None:
+        observable_id = item.get("observable")
+    return tuple(_observable_support(observable_id, params))
+
+
+def _expected_observable_semantics(
+    item: Mapping[str, Any], descriptor: Mapping[str, Any]
+) -> tuple[tuple[int, ...], str]:
+    item_id = str(item.get("item_id", "?"))
+    observable_field = (
+        "observable_id" if "observable_id" in item else "observable"
+    )
+    observable_id = item.get(observable_field)
+    try:
+        expected_support = _generator_observable_support(item, descriptor)
+        expected_pauli = z_support_label(
+            int(descriptor["n_qubits"]), expected_support
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError(
+            f"item {item_id} {observable_field} {observable_id!r} "
+            f"is not defined for family {item.get('family')!r}: {exc}"
+        ) from exc
+    return expected_support, expected_pauli
+
+
+def _validate_row_observable_semantics(
+    item: Mapping[str, Any], expected_support: tuple[int, ...], expected_pauli: str
+) -> None:
+    item_id = str(item.get("item_id", "?"))
+    observable_field = (
+        "observable_id" if "observable_id" in item else "observable"
+    )
+    observable_id = item.get(observable_field)
+    if item.get("pauli_label") != expected_pauli:
+        raise ValueError(
+            f"item {item_id} pauli_label disagrees with {observable_field} "
+            f"{observable_id!r}: actual={item.get('pauli_label')!r}, "
+            f"expected={expected_pauli!r}"
+        )
+    if item.get("obs_locality") != len(expected_support):
+        raise ValueError(
+            f"item {item_id} obs_locality disagrees with {observable_field} "
+            f"{observable_id!r}: actual={item.get('obs_locality')!r}, "
+            f"expected={len(expected_support)!r}"
+        )
+
+
+def _validate_row_ideal_semantics(
+    item: Mapping[str, Any],
+    descriptor: Mapping[str, Any],
+    expected_pauli: str,
+    circuit_cache: dict[str, Any],
+    label_cache: dict[tuple[str, str, str], float],
+    *,
+    circuit_key: str,
+) -> None:
+    item_id = str(item.get("item_id", "?"))
+    if circuit_key not in circuit_cache:
+        circuit_cache[circuit_key] = build_circuit_from_canonical_descriptor(
+            descriptor
+        )
+    label_method = str(item["label_method"])
+    label_key = (circuit_key, expected_pauli, label_method)
+    if label_key not in label_cache:
+        if label_method == "statevector":
+            ideal = statevector_expectation(
+                circuit_cache[circuit_key], expected_pauli
+            )
+        elif label_method == "stim":
+            ideal = stim_expectation(circuit_cache[circuit_key], expected_pauli)
+        else:
+            raise ValueError(
+                f"item {item_id} has unsupported label_method {label_method!r}"
+            )
+        label_cache[label_key] = round(float(ideal), 12)
+    expected_ideal = label_cache[label_key]
+    if item.get("ideal_expectation") != expected_ideal:
+        raise ValueError(
+            f"item {item_id} ideal_expectation disagrees with "
+            f"{label_method} generator: "
+            f"actual={item.get('ideal_expectation')!r}, "
+            f"expected={expected_ideal!r}"
+        )
+
+
+def _validate_realized_row_semantics(
+    item: Mapping[str, Any],
+    descriptor: Mapping[str, Any],
+    circuit_cache: dict[str, Any],
+    label_cache: dict[tuple[str, str, str], float],
+    *,
+    validate_ideal: bool = True,
+) -> None:
+    expected_support, expected_pauli = _expected_observable_semantics(
+        item, descriptor
+    )
+    _validate_row_observable_semantics(item, expected_support, expected_pauli)
+    if validate_ideal:
+        _validate_row_ideal_semantics(
+            item,
+            descriptor,
+            expected_pauli,
+            circuit_cache,
+            label_cache,
+            circuit_key=canonical_json(descriptor),
+        )
 
 
 def _validate_sidecar_semantics(
@@ -927,16 +1034,9 @@ def _validate_sidecar_semantics(
                 raise ValueError(
                     f"item {item_id} observable sidecar disagrees on {sidecar_field}"
                 )
-        try:
-            expected_support = _generator_observable_support(item, expected_circuit)
-            expected_pauli = z_support_label(
-                int(expected_circuit["n_qubits"]), expected_support
-            )
-        except (KeyError, TypeError, ValueError) as exc:
-            raise ValueError(
-                f"item {item_id} observable_id {item.get('observable_id')!r} "
-                f"is not defined for family {item.get('family')!r}: {exc}"
-            ) from exc
+        expected_support, expected_pauli = _expected_observable_semantics(
+            item, expected_circuit
+        )
         support = observable.get("support")
         if support != list(expected_support):
             raise ValueError(
@@ -944,46 +1044,18 @@ def _validate_sidecar_semantics(
                 f"{item['observable_id']!r}: actual={support!r}, "
                 f"expected={list(expected_support)!r}"
             )
-        if item.get("pauli_label") != expected_pauli:
-            raise ValueError(
-                f"item {item_id} pauli_label disagrees with observable_id "
-                f"{item['observable_id']!r}: actual={item.get('pauli_label')!r}, "
-                f"expected={expected_pauli!r}"
-            )
-        if item.get("obs_locality") != len(expected_support):
-            raise ValueError(
-                f"item {item_id} obs_locality disagrees with observable_id "
-                f"{item['observable_id']!r}: actual={item.get('obs_locality')!r}, "
-                f"expected={len(expected_support)!r}"
-            )
-
+        _validate_row_observable_semantics(
+            item, expected_support, expected_pauli
+        )
         circuit_id = str(item["circuit_id"])
-        if circuit_id not in circuit_cache:
-            circuit_cache[circuit_id] = build_circuit_from_canonical_descriptor(
-                expected_circuit
-            )
-        label_method = str(item["label_method"])
-        label_key = (circuit_id, expected_pauli, label_method)
-        if label_key not in label_cache:
-            if label_method == "statevector":
-                ideal = statevector_expectation(
-                    circuit_cache[circuit_id], expected_pauli
-                )
-            elif label_method == "stim":
-                ideal = stim_expectation(circuit_cache[circuit_id], expected_pauli)
-            else:
-                raise ValueError(
-                    f"item {item_id} has unsupported label_method {label_method!r}"
-                )
-            label_cache[label_key] = round(float(ideal), 12)
-        expected_ideal = label_cache[label_key]
-        if item.get("ideal_expectation") != expected_ideal:
-            raise ValueError(
-                f"item {item_id} ideal_expectation disagrees with "
-                f"{label_method} generator: "
-                f"actual={item.get('ideal_expectation')!r}, "
-                f"expected={expected_ideal!r}"
-            )
+        _validate_row_ideal_semantics(
+            item,
+            expected_circuit,
+            expected_pauli,
+            circuit_cache,
+            label_cache,
+            circuit_key=circuit_id,
+        )
 
         counts_sidecar = sidecars[str(item["counts_sidecar"])]
         for field in ("cell_id", "circuit_id", "shots", "sampler_seed"):
@@ -1011,6 +1083,67 @@ def _validate_sidecar_semantics(
             raise ValueError(
                 f"item {item_id} noisy_stderr disagrees with counts sidecar"
             )
+
+
+def _validate_split_tfi_profile_rows(
+    items: list[dict], manifest: Mapping[str, Any], expected_resolution: Any
+) -> None:
+    from qem_bench.circuits.tfi import sample_tfi_params
+    from qem_bench.datasets.generate import (
+        PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
+        _tfi_identity_fields_for_profile,
+        validate_physical_identity_encoding_profiles,
+    )
+
+    if PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD not in manifest:
+        return
+    families = {pool.family for pool in expected_resolution.circuit_pools}
+    profiles = validate_physical_identity_encoding_profiles(
+        manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD],
+        families=families,
+    )
+    profile = profiles.get("tfi")
+    if profile is None:
+        return
+
+    rows_by_draw: dict[tuple[str, int], list[dict]] = {}
+    for item in items:
+        if item["family"] == "tfi":
+            key = (str(item["circuit_pool_id"]), int(item["instance"]))
+            rows_by_draw.setdefault(key, []).append(item)
+
+    master = int(manifest["master_seed"])
+    for pool in expected_resolution.circuit_pools:
+        if pool.family != "tfi":
+            continue
+        grid = pool.parameter_grid
+        for instance in range(pool.n_instances):
+            spawn_key = tuple(pool.pool_seed_key) + (0, instance)
+            sequence = np.random.SeedSequence(master, spawn_key=spawn_key)
+            circuit_seed = int(
+                sequence.generate_state(1, dtype=np.uint32)[0]
+            )
+            params = sample_tfi_params(
+                np.random.default_rng(
+                    np.random.SeedSequence(master, spawn_key=spawn_key)
+                ),
+                list(grid["n_qubits"]),
+                list(grid["steps"]),
+                grid["dt"],
+                instance,
+                circuit_seed,
+            )
+            expected = _tfi_identity_fields_for_profile(params, profile)
+            rows = rows_by_draw.get((pool.circuit_pool_id, instance), [])
+            if not rows or any(
+                any(row[field] != value for field, value in expected.items())
+                for row in rows
+            ):
+                raise ValueError(
+                    "split TFI identity fields do not match the declared "
+                    f"serializer profile {profile!r} for pool "
+                    f"{pool.circuit_pool_id!r}, instance {instance}"
+                )
 
 
 def validate_split_artifact(data_dir: str | Path) -> tuple[list[dict], dict]:
@@ -1168,6 +1301,7 @@ def validate_split_artifact(data_dir: str | Path) -> tuple[list[dict], dict]:
         sidecar_payloads[relative] = payload
 
     _validate_sidecar_semantics(items, sidecar_payloads, registry)
+    _validate_split_tfi_profile_rows(items, manifest, expected_resolution)
 
     # Local import: generate.py imports validation.py, so a module-level import
     # here would close the cycle. Ordering matters and is deliberate. An

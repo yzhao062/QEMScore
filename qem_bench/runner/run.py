@@ -44,9 +44,12 @@ from qem_bench.budget import (
 )
 from qem_bench.circuits.tfi import sample_tfi_params
 from qem_bench.datasets.generate import (
-    LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
+    LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
     PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
+    SEED_FORMULA,
     UNKNOWN_IDENTITY_ENCODING_PROFILE,
+    _require_source_observable_closure,
+    _tfi_identity_fields_for_profile,
     dataset_hash,
     group_shots,
     validate_physical_identity_encoding_profiles,
@@ -55,6 +58,7 @@ from qem_bench.datasets.schema import (
     FAMILY_STRATA,
     FEATURE_SPEC_VERSION,
     FEATURES,
+    canonical_physical_circuit_descriptor,
     validate_groups,
     validate_item,
 )
@@ -75,6 +79,7 @@ from qem_bench.stats.descriptive import macro_mean_iqr
 from qem_bench.validation import (
     LEGACY_SCHEMA_VERSION,
     SPLIT_SCHEMA_VERSION,
+    _validate_realized_row_semantics,
     validate_split_artifact,
 )
 
@@ -294,13 +299,15 @@ def _adapt_legacy_v1_rows(items: list[dict]) -> None:
 
 def _validate_legacy_tfi_profile_rows(
     items: list[dict], manifest: Mapping[str, object], profile: str
-) -> None:
+) -> dict[int, dict[str, object]]:
     config = manifest["config"]
     master = int(config["master_seed"])
     rows_by_instance: dict[int, list[dict]] = {}
     for item in items:
-        rows_by_instance.setdefault(int(item["instance"]), []).append(item)
+        if item["family"] == "tfi":
+            rows_by_instance.setdefault(int(item["instance"]), []).append(item)
 
+    exact_descriptors: dict[int, dict[str, object]] = {}
     for instance, rows in sorted(rows_by_instance.items()):
         spawn_key = (0, instance)
         circuit_seed = int(
@@ -319,19 +326,13 @@ def _validate_legacy_tfi_profile_rows(
             instance,
             circuit_seed,
         )
-        j = params.j
-        h = params.h
-        if profile == LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE:
-            j = round(j, 12)
-            h = round(h, 12)
-        expected = {
-            "n_qubits": params.n_qubits,
-            "steps": params.steps,
-            "j": j,
-            "h": h,
-            "dt": params.dt,
-            "circuit_seed": params.circuit_seed,
-        }
+        expected = _tfi_identity_fields_for_profile(params, profile)
+        exact = _tfi_identity_fields_for_profile(
+            params, LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE
+        )
+        exact_descriptors[instance] = canonical_physical_circuit_descriptor(
+            {"family": "tfi", **exact}
+        )
         if any(
             any(row[field] != value for field, value in expected.items())
             for row in rows
@@ -340,11 +341,12 @@ def _validate_legacy_tfi_profile_rows(
                 "legacy TFI identity fields do not match the declared "
                 f"serializer profile {profile!r} at instance {instance}"
             )
+    return exact_descriptors
 
 
 def _normalize_dataset_identity_encoding_profiles(
     items: list[dict], manifest: dict
-) -> None:
+) -> dict[int, dict[str, object]]:
     families = {str(item["family"]) for item in items}
     declared = PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD in manifest
     if declared:
@@ -358,13 +360,17 @@ def _normalize_dataset_identity_encoding_profiles(
             for family in sorted(families)
         }
 
+    exact_tfi_descriptors = {}
     if (
         declared
         and manifest["dataset_schema_version"] == LEGACY_SCHEMA_VERSION
         and "tfi" in profiles
     ):
-        _validate_legacy_tfi_profile_rows(items, manifest, profiles["tfi"])
+        exact_tfi_descriptors = _validate_legacy_tfi_profile_rows(
+            items, manifest, profiles["tfi"]
+        )
     manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD] = profiles
+    return exact_tfi_descriptors
 
 
 def _load_legacy_v1(
@@ -380,6 +386,19 @@ def _load_legacy_v1(
     current_spec = {"version": FEATURE_SPEC_VERSION, "features": list(FEATURES)}
     if manifest.get("feature_spec") != current_spec:
         raise ValueError("dataset feature_spec does not match the installed code")
+    config = manifest.get("config")
+    master_seed = manifest.get("master_seed")
+    if (
+        not isinstance(config, dict)
+        or type(master_seed) is not int
+        or master_seed < 0
+        or type(config.get("master_seed")) is not int
+        or config.get("master_seed") != master_seed
+        or manifest.get("seed_formula") != SEED_FORMULA
+    ):
+        raise ValueError(
+            "legacy-v1 manifest seed contract does not match config and installed code"
+        )
 
     item_ids = [item["item_id"] for item in items]
     if len(item_ids) != len(set(item_ids)):
@@ -391,6 +410,14 @@ def _load_legacy_v1(
         # dataset_schema_version key at all, so read it from the constant.
         validate_item(item, schema_version=LEGACY_SCHEMA_VERSION)
     validate_groups(items)
+    invalid_roles = sorted(
+        {str(item["split"]) for item in items} - {"train", "test"}
+    )
+    if invalid_roles:
+        raise ValueError(
+            "legacy-v1 item roles must be train or test; "
+            f"found {invalid_roles!r}"
+        )
 
     row_noise_families = {item["noise_family"] for item in items}
     if len(row_noise_families) != 1:
@@ -402,7 +429,6 @@ def _load_legacy_v1(
     if row_noise_family not in SEVERITY_GRIDS:
         raise ValueError(f"unknown row noise_family {row_noise_family!r}")
 
-    config = manifest.get("config")
     manifest_noise_family = (
         config.get("noise_family") if isinstance(config, dict) else None
     )
@@ -470,7 +496,30 @@ def _load_legacy_v1(
         raise ValueError(
             f"manifest counts do not match item rows: manifest={counts}, rows={expected_counts}"
         )
-    _normalize_dataset_identity_encoding_profiles(items, manifest)
+    exact_tfi_descriptors = _normalize_dataset_identity_encoding_profiles(
+        items, manifest
+    )
+    circuit_cache: dict[str, Any] = {}
+    label_cache: dict[tuple[str, str, str], float] = {}
+    profiles = manifest[PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD]
+    for item in items:
+        descriptor = exact_tfi_descriptors.get(int(item["instance"]))
+        if item["family"] != "tfi" or descriptor is None:
+            descriptor = canonical_physical_circuit_descriptor(item)
+        _validate_realized_row_semantics(
+            item,
+            descriptor,
+            circuit_cache,
+            label_cache,
+            validate_ideal=(
+                item["family"] != "tfi"
+                or profiles["tfi"] != UNKNOWN_IDENTITY_ENCODING_PROFILE
+            ),
+        )
+    _require_source_observable_closure(
+        items,
+        split_name=str(manifest.get("preset")),
+    )
     return items, manifest
 
 

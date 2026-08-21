@@ -28,7 +28,9 @@ from qem_bench.datasets.generate import (
     _construct_legacy_source_observable_closure,
     _require_source_observable_closure,
     _uses_frozen_legacy_serializer,
+    dataset_hash,
     generate,
+    group_shots,
 )
 from qem_bench.datasets.split_generate import (
     _transpile_seed_from_circuit_id,
@@ -877,6 +879,121 @@ def test_every_legacy_preset_is_source_observable_closed(tmp_path):
         checked.add(preset)
 
     assert checked == set(PRESETS)
+
+
+def test_legacy_loader_rejects_realized_source_observable_gap(tmp_path):
+    data = tmp_path / "legacy-observable-gap"
+    generate("t0-qaoa-micro", data)
+    item_path = data / "items.jsonl"
+    items = [
+        json.loads(line)
+        for line in item_path.read_text(encoding="utf-8").splitlines()
+        if line
+    ]
+    chosen_group = sorted({item["measurement_group"] for item in items})[0]
+    for item in items:
+        item["split"] = (
+            "train" if item["measurement_group"] == chosen_group else "test"
+        )
+    item_path.write_text(
+        "\n".join(canonical_item_lines(items)) + "\n",
+        encoding="utf-8",
+    )
+
+    manifest_path = data / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["dataset_hash"] = dataset_hash(items)
+    manifest["counts"]["train_items"] = sum(
+        item["split"] == "train" for item in items
+    )
+    manifest["counts"]["test_items"] = sum(
+        item["split"] == "test" for item in items
+    )
+    manifest["generation_ledger"]["train_circuit_evals"] = group_shots(
+        items, "train"
+    )
+    manifest["generation_ledger"]["test_circuit_evals"] = group_shots(
+        items, "test"
+    )
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"split 't0-qaoa-micro' is not source-observable closed; "
+            r"prediction observables absent from training: "
+            r"\{'test': .*\(6, 'IIZIII'\).*\(6, 'IIZZII'\)"
+        ),
+    ):
+        _load(data)
+
+
+def test_legacy_loader_rejects_role_outside_train_test(tmp_path):
+    data = tmp_path / "legacy-invalid-role"
+    generate("t0-micro", data)
+    item_path = data / "items.jsonl"
+    items = [
+        json.loads(line)
+        for line in item_path.read_text(encoding="utf-8").splitlines()
+        if line
+    ]
+    group = next(
+        item["measurement_group"] for item in items if item["split"] == "test"
+    )
+    for item in items:
+        if item["measurement_group"] == group:
+            item["split"] = "validation"
+    item_path.write_text(
+        "\n".join(canonical_item_lines(items)) + "\n",
+        encoding="utf-8",
+    )
+
+    manifest_path = data / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["dataset_hash"] = dataset_hash(items)
+    manifest["counts"]["train_items"] = sum(
+        item["split"] == "train" for item in items
+    )
+    manifest["counts"]["test_items"] = sum(
+        item["split"] == "test" for item in items
+    )
+    manifest["generation_ledger"]["train_circuit_evals"] = group_shots(
+        items, "train"
+    )
+    manifest["generation_ledger"]["test_circuit_evals"] = group_shots(
+        items, "test"
+    )
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"legacy-v1 item roles must be train or test; "
+            r"found \['validation'\]"
+        ),
+    ):
+        _load(data)
+
+
+@pytest.mark.parametrize("mutation", ("master-seed", "seed-formula"))
+def test_legacy_loader_binds_manifest_seed_contract(tmp_path, mutation):
+    data = tmp_path / mutation
+    generate("t0-micro", data)
+    manifest_path = data / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if mutation == "master-seed":
+        manifest["master_seed"] += 1
+    else:
+        manifest["seed_formula"] = "edited formula"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "legacy-v1 manifest seed contract does not match config and installed code"
+        ),
+    ):
+        _load(data)
 
 
 def test_impossible_legacy_source_observable_closure_fails_closed():

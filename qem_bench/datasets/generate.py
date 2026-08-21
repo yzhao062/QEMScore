@@ -400,12 +400,34 @@ def _family_parameter_fields(params: CircuitParams) -> dict:
     }
 
 
+def _tfi_identity_fields_for_profile(params: TFIParams, profile: str) -> dict:
+    if profile not in PHYSICAL_IDENTITY_ENCODING_PROFILE_DOMAINS["tfi"]:
+        raise ValueError(f"unknown TFI identity encoding profile {profile!r}")
+    j = params.j
+    h = params.h
+    if profile == LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE:
+        j = round(j, 12)
+        h = round(h, 12)
+    return {
+        "n_qubits": params.n_qubits,
+        "steps": params.steps,
+        "j": j,
+        "h": h,
+        "dt": params.dt,
+        "circuit_seed": params.circuit_seed,
+    }
+
+
 def _frozen_legacy_parameter_fields(params: CircuitParams) -> dict:
-    fields = _family_parameter_fields(params)
     if isinstance(params, TFIParams):
-        fields["j"] = round(params.j, 12)
-        fields["h"] = round(params.h, 12)
-    return fields
+        identity_fields = _tfi_identity_fields_for_profile(
+            params, LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE
+        )
+        return {
+            field: identity_fields[field]
+            for field in ("steps", "j", "h", "dt")
+        }
+    return _family_parameter_fields(params)
 
 
 def _canonical_lines(items: list[dict]) -> list[str]:

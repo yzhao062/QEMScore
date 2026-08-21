@@ -960,6 +960,44 @@ def test_fully_rehashed_artifact_rejects_stderr_above_the_shot_bound(
         loader(data)
 
 
+@pytest.mark.parametrize("family", sorted(FAMILY_PRESETS))
+def test_fully_rehashed_legacy_artifact_rejects_wrong_exact_label(
+    schema_artifacts, tmp_path, family
+):
+    source = schema_artifacts["legacy"][family]
+    data = tmp_path / f"wrong-label-{family}"
+    shutil.copytree(source, data)
+    items, manifest = _read_artifact(data)
+    original = float(items[0]["ideal_expectation"])
+    items[0]["ideal_expectation"] = original / 2.0 if original else 0.125
+    assert items[0]["ideal_expectation"] != original
+    _write_legacy_artifact(data, items, manifest)
+
+    with pytest.raises(
+        ValueError,
+        match="ideal_expectation disagrees with .* generator",
+    ):
+        _load(data)
+
+
+def test_fully_rehashed_legacy_artifact_binds_observable_name_to_pauli(
+    schema_artifacts, tmp_path
+):
+    source = schema_artifacts["legacy"]["qaoa"]
+    data = tmp_path / "wrong-observable-semantics"
+    shutil.copytree(source, data)
+    items, manifest = _read_artifact(data)
+    item = next(row for row in items if row["observable"] == "z_mid")
+    item["observable"] = "zz_mid"
+    _write_legacy_artifact(data, items, manifest)
+
+    with pytest.raises(
+        ValueError,
+        match="pauli_label disagrees with observable 'zz_mid'",
+    ):
+        _load(data)
+
+
 def _mutate_qaoa_domain(item: dict, case: str) -> None:
     if case == "unknown-graph":
         item["graph_class"] = "complete"
