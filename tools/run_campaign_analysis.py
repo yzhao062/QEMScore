@@ -261,7 +261,22 @@ def analyze(args) -> None:
         path.parent.name: json.loads(path.read_text(encoding="utf-8"))
         for path in sorted((args.root / "rosters").glob("*/binding.json"))
     }
-    report = evaluate_campaign(records, rosters=rosters, n_resamples=args.resamples)
+    # A missing audit is read rather than refused. The rehearsal runs analyze
+    # before any audit exists, and the library already withholds the publication
+    # path from an unaudited setting, so refusing here would only make the
+    # rehearsal impossible without making the campaign safer.
+    audit_path = args.root / "audit.json"
+    audits = None
+    if audit_path.is_file():
+        from tools.audit_campaign import SCHEMA_VERSION as AUDIT_SCHEMA_VERSION
+
+        audit = json.loads(audit_path.read_text(encoding="utf-8"))
+        if audit.get("schema_version") != AUDIT_SCHEMA_VERSION:
+            raise SystemExit(
+                f"{audit_path}: expected schema_version {AUDIT_SCHEMA_VERSION!r}")
+        audits = audit.get("settings")
+    report = evaluate_campaign(
+        records, rosters=rosters, audits=audits, n_resamples=args.resamples)
     _write_json(args.root / "report.json", report)
     _write_json(args.root / "tables.json", build_campaign_tables(report))
     primary = report["primary"]
@@ -269,6 +284,10 @@ def analyze(args) -> None:
         "records": len(records),
         "failed_settings": report["failed_settings"],
         "settings_without_a_roster": report["settings_without_a_roster"],
+        "settings_without_an_audit": report["settings_without_an_audit"],
+        "settings_failing_audit": report["settings_failing_audit"],
+        "settings_without_a_zero_noise_replay":
+            report["settings_without_a_zero_noise_replay"],
         "primary_successes": primary["successes"],
         "successful_seeds": primary["successful_seeds"],
         "publication_path": primary["publication_path"],

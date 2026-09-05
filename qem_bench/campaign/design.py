@@ -59,6 +59,12 @@ ARMS: dict[str, dict[str, str]] = {
     "capacity_matched": {"full": "liao", "control": "liao-feat-only"},
 }
 PRIMARY_ARM = "primary"
+# Declared before the freeze and reported whichever way the two arms fall. It
+# carries no promotion verdict: the question it answers is which of the two
+# differences between the arms produced their divergence, not whether a benefit
+# replicates.
+LEARNER_FIXED_ARM = "learner_fixed"
+LEARNER_FIXED_CONTRAST: dict[str, str] = {"full": "liao", "control": "feat-only"}
 DROPPED_FEATURE = "noisy_expectation"
 TRAINING_SHUFFLE_ARMS: dict[str, str] = {
     "ridge": "ridge-training-shuffle",
@@ -183,6 +189,8 @@ def declared_design() -> dict[str, object]:
         "ratio_margin": RATIO_MARGIN,
         "arms": {name: dict(value) for name, value in ARMS.items()},
         "primary_arm": PRIMARY_ARM,
+        "learner_fixed_arm": LEARNER_FIXED_ARM,
+        "learner_fixed_contrast": dict(LEARNER_FIXED_CONTRAST),
         "dropped_feature": DROPPED_FEATURE,
         "training_shuffle_seed": TRAINING_SHUFFLE_SEED,
         "fixed_model_shuffle_seeds": list(FIXED_MODEL_SHUFFLE_SEEDS),

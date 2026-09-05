@@ -43,6 +43,8 @@ from qem_bench.baselines.controls import shuffle_noisy_items
 from qem_bench.baselines.liao import LiaoMitigator
 from qem_bench.campaign.design import (
     ARMS,
+    LEARNER_FIXED_ARM,
+    LEARNER_FIXED_CONTRAST,
     BASELINE_REGIME,
     BOOTSTRAP_RESAMPLES,
     CONFIDENCE,
@@ -71,7 +73,7 @@ from qem_bench.runner.run import (
     registered_methods,
 )
 from qem_bench.stats.bootstrap import circuit_blocked_bootstrap
-from qem_bench.stats.gain_contrast import evaluate_gain_contrast
+from qem_bench.stats.gain_contrast import CELL_FIELDS, evaluate_gain_contrast
 from qem_bench.stats.incremental_value import CONTROLS, evaluate_incremental_value
 
 RECORD_SCHEMA_VERSION = "qem-bench-campaign-record-v1"
@@ -802,10 +804,67 @@ def regenerate_setting_diagnostics(
     }
 
 
+def _label_spread(record: Mapping[str, object]) -> dict:
+    """Per-family ideal-label scale on the rows the endpoint scored.
+
+    The endpoint g = 1 - MAE_full / MAE_control is scale invariant, so a rise in
+    the control's error between the regimes cannot be separated from a wider
+    ideal-label distribution without a quantity in the same units. The evolution
+    step moves both. These are those units.
+
+    Each statistic is formed inside a (noise family, severity, observable) cell
+    and then macro-averaged over cells, which is how `_macro_mae` forms the
+    errors this sits beside. A pooled statistic would not decompose them: an
+    ideal label is keyed by circuit and observable alone, so pooling counts every
+    label once per severity and folds the offset between the two observables into
+    a term the MAE never sees.
+    """
+    by_family: dict[str, dict[tuple, list[float]]] = defaultdict(
+        lambda: defaultdict(list))
+    for item in record["test_items"]:
+        if item["stratum"] != "continuous_regression":
+            continue
+        cell = tuple(str(item[field]) for field in CELL_FIELDS)
+        value = float(item["ideal_expectation"])
+        if not math.isfinite(value):
+            raise ValueError("ideal labels must be finite")
+        by_family[str(item["family"])][cell].append(value)
+
+    families = {}
+    for family, cells in sorted(by_family.items()):
+        deviations, sds, counts = [], [], []
+        for _, labels in sorted(cells.items()):
+            column = np.asarray(labels, dtype=float)
+            deviations.append(float(np.abs(column - np.median(column)).mean()))
+            sds.append(float(column.std(ddof=0)))
+            counts.append(column.size)
+        families[family] = {
+            "n_cells": len(cells),
+            "n_items": int(sum(counts)),
+            "macro_mean_absolute_deviation": float(np.mean(deviations)),
+            "macro_std": float(np.mean(sds)),
+        }
+    return {
+        "regime": str(record["regime"]),
+        "seed": int(record["seed"]),
+        "size": int(record["size"]),
+        "cell_fields": list(CELL_FIELDS),
+        "statistic_scope": (
+            "formed inside each cell and macro-averaged over cells, matching how "
+            "the endpoint's MAE is formed; each cell's deviation is taken about "
+            "that cell's median, which is the absolute error of the best constant "
+            "predictor for the cell and therefore carries the units of full_mae "
+            "and control_mae"
+        ),
+        "families": families,
+    }
+
+
 def evaluate_campaign(
     records: Iterable[Mapping[str, object]],
     *,
     rosters: Mapping[str, Mapping[str, object]] | None = None,
+    audits: Mapping[str, Mapping[str, object]] | None = None,
     baseline_regime: str = BASELINE_REGIME,
     contrast_regime: str = CONTRAST_REGIME,
     root_seed: int = ROOT_SEED,
@@ -849,6 +908,7 @@ def evaluate_campaign(
         and root_seed == ROOT_SEED
         and required_families == REQUIRED_FAMILIES
     )
+    roster_bindings = _roster_bindings(indexed, rosters)
     report = {
         "schema_version": REPORT_SCHEMA_VERSION,
         "declared_design": declared_design(),
@@ -880,16 +940,34 @@ def evaluate_campaign(
             setting_key(*key): regenerate_setting_diagnostics(value)
             for key, value in sorted(indexed.items())
         },
+        # The endpoint is a ratio, so on its own it cannot say whether a
+        # regime's control error rose because the task got harder or because the
+        # labels spread out. This is the anchor that separates them, carried per
+        # setting and per family rather than promised.
+        "label_spread": {
+            setting_key(*key): _label_spread(value)
+            for key, value in sorted(indexed.items())
+        },
         "contrasts": {},
         "replication": {},
-        **_roster_bindings(indexed, rosters),
+        **roster_bindings,
+        **_audit_bindings(
+            indexed, audits,
+            roster_artifacts=roster_bindings["roster_artifacts"],
+        ),
     }
 
     sizes = sorted({key[2] for key in indexed} | {primary_size})
     seeds = sorted({key[1] for key in indexed} | set(SEEDS))
-    for arm_name, arm in ARMS.items():
+    # The learner-fixed contrast rides the same loop so it lands in the endpoint
+    # tables, and stays out of `replication` so it collects no promotion verdict
+    # and adds nothing to the primary test family.
+    for arm_name, arm in {**ARMS,
+                          LEARNER_FIXED_ARM: LEARNER_FIXED_CONTRAST}.items():
+        promoted_arm = arm_name in ARMS
         report["contrasts"][arm_name] = {}
-        report["replication"][arm_name] = {}
+        if promoted_arm:
+            report["replication"][arm_name] = {}
         for size in sizes:
             by_seed = {
                 str(seed): _seed_contrast(
@@ -906,11 +984,22 @@ def evaluate_campaign(
                 for seed in seeds
             }
             report["contrasts"][arm_name][str(size)] = by_seed
-            report["replication"][arm_name][str(size)] = _replication(
-                by_seed,
-                required_families=required_families,
-                contrast_regime=contrast_regime,
-            )
+            if promoted_arm:
+                report["replication"][arm_name][str(size)] = _replication(
+                    by_seed,
+                    required_families=required_families,
+                    contrast_regime=contrast_regime,
+                )
+
+    if not report["audit_complete"]:
+        # The audit is what makes the dataset behind a printed number checkable,
+        # and the plan requires it to pass before the number is printed. Stamping
+        # it here means an unaudited setting cannot reach a publication path,
+        # rather than the requirement living in a planning document.
+        for by_size in report["replication"].values():
+            for summary in by_size.values():
+                summary["promoted"] = False
+                summary["publication_path"] = "unaudited_not_publishable"
 
     if not frozen:
         # A rehearsal runs on a different shape, and its scores do not enter the
@@ -963,6 +1052,61 @@ def _roster_bindings(
             "methods": sorted(str(value) for value in binding["methods"]),
         }
     return {"roster_artifacts": bound, "settings_without_a_roster": missing}
+
+
+def _audit_bindings(
+    indexed: Mapping[tuple[str, int, int], Mapping[str, object]],
+    audits: Mapping[str, Mapping[str, object]] | None,
+    *,
+    roster_artifacts: Mapping[str, Mapping[str, object]],
+) -> dict:
+    """Tie each setting to the audit that re-derived the dataset it was fitted on.
+
+    A missing audit is not a warning here. The plan requires the re-derivation to
+    pass before a number is printed, so an unaudited setting withholds the
+    publication path in the same way a rehearsal does. An audit whose dataset
+    hash disagrees with the record is fatal, because that is a re-derivation of a
+    different dataset.
+    """
+    audited, missing, failing, unreplayed = {}, [], [], []
+    for key, record in sorted(indexed.items()):
+        name = setting_key(*key)
+        entry = (audits or {}).get(name)
+        if entry is None:
+            missing.append(name)
+            continue
+        if str(entry["dataset_hash"]) != str(record["dataset_hash"]):
+            raise ValueError(
+                f"{name}: the audit re-derived dataset {entry['dataset_hash']!r} "
+                f"and the record reports {record['dataset_hash']!r}"
+            )
+        if not bool(entry.get("passed")):
+            failing.append(name)
+            continue
+        replay = entry.get("zne_replay") or {}
+        binding = roster_artifacts.get(name)
+        replayed = bool(replay.get("checked")) and (
+            binding is None
+            or replay.get("roster_artifact_id") == binding["artifact_id"]
+        )
+        if binding is not None and not replayed:
+            # `passed` means no mismatch among the checks that ran. An audit run
+            # with --skip-zne, or run before the roster existed, runs none of the
+            # zero-noise ones. Naming the artifact is what makes the replay bind:
+            # the roster can be regenerated from the same dataset, so the dataset
+            # hash agrees while the replayed roster is no longer the bound one.
+            unreplayed.append(name)
+        audited[name] = {
+            "dataset_hash": str(entry["dataset_hash"]),
+            "zne_replayed": replayed,
+        }
+    return {
+        "audited_settings": audited,
+        "settings_without_an_audit": missing,
+        "settings_failing_audit": failing,
+        "settings_without_a_zero_noise_replay": unreplayed,
+        "audit_complete": not (missing or failing or unreplayed),
+    }
 
 
 def _seed_contrast(
@@ -1182,6 +1326,21 @@ def build_campaign_tables(report: Mapping[str, object]) -> dict:
                     "max_mae": summary["max"],
                     "permutations": len(summary["per_seed"]),
                 })
+    label_spread = []
+    for setting, summary in sorted(report.get("label_spread", {}).items()):
+        for family, values in sorted(summary["families"].items()):
+            label_spread.append({
+                "setting": setting,
+                "regime": summary["regime"],
+                "seed": summary["seed"],
+                "size": summary["size"],
+                "family": family,
+                "n_cells": values["n_cells"],
+                "n_items": values["n_items"],
+                "macro_mean_absolute_deviation":
+                    values["macro_mean_absolute_deviation"],
+                "macro_std": values["macro_std"],
+            })
     return {
         "schema_version": REPORT_SCHEMA_VERSION,
         "failed_settings": list(report["failed_settings"]),
@@ -1191,4 +1350,5 @@ def build_campaign_tables(report: Mapping[str, object]) -> dict:
         "gates": gates,
         "training_shuffle": training_shuffle,
         "fixed_model_shuffle": fixed_model_shuffle,
+        "label_spread": label_spread,
     }

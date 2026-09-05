@@ -16,6 +16,7 @@ from qem_bench.runner.run import (
     MethodOutput,
     MethodRegistration,
     _budget_preflight,
+    _print_table,
     _paired_budget_cell_evals,
     _run_artifact_id,
     _validation_candidate_record,
@@ -460,3 +461,50 @@ def test_ridge_selection_blocks_use_physical_circuit_ids():
     ]
     record = _validation_candidate_record(1.0, Estimator(), Model(), items)
     assert record["standard_error"] == pytest.approx(1.0)
+
+
+def test_an_undefined_budget_ratio_stays_a_separate_column(capsys):
+    """A method that spends nothing on test has no ratio, and says so legibly.
+
+    Feature-only and shrinkage spend zero test circuits, so their realized over
+    nominal ratio is 0/0 and the ledger reports None. The word standing in for it
+    is as wide as the column it was printed into, which ran it into the realized
+    total and produced `0undefined`. The column has to be wider than the widest
+    thing that can land in it.
+    """
+    ledger = {
+        "B_train": 0, "B_extra": 0, "B_pred": 0, "nominal_total": 0,
+        "total": 0, "test_budget_ratio": None,
+        "circuit_evals_per_mitigated_expectation": 0.0,
+    }
+    metrics = {key: 0.0 for key in (
+        "mae", "rmse", "signed_bias", "excess_loss_total",
+        "overcorrection_rate", "physicality_violation_rate")}
+    _print_table({
+        "artifact_id": "sha256:0123456789abcdef",
+        "dataset_hash": "0123456789abcdef",
+        "preset": None,
+        "n_test_items": 1,
+        "methods": {
+            "feat-only": {"role": "control", "metrics": metrics, "ledger": ledger},
+            "raw": {"role": "baseline", "metrics": metrics,
+                    "ledger": dict(ledger, total=8, nominal_total=8,
+                                   test_budget_ratio=1.0)},
+        },
+        "label_evals": {"statevector": 1, "stim": 0},
+        "surrogate_alarm": {"triggered": False, "ridge_mae": 0.0,
+                            "feature_only_mae": 0.0},
+    })
+
+    lines = capsys.readouterr().out.splitlines()
+    # Both tables carry a row per method, so index from the ledger header down.
+    start = next(index for index, line in enumerate(lines)
+                 if line.startswith("method") and "ratio" in line)
+    header = lines[start]
+    row = next(line for line in lines[start:] if line.startswith("feat-only"))
+
+    assert "undefined" in row
+    assert "0undefined" not in row
+    # Every cell separates from its neighbour, so the row splits into as many
+    # fields as the header names.
+    assert len(row.split()) == len(header.split())

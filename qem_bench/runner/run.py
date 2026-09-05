@@ -2534,13 +2534,13 @@ def _print_table(results: dict) -> None:
         )
         print(row)
     print(f"\n{'method':<11}{'B_train':>12}{'B_extra':>12}{'B_pred':>12}{'nominal':>12}"
-          f"{'realized':>12}{'ratio':>9}{'eval/EV':>11}")
+          f"{'realized':>12}{'ratio':>11}{'eval/EV':>11}")
     for name, spec in results["methods"].items():
         led = spec["ledger"]
         ratio = led["test_budget_ratio"]
         ratio_text = "undefined" if ratio is None else f"{ratio:.2f}"
         print(f"{name:<11}{led['B_train']:>12}{led['B_extra']:>12}{led['B_pred']:>12}"
-              f"{led['nominal_total']:>12}{led['total']:>12}{ratio_text:>9}"
+              f"{led['nominal_total']:>12}{led['total']:>12}{ratio_text:>11}"
               f"{led['circuit_evals_per_mitigated_expectation']:>11.1f}")
     label_summary = ", ".join(
         f"{method}={count}" for method, count in results["label_evals"].items()

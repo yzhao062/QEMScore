@@ -322,13 +322,36 @@ def _errors(full, control):
     }
 
 
+def _distinct_errors(ridge, feat_only, liao, liao_feat_only):
+    """Four different errors, so a MAE names which predictions produced it."""
+    return {
+        ARMS["primary"]["full"]: ridge,
+        ARMS["primary"]["control"]: feat_only,
+        ARMS["capacity_matched"]["full"]: liao,
+        ARMS["capacity_matched"]["control"]: liao_feat_only,
+    }
+
+
 RISING = (_errors(0.10, 0.10), _errors(0.08, 0.10))
 FLAT = (_errors(0.10, 0.10), _errors(0.10, 0.10))
 FALLING = (_errors(0.08, 0.10), _errors(0.10, 0.10))
 
 
+def _audit(record, **overrides):
+    return {
+        "dataset_hash": record["dataset_hash"],
+        "passed": True,
+        "zne_replay": {
+            "checked": True,
+            "roster_artifact_id": _binding(record)["artifact_id"],
+        },
+    } | overrides
+
+
 def _evaluate(records, **kwargs):
     """Evaluate at the frozen resample count, which is what a record can claim."""
+    kwargs.setdefault(
+        "audits", {record["setting"]: _audit(record) for record in records})
     return evaluate_campaign(records, **kwargs)
 
 
@@ -939,3 +962,199 @@ def test_the_two_sizes_differ_only_in_the_training_count():
     assert large["role_counts"]["train"] == 1280
     assert {key: value for key, value in small.items() if key != "role_counts"} == {
         key: value for key, value in large.items() if key != "role_counts"}
+
+
+def test_an_unaudited_setting_can_never_reach_a_publication_path():
+    """The plan requires the re-derivation to pass before a number is printed."""
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    report = evaluate_campaign(records)
+
+    assert report["design_frozen"] is True
+    assert report["primary"]["successes"] == 3
+    assert report["primary"]["promoted"] is False
+    assert report["primary"]["publication_path"] == "unaudited_not_publishable"
+    assert sorted(report["settings_without_an_audit"]) == sorted(
+        record["setting"] for record in records)
+
+
+def test_a_failing_audit_withholds_the_publication_path_and_is_named():
+    """A re-derivation that found a mismatch is not a re-derivation that passed."""
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    audits = {record["setting"]: _audit(record) for record in records}
+    audits["large-s211-n640"]["passed"] = False
+    report = evaluate_campaign(records, audits=audits)
+
+    assert report["settings_failing_audit"] == ["large-s211-n640"]
+    assert report["audit_complete"] is False
+    assert report["primary"]["promoted"] is False
+    assert report["primary"]["publication_path"] == "unaudited_not_publishable"
+
+
+def test_an_audit_of_a_different_dataset_is_refused():
+    """A re-derivation of another dataset says nothing about this one."""
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    audits = {record["setting"]: _audit(record) for record in records}
+    audits["shipped-s101-n640"]["dataset_hash"] = "sha256:somewhere-else"
+
+    with pytest.raises(ValueError, match="re-derived dataset"):
+        evaluate_campaign(records, audits=audits)
+
+
+def test_an_audit_that_skipped_the_zero_noise_replay_does_not_count_as_passed():
+    """`passed` means no mismatch among the checks that ran, and --skip-zne runs none."""
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    audits = {record["setting"]: _audit(record) for record in records}
+    audits["large-s101-n640"]["zne_replay"] = {"checked": False}
+    report = evaluate_campaign(
+        records,
+        rosters={record["setting"]: _binding(record) for record in records},
+        audits=audits,
+    )
+
+    assert report["settings_without_a_zero_noise_replay"] == ["large-s101-n640"]
+    assert report["audited_settings"]["large-s101-n640"]["zne_replayed"] is False
+    assert report["primary"]["promoted"] is False
+    assert report["primary"]["publication_path"] == "unaudited_not_publishable"
+
+
+def _with_labels(record, by_observable):
+    """Prescribe ideal labels per observable, keeping the prescribed errors.
+
+    A record's predictions equal its absolute errors only while the label is
+    zero. Shifting the prediction by the same label holds abs(prediction - label)
+    at the value the fixture prescribed.
+    """
+    for item in record["test_items"]:
+        center, half_width = by_observable[item["observable"]]
+        label = center + (half_width if item["instance"] % 2 == 0 else -half_width)
+        item["ideal_expectation"] = label
+        for predictions in record["test_predictions"].values():
+            predictions[item["item_id"]] += label
+    return record
+
+
+def test_the_tables_carry_the_ideal_label_spread_beside_every_endpoint():
+    """The endpoint is scale invariant, so the label scale travels with it."""
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    for record in records:
+        widths = ((0.5, 2.5) if record["regime"] == "large" else (0.1, 0.5))
+        _with_labels(record, {"z_mid": (0.1, widths[0]),
+                              "zz_mid": (0.9, widths[1])})
+
+    report = _evaluate(records)
+    tables = build_campaign_tables(report)
+    rows = {(row["regime"], row["seed"], row["size"], row["family"]): row
+            for row in tables["label_spread"]}
+    assert len(rows) == len(tables["label_spread"]) == 12
+
+    # Within a cell the circuits sit at the center plus or minus the half width,
+    # so both statistics equal that half width and the macro mean over the four
+    # cells is 0.3. Pooling the same rows would fold the gap between the two
+    # observable centers into the number.
+    shipped = rows[("shipped", 101, 640, "tfi")]
+    endpoint = report["contrasts"]["primary"]["640"]["101"]["families"]["tfi"][
+        "regimes"]["shipped"]
+    assert (shipped["n_cells"], shipped["n_items"]) == (
+        endpoint["n_cells"], endpoint["n_items"]) == (4, 32)
+    assert shipped["macro_mean_absolute_deviation"] == pytest.approx(0.3)
+    assert shipped["macro_std"] == pytest.approx(0.3)
+    assert shipped["macro_std"] != pytest.approx(0.5385164807134504)
+    assert rows[("large", 101, 640, "tfi")][
+        "macro_mean_absolute_deviation"] == pytest.approx(1.5)
+
+    # Every available endpoint joins to a spread row on the four columns it
+    # already prints, and the endpoint itself is unchanged.
+    large = next(row for row in tables["endpoints"]
+                 if row["arm"] == "primary" and row["seed"] == 101
+                 and row["family"] == "tfi" and row["regime"] == "large")
+    assert large["control_mae"] == pytest.approx(0.10)
+    assert large["gain"] == pytest.approx(0.2)
+    for row in tables["endpoints"]:
+        if row["available"]:
+            assert (row["regime"], row["seed"], row["size"],
+                    row["family"]) in rows
+    json.dumps(tables, allow_nan=False)
+
+
+def test_a_replay_of_a_replaced_roster_does_not_count_as_a_replay():
+    """The roster can be regenerated, so agreeing dataset hashes prove nothing.
+
+    `roster` writes a fresh binding for the same dataset, and the audit that ran
+    against the previous one still reports `passed` with its own artifact named.
+    Without the artifact comparison the stale audit authorizes the roster whose
+    zero-noise numbers the paper would print.
+    """
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    rosters = {record["setting"]: _binding(record) for record in records}
+    audits = {record["setting"]: _audit(record) for record in records}
+    rosters["large-s101-n640"]["artifact_id"] = "run-replacement-never-audited"
+    report = evaluate_campaign(records, rosters=rosters, audits=audits)
+
+    assert report["settings_without_a_zero_noise_replay"] == ["large-s101-n640"]
+    assert report["audited_settings"]["large-s101-n640"]["zne_replayed"] is False
+    assert report["audit_complete"] is False
+    assert report["primary"]["promoted"] is False
+    assert report["primary"]["publication_path"] == "unaudited_not_publishable"
+
+
+def test_a_replay_naming_the_bound_roster_is_accepted():
+    """The gate has to admit the case it exists to distinguish."""
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    report = evaluate_campaign(
+        records,
+        rosters={record["setting"]: _binding(record) for record in records},
+        audits={record["setting"]: _audit(record) for record in records},
+    )
+
+    assert report["settings_without_a_zero_noise_replay"] == []
+    assert report["audit_complete"] is True
+    assert report["primary"]["publication_path"] == "promote_three_of_three"
+
+
+def test_the_learner_fixed_contrast_is_reported_without_a_promotion_verdict():
+    """Both promoted arms move learner and control at once.
+
+    A divergence between them cannot be attributed to the control without a
+    comparison that holds the learner fixed. The plan declares that comparison,
+    so the driver has to compute it, and it has to stay out of the promotion
+    machinery it was never meant to enter.
+
+    The four methods carry four different errors, so the reported MAEs name which
+    predictions the contrast consumed. Routing it through any other pair changes
+    them.
+    """
+    pair = (_distinct_errors(0.10, 0.12, 0.03, 0.05),
+            _distinct_errors(0.08, 0.12, 0.02, 0.05))
+    report = _evaluate(_campaign({101: pair, 211: pair, 307: pair}))
+
+    assert set(report["contrasts"]) == {"primary", "capacity_matched",
+                                        "learner_fixed"}
+    assert set(report["replication"]) == {"primary", "capacity_matched"}
+    assert report["declared_design"]["learner_fixed_contrast"] == {
+        "full": "liao", "control": "feat-only"}
+
+    contrast = report["contrasts"]["learner_fixed"]["640"]["101"]
+    assert contrast["full_method"] == "liao"
+    assert contrast["control_method"] == "feat-only"
+
+    regimes = contrast["families"]["tfi"]["regimes"]
+    # liao against feat-only, so 0.03 against 0.12 and 0.02 against 0.12. The
+    # primary arm would read 0.10 and the capacity-matched control 0.05.
+    assert regimes["shipped"]["full_mae"] == pytest.approx(0.03)
+    assert regimes["shipped"]["control_mae"] == pytest.approx(0.12)
+    assert regimes["shipped"]["gain"] == pytest.approx(1 - 0.03 / 0.12)
+    assert regimes["large"]["full_mae"] == pytest.approx(0.02)
+    assert regimes["large"]["control_mae"] == pytest.approx(0.12)
+    assert contrast["families"]["tfi"]["contrast"]["estimate"] == pytest.approx(
+        (1 - 0.02 / 0.12) - (1 - 0.03 / 0.12))
+
+    # The two promoted arms keep their own pairs, so the third one displaced
+    # nothing.
+    primary = report["contrasts"]["primary"]["640"]["101"]
+    assert primary["full_method"] == "ridge"
+    assert primary["families"]["tfi"]["regimes"]["shipped"][
+        "full_mae"] == pytest.approx(0.10)
+
+    tables = build_campaign_tables(report)
+    assert [row["arm"] for row in tables["endpoints"]].count("learner_fixed") > 0
+    assert all(row["arm"] != "learner_fixed" for row in tables["replication"])
