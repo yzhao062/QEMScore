@@ -63,6 +63,7 @@ from qem_bench.datasets.schema import (
     validate_groups,
     validate_item,
 )
+from qem_bench.datasets.splits import SPLIT_AXES
 from qem_bench.noise import SEVERITY_GRIDS
 from qem_bench.reproducibility import (
     environment_contract,
@@ -72,6 +73,7 @@ from qem_bench.runner.metrics import (
     CELL_GROUPINGS,
     DEFAULT_CELL_GROUPING,
     EXACT_SUMMATION_METHOD,
+    LEGACY_CELL_GROUPINGS,
     _exact_mean,
     _exact_sum,
     build_cell_records,
@@ -89,6 +91,8 @@ from qem_bench.validation import (
 
 SUPPORTED_LABEL_METHODS = frozenset({"statevector", "stim"})
 METRIC_SCHEMA = "qem-bench-cell-metrics-v2"
+SPLIT_METRIC_SCHEMA = "qem-bench-cell-metrics-v3"
+SPLIT_IDENTITY_ITEM_FIELDS = ("split_id", "split_axis")
 STANDARD_ERROR_METHOD = "two-pass sample variance with math.fsum, ddof=1"
 SURROGATE_ALARM_NOTE = (
     "triggered means the learned model shows no measured incremental value "
@@ -1447,6 +1451,11 @@ def _identity_test_items(items: list[dict]) -> list[dict]:
         circuit_id, stratum_id = normalized_bootstrap_ids(item)
         row["circuit_id"] = circuit_id
         row["bootstrap_stratum_id"] = stratum_id
+        if (
+            "split_id" in item
+            or item.get("dataset_schema_version") == SPLIT_SCHEMA_VERSION
+        ):
+            row.update({field: item[field] for field in SPLIT_IDENTITY_ITEM_FIELDS})
         projected.append(row)
     return projected
 
@@ -1469,7 +1478,9 @@ def _run_artifact_id(
         "preset": preset,
         "item_stream_hashes": dict(sorted(item_stream_hashes.items())),
         "test_items": test_items,
-        "analysis_contract": _analysis_contract(),
+        "analysis_contract": _analysis_contract(
+            split_v2=any("split_id" in item for item in test_items)
+        ),
         "dataset_environment_contract": dataset_environment_contract,
         "environment_contract": environment_contract,
         "methods": {
@@ -1503,9 +1514,9 @@ def _run_artifact_id(
     return "sha256:" + hashlib.sha256(encoded).hexdigest()
 
 
-def _analysis_contract() -> dict:
+def _analysis_contract(*, split_v2: bool = False) -> dict:
     return {
-        "metric_schema": METRIC_SCHEMA,
+        "metric_schema": SPLIT_METRIC_SCHEMA if split_v2 else METRIC_SCHEMA,
         "aggregation": {
             "sums_and_means": EXACT_SUMMATION_METHOD,
             "quantiles": TYPE7_QUANTILE_METHOD,
@@ -1517,7 +1528,10 @@ def _analysis_contract() -> dict:
             "containers": "exact type, keys, lengths, and sequence order",
         },
         "cell_groupings": {
-            name: list(fields) for name, fields in CELL_GROUPINGS.items()
+            name: list(fields)
+            for name, fields in (
+                CELL_GROUPINGS if split_v2 else LEGACY_CELL_GROUPINGS
+            ).items()
         },
         "default_cell_grouping": DEFAULT_CELL_GROUPING,
     }
@@ -1548,8 +1562,16 @@ def _canonical_test_items(run_result: Mapping[str, object]) -> list[dict]:
         items = _identity_test_items(test_items)
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError("run artifact has invalid test item metadata") from exc
+    split_v2 = run_result["dataset_schema_version"] == SPLIT_SCHEMA_VERSION
+    expected_fields = set(IDENTITY_ITEM_FIELDS)
+    if split_v2:
+        expected_fields.update(SPLIT_IDENTITY_ITEM_FIELDS)
+        if any(not set(SPLIT_IDENTITY_ITEM_FIELDS) <= set(item) for item in items):
+            raise ValueError(
+                "split-v2 run lacks split identity metadata; rerun the dataset"
+            )
     if items != test_items or any(
-        set(item) != set(IDENTITY_ITEM_FIELDS) for item in test_items
+        set(item) != expected_fields for item in test_items
     ):
         raise ValueError("run artifact test_items must be canonical identity projections")
 
@@ -1576,6 +1598,21 @@ def _canonical_test_items(run_result: Mapping[str, object]) -> list[dict]:
             raise ValueError("run artifact test item targets must be finite numbers")
         if item["split"] != "test":
             raise ValueError("run artifact test_items must belong to the test split")
+        if (
+            FAMILY_STRATA.get(item["family"]) != item["stratum"]
+            or item["stratum"] != run_result["stratum"]
+        ):
+            raise ValueError(
+                "run artifact stratum must match every test item and its family"
+            )
+        if split_v2:
+            split_id = item["split_id"]
+            if not isinstance(split_id, str) or split_id not in SPLIT_AXES:
+                raise ValueError("run artifact test item has invalid split_id")
+            if item["split_axis"] != SPLIT_AXES[split_id]:
+                raise ValueError("run artifact test item split_axis must match split_id")
+    if split_v2 and len({item["split_id"] for item in items}) != 1:
+        raise ValueError("run artifact test_items must belong to one split_id")
     return items
 
 
@@ -2129,11 +2166,11 @@ def validate_run_artifact(run_result: dict) -> dict:
         if not isinstance(spec, dict):
             raise ValueError(f"run artifact method {name!r} must be an object")
     dataset_schema_version = _validate_run_contract_fields(run_result, methods)
-    _require_run_match(
-        "analysis_contract", run_result.get("analysis_contract"), _analysis_contract()
-    )
-
     items = _canonical_test_items(run_result)
+    _require_run_match(
+        "analysis_contract", run_result.get("analysis_contract"),
+        _analysis_contract(split_v2=dataset_schema_version == SPLIT_SCHEMA_VERSION),
+    )
     run_identity_encoding_profiles(run_result)
     n_test = len(items)
     for name, spec in methods.items():
@@ -2149,6 +2186,15 @@ def validate_run_artifact(run_result: dict) -> dict:
         )
         if budget is None:
             raise ValueError("split-v2 run artifact requires an enforced budget")
+        for cell in budget.values():
+            descriptor = cell["pairing"]["descriptor"]
+            if any(
+                descriptor[field] != items[0][field]
+                for field in (*SPLIT_IDENTITY_ITEM_FIELDS, "stratum")
+            ):
+                raise ValueError(
+                    "run artifact budget and test items disagree on split or stratum"
+                )
     else:
         assignment = None
         budget = None
@@ -2376,7 +2422,7 @@ def run(
     results: dict = {
         "schema_version": "qem-bench-run-v2",
         "artifact_id": artifact_id,
-        "analysis_contract": _analysis_contract(),
+        "analysis_contract": _analysis_contract(split_v2=split_v2),
         "dataset_schema_version": manifest["dataset_schema_version"],
         "dataset_manifest_sha256": dataset_manifest_sha256,
         "dataset_environment_contract": dataset_environment_contract,

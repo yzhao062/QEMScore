@@ -1,5 +1,5 @@
 {
-  "schema_version": "qem-bench-report-trace-v1",
+  "schema_version": "qem-bench-report-trace-v2",
   "source_manifest": "results-manifest.json",
   "source_manifest_sha256": "sha256:d369987e808fef330e4cebbb92a2461582c9d93848ea85644294806fdc356375",
   "source_runs": [
@@ -42,6 +42,7 @@
     "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1",
     "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f"
   ],
+  "headline_stratum": "continuous_regression",
   "table1": {
     "raw": {
       "cell_ids": [
@@ -57,10 +58,6 @@
         "sha256:dfbdf1e5d2ac45634f1bd2c106c3f9b2eaa081139e1c054c77898d9313406720",
         "sha256:88438189dc4717a40b8ce8ff8b65765e76a4b08cd3d50c487aaabb8d64772d77",
         "sha256:b04901659b8390500b2ce2f31194d4299f55c846c83b8cda00c992ba93e65fc4",
-        "sha256:04f5694e21e5140fe2f7b2686e7afafa8bfea8a170a94da363eb05b83f9c9d6f",
-        "sha256:8eab97c1e169bca32e25d9442eb196458f7d0bf044c08dc17a88ae48e92409b0",
-        "sha256:755573321413985c701c394748d8c15676b99e1ea70bb17cef398a8d56d02b86",
-        "sha256:c2f366340faddc92b8638590c882d398742731e280472d54bc496b370e65c195",
         "sha256:09f2d9967cf4eae7ee2b96ef54fb446965bd65030244489e02c32df427496e5c",
         "sha256:27fb7989b5c6bc26f0a85a2bd8cdb7833a0d037c8f9b0482ab235faf6046710e",
         "sha256:3c6fd1591f44e51e7a0b74759190e8bb1a312bea352cfc0c0531eec3281cdd8a",
@@ -68,66 +65,267 @@
         "sha256:8230323fc1cf53e5cafb70d8de1af34017d744fc9bce2798f64a3f153e955fee",
         "sha256:e929043e388f18ac949607123083186a6eef4072c2296ebf6eada9d240b240da"
       ],
+      "cells": [
+        {
+          "cell_id": "sha256:ccc9044f0cc334738822272cb2f9dbe6555546a58a68a4ab6680021fa76bb6ad",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:d05efb384cf357871a91f89270479ca5b566865ffe56b83140a67874929a9c83",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:91d8b6e8d361b028ad6dd852fc5dd4eda1317af8d45cec417b5fb8123b8b51fd",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:85203af85daa9c176b0cb0ae0430233bf0c6ae4a748f2f6c401697c191350f1d",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:f337a442a3176c2a85395b7a1a016db1d02e7d975f31160d075201b5965daf51",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:f465bf16ad785b5497e2bba4aee6c3f10f44417e894bfbe5cae0d2e54c524f68",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:827720800a4b569b0708f1dfe195b0ce631df9c2a2a9d05fc796cfceee12fefb",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:0c0a59724430aac9ef2509b150eea3da8929de7ae8e3320bab0a2bb97309eeda",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:4d22010c266ad0e535d8404346c9751bb6f5448a3067fe3ab72a83dd03a75465",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:dfbdf1e5d2ac45634f1bd2c106c3f9b2eaa081139e1c054c77898d9313406720",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:88438189dc4717a40b8ce8ff8b65765e76a4b08cd3d50c487aaabb8d64772d77",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:b04901659b8390500b2ce2f31194d4299f55c846c83b8cda00c992ba93e65fc4",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:09f2d9967cf4eae7ee2b96ef54fb446965bd65030244489e02c32df427496e5c",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:27fb7989b5c6bc26f0a85a2bd8cdb7833a0d037c8f9b0482ab235faf6046710e",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:3c6fd1591f44e51e7a0b74759190e8bb1a312bea352cfc0c0531eec3281cdd8a",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L3",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:eed53faae099f51a254a776b4f5874331a1e2aa21a9219555786f45bf10857e0",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:8230323fc1cf53e5cafb70d8de1af34017d744fc9bce2798f64a3f153e955fee",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:e929043e388f18ac949607123083186a6eef4072c2296ebf6eada9d240b240da",
+          "key": {
+            "method": "raw",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L3",
+            "observable": "zz_mid"
+          }
+        }
+      ],
       "artifact_ids": [
         "sha256:689116c1bd7c276366503b64d530951538d0aa9810161e8910a36caada2206fe",
-        "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1",
         "sha256:ebfc9f6f22d04a4e7c5aefbc3ee2ac91cda1091d16dd5b7e9937b0ffa3f81a8d",
         "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f",
         "sha256:f7a671b3c9d58072eb29853a57cdf104a6629357d5350e6712bd1a8d81f79b0d",
         "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7"
       ],
+      "n_cells": 18,
+      "n_expectations": 112,
       "metrics": {
         "macro_mae": {
-          "mean": 0.15780236097239111,
-          "q1": 0.035481770833333336,
-          "median": 0.08029939188646429,
-          "q3": 0.20767455322669048,
-          "n_cells": 22
+          "mean": 0.1809880418829225,
+          "q1": 0.045247395833333336,
+          "median": 0.09457645476089285,
+          "q3": 0.2536426171677857,
+          "n_cells": 18
         },
         "mae_circuit_bootstrap_interval": {
-          "estimate": 0.15780236097239111,
-          "lower": 0.141512376374624,
-          "upper": 0.17704206427478542,
+          "estimate": 0.18098804188292247,
+          "lower": 0.16128693740494562,
+          "upper": 0.2028761118449788,
           "confidence": 0.95,
           "n_resamples": 2000,
-          "n_circuits": 62,
+          "n_circuits": 56,
           "seed": 20260818,
           "metric": "mae",
           "paired": false
         },
-        "mean_rank": 2.1363636363636362,
+        "mean_rank": 2.2222222222222223,
         "macro_rmse": {
-          "mean": 0.16595292853300972,
-          "q1": 0.04522618740015752,
-          "median": 0.08380302722195473,
-          "q3": 0.21835655052819908,
-          "n_cells": 22
+          "mean": 0.19025740890650567,
+          "q1": 0.053146028508115103,
+          "median": 0.10240823020200385,
+          "q3": 0.26751256021591535,
+          "n_cells": 18
         },
         "excess_loss_mean": {
           "mean": 0.0,
           "q1": 0.0,
           "median": 0.0,
           "q3": 0.0,
-          "n_cells": 22
+          "n_cells": 18
         },
         "overcorrection_rate": {
           "mean": 0.0,
           "q1": 0.0,
           "median": 0.0,
           "q3": 0.0,
-          "n_cells": 22
+          "n_cells": 18
         }
       },
       "ledger": {
         "B_train": 0,
         "B_extra": 0,
-        "B_pred": 80896,
-        "nominal_total": 80896,
-        "realized_total": 80896,
-        "nominal_test_total": 80896,
-        "realized_test_total": 80896,
+        "B_pred": 77824,
+        "nominal_total": 77824,
+        "realized_total": 77824,
+        "nominal_test_total": 77824,
+        "realized_test_total": 77824,
         "test_budget_ratio": 1.0,
-        "circuit_evals_per_mitigated_expectation": 652.3870967741935
+        "circuit_evals_per_mitigated_expectation": 694.8571428571429
       }
     },
     "ridge": {
@@ -144,10 +342,6 @@
         "sha256:ab9074fcee5d12e783cc53435469a3e7be68a9d941e975d7e043d911ed4bab9e",
         "sha256:23dc4651d5b503f69499a3d177562da938d7a46b1633d62d5b63fb845ce1d2ec",
         "sha256:bf4eb6af06a66c852a95d16fa834343af303afc358ed8cecc771718be409a9f1",
-        "sha256:cb90449babbd99ebe69d78d6ce436c5bf13830fbd4afe64d676d497676cbe7b6",
-        "sha256:2a70272c2d744cfb5549825a879764366f5e53e791180d184e87c00d8392e31f",
-        "sha256:c317a8fa45e47809e9acc8f9c8abbba13802397f5af0627817ea9085a20ae6c7",
-        "sha256:9a6666d100acba915a36c7f357d5afccbb7fa6012009dd8984bff8334bb1197b",
         "sha256:1702110ba669aaf21fa051e3c916391d3954f713afee66e47deb8e1d0585b0ca",
         "sha256:689cdbb993d0b5ee44bcfd81c9be0e33ad025a6fa673bbb8be2a9f7f77799773",
         "sha256:cd27ee50d0a649225241bcf4d98a900dc04692f490580bd1f143b89e270c7d92",
@@ -155,66 +349,267 @@
         "sha256:9bbbb1275f783ba4cff655051dee3d703d84d271301d296ae7f47313494638ea",
         "sha256:c5dfca7b28b4d31a74c3edf7bedaa526e4df00a6e041756af8c42092f9c23a5a"
       ],
+      "cells": [
+        {
+          "cell_id": "sha256:d6c4afd0c0478f94bfc035888019e09f923e4c5c549c923f4d5303af2d4d5ac4",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:29b0e87ec799c4e019a56b8aefd54f11c1547818e5c41248210e4c8f4a519bd3",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:6807139fb393a94462e22e4ad852a0d7d01f3bfe49439c33d669226564941b45",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:94e0d8cdd3b26820fbd6ecc2bcdff2a93ac02caeecb92983b50de823212ffc4d",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:8f18ecf009952bcdb42ea6622a74b70ead5080ea0fc69401a7d11b9a709ce211",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:177445c35fec06bff5f74509e0e4942442796e08f0bce165e0b169c3acb8149f",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:c287da35196e3b1fd89d18167f894839ffcc4455ca72312fad091b01e917a4a9",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:157e45c94a79beec397dbd3a888fe42c03ddfec43c81eaa4aa068e954307cf40",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:8bc2abacddab6f36593a297c862b0b5ce0426f889be0e12d76f3a7b9ba0dd2e6",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:ab9074fcee5d12e783cc53435469a3e7be68a9d941e975d7e043d911ed4bab9e",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:23dc4651d5b503f69499a3d177562da938d7a46b1633d62d5b63fb845ce1d2ec",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:bf4eb6af06a66c852a95d16fa834343af303afc358ed8cecc771718be409a9f1",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:1702110ba669aaf21fa051e3c916391d3954f713afee66e47deb8e1d0585b0ca",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:689cdbb993d0b5ee44bcfd81c9be0e33ad025a6fa673bbb8be2a9f7f77799773",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:cd27ee50d0a649225241bcf4d98a900dc04692f490580bd1f143b89e270c7d92",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L3",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:4baa842bd04d3c94afc7ac1bf652aaed1c5f547ff12e38f750479690f31fb33e",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:9bbbb1275f783ba4cff655051dee3d703d84d271301d296ae7f47313494638ea",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:c5dfca7b28b4d31a74c3edf7bedaa526e4df00a6e041756af8c42092f9c23a5a",
+          "key": {
+            "method": "ridge",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L3",
+            "observable": "zz_mid"
+          }
+        }
+      ],
       "artifact_ids": [
         "sha256:689116c1bd7c276366503b64d530951538d0aa9810161e8910a36caada2206fe",
-        "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1",
         "sha256:ebfc9f6f22d04a4e7c5aefbc3ee2ac91cda1091d16dd5b7e9937b0ffa3f81a8d",
         "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f",
         "sha256:f7a671b3c9d58072eb29853a57cdf104a6629357d5350e6712bd1a8d81f79b0d",
         "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7"
       ],
+      "n_cells": 18,
+      "n_expectations": 112,
       "metrics": {
         "macro_mae": {
-          "mean": 0.053048609009202115,
-          "q1": 0.02133525188808642,
-          "median": 0.05794648717243718,
-          "q3": 0.07499749020873409,
-          "n_cells": 22
+          "mean": 0.056577102850636725,
+          "q1": 0.028275312285476487,
+          "median": 0.06011546996766859,
+          "q3": 0.0786578685266548,
+          "n_cells": 18
         },
         "mae_circuit_bootstrap_interval": {
-          "estimate": 0.0530486090092021,
-          "lower": 0.0417500190045426,
-          "upper": 0.06534319753586139,
+          "estimate": 0.056577102850636725,
+          "lower": 0.04400752099578829,
+          "upper": 0.07066445170699584,
           "confidence": 0.95,
           "n_resamples": 2000,
-          "n_circuits": 62,
+          "n_circuits": 56,
           "seed": 20260819,
           "metric": "mae",
           "paired": false
         },
-        "mean_rank": 1.5,
+        "mean_rank": 1.5555555555555556,
         "macro_rmse": {
-          "mean": 0.06515039223889198,
-          "q1": 0.025446093102952566,
-          "median": 0.07480887864518053,
-          "q3": 0.08919424499408868,
-          "n_cells": 22
+          "mean": 0.06980002161505275,
+          "q1": 0.0314396314862961,
+          "median": 0.07525422103989017,
+          "q3": 0.09238336169082836,
+          "n_cells": 18
         },
         "excess_loss_mean": {
-          "mean": 0.012402527881216006,
+          "mean": 0.01412637227441805,
           "q1": 0.0,
-          "median": 0.005089864728929779,
-          "q3": 0.01694312268601932,
-          "n_cells": 22
+          "median": 0.010194002697907097,
+          "q3": 0.019053954046800253,
+          "n_cells": 18
         },
         "overcorrection_rate": {
-          "mean": 0.3344155844155844,
+          "mean": 0.32539682539682535,
           "q1": 0.0,
-          "median": 0.30952380952380953,
-          "q3": 0.625,
-          "n_cells": 22
+          "median": 0.21428571428571427,
+          "q3": 0.6666666666666666,
+          "n_cells": 18
         }
       },
       "ledger": {
-        "B_train": 123904,
+        "B_train": 118784,
         "B_extra": 0,
-        "B_pred": 80896,
-        "nominal_total": 204800,
-        "realized_total": 204800,
-        "nominal_test_total": 80896,
-        "realized_test_total": 80896,
+        "B_pred": 77824,
+        "nominal_total": 196608,
+        "realized_total": 196608,
+        "nominal_test_total": 77824,
+        "realized_test_total": 77824,
         "test_budget_ratio": 1.0,
-        "circuit_evals_per_mitigated_expectation": 652.3870967741935
+        "circuit_evals_per_mitigated_expectation": 694.8571428571429
       }
     },
     "zne": {
@@ -231,10 +626,6 @@
         "sha256:61e2f941398129b2f814e59dc0cfcdda9691a395bbd1d91559eb335795cf5242",
         "sha256:18a1c978f6605fc9fd24b6b2c8e5c1e11e0f73e570a8fa17050b4e29a620a690",
         "sha256:742847c7c64fbe937ea11918ad7c7cb3b7cf88476f52245078718653c0955737",
-        "sha256:e221f168effaaf750b838c2dbd928610039dab218826614883e4ecd33cd6e0f6",
-        "sha256:9a2ebc43353bf5a516038ffaca32fa02a2e66aa9e350306e5f909c825e2fb78f",
-        "sha256:8118df3bda55836934a1f1c97376ac45be1b841362231756f2a103eb9f286090",
-        "sha256:f7abcb695dfb974e4b0c40872c0e2e52a836f29d6edf171f4ff13fed4a683c5d",
         "sha256:3a4f2f91a52627b06e5dac817c3d93f7a4732c70076f4274018c3adb489c6a09",
         "sha256:28ad4e4f24cfe13b12cfcb6d54a245fadb69fac2d435a5abb1dcd159c08dcdd3",
         "sha256:eff83eede46bf03468fb640156abaafccf71d7091b75c639cbc765944772ba4f",
@@ -242,67 +633,1468 @@
         "sha256:6eecd656ad9f7dce898101d4472c59d6a9448004adbf9f619834d91d7d865d3c",
         "sha256:2aed732167f29996fb9fee7767a79d9372f1e578aead9294bb04326147f6035b"
       ],
+      "cells": [
+        {
+          "cell_id": "sha256:fadf9989edbe68a74c5cb8609c4c659f78ed11b19c7d0aca539cfac43c9bf89f",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:ad0d1ef74227b8d416740f26e32b0b4a71969febabb18bc3ab641dcd02932874",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:e71fdac72deee746e4c7ef8ac2f23df3219dab791c063a0be854704d43006d45",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:8871311e7240cf313f92e3fd1553c705ab3ce656163380ea54f5e5c1fac240e7",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "heisenberg",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:e6bf6bb8f123da3ee041d019fe80057665d26a004ef0f8d67fdea9670ed59126",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:af0ac5f7d82c14d3cb74136b3eebce45bf2f25f84a8a6dd1c5e6414201974494",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:d1aef331d143b0917a1401b08cfbd221e3a4ca7700eef5e21dc535106b21783d",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:bf73d74202d910d4525c9bcee28f3ee9468665fe96d5ca38940e29a5918da201",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "near_clifford",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:d57e9494e41d4654107c76ff4c606c9c779f02c8d6b8746b2e6b1bdfc4ca7950",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:61e2f941398129b2f814e59dc0cfcdda9691a395bbd1d91559eb335795cf5242",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:18a1c978f6605fc9fd24b6b2c8e5c1e11e0f73e570a8fa17050b4e29a620a690",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:742847c7c64fbe937ea11918ad7c7cb3b7cf88476f52245078718653c0955737",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "qaoa",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:3a4f2f91a52627b06e5dac817c3d93f7a4732c70076f4274018c3adb489c6a09",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:28ad4e4f24cfe13b12cfcb6d54a245fadb69fac2d435a5abb1dcd159c08dcdd3",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:eff83eede46bf03468fb640156abaafccf71d7091b75c639cbc765944772ba4f",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L3",
+            "observable": "z_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:09ecca627e8f49c709fce261df67baa2d0a85e8a19153ef905f851a98f25569b",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L1",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:6eecd656ad9f7dce898101d4472c59d6a9448004adbf9f619834d91d7d865d3c",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L2",
+            "observable": "zz_mid"
+          }
+        },
+        {
+          "cell_id": "sha256:2aed732167f29996fb9fee7767a79d9372f1e578aead9294bb04326147f6035b",
+          "key": {
+            "method": "zne",
+            "split": "test",
+            "family": "tfi",
+            "noise_family": "depolarizing_readout",
+            "severity": "L3",
+            "observable": "zz_mid"
+          }
+        }
+      ],
       "artifact_ids": [
         "sha256:689116c1bd7c276366503b64d530951538d0aa9810161e8910a36caada2206fe",
-        "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1",
         "sha256:ebfc9f6f22d04a4e7c5aefbc3ee2ac91cda1091d16dd5b7e9937b0ffa3f81a8d",
         "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f",
         "sha256:f7a671b3c9d58072eb29853a57cdf104a6629357d5350e6712bd1a8d81f79b0d",
         "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7"
       ],
+      "n_cells": 18,
+      "n_expectations": 112,
       "metrics": {
         "macro_mae": {
-          "mean": 0.10646416003511895,
-          "q1": 0.054545084635416664,
-          "median": 0.08644612630208334,
-          "q3": 0.1244121115355,
-          "n_cells": 22
+          "mean": 0.10671248900125647,
+          "q1": 0.048502604166666664,
+          "median": 0.0845383277325,
+          "q3": 0.10940169918983332,
+          "n_cells": 18
         },
         "mae_circuit_bootstrap_interval": {
-          "estimate": 0.10646416003511892,
-          "lower": 0.0904463427017033,
-          "upper": 0.1235032883009464,
+          "estimate": 0.10671248900125646,
+          "lower": 0.08813028762592114,
+          "upper": 0.12580285761867102,
           "confidence": 0.95,
           "n_resamples": 2000,
-          "n_circuits": 62,
+          "n_circuits": 56,
           "seed": 20260820,
           "metric": "mae",
           "paired": false
         },
-        "mean_rank": 2.3636363636363638,
+        "mean_rank": 2.2222222222222223,
         "macro_rmse": {
-          "mean": 0.1210698393780676,
+          "mean": 0.12251969549342537,
           "q1": 0.06331051046771634,
-          "median": 0.09841240114928601,
-          "q3": 0.14976814393779836,
-          "n_cells": 22
+          "median": 0.09524817230274801,
+          "q3": 0.14723606538524409,
+          "n_cells": 18
         },
         "excess_loss_mean": {
-          "mean": 0.02645546863146645,
+          "mean": 0.01957133232040344,
           "q1": 0.0,
-          "median": 0.025390625,
-          "q3": 0.044148763020833336,
-          "n_cells": 22
+          "median": 0.007238821705803573,
+          "q3": 0.0384521484375,
+          "n_cells": 18
         },
         "overcorrection_rate": {
-          "mean": 0.4334415584415584,
+          "mean": 0.3492063492063492,
           "q1": 0.0,
-          "median": 0.3333333333333333,
-          "q3": 0.9375,
-          "n_cells": 22
+          "median": 0.10714285714285714,
+          "q3": 0.6666666666666666,
+          "n_cells": 18
         }
       },
       "ledger": {
         "B_train": 0,
-        "B_extra": 161792,
-        "B_pred": 80896,
-        "nominal_total": 80896,
-        "realized_total": 242688,
-        "nominal_test_total": 80896,
-        "realized_test_total": 242688,
+        "B_extra": 155648,
+        "B_pred": 77824,
+        "nominal_total": 77824,
+        "realized_total": 233472,
+        "nominal_test_total": 77824,
+        "realized_test_total": 233472,
         "test_budget_ratio": 3.0,
-        "circuit_evals_per_mitigated_expectation": 1957.1612903225807
+        "circuit_evals_per_mitigated_expectation": 2084.5714285714284
       }
+    }
+  },
+  "strata": {
+    "continuous_regression": {
+      "table1": {
+        "raw": {
+          "cell_ids": [
+            "sha256:ccc9044f0cc334738822272cb2f9dbe6555546a58a68a4ab6680021fa76bb6ad",
+            "sha256:d05efb384cf357871a91f89270479ca5b566865ffe56b83140a67874929a9c83",
+            "sha256:91d8b6e8d361b028ad6dd852fc5dd4eda1317af8d45cec417b5fb8123b8b51fd",
+            "sha256:85203af85daa9c176b0cb0ae0430233bf0c6ae4a748f2f6c401697c191350f1d",
+            "sha256:f337a442a3176c2a85395b7a1a016db1d02e7d975f31160d075201b5965daf51",
+            "sha256:f465bf16ad785b5497e2bba4aee6c3f10f44417e894bfbe5cae0d2e54c524f68",
+            "sha256:827720800a4b569b0708f1dfe195b0ce631df9c2a2a9d05fc796cfceee12fefb",
+            "sha256:0c0a59724430aac9ef2509b150eea3da8929de7ae8e3320bab0a2bb97309eeda",
+            "sha256:4d22010c266ad0e535d8404346c9751bb6f5448a3067fe3ab72a83dd03a75465",
+            "sha256:dfbdf1e5d2ac45634f1bd2c106c3f9b2eaa081139e1c054c77898d9313406720",
+            "sha256:88438189dc4717a40b8ce8ff8b65765e76a4b08cd3d50c487aaabb8d64772d77",
+            "sha256:b04901659b8390500b2ce2f31194d4299f55c846c83b8cda00c992ba93e65fc4",
+            "sha256:09f2d9967cf4eae7ee2b96ef54fb446965bd65030244489e02c32df427496e5c",
+            "sha256:27fb7989b5c6bc26f0a85a2bd8cdb7833a0d037c8f9b0482ab235faf6046710e",
+            "sha256:3c6fd1591f44e51e7a0b74759190e8bb1a312bea352cfc0c0531eec3281cdd8a",
+            "sha256:eed53faae099f51a254a776b4f5874331a1e2aa21a9219555786f45bf10857e0",
+            "sha256:8230323fc1cf53e5cafb70d8de1af34017d744fc9bce2798f64a3f153e955fee",
+            "sha256:e929043e388f18ac949607123083186a6eef4072c2296ebf6eada9d240b240da"
+          ],
+          "cells": [
+            {
+              "cell_id": "sha256:ccc9044f0cc334738822272cb2f9dbe6555546a58a68a4ab6680021fa76bb6ad",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:d05efb384cf357871a91f89270479ca5b566865ffe56b83140a67874929a9c83",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:91d8b6e8d361b028ad6dd852fc5dd4eda1317af8d45cec417b5fb8123b8b51fd",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:85203af85daa9c176b0cb0ae0430233bf0c6ae4a748f2f6c401697c191350f1d",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:f337a442a3176c2a85395b7a1a016db1d02e7d975f31160d075201b5965daf51",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:f465bf16ad785b5497e2bba4aee6c3f10f44417e894bfbe5cae0d2e54c524f68",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:827720800a4b569b0708f1dfe195b0ce631df9c2a2a9d05fc796cfceee12fefb",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:0c0a59724430aac9ef2509b150eea3da8929de7ae8e3320bab0a2bb97309eeda",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:4d22010c266ad0e535d8404346c9751bb6f5448a3067fe3ab72a83dd03a75465",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:dfbdf1e5d2ac45634f1bd2c106c3f9b2eaa081139e1c054c77898d9313406720",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:88438189dc4717a40b8ce8ff8b65765e76a4b08cd3d50c487aaabb8d64772d77",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:b04901659b8390500b2ce2f31194d4299f55c846c83b8cda00c992ba93e65fc4",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:09f2d9967cf4eae7ee2b96ef54fb446965bd65030244489e02c32df427496e5c",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:27fb7989b5c6bc26f0a85a2bd8cdb7833a0d037c8f9b0482ab235faf6046710e",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:3c6fd1591f44e51e7a0b74759190e8bb1a312bea352cfc0c0531eec3281cdd8a",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L3",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:eed53faae099f51a254a776b4f5874331a1e2aa21a9219555786f45bf10857e0",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:8230323fc1cf53e5cafb70d8de1af34017d744fc9bce2798f64a3f153e955fee",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:e929043e388f18ac949607123083186a6eef4072c2296ebf6eada9d240b240da",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L3",
+                "observable": "zz_mid"
+              }
+            }
+          ],
+          "artifact_ids": [
+            "sha256:689116c1bd7c276366503b64d530951538d0aa9810161e8910a36caada2206fe",
+            "sha256:ebfc9f6f22d04a4e7c5aefbc3ee2ac91cda1091d16dd5b7e9937b0ffa3f81a8d",
+            "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f",
+            "sha256:f7a671b3c9d58072eb29853a57cdf104a6629357d5350e6712bd1a8d81f79b0d",
+            "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7"
+          ],
+          "n_cells": 18,
+          "n_expectations": 112,
+          "metrics": {
+            "macro_mae": {
+              "mean": 0.1809880418829225,
+              "q1": 0.045247395833333336,
+              "median": 0.09457645476089285,
+              "q3": 0.2536426171677857,
+              "n_cells": 18
+            },
+            "mae_circuit_bootstrap_interval": {
+              "estimate": 0.18098804188292247,
+              "lower": 0.16128693740494562,
+              "upper": 0.2028761118449788,
+              "confidence": 0.95,
+              "n_resamples": 2000,
+              "n_circuits": 56,
+              "seed": 20260818,
+              "metric": "mae",
+              "paired": false
+            },
+            "mean_rank": 2.2222222222222223,
+            "macro_rmse": {
+              "mean": 0.19025740890650567,
+              "q1": 0.053146028508115103,
+              "median": 0.10240823020200385,
+              "q3": 0.26751256021591535,
+              "n_cells": 18
+            },
+            "excess_loss_mean": {
+              "mean": 0.0,
+              "q1": 0.0,
+              "median": 0.0,
+              "q3": 0.0,
+              "n_cells": 18
+            },
+            "overcorrection_rate": {
+              "mean": 0.0,
+              "q1": 0.0,
+              "median": 0.0,
+              "q3": 0.0,
+              "n_cells": 18
+            }
+          },
+          "ledger": {
+            "B_train": 0,
+            "B_extra": 0,
+            "B_pred": 77824,
+            "nominal_total": 77824,
+            "realized_total": 77824,
+            "nominal_test_total": 77824,
+            "realized_test_total": 77824,
+            "test_budget_ratio": 1.0,
+            "circuit_evals_per_mitigated_expectation": 694.8571428571429
+          }
+        },
+        "ridge": {
+          "cell_ids": [
+            "sha256:d6c4afd0c0478f94bfc035888019e09f923e4c5c549c923f4d5303af2d4d5ac4",
+            "sha256:29b0e87ec799c4e019a56b8aefd54f11c1547818e5c41248210e4c8f4a519bd3",
+            "sha256:6807139fb393a94462e22e4ad852a0d7d01f3bfe49439c33d669226564941b45",
+            "sha256:94e0d8cdd3b26820fbd6ecc2bcdff2a93ac02caeecb92983b50de823212ffc4d",
+            "sha256:8f18ecf009952bcdb42ea6622a74b70ead5080ea0fc69401a7d11b9a709ce211",
+            "sha256:177445c35fec06bff5f74509e0e4942442796e08f0bce165e0b169c3acb8149f",
+            "sha256:c287da35196e3b1fd89d18167f894839ffcc4455ca72312fad091b01e917a4a9",
+            "sha256:157e45c94a79beec397dbd3a888fe42c03ddfec43c81eaa4aa068e954307cf40",
+            "sha256:8bc2abacddab6f36593a297c862b0b5ce0426f889be0e12d76f3a7b9ba0dd2e6",
+            "sha256:ab9074fcee5d12e783cc53435469a3e7be68a9d941e975d7e043d911ed4bab9e",
+            "sha256:23dc4651d5b503f69499a3d177562da938d7a46b1633d62d5b63fb845ce1d2ec",
+            "sha256:bf4eb6af06a66c852a95d16fa834343af303afc358ed8cecc771718be409a9f1",
+            "sha256:1702110ba669aaf21fa051e3c916391d3954f713afee66e47deb8e1d0585b0ca",
+            "sha256:689cdbb993d0b5ee44bcfd81c9be0e33ad025a6fa673bbb8be2a9f7f77799773",
+            "sha256:cd27ee50d0a649225241bcf4d98a900dc04692f490580bd1f143b89e270c7d92",
+            "sha256:4baa842bd04d3c94afc7ac1bf652aaed1c5f547ff12e38f750479690f31fb33e",
+            "sha256:9bbbb1275f783ba4cff655051dee3d703d84d271301d296ae7f47313494638ea",
+            "sha256:c5dfca7b28b4d31a74c3edf7bedaa526e4df00a6e041756af8c42092f9c23a5a"
+          ],
+          "cells": [
+            {
+              "cell_id": "sha256:d6c4afd0c0478f94bfc035888019e09f923e4c5c549c923f4d5303af2d4d5ac4",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:29b0e87ec799c4e019a56b8aefd54f11c1547818e5c41248210e4c8f4a519bd3",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:6807139fb393a94462e22e4ad852a0d7d01f3bfe49439c33d669226564941b45",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:94e0d8cdd3b26820fbd6ecc2bcdff2a93ac02caeecb92983b50de823212ffc4d",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:8f18ecf009952bcdb42ea6622a74b70ead5080ea0fc69401a7d11b9a709ce211",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:177445c35fec06bff5f74509e0e4942442796e08f0bce165e0b169c3acb8149f",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:c287da35196e3b1fd89d18167f894839ffcc4455ca72312fad091b01e917a4a9",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:157e45c94a79beec397dbd3a888fe42c03ddfec43c81eaa4aa068e954307cf40",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:8bc2abacddab6f36593a297c862b0b5ce0426f889be0e12d76f3a7b9ba0dd2e6",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:ab9074fcee5d12e783cc53435469a3e7be68a9d941e975d7e043d911ed4bab9e",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:23dc4651d5b503f69499a3d177562da938d7a46b1633d62d5b63fb845ce1d2ec",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:bf4eb6af06a66c852a95d16fa834343af303afc358ed8cecc771718be409a9f1",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:1702110ba669aaf21fa051e3c916391d3954f713afee66e47deb8e1d0585b0ca",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:689cdbb993d0b5ee44bcfd81c9be0e33ad025a6fa673bbb8be2a9f7f77799773",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:cd27ee50d0a649225241bcf4d98a900dc04692f490580bd1f143b89e270c7d92",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L3",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:4baa842bd04d3c94afc7ac1bf652aaed1c5f547ff12e38f750479690f31fb33e",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:9bbbb1275f783ba4cff655051dee3d703d84d271301d296ae7f47313494638ea",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:c5dfca7b28b4d31a74c3edf7bedaa526e4df00a6e041756af8c42092f9c23a5a",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L3",
+                "observable": "zz_mid"
+              }
+            }
+          ],
+          "artifact_ids": [
+            "sha256:689116c1bd7c276366503b64d530951538d0aa9810161e8910a36caada2206fe",
+            "sha256:ebfc9f6f22d04a4e7c5aefbc3ee2ac91cda1091d16dd5b7e9937b0ffa3f81a8d",
+            "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f",
+            "sha256:f7a671b3c9d58072eb29853a57cdf104a6629357d5350e6712bd1a8d81f79b0d",
+            "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7"
+          ],
+          "n_cells": 18,
+          "n_expectations": 112,
+          "metrics": {
+            "macro_mae": {
+              "mean": 0.056577102850636725,
+              "q1": 0.028275312285476487,
+              "median": 0.06011546996766859,
+              "q3": 0.0786578685266548,
+              "n_cells": 18
+            },
+            "mae_circuit_bootstrap_interval": {
+              "estimate": 0.056577102850636725,
+              "lower": 0.04400752099578829,
+              "upper": 0.07066445170699584,
+              "confidence": 0.95,
+              "n_resamples": 2000,
+              "n_circuits": 56,
+              "seed": 20260819,
+              "metric": "mae",
+              "paired": false
+            },
+            "mean_rank": 1.5555555555555556,
+            "macro_rmse": {
+              "mean": 0.06980002161505275,
+              "q1": 0.0314396314862961,
+              "median": 0.07525422103989017,
+              "q3": 0.09238336169082836,
+              "n_cells": 18
+            },
+            "excess_loss_mean": {
+              "mean": 0.01412637227441805,
+              "q1": 0.0,
+              "median": 0.010194002697907097,
+              "q3": 0.019053954046800253,
+              "n_cells": 18
+            },
+            "overcorrection_rate": {
+              "mean": 0.32539682539682535,
+              "q1": 0.0,
+              "median": 0.21428571428571427,
+              "q3": 0.6666666666666666,
+              "n_cells": 18
+            }
+          },
+          "ledger": {
+            "B_train": 118784,
+            "B_extra": 0,
+            "B_pred": 77824,
+            "nominal_total": 196608,
+            "realized_total": 196608,
+            "nominal_test_total": 77824,
+            "realized_test_total": 77824,
+            "test_budget_ratio": 1.0,
+            "circuit_evals_per_mitigated_expectation": 694.8571428571429
+          }
+        },
+        "zne": {
+          "cell_ids": [
+            "sha256:fadf9989edbe68a74c5cb8609c4c659f78ed11b19c7d0aca539cfac43c9bf89f",
+            "sha256:ad0d1ef74227b8d416740f26e32b0b4a71969febabb18bc3ab641dcd02932874",
+            "sha256:e71fdac72deee746e4c7ef8ac2f23df3219dab791c063a0be854704d43006d45",
+            "sha256:8871311e7240cf313f92e3fd1553c705ab3ce656163380ea54f5e5c1fac240e7",
+            "sha256:e6bf6bb8f123da3ee041d019fe80057665d26a004ef0f8d67fdea9670ed59126",
+            "sha256:af0ac5f7d82c14d3cb74136b3eebce45bf2f25f84a8a6dd1c5e6414201974494",
+            "sha256:d1aef331d143b0917a1401b08cfbd221e3a4ca7700eef5e21dc535106b21783d",
+            "sha256:bf73d74202d910d4525c9bcee28f3ee9468665fe96d5ca38940e29a5918da201",
+            "sha256:d57e9494e41d4654107c76ff4c606c9c779f02c8d6b8746b2e6b1bdfc4ca7950",
+            "sha256:61e2f941398129b2f814e59dc0cfcdda9691a395bbd1d91559eb335795cf5242",
+            "sha256:18a1c978f6605fc9fd24b6b2c8e5c1e11e0f73e570a8fa17050b4e29a620a690",
+            "sha256:742847c7c64fbe937ea11918ad7c7cb3b7cf88476f52245078718653c0955737",
+            "sha256:3a4f2f91a52627b06e5dac817c3d93f7a4732c70076f4274018c3adb489c6a09",
+            "sha256:28ad4e4f24cfe13b12cfcb6d54a245fadb69fac2d435a5abb1dcd159c08dcdd3",
+            "sha256:eff83eede46bf03468fb640156abaafccf71d7091b75c639cbc765944772ba4f",
+            "sha256:09ecca627e8f49c709fce261df67baa2d0a85e8a19153ef905f851a98f25569b",
+            "sha256:6eecd656ad9f7dce898101d4472c59d6a9448004adbf9f619834d91d7d865d3c",
+            "sha256:2aed732167f29996fb9fee7767a79d9372f1e578aead9294bb04326147f6035b"
+          ],
+          "cells": [
+            {
+              "cell_id": "sha256:fadf9989edbe68a74c5cb8609c4c659f78ed11b19c7d0aca539cfac43c9bf89f",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:ad0d1ef74227b8d416740f26e32b0b4a71969febabb18bc3ab641dcd02932874",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:e71fdac72deee746e4c7ef8ac2f23df3219dab791c063a0be854704d43006d45",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:8871311e7240cf313f92e3fd1553c705ab3ce656163380ea54f5e5c1fac240e7",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "heisenberg",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:e6bf6bb8f123da3ee041d019fe80057665d26a004ef0f8d67fdea9670ed59126",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:af0ac5f7d82c14d3cb74136b3eebce45bf2f25f84a8a6dd1c5e6414201974494",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:d1aef331d143b0917a1401b08cfbd221e3a4ca7700eef5e21dc535106b21783d",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:bf73d74202d910d4525c9bcee28f3ee9468665fe96d5ca38940e29a5918da201",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "near_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:d57e9494e41d4654107c76ff4c606c9c779f02c8d6b8746b2e6b1bdfc4ca7950",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:61e2f941398129b2f814e59dc0cfcdda9691a395bbd1d91559eb335795cf5242",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:18a1c978f6605fc9fd24b6b2c8e5c1e11e0f73e570a8fa17050b4e29a620a690",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:742847c7c64fbe937ea11918ad7c7cb3b7cf88476f52245078718653c0955737",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "qaoa",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:3a4f2f91a52627b06e5dac817c3d93f7a4732c70076f4274018c3adb489c6a09",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:28ad4e4f24cfe13b12cfcb6d54a245fadb69fac2d435a5abb1dcd159c08dcdd3",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:eff83eede46bf03468fb640156abaafccf71d7091b75c639cbc765944772ba4f",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L3",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:09ecca627e8f49c709fce261df67baa2d0a85e8a19153ef905f851a98f25569b",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:6eecd656ad9f7dce898101d4472c59d6a9448004adbf9f619834d91d7d865d3c",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:2aed732167f29996fb9fee7767a79d9372f1e578aead9294bb04326147f6035b",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "tfi",
+                "noise_family": "depolarizing_readout",
+                "severity": "L3",
+                "observable": "zz_mid"
+              }
+            }
+          ],
+          "artifact_ids": [
+            "sha256:689116c1bd7c276366503b64d530951538d0aa9810161e8910a36caada2206fe",
+            "sha256:ebfc9f6f22d04a4e7c5aefbc3ee2ac91cda1091d16dd5b7e9937b0ffa3f81a8d",
+            "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f",
+            "sha256:f7a671b3c9d58072eb29853a57cdf104a6629357d5350e6712bd1a8d81f79b0d",
+            "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7"
+          ],
+          "n_cells": 18,
+          "n_expectations": 112,
+          "metrics": {
+            "macro_mae": {
+              "mean": 0.10671248900125647,
+              "q1": 0.048502604166666664,
+              "median": 0.0845383277325,
+              "q3": 0.10940169918983332,
+              "n_cells": 18
+            },
+            "mae_circuit_bootstrap_interval": {
+              "estimate": 0.10671248900125646,
+              "lower": 0.08813028762592114,
+              "upper": 0.12580285761867102,
+              "confidence": 0.95,
+              "n_resamples": 2000,
+              "n_circuits": 56,
+              "seed": 20260820,
+              "metric": "mae",
+              "paired": false
+            },
+            "mean_rank": 2.2222222222222223,
+            "macro_rmse": {
+              "mean": 0.12251969549342537,
+              "q1": 0.06331051046771634,
+              "median": 0.09524817230274801,
+              "q3": 0.14723606538524409,
+              "n_cells": 18
+            },
+            "excess_loss_mean": {
+              "mean": 0.01957133232040344,
+              "q1": 0.0,
+              "median": 0.007238821705803573,
+              "q3": 0.0384521484375,
+              "n_cells": 18
+            },
+            "overcorrection_rate": {
+              "mean": 0.3492063492063492,
+              "q1": 0.0,
+              "median": 0.10714285714285714,
+              "q3": 0.6666666666666666,
+              "n_cells": 18
+            }
+          },
+          "ledger": {
+            "B_train": 0,
+            "B_extra": 155648,
+            "B_pred": 77824,
+            "nominal_total": 77824,
+            "realized_total": 233472,
+            "nominal_test_total": 77824,
+            "realized_test_total": 233472,
+            "test_budget_ratio": 3.0,
+            "circuit_evals_per_mitigated_expectation": 2084.5714285714284
+          }
+        }
+      },
+      "by_split": {}
+    },
+    "clifford_control": {
+      "table1": {
+        "raw": {
+          "cell_ids": [
+            "sha256:04f5694e21e5140fe2f7b2686e7afafa8bfea8a170a94da363eb05b83f9c9d6f",
+            "sha256:8eab97c1e169bca32e25d9442eb196458f7d0bf044c08dc17a88ae48e92409b0",
+            "sha256:755573321413985c701c394748d8c15676b99e1ea70bb17cef398a8d56d02b86",
+            "sha256:c2f366340faddc92b8638590c882d398742731e280472d54bc496b370e65c195"
+          ],
+          "cells": [
+            {
+              "cell_id": "sha256:04f5694e21e5140fe2f7b2686e7afafa8bfea8a170a94da363eb05b83f9c9d6f",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:8eab97c1e169bca32e25d9442eb196458f7d0bf044c08dc17a88ae48e92409b0",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:755573321413985c701c394748d8c15676b99e1ea70bb17cef398a8d56d02b86",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:c2f366340faddc92b8638590c882d398742731e280472d54bc496b370e65c195",
+              "key": {
+                "method": "raw",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            }
+          ],
+          "artifact_ids": [
+            "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1"
+          ],
+          "n_cells": 4,
+          "n_expectations": 12,
+          "metrics": {
+            "macro_mae": {
+              "mean": 0.053466796875,
+              "q1": 0.02392578125,
+              "median": 0.0546875,
+              "q3": 0.084228515625,
+              "n_cells": 4
+            },
+            "mae_circuit_bootstrap_interval": {
+              "estimate": 0.053466796875,
+              "lower": 0.041015625,
+              "upper": 0.07032714843749992,
+              "confidence": 0.95,
+              "n_resamples": 2000,
+              "n_circuits": 6,
+              "seed": 20260818,
+              "metric": "mae",
+              "paired": false
+            },
+            "mean_rank": 1.75,
+            "macro_rmse": {
+              "mean": 0.05658276685227801,
+              "q1": 0.028051579435110094,
+              "median": 0.05746137471387104,
+              "q3": 0.08599256213103895,
+              "n_cells": 4
+            },
+            "excess_loss_mean": {
+              "mean": 0.0,
+              "q1": 0.0,
+              "median": 0.0,
+              "q3": 0.0,
+              "n_cells": 4
+            },
+            "overcorrection_rate": {
+              "mean": 0.0,
+              "q1": 0.0,
+              "median": 0.0,
+              "q3": 0.0,
+              "n_cells": 4
+            }
+          },
+          "ledger": {
+            "B_train": 0,
+            "B_extra": 0,
+            "B_pred": 3072,
+            "nominal_total": 3072,
+            "realized_total": 3072,
+            "nominal_test_total": 3072,
+            "realized_test_total": 3072,
+            "test_budget_ratio": 1.0,
+            "circuit_evals_per_mitigated_expectation": 256.0
+          }
+        },
+        "ridge": {
+          "cell_ids": [
+            "sha256:cb90449babbd99ebe69d78d6ce436c5bf13830fbd4afe64d676d497676cbe7b6",
+            "sha256:2a70272c2d744cfb5549825a879764366f5e53e791180d184e87c00d8392e31f",
+            "sha256:c317a8fa45e47809e9acc8f9c8abbba13802397f5af0627817ea9085a20ae6c7",
+            "sha256:9a6666d100acba915a36c7f357d5afccbb7fa6012009dd8984bff8334bb1197b"
+          ],
+          "cells": [
+            {
+              "cell_id": "sha256:cb90449babbd99ebe69d78d6ce436c5bf13830fbd4afe64d676d497676cbe7b6",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:2a70272c2d744cfb5549825a879764366f5e53e791180d184e87c00d8392e31f",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:c317a8fa45e47809e9acc8f9c8abbba13802397f5af0627817ea9085a20ae6c7",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:9a6666d100acba915a36c7f357d5afccbb7fa6012009dd8984bff8334bb1197b",
+              "key": {
+                "method": "ridge",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            }
+          ],
+          "artifact_ids": [
+            "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1"
+          ],
+          "n_cells": 4,
+          "n_expectations": 12,
+          "metrics": {
+            "macro_mae": {
+              "mean": 0.03717038672274634,
+              "q1": 0.02148501283697043,
+              "median": 0.03380106520044331,
+              "q3": 0.04948643908621922,
+              "n_cells": 4
+            },
+            "mae_circuit_bootstrap_interval": {
+              "estimate": 0.03717038672274634,
+              "lower": 0.02218584090542495,
+              "upper": 0.05165545243228426,
+              "confidence": 0.95,
+              "n_resamples": 2000,
+              "n_circuits": 6,
+              "seed": 20260819,
+              "metric": "mae",
+              "paired": false
+            },
+            "mean_rank": 1.25,
+            "macro_rmse": {
+              "mean": 0.04422706004616847,
+              "q1": 0.026146577745135204,
+              "median": 0.04021434849950871,
+              "q3": 0.05829483080054197,
+              "n_cells": 4
+            },
+            "excess_loss_mean": {
+              "mean": 0.0046452281118067925,
+              "q1": 0.0006877854302642403,
+              "median": 0.002738291532334558,
+              "q3": 0.00669573421387711,
+              "n_cells": 4
+            },
+            "overcorrection_rate": {
+              "mean": 0.375,
+              "q1": 0.375,
+              "median": 0.5,
+              "q3": 0.5,
+              "n_cells": 4
+            }
+          },
+          "ledger": {
+            "B_train": 5120,
+            "B_extra": 0,
+            "B_pred": 3072,
+            "nominal_total": 8192,
+            "realized_total": 8192,
+            "nominal_test_total": 3072,
+            "realized_test_total": 3072,
+            "test_budget_ratio": 1.0,
+            "circuit_evals_per_mitigated_expectation": 256.0
+          }
+        },
+        "zne": {
+          "cell_ids": [
+            "sha256:e221f168effaaf750b838c2dbd928610039dab218826614883e4ecd33cd6e0f6",
+            "sha256:9a2ebc43353bf5a516038ffaca32fa02a2e66aa9e350306e5f909c825e2fb78f",
+            "sha256:8118df3bda55836934a1f1c97376ac45be1b841362231756f2a103eb9f286090",
+            "sha256:f7abcb695dfb974e4b0c40872c0e2e52a836f29d6edf171f4ff13fed4a683c5d"
+          ],
+          "cells": [
+            {
+              "cell_id": "sha256:e221f168effaaf750b838c2dbd928610039dab218826614883e4ecd33cd6e0f6",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:9a2ebc43353bf5a516038ffaca32fa02a2e66aa9e350306e5f909c825e2fb78f",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "z_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:8118df3bda55836934a1f1c97376ac45be1b841362231756f2a103eb9f286090",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L1",
+                "observable": "zz_mid"
+              }
+            },
+            {
+              "cell_id": "sha256:f7abcb695dfb974e4b0c40872c0e2e52a836f29d6edf171f4ff13fed4a683c5d",
+              "key": {
+                "method": "zne",
+                "split": "test",
+                "family": "random_clifford",
+                "noise_family": "depolarizing_readout",
+                "severity": "L2",
+                "observable": "zz_mid"
+              }
+            }
+          ],
+          "artifact_ids": [
+            "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1"
+          ],
+          "n_cells": 4,
+          "n_expectations": 12,
+          "metrics": {
+            "macro_mae": {
+              "mean": 0.1053466796875,
+              "q1": 0.077850341796875,
+              "median": 0.10736083984375,
+              "q3": 0.134857177734375,
+              "n_cells": 4
+            },
+            "mae_circuit_bootstrap_interval": {
+              "estimate": 0.1053466796875,
+              "lower": 0.07565826416015625,
+              "upper": 0.13751434326171874,
+              "confidence": 0.95,
+              "n_resamples": 2000,
+              "n_circuits": 6,
+              "seed": 20260820,
+              "metric": "mae",
+              "paired": false
+            },
+            "mean_rank": 3.0,
+            "macro_rmse": {
+              "mean": 0.1145454868589578,
+              "q1": 0.0869081583810696,
+              "median": 0.1225193429853899,
+              "q3": 0.1501566714632781,
+              "n_cells": 4
+            },
+            "excess_loss_mean": {
+              "mean": 0.05743408203125,
+              "q1": 0.05364990234375,
+              "median": 0.05828857421875,
+              "q3": 0.06207275390625,
+              "n_cells": 4
+            },
+            "overcorrection_rate": {
+              "mean": 0.8125,
+              "q1": 0.6875,
+              "median": 0.875,
+              "q3": 1.0,
+              "n_cells": 4
+            }
+          },
+          "ledger": {
+            "B_train": 0,
+            "B_extra": 6144,
+            "B_pred": 3072,
+            "nominal_total": 3072,
+            "realized_total": 9216,
+            "nominal_test_total": 3072,
+            "realized_test_total": 9216,
+            "test_budget_ratio": 3.0,
+            "circuit_evals_per_mitigated_expectation": 768.0
+          }
+        }
+      },
+      "by_split": {}
     }
   },
   "figure1": {
@@ -310,6 +2102,9 @@
       {
         "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
         "preset": "t0-heisenberg-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "raw",
         "cell_ids": [
           "sha256:26611956093a718a6ca00459bee06f2210636a0c9605fdb1dc6bb284ff64ba45",
@@ -326,6 +2121,9 @@
       {
         "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
         "preset": "t0-heisenberg-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "ridge",
         "cell_ids": [
           "sha256:0b1e3b806c9a86e9e50c25aa1a6b5d525b81cfed02e1f6eb4d96ce30bc05897f",
@@ -342,6 +2140,9 @@
       {
         "artifact_id": "sha256:ff3f3de0b4ab438ff452c55478a0ef1d42f0b5720e66aefb1a594f7438a749b7",
         "preset": "t0-heisenberg-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "zne",
         "cell_ids": [
           "sha256:cb8fb4750777ad7097a34f2fe08a594181739a5b38b5156b27b55a469a487872",
@@ -358,6 +2159,9 @@
       {
         "artifact_id": "sha256:ebfc9f6f22d04a4e7c5aefbc3ee2ac91cda1091d16dd5b7e9937b0ffa3f81a8d",
         "preset": "t0-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "raw",
         "cell_ids": [
           "sha256:bb97b8930d287356712b29220bf294244e5c804eaba7771bb1060de90f5cf066",
@@ -374,6 +2178,9 @@
       {
         "artifact_id": "sha256:ebfc9f6f22d04a4e7c5aefbc3ee2ac91cda1091d16dd5b7e9937b0ffa3f81a8d",
         "preset": "t0-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "ridge",
         "cell_ids": [
           "sha256:3e81aeeda9e384cb1f497144a14677a159a2d4ebb175db2704e961266eee30ba",
@@ -390,6 +2197,9 @@
       {
         "artifact_id": "sha256:ebfc9f6f22d04a4e7c5aefbc3ee2ac91cda1091d16dd5b7e9937b0ffa3f81a8d",
         "preset": "t0-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "zne",
         "cell_ids": [
           "sha256:c05b59a568c4dca9082927f07d0818f8b32ccae5ac03b215a824ae05f110d5b5",
@@ -406,6 +2216,9 @@
       {
         "artifact_id": "sha256:689116c1bd7c276366503b64d530951538d0aa9810161e8910a36caada2206fe",
         "preset": "t0-nc-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "raw",
         "cell_ids": [
           "sha256:38044ba571f26dd6fc6fb6ab17bea2a9021a542e362181e0006c5ea4cfd1f2a3",
@@ -422,6 +2235,9 @@
       {
         "artifact_id": "sha256:689116c1bd7c276366503b64d530951538d0aa9810161e8910a36caada2206fe",
         "preset": "t0-nc-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "ridge",
         "cell_ids": [
           "sha256:888ec08baf5d3454a0216e3d2b9fd9c4e5e603fb41b00288617804f4e7ed0620",
@@ -438,6 +2254,9 @@
       {
         "artifact_id": "sha256:689116c1bd7c276366503b64d530951538d0aa9810161e8910a36caada2206fe",
         "preset": "t0-nc-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "zne",
         "cell_ids": [
           "sha256:8678468ae2b06628baf05826a4da040c7840450b9132a631c0bbefe69a1dc36a",
@@ -454,6 +2273,9 @@
       {
         "artifact_id": "sha256:f7a671b3c9d58072eb29853a57cdf104a6629357d5350e6712bd1a8d81f79b0d",
         "preset": "t0-qaoa-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "raw",
         "cell_ids": [
           "sha256:b9ff7909fe7498f3e432c40404750552baff98c0ab5c968e0ac52e27e86fca49",
@@ -470,6 +2292,9 @@
       {
         "artifact_id": "sha256:f7a671b3c9d58072eb29853a57cdf104a6629357d5350e6712bd1a8d81f79b0d",
         "preset": "t0-qaoa-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "ridge",
         "cell_ids": [
           "sha256:c3ac7aaf56052a363e8f13c515f4ed80f5b19172dbd8e357baed1f5b6816c050",
@@ -486,6 +2311,9 @@
       {
         "artifact_id": "sha256:f7a671b3c9d58072eb29853a57cdf104a6629357d5350e6712bd1a8d81f79b0d",
         "preset": "t0-qaoa-micro",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "zne",
         "cell_ids": [
           "sha256:94efdbca5d0946fb647c52b7c04a3987dfdca07eed29393b9b94dac5311f9e51",
@@ -502,6 +2330,9 @@
       {
         "artifact_id": "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1",
         "preset": "t0-rc-micro",
+        "stratum": "clifford_control",
+        "split_id": null,
+        "page": 1,
         "method": "raw",
         "cell_ids": [
           "sha256:d42c927d31176d35dc5bb44c14b274652cc648a676966e54b8c6ef2638aafa42",
@@ -518,6 +2349,9 @@
       {
         "artifact_id": "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1",
         "preset": "t0-rc-micro",
+        "stratum": "clifford_control",
+        "split_id": null,
+        "page": 1,
         "method": "ridge",
         "cell_ids": [
           "sha256:6ac1e4b5860e5de10dbe4146e9dabedcb5c2c83987a8106cfbbc25385d145186",
@@ -534,6 +2368,9 @@
       {
         "artifact_id": "sha256:839b1b2829f785344eafbad508394372368b3a9df857293ff4525cbec9887ac1",
         "preset": "t0-rc-micro",
+        "stratum": "clifford_control",
+        "split_id": null,
+        "page": 1,
         "method": "zne",
         "cell_ids": [
           "sha256:94285e1627bd87c6fba265665d5673ad1d0cc7dcbbb6133d5ea300394efc56f3",
@@ -550,6 +2387,9 @@
       {
         "artifact_id": "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f",
         "preset": "t0-smoke",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "raw",
         "cell_ids": [
           "sha256:1865380da0ac1cffbe97f93d5cacadc9ac839c5998dcaabf3b49db9ff5cb1dab",
@@ -568,6 +2408,9 @@
       {
         "artifact_id": "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f",
         "preset": "t0-smoke",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "ridge",
         "cell_ids": [
           "sha256:cdf8fbe9b1c600d66a166c350cca0fff5f4a00588119dbf53e174852d3183eb8",
@@ -586,6 +2429,9 @@
       {
         "artifact_id": "sha256:ee6ff2f56fa4c5a373596c166187299064ebccdfa5fce2e431ab7a8e4f0acb1f",
         "preset": "t0-smoke",
+        "stratum": "continuous_regression",
+        "split_id": null,
+        "page": 1,
         "method": "zne",
         "cell_ids": [
           "sha256:7fbb1d978a0d6fab932ccc17c13c19cfd5a9076bd92ae25438df5c679d385d8d",

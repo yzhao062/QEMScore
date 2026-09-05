@@ -6,15 +6,33 @@
 \centering
 \scriptsize
 \setlength{\tabcolsep}{2.2pt}
-\caption{Walking-skeleton results on shipped presets (t0-heisenberg-micro, t0-micro, t0-nc-micro, t0-qaoa-micro, t0-rc-micro, t0-smoke). MAE confidence intervals use a circuit-blocked bootstrap. Nominal and realized totals expose current budget inequality.}
+\caption{Legacy-v1 walking-skeleton results. Run presets: t0-heisenberg-micro, t0-micro, t0-nc-micro, t0-qaoa-micro, t0-rc-micro, t0-smoke. MAE confidence intervals use a circuit-blocked bootstrap. Nominal and realized circuit-evaluation totals are reported; budgets are not equalized. The headline includes only continuous regression. Clifford controls are reported separately and excluded from all headline statistics and costs. Section: Continuous regression (headline).}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lrrrrrrrrrrrrrr}
 Method & Cells & Macro MAE [95\% CI] & MAE IQR & Rank & Macro RMSE & Harm mean & OCR & $B_{train}$ & $B_{extra}$ & $B_{pred}$ & Nominal total & Realized total & Test ratio & Eval./expect. \\
 \hline
-Raw & 22 & 0.1578 [0.1415, 0.1770] & [0.0355, 0.2077] & 2.14 & 0.1660 & 0.0000 & 0.000 & 0 & 0 & 80,896 & 80,896 & 80,896 & 1.0x & 652.4 \\
-Ridge & 22 & 0.0530 [0.0418, 0.0653] & [0.0213, 0.0750] & 1.50 & 0.0652 & 0.0124 & 0.334 & 123,904 & 0 & 80,896 & 204,800 & 204,800 & 1.0x & 652.4 \\
-Local digital ZNE & 22 & 0.1065 [0.0904, 0.1235] & [0.0545, 0.1244] & 2.36 & 0.1211 & 0.0265 & 0.433 & 0 & 161,792 & 80,896 & 80,896 & 242,688 & 3.0x & 1957.2 \\
+Raw & 18 & 0.1810 [0.1613, 0.2029] & [0.0452, 0.2536] & 2.22 & 0.1903 & 0.0000 & 0.000 & 0 & 0 & 77,824 & 77,824 & 77,824 & 1.0x & 694.9 \\
+Ridge & 18 & 0.0566 [0.0440, 0.0707] & [0.0283, 0.0787] & 1.56 & 0.0698 & 0.0141 & 0.325 & 118,784 & 0 & 77,824 & 196,608 & 196,608 & 1.0x & 694.9 \\
+Local digital ZNE & 18 & 0.1067 [0.0881, 0.1258] & [0.0485, 0.1094] & 2.22 & 0.1225 & 0.0196 & 0.349 & 0 & 155,648 & 77,824 & 77,824 & 233,472 & 3.0x & 2084.6 \\
+\hline
 \end{tabular}}
-\par\vspace{2pt}\raggedright\tiny Run artifacts: ff3f3de0b4ab, ebfc9f6f22d0, 689116c1bd7c, f7a671b3c9d5, 839b1b2829f7, ee6ff2f56fa4. Full cell identifiers and numeric provenance are in \texttt{report-trace.json}. These shipped presets do not yet implement the S0 to S6 grammar.
+
+\end{table}
+
+\begin{table}[ht]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.2pt}
+\caption{Legacy-v1 walking-skeleton results (continued). Section: Clifford control (excluded from headline).}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrrrrrrrrr}
+Method & Cells & Macro MAE [95\% CI] & MAE IQR & Rank & Macro RMSE & Harm mean & OCR & $B_{train}$ & $B_{extra}$ & $B_{pred}$ & Nominal total & Realized total & Test ratio & Eval./expect. \\
+\hline
+Raw & 4 & 0.0535 [0.0410, 0.0703] & [0.0239, 0.0842] & 1.75 & 0.0566 & 0.0000 & 0.000 & 0 & 0 & 3,072 & 3,072 & 3,072 & 1.0x & 256.0 \\
+Ridge & 4 & 0.0372 [0.0222, 0.0517] & [0.0215, 0.0495] & 1.25 & 0.0442 & 0.0046 & 0.375 & 5,120 & 0 & 3,072 & 8,192 & 8,192 & 1.0x & 256.0 \\
+Local digital ZNE & 4 & 0.1053 [0.0757, 0.1375] & [0.0779, 0.1349] & 3.00 & 0.1145 & 0.0574 & 0.812 & 0 & 6,144 & 3,072 & 3,072 & 9,216 & 3.0x & 768.0 \\
+\hline
+\end{tabular}}
+\par\vspace{2pt}\raggedright\tiny Run artifacts: ff3f3de0b4ab, ebfc9f6f22d0, 689116c1bd7c, f7a671b3c9d5, 839b1b2829f7, ee6ff2f56fa4. Full cell identifiers and numeric sources are in \texttt{report-trace.json}. These legacy-v1 runs have no declared S0 to S6 split axis.
 \end{table}
 \end{document}

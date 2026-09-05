@@ -171,12 +171,13 @@ def regenerate() -> None:
     if missing_presets:
         raise RuntimeError(f"walking-skeleton presets are missing: {missing_presets}")
 
-    with tempfile.TemporaryDirectory(prefix="qem-bench-example-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="qb-ex-") as temporary:
         work_root = Path(temporary)
         os.environ["MPLCONFIGDIR"] = str(work_root / "matplotlib")
         staging_root = work_root / "report-walking-skeleton"
         staging_root.mkdir()
 
+        generated_results = []
         for preset in PRESETS:
             print(f"regenerating {preset}")
             data_dir = work_root / "datasets" / preset
@@ -189,6 +190,8 @@ def regenerate() -> None:
                     f"{preset} hash moved: expected {frozen_hash}, "
                     f"got {manifest['dataset_hash']}"
                 )
+            if frozen_hash is not None:
+                print(f"{preset} frozen hash: {manifest['dataset_hash']}")
             result = run(data_dir, run_dir)
             if tuple(result["methods"]) != RUN_METHODS:
                 raise RuntimeError(
@@ -196,6 +199,7 @@ def regenerate() -> None:
                     f"got {tuple(result['methods'])}"
                 )
             validate_run_artifact(result)
+            generated_results.append(result)
             _write_json_lf(run_dir / "results.json", result)
 
         manifest_path = staging_root / "results-manifest.json"
@@ -206,9 +210,30 @@ def regenerate() -> None:
             methods=REPORT_METHODS,
             bootstrap_seed=REPORT_BOOTSTRAP_SEED,
         )
+        report_trace = json.loads(report_paths["trace"].read_text(encoding="utf-8"))
+        for stratum in ("continuous_regression", "clifford_control"):
+            expected_artifacts = sorted(
+                result["artifact_id"] for result in generated_results
+                if result["stratum"] == stratum
+            )
+            for method in REPORT_METHODS:
+                summary = report_trace["strata"][stratum]["table1"][method]
+                if summary["artifact_ids"] != expected_artifacts:
+                    raise RuntimeError(
+                        f"{stratum} report membership differs from generated runs"
+                    )
+                if stratum == "continuous_regression":
+                    if report_trace["table1"][method]["artifact_ids"] != expected_artifacts:
+                        raise RuntimeError(
+                            "headline membership differs from continuous-regression runs"
+                        )
+        print(
+            "ridge headline macro MAE:",
+            report_trace["table1"]["ridge"]["metrics"]["macro_mae"]["mean"],
+        )
         _write_json_lf(
             report_paths["trace"],
-            json.loads(report_paths["trace"].read_text(encoding="utf-8")),
+            report_trace,
         )
         table_text = report_paths["table1"].read_text(encoding="utf-8")
         _write_lf(report_paths["table1"], table_text)

@@ -7,7 +7,7 @@ merely emulates the simulator from circuit structure:
   evaluations at train and test time; strong accuracy here means the model class is
   a classical surrogate of the data-generating process, not a mitigator.
 - noisy-value-only: the noisy expectation (plus shots) with no circuit features.
-- shrinkage: predict the train-split mean label; a zero-cost floor.
+- shrinkage: predict the training mean label for the family; a zero-cost floor.
 - shuffled-noisy (diagnostic): full features with the training noisy-expectation
   column permuted. Accuracy that survives the shuffle exposes surrogate behavior.
 
@@ -48,19 +48,49 @@ class NoisyOnlyControl(_ColumnSubsetRidge):
 
 
 class ShrinkageControl:
-    """Predict the train-split mean label. Zero circuit-evaluation cost."""
+    """Predict the training mean for each family at zero measurement cost.
+
+    For a family absent from training (S3), use the pooled source training mean.
+    Its family mean cannot be learned without target labels.
+    """
 
     def __init__(self) -> None:
         self._mean: float | None = None
+        self._family_means: dict[str, float] = {}
 
     def fit(self, train_items: list[dict]) -> "ShrinkageControl":
+        if not train_items:
+            raise ValueError("train_items must not be empty")
         self._mean = float(np.mean([it["ideal_expectation"] for it in train_items]))
+        self._family_means = {
+            family: float(np.mean([
+                it["ideal_expectation"] for it in train_items if it["family"] == family
+            ]))
+            for family in {it["family"] for it in train_items}
+        }
         return self
 
     def predict(self, items: list[dict]) -> np.ndarray:
         if self._mean is None:
             raise RuntimeError("fit first")
-        return np.full(len(items), self._mean)
+        return np.asarray([
+            self._family_means.get(it["family"], self._mean) for it in items
+        ], dtype=float)
+
+
+def shuffle_noisy_items(items: list[dict], *, seed: int) -> list[dict]:
+    """Copy rows and permute only the noisy value, for any learned method.
+
+    The caller chooses the intervention: training shuffle followed by refitting,
+    or evaluation shuffle with the fitted model held fixed. These are different
+    diagnostics and must be labeled separately. Item order and labels are kept.
+    """
+    shuffled = [dict(item) for item in items]
+    column = np.asarray([item["noisy_expectation"] for item in items], dtype=float)
+    np.random.default_rng(seed).shuffle(column)
+    for item, value in zip(shuffled, column, strict=True):
+        item["noisy_expectation"] = float(value)
+    return shuffled
 
 
 class ShuffledNoisyControl(RidgeMitigator):
@@ -75,10 +105,4 @@ class ShuffledNoisyControl(RidgeMitigator):
         self.shuffle_seed = shuffle_seed
 
     def fit(self, train_items: list[dict]) -> "RidgeMitigator":
-        rng = np.random.default_rng(self.shuffle_seed)
-        shuffled = [dict(it) for it in train_items]
-        column = np.array([it["noisy_expectation"] for it in shuffled])
-        rng.shuffle(column)
-        for it, value in zip(shuffled, column):
-            it["noisy_expectation"] = float(value)
-        return super().fit(shuffled)
+        return super().fit(shuffle_noisy_items(train_items, seed=self.shuffle_seed))

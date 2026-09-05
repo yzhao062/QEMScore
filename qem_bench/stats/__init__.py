@@ -2,6 +2,7 @@
 
 from qem_bench.stats.bootstrap import BootstrapInterval, circuit_blocked_bootstrap
 from qem_bench.stats.descriptive import macro_mean_iqr
+from qem_bench.stats.incremental_value import evaluate_incremental_value
 from qem_bench.stats.inference import (
     PlannedComparisonFamily,
     bias_by_stratum,
@@ -28,6 +29,7 @@ __all__ = [
     "circuit_blocked_bootstrap",
     "critical_difference",
     "critical_difference_resolution",
+    "evaluate_incremental_value",
     "friedman_rank_test",
     "holm_adjust",
     "mean_ranks",

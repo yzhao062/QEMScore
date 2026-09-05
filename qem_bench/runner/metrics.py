@@ -11,12 +11,13 @@ from collections.abc import Mapping, Sequence
 import numpy as np
 
 from qem_bench.datasets.schema import canonical_physical_circuit_identity
+from qem_bench.datasets.splits import SPLIT_AXES
 
 PHYS_BOUND = 1.0 + 1e-9
 EXACT_SUMMATION_METHOD = "CPython math.fsum over binary64 values"
 
 DEFAULT_CELL_GROUPING = "six-part"
-CELL_GROUPINGS: dict[str, tuple[str, ...]] = {
+LEGACY_CELL_GROUPINGS: dict[str, tuple[str, ...]] = {
     "six-part": (
         "method",
         "split",
@@ -32,6 +33,10 @@ CELL_GROUPINGS: dict[str, tuple[str, ...]] = {
         "noise_family",
         "severity",
     ),
+}
+CELL_GROUPINGS: dict[str, tuple[str, ...]] = {
+    name: (*fields[:2], "split_id", *fields[2:])
+    for name, fields in LEGACY_CELL_GROUPINGS.items()
 }
 
 
@@ -96,7 +101,9 @@ def build_cell_records(
 ) -> list[dict]:
     """Build one traceable metric record per declared cell.
 
-    ``six-part`` implements the default six-field reporting cell contract.
+    ``six-part`` retains its public name and adds ``split_id`` for split-v2
+    rows. ``split`` always means the row role. Legacy rows retain their original
+    six-field keys and cell identities; no split axis is assigned to them.
     ``observable-excluded`` keeps sibling observables from the same counts draw
     in one cell. The caller must select the grouping explicitly when departing
     from the default.
@@ -120,7 +127,13 @@ def build_cell_records(
     if not np.all(np.isfinite(predictions)) or not np.all(np.isfinite(raw_predictions)):
         raise ValueError("predictions must be finite")
 
-    fields = CELL_GROUPINGS[grouping]
+    split_aware = any(
+        "split_id" in item
+        or "split_axis" in item
+        or item.get("dataset_schema_version") == "split-v2"
+        for item in items
+    )
+    fields = (CELL_GROUPINGS if split_aware else LEGACY_CELL_GROUPINGS)[grouping]
     grouped: dict[tuple[object, ...], list[dict]] = defaultdict(list)
     for item, prediction, raw_prediction in zip(
         items, predictions, raw_predictions, strict=True
@@ -150,6 +163,18 @@ def build_cell_records(
             ),
             "physicality_violation": bool(abs(prediction) > PHYS_BOUND),
         }
+        if split_aware:
+            split_id = item.get("split_id")
+            if not isinstance(split_id, str) or split_id not in SPLIT_AXES:
+                raise ValueError(
+                    "split-aware cell records require a valid split_id on every row"
+                )
+            if item.get("split_axis") != SPLIT_AXES[split_id]:
+                raise ValueError(
+                    "split-aware cell records require split_axis to match split_id"
+                )
+            item_values["split_id"] = split_id
+            item_values["split_axis"] = item["split_axis"]
         values = {
             "method": method,
             "split": item_values["split"],
@@ -158,6 +183,8 @@ def build_cell_records(
             "severity": item_values["severity"],
             "observable": item_values["observable"],
         }
+        if split_aware:
+            values["split_id"] = item_values["split_id"]
         grouped[tuple(values[field] for field in fields)].append(item_values)
 
     records: list[dict] = []
@@ -268,6 +295,7 @@ __all__ = [
     "CELL_GROUPINGS",
     "DEFAULT_CELL_GROUPING",
     "EXACT_SUMMATION_METHOD",
+    "LEGACY_CELL_GROUPINGS",
     "PHYS_BOUND",
     "build_cell_records",
     "excess_absolute_loss",
