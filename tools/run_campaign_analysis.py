@@ -88,13 +88,15 @@ def _counts(args) -> dict[str, int] | None:
 
 
 def _requested(args) -> list[tuple[str, int, int]]:
+    regimes = [args.regime] if args.regime else list(REGIMES)
     if args.rehearsal is not None:
         if args.setting:
             raise SystemExit("--setting names frozen settings; --rehearsal replaces it")
         seed, size = args.rehearsal["seed"], args.rehearsal["train"]
-        return [(regime, seed, size) for regime in REGIMES]
+        return [(regime, seed, size) for regime in regimes]
     keys = args.setting or list(campaign_setting_keys())
-    return [_parse_setting(key) for key in keys]
+    resolved = [_parse_setting(key) for key in keys]
+    return [value for value in resolved if value[0] in regimes]
 
 
 def _code_revision(args) -> str:
@@ -288,6 +290,10 @@ def main() -> None:
         "--code-revision",
         help="override the revision recorded in each record; resolved from git "
              "otherwise")
+    parser.add_argument(
+        "--regime", choices=sorted(REGIMES),
+        help="restrict to one evolution-step regime; a maximum-size rehearsal "
+             "calibrates throughput on one rather than paying for both")
     parser.add_argument("--overwrite", action="store_true",
                         help="rebuild records that already exist")
     parser.add_argument(
