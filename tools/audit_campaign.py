@@ -37,12 +37,20 @@ builder that is simply wrong agrees with itself in the generator, in the
 validator, and in any re-derivation that calls it.
 
 What none of it establishes. The noise model, the sampler, the folding and the
-extrapolation are still shared. Reproducing a stored histogram bit for bit needs
-the sampler to consume randomness in the same order, so an independent noise
-construction and an exact histogram comparison cannot both hold; the audit keeps
-the exact comparison. The histogram replay covers the sample rather than every
-execution, and the zero-noise comparison lands on the prediction because the run
-artifact stores no folded histogram.
+extrapolation are still shared, and that is a bounded scope rather than a
+necessity: round 5 of the plan review built the noise models separately and
+still reproduced every sampled histogram exactly, so independence and exact
+replay are compatible. This audit simply does not do it. The consequence is a
+real fault class it passes, and round 5 executed one: a sampler that requests
+the L1 model for an L3 row keeps every parameter, identity, seed and recorded
+severity, and a replay through the same wrong helper agrees with it. The
+separately verified frozen noise-model tests cover model construction; they do
+not cover which severity the sampler asks for. Hardening this would mean
+checking the model attached to the simulator against independently specified
+channels for the requested severity, which is a deterministic check that does
+not replace exact replay. The histogram replay also covers the sample rather
+than every execution, and the zero-noise comparison lands on the prediction
+because the run artifact stores no folded histogram.
 
 The sample is fixed before any score is inspected. Per family, regime, and seed
 pool, the audited indices are training {0, 79, 159, 160, 399, 639}, validation
@@ -191,7 +199,7 @@ def audit_dataset(
             "exhaustive parameter draws and compiled structure over every pool "
             "instance; histogram and zero-noise replay over the frozen sample; "
             "the remaining checks re-derive what validate_split_artifact "
-            "enforces; the noise model and sampler stay shared; "
+            "enforces; the noise model and sampler stay shared, so a fault "            "persisting through both generation and replay can pass; "
             "with an independent protocol and label for the sample; the folded "
             "lands on the prediction because no folded histogram is stored"
         ),

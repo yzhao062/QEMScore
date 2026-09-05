@@ -18,24 +18,21 @@ Qubit 0 is the least significant bit, which is the convention the stored counts
 follow. The state is carried as an n-axis tensor with one axis per qubit, so a
 gate is applied by contracting its axes rather than by building a 2^n matrix.
 
-What this deliberately does not reimplement is the noise model. Reproducing a
-stored histogram bit for bit requires the sampler to consume randomness in the
-same order, and a second noise construction would not, so the histogram
-comparison and an independent noise model cannot both hold. The audit keeps the
-exact histogram comparison and compares the noise model structurally instead.
+What this does not reimplement is the noise model, and the reason is scope
+rather than necessity. An earlier version of this note claimed the two were
+incompatible, that a second noise construction would change the sampler's draw
+order and break exact histogram replay. Round 5 of the plan review built the
+models separately and reproduced every sampled histogram exactly, so the claim
+was wrong. The audit shares the production noise model because it has not been
+reimplemented, and it says so rather than dressing the gap as a trade.
 """
 
 from __future__ import annotations
 
 from collections.abc import Sequence
-import cmath
 import math
 
 import numpy as np
-
-# One entry per gate the two protocols use: name, arity, and the matrix builder.
-_SQRT_HALF = 1.0 / math.sqrt(2.0)
-
 
 def tfi_gates(*, n_qubits: int, steps: int, j: float, h: float, dt: float):
     """The TFI Trotter sequence, as (name, angle, qubits) triples."""
