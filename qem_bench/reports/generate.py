@@ -640,9 +640,15 @@ def _figure_page(
             )
     ticks = list(geometry["ticks"])
     x_labels = dict(geometry["x_labels"])
+    # set_xticks only widens the view when a tick falls outside it, so panels
+    # whose points span different costs keep different limits and their frontiers
+    # cannot be compared by eye. Fixing the limits to the shared tick range makes
+    # every panel one scale.
+    limits = (ticks[0] / 1.2, ticks[-1] * 1.2)
     for axis in panels.flat:
         axis.set_xscale("log")
         axis.set_xticks(ticks, [x_labels[value] for value in ticks])
+        axis.set_xlim(*limits)
         axis.minorticks_off()
         axis.grid(True, which="both", color="0.9", linewidth=0.6)
         label = "Circuit evaluations per mitigated expectation"

@@ -22,7 +22,7 @@ from dataclasses import asdict, dataclass
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 
-from qem_bench.datasets.schema import build_features
+from qem_bench.datasets.schema import FEATURES, build_features
 
 RANDOM_FOREST_NAME = "random_forest"
 MLP_NAME = "mlp"
@@ -61,11 +61,35 @@ def _items(items: Sequence[Item], label: str) -> list[Item]:
     return rows
 
 
-def _matrix(items: Sequence[Item], label: str) -> np.ndarray:
+def _dropped_columns(drop_features: Sequence[str]) -> tuple[int, ...]:
+    """Resolve feature names to column indices, refusing anything unknown.
+
+    A silently ignored name would produce a control that still reads the input
+    it was built to withhold, and nothing downstream could detect it.
+    """
+    names = tuple(drop_features)
+    if len(set(names)) != len(names):
+        raise ValueError("drop_features must not repeat a name")
+    unknown = [name for name in names if name not in FEATURES]
+    if unknown:
+        raise ValueError(f"unknown feature names: {sorted(unknown)}")
+    if len(names) >= len(FEATURES):
+        raise ValueError("drop_features must leave at least one column")
+    return tuple(FEATURES.index(name) for name in names)
+
+
+def _matrix(
+    items: Sequence[Item], label: str, drop_columns: Sequence[int] = ()
+) -> np.ndarray:
     rows = _items(items, label)
     matrix = np.asarray([build_features(dict(item)) for item in rows], dtype=float)
     if matrix.ndim != 2 or not np.all(np.isfinite(matrix)):
         raise ValueError(f"{label} features must be a finite matrix")
+    if drop_columns:
+        # Deletion, not zeroing. A zeroed column still occupies a slot that the
+        # forest can sample as a split candidate and that the network still
+        # weights, so the two are different experiments.
+        matrix = np.delete(matrix, list(drop_columns), axis=1)
     return matrix
 
 
@@ -133,8 +157,12 @@ class LiaoRandomForestMitigator:
     represented directly by the scikit-learn estimator configuration.
     """
 
-    def __init__(self, random_state: int = 0) -> None:
+    def __init__(
+        self, random_state: int = 0, *, drop_features: Sequence[str] = ()
+    ) -> None:
         self.random_state = random_state
+        self.drop_features = tuple(drop_features)
+        self._drop_columns = _dropped_columns(self.drop_features)
         self._models: dict[ObservableKey, RandomForestRegressor] = {}
 
     def fit(self, train_items: Sequence[Item]) -> "LiaoRandomForestMitigator":
@@ -160,7 +188,8 @@ class LiaoRandomForestMitigator:
                 n_jobs=1,
             )
             model.fit(
-                _matrix(group, "train_items"), _targets(group, "train_items")
+                _matrix(group, "train_items", self._drop_columns),
+                _targets(group, "train_items"),
             )
             models[key] = model
         self._models = models
@@ -184,6 +213,7 @@ class LiaoRandomForestMitigator:
             "min_samples_split": 2,
             "max_features": 1,
             "random_state": self.random_state,
+            "dropped_features": list(self.drop_features),
         }
 
     def predict(self, items: Sequence[Item]) -> np.ndarray:
@@ -200,7 +230,8 @@ class LiaoRandomForestMitigator:
         predictions = np.empty(len(rows), dtype=float)
         for key, indices in grouped_indices.items():
             group = [rows[index] for index in indices]
-            predictions[indices] = self._models[key].predict(_matrix(group, "items"))
+            predictions[indices] = self._models[key].predict(
+                _matrix(group, "items", self._drop_columns))
         return predictions
 
 
@@ -240,6 +271,7 @@ class LiaoMLPMitigator:
         weight_decay: float = DEFAULT_MLP_WEIGHT_DECAY,
         patience: int = 20,
         min_delta: float = 0.0,
+        drop_features: Sequence[str] = (),
     ) -> None:
         if isinstance(epochs, bool) or not isinstance(epochs, int) or epochs <= 0:
             raise ValueError("epochs must be a positive integer")
@@ -255,6 +287,8 @@ class LiaoMLPMitigator:
             raise ValueError("min_delta must be finite and nonnegative")
 
         self.random_state = random_state
+        self.drop_features = tuple(drop_features)
+        self._drop_columns = _dropped_columns(self.drop_features)
         self.epochs = epochs
         self.stopping_rule = stopping_rule
         self.dropout = float(dropout)
@@ -290,6 +324,7 @@ class LiaoMLPMitigator:
             "batch_size": MLP_BATCH_SIZE,
             "random_state": self.random_state,
             "preprocessing": "training-only feature standardization",
+            "dropped_features": list(self.drop_features),
             "unverified_hyperparameters": self.declarations.with_provenance(),
             "patience": self.patience,
             "min_delta": self.min_delta,
@@ -371,7 +406,7 @@ class LiaoMLPMitigator:
         validation_items: Sequence[Item] | None = None,
     ) -> "LiaoMLPMitigator":
         train_rows = _items(train_items, "train_items")
-        x = _matrix(train_rows, "train_items")
+        x = _matrix(train_rows, "train_items", self._drop_columns)
         y = _targets(train_rows, "train_items").reshape(-1, 1)
 
         validation_x: np.ndarray | None = None
@@ -381,7 +416,8 @@ class LiaoMLPMitigator:
                 raise ValueError("validation_patience requires validation_items")
             validation_rows = _items(validation_items, "validation_items")
             _require_disjoint_groups(train_rows, validation_rows)
-            validation_x = _matrix(validation_rows, "validation_items")
+            validation_x = _matrix(
+                validation_rows, "validation_items", self._drop_columns)
             validation_y = _targets(validation_rows, "validation_items").reshape(-1, 1)
 
         self.feature_mean_ = np.mean(x, axis=0)
@@ -456,7 +492,7 @@ class LiaoMLPMitigator:
         return self
 
     def predict(self, items: Sequence[Item]) -> np.ndarray:
-        x = self._standardize(_matrix(items, "items"))
+        x = self._standardize(_matrix(items, "items", self._drop_columns))
         predictions, _ = self._forward(x)
         return np.asarray(predictions[:, 0], dtype=float)
 
@@ -566,8 +602,11 @@ class LiaoMitigator:
         weight_decay: float = DEFAULT_MLP_WEIGHT_DECAY,
         patience: int = 20,
         min_delta: float = 0.0,
+        drop_features: Sequence[str] = (),
     ) -> None:
         self.random_state = random_state
+        self.drop_features = tuple(drop_features)
+        _dropped_columns(self.drop_features)
         self._mlp_arguments = {
             "epochs": epochs,
             "stopping_rule": stopping_rule,
@@ -575,6 +614,7 @@ class LiaoMitigator:
             "weight_decay": weight_decay,
             "patience": patience,
             "min_delta": min_delta,
+            "drop_features": self.drop_features,
         }
         self.candidate_models_: dict[str, object] = {}
         self.validation_scores_: tuple[LiaoValidationScore, ...] = ()
@@ -591,7 +631,8 @@ class LiaoMitigator:
         validation_rows = _items(validation_items, "validation_items")
         _require_disjoint_groups(train_rows, validation_rows)
 
-        random_forest = LiaoRandomForestMitigator(self.random_state).fit(train_rows)
+        random_forest = LiaoRandomForestMitigator(
+            self.random_state, drop_features=self.drop_features).fit(train_rows)
         mlp = LiaoMLPMitigator(self.random_state, **self._mlp_arguments)
         if mlp.stopping_rule == "validation_patience":
             mlp.fit(train_rows, validation_items=validation_rows)
@@ -639,6 +680,7 @@ class LiaoMitigator:
         return {
             "selected_model": self.selected_model_name_,
             "selection_rule": "source-validation one-standard-error",
+            "dropped_features": list(self.drop_features),
             "one_standard_error_threshold": self.one_standard_error_threshold_,
             "eligible_models": list(self.eligible_models_),
             "tie_break_order": [

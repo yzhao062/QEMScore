@@ -340,3 +340,105 @@ def test_validation_standard_error_blocks_physical_circuits_across_severity():
 
     assert score.validation_mae == pytest.approx(1.0)
     assert score.standard_error == pytest.approx(1.0)
+
+
+# --- Capacity-matched feature-only control -----------------------------------
+# The campaign compares the ablation against a counterpart that is the same
+# candidate family under the same search and seeds, with the noisy-measurement
+# column physically removed. These pin what "same" and "removed" have to mean.
+
+NOISY = "noisy_expectation"
+
+
+def _perturb_noisy(items: list[dict], delta: float = 0.25) -> list[dict]:
+    return [dict(item, noisy_expectation=item["noisy_expectation"] + delta)
+            for item in items]
+
+
+def test_the_control_cannot_read_the_noisy_value_and_the_full_arm_can(legacy_v1_items):
+    """The guarantee the control exists to provide.
+
+    Moving only the noisy column at prediction time must leave the control's
+    output identical and must move the full arm's. A zeroed column would satisfy
+    neither side of this, and a control fitted on a different candidate family
+    would answer a different question.
+    """
+    train, validation = _source_train_validation(legacy_v1_items)
+    _, test = _split(legacy_v1_items)
+    full = LiaoMitigator(random_state=17).fit(train, validation)
+    control = LiaoMitigator(random_state=17, drop_features=(NOISY,)).fit(train, validation)
+
+    moved = _perturb_noisy(test)
+    control_before, control_after = control.predict(test), control.predict(moved)
+    full_before, full_after = full.predict(test), full.predict(moved)
+
+    assert np.array_equal(control_before, control_after)
+    assert not np.allclose(full_before, full_after)
+
+
+def test_the_control_deletes_the_column_rather_than_zeroing_it(legacy_v1_items):
+    train, validation = _source_train_validation(legacy_v1_items)
+    control = LiaoMitigator(random_state=17, drop_features=(NOISY,)).fit(train, validation)
+    forest = control.candidate_models_["random_forest"]
+    for estimator in forest.estimators_.values():
+        assert estimator.n_features_in_ == len(FEATURES) - 1
+
+    zeroed_train = [dict(item, noisy_expectation=0.0) for item in train]
+    zeroed_validation = [dict(item, noisy_expectation=0.0) for item in validation]
+    zeroed = LiaoMitigator(random_state=17).fit(zeroed_train, zeroed_validation)
+    _, test = _split(legacy_v1_items)
+    zeroed_test = [dict(item, noisy_expectation=0.0) for item in test]
+    # Both withhold the measurement, but the zeroed model still spends a split
+    # candidate and a weight on a constant column, so it is a different estimator.
+    assert not np.allclose(control.predict(test), zeroed.predict(zeroed_test))
+
+
+def test_the_control_keeps_the_same_candidates_search_and_seed(legacy_v1_items):
+    train, validation = _source_train_validation(legacy_v1_items)
+    full = LiaoMitigator(random_state=17).fit(train, validation)
+    control = LiaoMitigator(random_state=17, drop_features=(NOISY,)).fit(train, validation)
+
+    assert set(control.candidate_models_) == set(full.candidate_models_)
+    assert len(control.validation_scores_) == len(full.validation_scores_)
+    assert control.selected_model_name_ in set(full.candidate_models_)
+    for name in control.candidate_models_:
+        assert control.candidate_models_[name].random_state == 17
+    forest_config = control.candidate_models_["random_forest"].config_
+    assert forest_config["n_estimators_per_observable"] == RANDOM_FOREST_TREES
+    assert forest_config["max_features"] == 1
+    mlp_config = control.candidate_models_["mlp"].config_
+    assert mlp_config["hidden_layer_sizes"] == list(MLP_HIDDEN_WIDTHS)
+    assert mlp_config["batch_size"] == MLP_BATCH_SIZE
+    assert mlp_config["learning_rate_init"] == MLP_LEARNING_RATE
+    # Selection is the same rule, run independently on each pipeline's scores.
+    assert control.config_["selection_rule"] == full.config_["selection_rule"]
+    assert control.config_["tie_break_order"] == full.config_["tie_break_order"]
+
+
+def test_every_config_declares_what_was_dropped(legacy_v1_items):
+    train, validation = _source_train_validation(legacy_v1_items)
+    control = LiaoMitigator(random_state=17, drop_features=(NOISY,)).fit(train, validation)
+    full = LiaoMitigator(random_state=17).fit(train, validation)
+
+    assert control.config_["dropped_features"] == [NOISY]
+    assert full.config_["dropped_features"] == []
+    for name in ("random_forest", "mlp"):
+        assert control.config_["candidate_configs"][name]["dropped_features"] == [NOISY]
+        assert full.config_["candidate_configs"][name]["dropped_features"] == []
+    json.dumps(control.config_, allow_nan=False, default=str)
+
+
+@pytest.mark.parametrize("names,message", [
+    (("no_such_feature",), "unknown feature names"),
+    ((NOISY, NOISY), "must not repeat"),
+    (tuple(FEATURES), "at least one column"),
+])
+def test_an_unresolvable_mask_is_refused_at_construction(names, message):
+    # A silently ignored name would leave a control still reading the input it
+    # was built to withhold, and no later check could tell.
+    with pytest.raises(ValueError, match=message):
+        LiaoMitigator(random_state=0, drop_features=names)
+    with pytest.raises(ValueError, match=message):
+        LiaoRandomForestMitigator(random_state=0, drop_features=names)
+    with pytest.raises(ValueError, match=message):
+        LiaoMLPMitigator(random_state=0, drop_features=names)

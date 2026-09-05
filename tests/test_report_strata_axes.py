@@ -259,6 +259,7 @@ def test_figure_legend_stays_clear_of_the_panels_and_the_title(
             "legend": figure.legends[0].get_window_extent(renderer),
             "entries": [text.get_text() for text in figure.legends[0].get_texts()],
             "panels": [axis.get_tightbbox(renderer) for axis in figure.axes],
+            "x_limits": [axis.get_xlim() for axis in figure.axes],
             "title": figure._suptitle.get_window_extent(renderer),
             "canvas": figure.get_window_extent(renderer),
         })
@@ -291,6 +292,13 @@ def test_figure_legend_stays_clear_of_the_panels_and_the_title(
         # rather than into a panel, which is just as unreadable.
         assert page["canvas"].y0 <= legend.y0 and legend.y1 <= page["canvas"].y1
         assert page["canvas"].x0 <= legend.x0 and legend.x1 <= page["canvas"].x1
+        # Every panel on a page reads against one cost scale. set_xticks alone
+        # only widens a view that a tick falls outside, so a panel whose points
+        # sit at different costs would keep its own limits and its frontier
+        # would sit at a different place on the page for the same cost.
+        limits = {panel for panel in page["x_limits"]}
+        assert len(limits) == 1, page["x_limits"]
+        assert all(value > 0 for value in limits.pop())
 
 
 @pytest.fixture(scope="module", params=["legacy-v1", "split-v2"])

@@ -186,6 +186,9 @@ def test_legacy_v1_result_regression(tmp_path):
             "min_samples_split": 2,
             "max_features": 1,
             "random_state": 7,
+            # An empty list rather than an absent key: a reader of a full arm's
+            # config should see that nothing was withheld, not infer it.
+            "dropped_features": [],
             "feature_fidelity": {
                 "status": "restricted-feature-ablation",
                 "published_liao_encoding_reproduced": False,
