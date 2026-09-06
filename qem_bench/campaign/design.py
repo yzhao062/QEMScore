@@ -34,6 +34,18 @@ VALIDATION_CIRCUITS_PER_FAMILY = 320
 TEST_CIRCUITS_PER_FAMILY = 160
 FAMILIES: tuple[str, ...] = ("tfi", "heisenberg")
 
+# The six decompositions the paper reports together: the shipped regime at the
+# primary training size, on all three seeds, in both families. The full grid is
+# exported whatever these are, so the point of naming them here is that they are
+# named before any share exists. Picking six out of the grid once the numbers are
+# on the page is a selection however the six are picked, and no later reader
+# could tell one choice from the other.
+PRIMARY_SHARE_REGIME = BASELINE_REGIME
+PRIMARY_SHARE_SIZE = PRIMARY_SIZE
+PRIMARY_SHARE_SEEDS: tuple[int, ...] = SEEDS
+PRIMARY_SHARE_FAMILIES: tuple[str, ...] = FAMILIES
+SHARE_ROLES: tuple[str, ...] = ("primary", "secondary", "rehearsal")
+
 N_QUBITS = 10
 FAMILY_NATIVE_STEPS = 3
 NOISE_FAMILY = "depolarizing_readout"
@@ -59,6 +71,35 @@ ARMS: dict[str, dict[str, str]] = {
     "capacity_matched": {"full": "liao", "control": "liao-feat-only"},
 }
 PRIMARY_ARM = "primary"
+
+# The ladder the improvement share decomposes, from the most restricted rung
+# to the full one. It is frozen here rather than inside the estimator so that
+# no caller can reorder or substitute a rung, which no name-based check
+# inside the estimator could detect. `feat-only` is the affine feature-only
+# control, `liao-feat-only` is the same nonlinear learner with the noisy
+# observation dropped, and `liao` is that learner with every feature.
+SHARE_LADDER: tuple[str, ...] = ("feat-only", "liao-feat-only", "liao")
+SHARE_RUNG_LABELS: tuple[str, ...] = ("A", "C", "F")
+SHARE_GAP_LABELS: tuple[str, ...] = ("K", "D")
+# What the share means. It travels in the freeze because it is a claim about
+# what the number licenses, and a claim that drifts unnoticed is the failure
+# the manifest exists to catch.
+SHARE_INTERPRETATION = (
+    "fraction of the total improvement over the affine feature-only control "
+    "that the nonlinear feature-only control reproduces"
+)
+# The unmitigated reference R: the noisy expectation itself, scored as a
+# predictor on the same rows with the same aggregation. It travels beside the
+# decomposition so a reader can see the scale the improvement is measured
+# against, and it is a reference rather than a rung, so it enters no gap and
+# cannot move T or the share. The name is chosen to collide with nothing that
+# is already scored: it names no ladder rung, no registered runner method
+# (`raw`, `ridge`, `zne`, `liao`, `feat-only`, `noisy-only`, `shrinkage`,
+# `shuf-noisy`), no gate control and no training-shuffle arm. The estimator
+# refuses a reference that names a rung, and `evaluate_setting_share` refuses
+# one that names a fitted arm, so both collisions fail loudly rather than
+# silently displacing a scored column.
+SHARE_REFERENCE_METHOD = "unmitigated"
 # Declared before the freeze and reported whichever way the two arms fall. It
 # carries no promotion verdict: the question it answers is which of the two
 # differences between the arms produced their divergence, not whether a benefit
@@ -101,6 +142,51 @@ def campaign_setting_keys() -> tuple[str, ...]:
         for seed in SEEDS
         for size in SIZES
     )
+
+
+def primary_share_keys() -> tuple[tuple[str, int, int, str], ...]:
+    """The six (regime, seed, size, family) decompositions the paper reports.
+
+    Ordered, because a consumer that has to sort them is a consumer that could
+    have sorted them by value.
+    """
+    return tuple(
+        (PRIMARY_SHARE_REGIME, seed, PRIMARY_SHARE_SIZE, family)
+        for seed in PRIMARY_SHARE_SEEDS
+        for family in PRIMARY_SHARE_FAMILIES
+    )
+
+
+def share_role(regime: str, seed: int, size: int, family: str) -> str:
+    """Label one decomposition of the grid: primary, secondary or rehearsal.
+
+    A seed or size outside the frozen design is a rehearsal whatever else it
+    resembles, so a rehearsal's numbers cannot arrive under the label the six
+    committed keys carry.
+    """
+    if regime not in REGIMES or not is_frozen_setting(seed, size):
+        return "rehearsal"
+    if (regime, seed, size, family) in primary_share_keys():
+        return "primary"
+    return "secondary"
+
+
+def setting_share_role(regime: str, seed: int, size: int) -> str:
+    """The role that every family of one setting carries.
+
+    The primary keys are a product over seeds and families at one regime and
+    size, so the families of a setting never disagree. This raises rather than
+    picking one of them if an edit ever breaks that, because a setting-level
+    label that hid a family-level split would be the ambiguity the roles exist
+    to remove.
+    """
+    roles = {share_role(regime, seed, size, family) for family in FAMILIES}
+    if len(roles) != 1:
+        raise ValueError(
+            f"{regime}-s{seed}-n{size}: the primary keys split this setting's "
+            "families, which one setting-level role cannot express"
+        )
+    return roles.pop()
 
 
 def expected_circuits(size: int) -> dict[str, int]:
@@ -188,6 +274,13 @@ def declared_design() -> dict[str, object]:
         "confidence": CONFIDENCE,
         "ratio_margin": RATIO_MARGIN,
         "arms": {name: dict(value) for name, value in ARMS.items()},
+        "share_ladder": list(SHARE_LADDER),
+        "share_rung_labels": list(SHARE_RUNG_LABELS),
+        "share_gap_labels": list(SHARE_GAP_LABELS),
+        "share_interpretation": SHARE_INTERPRETATION,
+        "share_reference_method": SHARE_REFERENCE_METHOD,
+        "share_roles": list(SHARE_ROLES),
+        "primary_share_keys": [list(key) for key in primary_share_keys()],
         "primary_arm": PRIMARY_ARM,
         "learner_fixed_arm": LEARNER_FIXED_ARM,
         "learner_fixed_contrast": dict(LEARNER_FIXED_CONTRAST),

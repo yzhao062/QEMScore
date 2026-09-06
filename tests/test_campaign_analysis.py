@@ -12,15 +12,18 @@ import copy
 import json
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from qem_bench.campaign.analysis import (
     RECORD_SCHEMA_VERSION,
     REPORT_SCHEMA_VERSION,
+    TEST_ROW_FIELDS,
     assert_campaign_structure,
     build_campaign_tables,
     build_setting_record,
     evaluate_campaign,
+    evaluate_setting_share,
     regenerate_setting_diagnostics,
 )
 from qem_bench.campaign.design import (
@@ -28,11 +31,13 @@ from qem_bench.campaign.design import (
     campaign_setting_keys,
     campaign_split_spec,
     expected_circuits,
+    primary_share_keys,
     role_counts,
     setting_key,
 )
 from qem_bench.datasets.split_generate import generate_split
 from qem_bench.datasets.splits import SplitSpec
+from qem_bench.stats.improvement_share import draw_matrix
 from qem_bench.validation import validate_split_artifact
 
 SEVERITIES = ("L1", "L3")
@@ -278,6 +283,11 @@ def _record(regime, seed, size, errors, *, frozen=True, label=None):
                         "noise_family": "depolarizing_readout",
                         "severity": severity,
                         "observable": observable,
+                        # The unmitigated reference the improvement share
+                        # scores beside the ladder. It is a model input rather
+                        # than a label, and it is worse than every arm here, so
+                        # a reported reference error names this column.
+                        "noisy_expectation": 0.40,
                         "ideal_expectation": 0.0,
                     })
                     for method, error in errors.items():
@@ -734,6 +744,12 @@ def test_the_record_retains_a_prediction_for_every_test_row(rehearsal_record):
     for method, predictions in rehearsal_record["test_predictions"].items():
         assert set(predictions) == identities, method
     assert {row["split"] for row in rehearsal_record["test_items"]} == {"test"}
+    # The retained rows are exactly the declared projection, and the unmitigated
+    # reference is one of them. Without this column the improvement share has
+    # nothing to score R against and could only report the ladder.
+    for row in rehearsal_record["test_items"]:
+        assert set(row) == set(TEST_ROW_FIELDS)
+        assert isinstance(row["noisy_expectation"], float)
 
 
 def test_the_record_reports_the_gate_and_both_shuffle_diagnostics(rehearsal_record):
@@ -1158,3 +1174,446 @@ def test_the_learner_fixed_contrast_is_reported_without_a_promotion_verdict():
     tables = build_campaign_tables(report)
     assert [row["arm"] for row in tables["endpoints"]].count("learner_fixed") > 0
     assert all(row["arm"] != "learner_fixed" for row in tables["replication"])
+
+
+def test_the_share_carries_the_unmitigated_reference_beside_the_decomposition():
+    """The plan reports R beside A, C, F, so the report has to supply it.
+
+    A signature that accepts `reference_methods` is not a caller that passes
+    one, and a record whose retained rows drop `noisy_expectation` cannot build
+    one. This test goes through `evaluate_campaign` to the reported number, so
+    an unwired reference fails here rather than reading as wired.
+
+    The four arms carry four different errors, so the ladder rungs name which
+    predictions produced them: A is feat-only at 0.12, C is liao-feat-only at
+    0.05 and F is liao at 0.03. R is the noisy expectation at 0.40, which is
+    worse than every rung, so it cannot be confused with one.
+    """
+    pair = (_distinct_errors(0.10, 0.12, 0.03, 0.05),
+            _distinct_errors(0.08, 0.12, 0.02, 0.05))
+    records = _campaign({101: pair, 211: pair, 307: pair})
+    assert all(row["noisy_expectation"] == 0.40
+               for record in records for row in record["test_items"])
+
+    report = _evaluate(records)
+    share = report["shares"]["shipped-s101-n640"]
+
+    assert share["reference_methods"] == ["unmitigated"]
+    assert share["reference_method"] == "unmitigated"
+    assert share["status"] == "estimated"
+    family = share["families"]["tfi"]
+    reference = family["reference_errors"]["unmitigated"]
+    assert reference["estimate"] == pytest.approx(0.40, rel=1e-12)
+    assert reference["lower"] == pytest.approx(0.40, rel=1e-12)
+    assert reference["upper"] == pytest.approx(0.40, rel=1e-12)
+
+    # The reference stays out of the ladder, so the decomposition is the one the
+    # frozen constants declare and the share still divides T rather than R.
+    assert set(family["errors"]) == {"A", "C", "F"}
+    assert family["errors"]["A"]["estimate"] == pytest.approx(0.12, rel=1e-12)
+    assert family["total"]["estimate"] == pytest.approx(0.09, rel=1e-12)
+    assert family["share"]["point"] == pytest.approx(0.07 / 0.09, rel=1e-12)
+
+    # R - A is a point difference beside the ladder, not a declared span.
+    # A span endpoint has to be a ladder rung.
+    assert share["span_labels"] == []
+    assert family["spans"] == {}
+    points = family["point_values"]
+    assert points["reference_errors"]["unmitigated"] - points["errors"][
+        "A"] == pytest.approx(0.40 - 0.12, rel=1e-12)
+
+    # The scope travels with the number, so it is the instruction a reader
+    # follows. It has to name the same orientation, or the reader subtracts
+    # the reference from the rung and reads the improvement A makes as a loss.
+    scope = share["reference_scope"]
+    assert "R - A is not published as an interval" in scope
+    assert ("point_values.reference_errors.unmitigated minus "
+            "point_values.errors.A") in scope
+    json.dumps(report, allow_nan=False)
+
+
+def test_the_wrapper_key_drops_the_size_so_both_sizes_draw_one_resample():
+    """The production key is the one this pins, not a key the caller supplies.
+
+    The estimator-level size test hands `stream_components` in directly, so it
+    says nothing about the tuple `evaluate_setting_share` builds. Mixing the
+    size into that tuple leaves the rest of the suite passing and silently
+    unpairs the two sizes whose comparison the report advertises as paired.
+
+    The larger side's rows arrive reversed. Row order is an artifact of how a
+    record was assembled and the table sorts the circuits it scores, so a key
+    that depended on it would be a second way to lose the pairing.
+    """
+    errors = _distinct_errors(0.10, 0.12, 0.03, 0.05)
+    small = _record("shipped", 101, 160, errors, label="one-pool")
+    large = _record("shipped", 101, 640, errors, label="one-pool")
+    large["test_items"] = list(reversed(large["test_items"]))
+
+    left = evaluate_setting_share(small, n_resamples=40)
+    right = evaluate_setting_share(large, n_resamples=40)
+    assert (left["size"], right["size"]) == (160, 640)
+
+    for family in FAMILIES:
+        circuits = [
+            sorted({row["circuit_id"] for row in record["test_items"]
+                    if row["family"] == family})
+            for record in (small, large)
+        ]
+        assert circuits[0] == circuits[1] != []
+
+        one, other = left["families"][family], right["families"][family]
+        assert one["status"] == other["status"] == "estimated"
+        assert one["circuit_order_digest"] == other["circuit_order_digest"]
+        assert one["n_circuits"] == other["n_circuits"] == len(circuits[0])
+        assert one["stream_seed"] == other["stream_seed"]
+        assert np.array_equal(
+            draw_matrix(one["n_circuits"], seed=one["stream_seed"],
+                        n_resamples=40),
+            draw_matrix(other["n_circuits"], seed=other["stream_seed"],
+                        n_resamples=40))
+
+
+def test_two_sizes_that_scored_different_circuits_cannot_be_combined():
+    """The pairing claim is checked on the records the report combines.
+
+    `assert_campaign_structure` compares the two sizes' test circuits before
+    anything is fitted, but only across the settings it was handed, and records
+    are fitted one setting at a time. Without this check the report accepts two
+    sizes that scored disjoint pools, publishes both shares as estimated, and
+    carries the paired claim beside numbers that were never paired.
+
+    A rehearsal resample count keeps the accepted half cheap; what it exercises
+    is the combination rule, which runs before anything is estimated.
+    """
+    errors = _distinct_errors(0.10, 0.12, 0.03, 0.05)
+    disjoint = [_record("shipped", 101, size, errors) for size in (160, 640)]
+    with pytest.raises(ValueError, match="retained test circuits differ"):
+        _evaluate(disjoint, n_resamples=40)
+
+    paired = [_record("shipped", 101, size, errors, label="one-pool")
+              for size in (160, 640)]
+    report = _evaluate(paired, n_resamples=40)
+    supplied = {record["setting"] for record in paired}
+    assert set(report["shares"]) == set(campaign_setting_keys())
+    assert all(report["shares"][key]["status"] == "estimated" for key in supplied)
+    assert all(report["shares"][key]["status"] == "not_estimable"
+               for key in set(report["shares"]) - supplied)
+
+
+# --------------------------------------------------------------------------
+# What a share says about its own eligibility, and which settings it reports
+# --------------------------------------------------------------------------
+
+
+def test_a_rehearsal_share_carries_the_rehearsal_restriction():
+    """The rehearsal and audit restrictions reached `replication` alone.
+
+    A rehearsal keeps held-out test rows, so its decomposition is arithmetically
+    estimable and says so. Without a restriction of its own that estimated
+    number travels with no trace of the prohibition the older primary result
+    carries, and a consumer reading `shares` inherits none of it.
+    """
+    record = _record("shipped", 999, 8,
+                     _distinct_errors(0.08, 0.10, 0.02, 0.025), frozen=False)
+    report = evaluate_campaign([record], n_resamples=40)
+    share = report["shares"][record["setting"]]
+
+    assert report["primary"]["publication_path"] == "rehearsal_not_publishable"
+    # A is 0.10, C is 0.025 and F is 0.02, so T is 0.08, K is 0.075, S is 0.9375.
+    assert share["status"] == "estimated"
+    assert share["families"]["tfi"]["share"]["point"] == pytest.approx(0.9375)
+    assert share["publication_path"] == "rehearsal_not_publishable"
+    assert share["design_frozen"] is False
+
+
+def test_an_unaudited_share_carries_the_unaudited_restriction():
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    report = evaluate_campaign(records)
+
+    assert report["design_frozen"] is True
+    assert report["primary"]["publication_path"] == "unaudited_not_publishable"
+    for share in report["shares"].values():
+        assert share["publication_path"] == "unaudited_not_publishable"
+        assert share["audit_complete"] is False
+
+
+def test_a_frozen_audited_share_is_still_not_publishable():
+    """The best case this module can reach is still not a publication license.
+
+    The replication result here says `promote_three_of_three`, and the share
+    deliberately does not follow it. `evaluate_campaign` reads records and never
+    the datasets they name, so it cannot tell a complete retained projection
+    from a filtered one, and it opens no manifest. Only a layer that has checked
+    both may write a value that permits publication, and none exists yet.
+    """
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    report = evaluate_campaign(
+        records,
+        rosters={record["setting"]: _binding(record) for record in records},
+        audits={record["setting"]: _audit(record) for record in records},
+    )
+
+    assert report["primary"]["publication_path"] == "promote_three_of_three"
+    for share in report["shares"].values():
+        assert share["publication_path"] == "unverified_not_publishable"
+        assert share["design_frozen"] is True
+        assert share["audit_complete"] is True
+    assert "eligible_for_publication" not in json.dumps(report, allow_nan=False)
+
+
+def test_a_record_fitted_from_a_dirty_tree_can_never_be_published():
+    """A revision nobody can check out again cannot support a published number.
+
+    `_code_revision` appends `-dirty` when the working tree carried uncommitted
+    edits at fit time, and until now nothing read that marker. This is the
+    realistic single-author failure: fitting the campaign with edits in flight
+    and then publishing the result. It outranks the other three restrictions
+    because a fit that cannot be reproduced is not rescued by a passing audit.
+    """
+    records = _campaign({101: RISING, 211: RISING, 307: RISING})
+    records[0] = dict(records[0], code_revision="abc123-dirty")
+    report = evaluate_campaign(
+        records,
+        rosters={record["setting"]: _binding(record) for record in records},
+        audits={record["setting"]: _audit(record) for record in records},
+    )
+
+    assert report["fitted_from_a_clean_tree"] is False
+    for share in report["shares"].values():
+        assert share["publication_path"] == "dirty_code_not_publishable"
+        assert share["fitted_from_a_clean_tree"] is False
+    assert "eligible_for_publication" not in json.dumps(report, allow_nan=False)
+
+
+def test_every_expected_setting_appears_in_the_share_export():
+    """A consumer iterating `shares` has to see the settings that produced nothing.
+
+    Iterating the supplied records alone makes reading the map a selection:
+    eleven settings would simply be absent, and a table writer built on it would
+    print the twelfth as though it were the grid. An absent setting carries the
+    estimator's own not-estimable result, so it answers the questions a supplied
+    setting answers rather than carrying a shape invented beside it.
+    """
+    record = _record("shipped", 101, 640, _distinct_errors(0.10, 0.12, 0.03, 0.05))
+    report = _evaluate([record], n_resamples=40)
+
+    assert set(report["shares"]) == set(campaign_setting_keys())
+    assert len(report["failed_settings"]) == 11
+    supplied = report["shares"]["shipped-s101-n640"]
+    assert supplied["record_present"] is True
+    assert supplied["status"] == "estimated"
+
+    absent = report["shares"]["large-s307-n160"]
+    assert absent["record_present"] is False
+    assert absent["status"] == "not_estimable"
+    assert (absent["regime"], absent["seed"], absent["size"]) == ("large", 307, 160)
+    assert set(absent["families"]) == set(supplied["families"]) == set(FAMILIES)
+    for family in FAMILIES:
+        entry = absent["families"][family]
+        assert set(entry) == set(supplied["families"][family])
+        assert entry["status"] == "not_estimable"
+        assert entry["reasons"] == ["family_missing_from_the_setting"]
+        assert entry["share"]["point"] is None
+        assert entry["point_values"] is None
+        assert entry["denominator_diagnostics"]["n_draws"] == 0
+    # The ladder, the interpretation and the restriction travel with it, so an
+    # absent entry cannot be mistaken for a differently defined quantity.
+    assert absent["ladder"] == supplied["ladder"]
+    assert absent["share_interpretation"] == supplied["share_interpretation"]
+    assert absent["publication_path"] == supplied["publication_path"]
+    json.dumps(report, allow_nan=False)
+
+
+# --------------------------------------------------------------------------
+# Which six of the grid the paper reports, and the grid it reports them in
+# --------------------------------------------------------------------------
+
+
+def test_only_the_six_committed_decompositions_are_labeled_primary():
+    """Every entry of the grid used to arrive stamped primary.
+
+    Twelve settings and two families is twenty-four decompositions, and the
+    frozen commitment is six of them: the shipped regime at n640, on the three
+    declared seeds, in both families. A grid labelled primary throughout leaves
+    picking six out of twenty-four to whoever draws the table, which is the
+    selection the roles exist to remove.
+    """
+    report = _evaluate(_campaign({101: RISING, 211: RISING, 307: RISING}))
+
+    roles = {}
+    for share in report["shares"].values():
+        for family in share["families"]:
+            roles.setdefault(share["share_role"], set()).add(
+                (share["regime"], share["seed"], share["size"], family))
+
+    assert sum(len(keys) for keys in roles.values()) == 24
+    assert sorted(roles["primary"]) == sorted(primary_share_keys())
+    assert len(roles["secondary"]) == 18
+    assert set(roles) == {"primary", "secondary"}
+    # The smaller training size and the contrast regime are the secondary half,
+    # and they stay in the report rather than being dropped for not being it.
+    assert ("large", 101, 640, "tfi") in roles["secondary"]
+    assert ("shipped", 101, 160, "tfi") in roles["secondary"]
+
+
+def test_a_rehearsal_decomposition_is_labeled_a_rehearsal():
+    """A rehearsal reached the report labelled primary alongside the campaign.
+
+    `secondary` would have been wrong too: that is a reported result the paper
+    does not headline, and a rehearsal is a result the paper cannot use at all.
+    """
+    record = _record("shipped", 999, 8,
+                     _distinct_errors(0.08, 0.10, 0.02, 0.025), frozen=False)
+    report = evaluate_campaign([record], n_resamples=40)
+
+    assert report["shares"][record["setting"]]["share_role"] == "rehearsal"
+    # It joins the grid rather than replacing part of it, so the six committed
+    # keys are still exactly the six.
+    assert len(report["shares"]) == len(campaign_setting_keys()) + 1
+    row = next(entry for entry in build_campaign_tables(report)["shares"]
+               if entry["setting"] == record["setting"])
+    assert row["share_role"] == "rehearsal"
+    assert row["publication_path"] == "rehearsal_not_publishable"
+
+
+def test_the_older_evolution_step_hypothesis_is_labeled_secondary():
+    """`report["primary"]` is an older key holding a demoted hypothesis.
+
+    A reader who took the key at its word would read the evolution-step result
+    as the campaign's primary one. The label says which it is; the six primary
+    decompositions are the ones `shares` marks.
+    """
+    report = _evaluate(_campaign({101: RISING, 211: RISING, 307: RISING}))
+
+    assert report["primary"]["hypothesis_role"] == "secondary"
+    assert "evolution step" in report["primary"]["hypothesis"]
+
+
+def test_the_table_export_carries_the_whole_ordered_grid():
+    """The tables emitted no share rows at all.
+
+    The paper's result therefore had to be read out of `report` by hand, from a
+    grid whose entries all read primary. Every decomposition is exported now,
+    each row carrying the role, the reference, the ladder, the gaps, the total,
+    the share, their intervals, the refusal reasons and the publication fields.
+    """
+    errors = _distinct_errors(0.10, 0.12, 0.03, 0.05)
+    records = [_record(regime, seed, 640, errors)
+               for regime in ("shipped", "large") for seed in (101, 211, 307)]
+    report = _evaluate(records)
+    tables = build_campaign_tables(report)
+    rows = tables["shares"]
+
+    assert len(rows) == 24
+    assert [tuple(key) for key in tables["primary_share_keys"]] == list(
+        primary_share_keys())
+    # The order is the report's own, so an exporter cannot reorder the grid.
+    assert [row["setting"] for row in rows[:2]] == ["large-s101-n160"] * 2
+    assert [row["family"] for row in rows[:2]] == ["heisenberg", "tfi"]
+
+    primary = [row for row in rows if row["share_role"] == "primary"]
+    assert len(primary) == 6
+    row = next(entry for entry in primary
+               if entry["setting"] == "shipped-s101-n640"
+               and entry["family"] == "tfi")
+    assert row["status"] == "estimated"
+    assert row["share_status"] == "estimated"
+    assert row["reasons"] == row["share_reasons"] == []
+    assert row["n_circuits"] == 8
+    assert row["R"] == pytest.approx(0.40)
+    assert (row["A"], row["C"], row["F"]) == pytest.approx((0.12, 0.05, 0.03))
+    assert (row["K"], row["D"], row["T"]) == pytest.approx((0.07, 0.02, 0.09))
+    assert row["S"] == pytest.approx(0.07 / 0.09)
+    for label in ("R", "A", "C", "F", "K", "D", "T", "S"):
+        assert row[f"{label}_lower"] <= row[label] <= row[f"{label}_upper"]
+    assert row["publication_path"] == "unverified_not_publishable"
+    assert (row["design_frozen"], row["audit_complete"],
+            row["fitted_from_a_clean_tree"]) == (True, True, True)
+    # Written by the driver, which is the layer that opens the freeze. This
+    # report came from the library, so they are absent rather than claimed.
+    assert row["freeze_verified"] is None
+    assert row["fit_bindings_verified"] is None
+    assert row["freeze_manifest_sha256"] is None
+    json.dumps(rows, allow_nan=False)
+
+
+def test_an_unavailable_decomposition_is_exported_as_a_placeholder():
+    """A committed key that produced nothing is a row of nulls, not an absence.
+
+    Exporting only what was estimated would make the table a selection of the
+    settings that succeeded, and a small share, a negative gap and a withheld
+    share are all outcomes the paper reports as they come.
+    """
+    rows = build_campaign_tables(evaluate_campaign([]))["shares"]
+
+    assert len(rows) == 24
+    primary = [row for row in rows if row["share_role"] == "primary"]
+    assert sorted((row["regime"], row["seed"], row["size"], row["family"])
+                  for row in primary) == sorted(primary_share_keys())
+    for row in primary:
+        assert row["record_present"] is False
+        assert row["status"] == "not_estimable"
+        assert row["reasons"] == ["family_missing_from_the_setting"]
+        for label in ("R", "A", "C", "F", "K", "D", "T", "S"):
+            assert row[label] is None
+            assert row[f"{label}_lower"] is None
+            assert row[f"{label}_upper"] is None
+    json.dumps(rows, allow_nan=False)
+
+
+def test_a_negative_gap_and_a_withheld_share_are_exported_as_they_come():
+    """The reporting rule admits all three outcomes, so the export carries them.
+
+    A negative gap is a number the grid prints; a withheld share is a row whose
+    S is null beside the reason. Neither is an occasion to drop the row, and a
+    row that vanished would leave the surviving rows reading as the grid.
+    """
+    # A = 0.05, C = 0.08, F = 0.03: K is negative and T is still positive.
+    negative = _record("shipped", 101, 640,
+                       _distinct_errors(0.03, 0.05, 0.03, 0.08))
+    # A = 0.03, C = 0.04, F = 0.05: the improvement runs backwards, so the
+    # denominator is not positive and the share is withheld.
+    withheld = _record("shipped", 211, 640,
+                       _distinct_errors(0.05, 0.03, 0.05, 0.04))
+    rows = build_campaign_tables(
+        _evaluate([negative, withheld], n_resamples=40))["shares"]
+
+    first = next(row for row in rows if row["setting"] == "shipped-s101-n640"
+                 and row["family"] == "tfi")
+    assert first["share_role"] == "primary"
+    assert first["K"] == pytest.approx(-0.03)
+    assert first["T"] == pytest.approx(0.02)
+    assert first["S"] == pytest.approx(-1.5)
+
+    second = next(row for row in rows if row["setting"] == "shipped-s211-n640"
+                  and row["family"] == "tfi")
+    assert second["share_role"] == "primary"
+    assert second["status"] == "estimated"
+    assert second["T"] == pytest.approx(-0.02)
+    assert second["share_status"] == "not_estimable"
+    assert "nonpositive_point_total" in second["share_reasons"]
+    assert second["S"] is None
+    json.dumps(rows, allow_nan=False)
+
+
+def test_a_grid_missing_a_committed_decomposition_is_refused():
+    """The projection is counted rather than trusted to the entries' own labels.
+
+    An entry carries its role and nothing else counts them, so a grid short of a
+    committed key or one whose primary label spread again reads as correct from
+    any single row.
+    """
+    report = _evaluate(_campaign({101: RISING, 211: RISING, 307: RISING}))
+    del report["shares"]["shipped-s101-n640"]
+
+    with pytest.raises(ValueError, match="primary projection"):
+        build_campaign_tables(report)
+
+
+def test_a_decomposition_whose_role_disagrees_with_its_key_is_refused():
+    """The role is derived from the key on both sides, so they cannot drift."""
+    report = _evaluate(_campaign({101: RISING, 211: RISING, 307: RISING}))
+    report["shares"]["large-s101-n640"]["share_role"] = "primary"
+
+    with pytest.raises(ValueError, match="this family's key is 'secondary'"):
+        build_campaign_tables(report)

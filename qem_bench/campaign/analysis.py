@@ -55,16 +55,26 @@ from qem_bench.campaign.design import (
     PRIMARY_ARM,
     PRIMARY_SIZE,
     RATIO_MARGIN,
+    REGIMES,
     REQUIRED_FAMILIES,
     ROOT_SEED,
     SEEDS,
+    SHARE_GAP_LABELS,
+    SHARE_INTERPRETATION,
+    SHARE_LADDER,
+    SHARE_REFERENCE_METHOD,
+    SHARE_RUNG_LABELS,
+    SIZES,
     TRAINING_SHUFFLE_ARMS,
     TRAINING_SHUFFLE_SEED,
     campaign_setting_keys,
     declared_design,
     expected_circuits,
     is_frozen_setting,
+    primary_share_keys,
     setting_key,
+    setting_share_role,
+    share_role,
 )
 from qem_bench.runner.metrics import build_cell_records, headline_metrics
 from qem_bench.runner.run import (
@@ -74,16 +84,63 @@ from qem_bench.runner.run import (
 )
 from qem_bench.stats.bootstrap import circuit_blocked_bootstrap
 from qem_bench.stats.gain_contrast import CELL_FIELDS, evaluate_gain_contrast
+from qem_bench.stats.improvement_share import (
+    build_ladder_tables,
+    estimate_improvement_share,
+)
 from qem_bench.stats.incremental_value import CONTROLS, evaluate_incremental_value
 
-RECORD_SCHEMA_VERSION = "qem-bench-campaign-record-v1"
+# v2 added `noisy_expectation` to the retained test rows, which is what lets the
+# improvement share carry its unmitigated reference. `evaluate_campaign` refuses
+# any other version, so a v1 record fails loudly here rather than reaching the
+# share with a column it does not have.
+RECORD_SCHEMA_VERSION = "qem-bench-campaign-record-v2"
 REPORT_SCHEMA_VERSION = "qem-bench-campaign-report-v1"
 ROLES = ("train", "validation", "test")
 # The fixed-model permutation preserves these groups, so a permuted value stays
 # a plausible reading of the same cell rather than of a different noise level.
 FIXED_MODEL_SHUFFLE_STRATA = ("family", "noise_family", "severity", "observable")
+# Two resample schemes coexist in one report, so every quantity carries the
+# name of the one that produced it rather than leaving a reader to infer it.
+SHARE_STREAM_SCHEME = (
+    "ladder_stream_seed(root_seed, [regime, seed, family]); the training "
+    "size is excluded, so the two sizes inside one regime draw the same "
+    "circuits and their comparison is paired"
+)
+CONTRAST_STREAM_SCHEME = (
+    "_setting_stream_seed(root_seed, seed, size); the size is mixed in, "
+    "which is right for a quantity that contrasts two regimes at one size "
+    "and pairs nothing across sizes"
+)
+# What the unmitigated reference is, and what the report does and does not say
+# about R - A. Both strings travel in the result, so a reader takes the scope
+# from the file that carries the number rather than from a planning document.
+SHARE_REFERENCE_DEFINITION = (
+    "R = macro MAE of the noisy expectation scored as a predictor, on the same "
+    "rows, in the same cells and with the same equal-weight aggregation as "
+    "every ladder rung; no model, no fit and no selection stand behind it"
+)
+SHARE_REFERENCE_SCOPE = (
+    "R carries its own percentile interval from the one circuit resample the "
+    f"ladder draws, so it is paired with {SHARE_RUNG_LABELS[0]} draw by draw. "
+    f"R - {SHARE_RUNG_LABELS[0]} is not published as an interval: a declared "
+    "span resolves to a pair of ladder indices and is checked inside every "
+    "draw against the sum of the gaps it covers, and a reference method "
+    "occupies no ladder index and no gap, so it cannot be a span endpoint. "
+    "Subtracting the two published intervals afterwards is the derived "
+    "marginal the estimator forbids. The point difference is exact and is "
+    f"point_values.reference_errors.{SHARE_REFERENCE_METHOD} minus "
+    f"point_values.errors.{SHARE_RUNG_LABELS[0]}, because the "
+    "point estimate is the identity draw of the same evaluator"
+)
 # Test rows travel inside the record so the analysis is reproducible from the
-# record alone. Only the fields the contrast reads are retained.
+# record alone. Only the fields the contrast and the improvement share read are
+# retained. `noisy_expectation` is one of them: it is the unmitigated reference
+# the share scores beside the ladder, and it is a model input rather than a
+# label, so retaining it changes nothing about label isolation. It is already
+# in `PREDICTION_ITEM_FIELDS`, which is to say every arm already sees it at
+# prediction time; `ideal_expectation` is the single field the prediction rows
+# drop, and it stays dropped.
 TEST_ROW_FIELDS = (
     "item_id",
     "dataset_schema_version",
@@ -95,6 +152,7 @@ TEST_ROW_FIELDS = (
     "noise_family",
     "severity",
     "observable",
+    "noisy_expectation",
     "ideal_expectation",
 )
 # Validation rows travel too, because the gate, the training-shuffle intervals
@@ -899,6 +957,7 @@ def evaluate_campaign(
         if key in indexed:
             raise ValueError(f"setting {record['setting']} appears twice")
         indexed[key] = record
+    _assert_sizes_score_one_circuit_set(indexed)
 
     supplied = {setting_key(*key) for key in indexed}
     frozen = (
@@ -948,6 +1007,17 @@ def evaluate_campaign(
             setting_key(*key): _label_spread(value)
             for key, value in sorted(indexed.items())
         },
+        # The decomposition of one setting's own improvement. It carries no
+        # promotion verdict and never enters `replication`, for the same
+        # reason the learner-fixed contrast does not: the two-of-three
+        # directional rule belongs to the demoted evolution-step hypothesis
+        # and says nothing about how one improvement divides.
+        "shares": _setting_shares(
+            indexed,
+            root_seed=root_seed,
+            n_resamples=n_resamples,
+            confidence=confidence,
+        ),
         "contrasts": {},
         "replication": {},
         **roster_bindings,
@@ -1009,12 +1079,49 @@ def evaluate_campaign(
             for summary in by_size.values():
                 summary["promoted"] = False
                 summary["publication_path"] = "rehearsal_not_publishable"
+
+    # Both restrictions above reach `replication` alone, and the share never
+    # enters it, so a consumer reading `shares` would otherwise lose them. The
+    # third value asserts nothing positive: this module reads records and never
+    # the datasets they name, and it opens no manifest, so it can say only that
+    # the share is unverified. `estimated` is a statement about arithmetic, and
+    # a rehearsal and a filtered record can both earn it.
+    # A record fitted from a working tree with uncommitted edits names a
+    # revision no one can check out again, so the fit is unreproducible whatever
+    # else is true. The record already carries the marker; nothing read it.
+    fitted_clean = not any(
+        str(value.get("code_revision", "")).endswith("-dirty")
+        for value in indexed.values()
+    )
+    report["fitted_from_a_clean_tree"] = fitted_clean
+    for share in report["shares"].values():
+        share["design_frozen"] = frozen
+        share["audit_complete"] = report["audit_complete"]
+        share["fitted_from_a_clean_tree"] = fitted_clean
+        share["publication_path"] = (
+            "dirty_code_not_publishable" if not fitted_clean else
+            "rehearsal_not_publishable" if not frozen else
+            "unaudited_not_publishable" if not report["audit_complete"] else
+            "unverified_not_publishable"
+        )
+    _assert_primary_projection(
+        (share["regime"], share["seed"], share["size"], family)
+        for share in report["shares"].values()
+        if share["share_role"] == "primary"
+        for family in share["families"]
+    )
     primary = report["replication"][primary_arm][str(primary_size)]
     report["primary"] = {
         "arm": primary_arm,
         "full_method": ARMS[primary_arm]["full"],
         "control_method": ARMS[primary_arm]["control"],
         "size": primary_size,
+        # The key of this entry is older than the claim the campaign now makes.
+        # It holds the evolution-step hypothesis, which the plan demoted, and a
+        # reader who took the key at its word would read the demoted result as
+        # the reported one. The six primary decompositions are the entries of
+        # `shares` whose `share_role` is primary.
+        "hypothesis_role": "secondary",
         "hypothesis": (
             "the larger evolution step increases the incremental predictive benefit "
             "of the noisy measurement relative to the shipped step"
@@ -1026,6 +1133,76 @@ def evaluate_campaign(
         **primary,
     }
     return report
+
+
+def _assert_primary_projection(
+    observed: Iterable[tuple[str, int, int, str]],
+) -> None:
+    """The primary projection has to be the six keys the design committed to.
+
+    Both consumers of the grid run this: the report, which is what a program
+    reads, and the table export, which is what the manuscript prints. A
+    projection short of the six is a grid with a committed decomposition missing
+    from it, and a projection past them is a grid whose primary label has spread
+    again. Neither is visible from the entries themselves, because an entry
+    carries its own role and nothing counts them.
+
+    An unavailable setting is a placeholder rather than an absence, so the six
+    are present whether or not their records were.
+    """
+    found = sorted(tuple(key) for key in observed)
+    expected = sorted(primary_share_keys())
+    if found != expected:
+        raise ValueError(
+            "the primary projection of the share grid is "
+            f"{found} and the frozen design commits to {expected}"
+        )
+
+
+def _assert_sizes_score_one_circuit_set(
+    indexed: Mapping[tuple[str, int, int], Mapping[str, object]],
+) -> None:
+    """Check the pairing `SHARE_STREAM_SCHEME` claims, on the records combined.
+
+    `assert_campaign_structure` compares the two sizes' test circuits, but only
+    across the settings one call happens to receive, and settings are fitted in
+    subsets. The share drops the size from its stream key on the strength of
+    that comparison and then publishes the claim beside every number, so the
+    claim is re-checked here against the rows actually being combined rather
+    than inherited from a pre-fit run that may have asserted a different subset.
+
+    One size at a regime and seed pairs with nothing and is left alone.
+    """
+    by_regime_seed: dict[tuple[str, int], list[int]] = defaultdict(list)
+    for regime, seed, size in indexed:
+        by_regime_seed[(regime, seed)].append(size)
+    for (regime, seed), sizes in sorted(by_regime_seed.items()):
+        first, *rest = sorted(sizes)
+        reference = _test_circuits_by_family(indexed[(regime, seed, first)])
+        for size in rest:
+            circuits = _test_circuits_by_family(indexed[(regime, seed, size)])
+            if circuits != reference:
+                raise ValueError(
+                    f"{regime}/seed {seed}: the retained test circuits differ "
+                    f"between n{first} and n{size}; the improvement share pairs "
+                    "the two sizes on one circuit resample and cannot do so on "
+                    "different circuits"
+                )
+
+
+def _test_circuits_by_family(
+    record: Mapping[str, object],
+) -> dict[str, set[str]]:
+    """The retained test circuits of one record, keyed by family.
+
+    Sets rather than ordered sequences, because `build_ladder_tables` sorts the
+    circuits it scores; two records that agree here agree on the circuit order
+    digest that the share publishes and the contrast checks.
+    """
+    families: dict[str, set[str]] = defaultdict(set)
+    for row in record["test_items"]:
+        families[str(row["family"])].add(str(row["circuit_id"]))
+    return dict(families)
 
 
 def _roster_bindings(
@@ -1142,7 +1319,7 @@ def _seed_contrast(
             "items": record["test_items"],
             "predictions_by_method": record["test_predictions"],
         }
-    return evaluate_gain_contrast(
+    contrast = evaluate_gain_contrast(
         regimes,
         full_method=arm["full"],
         control_method=arm["control"],
@@ -1152,12 +1329,205 @@ def _seed_contrast(
         n_resamples=n_resamples,
         root_seed=_setting_stream_seed(root_seed, seed, size),
     )
+    contrast["resample_stream_scheme"] = CONTRAST_STREAM_SCHEME
+    return contrast
 
 
 def _setting_stream_seed(root_seed: int, seed: int, size: int) -> int:
-    """One reproducible root per seed and size, derived from the campaign root."""
+    """One reproducible root per seed and size, derived from the campaign root.
+
+    The size belongs in this key. The quantity it seeds contrasts two regimes
+    at one size, and the two regimes hold disjoint circuit pools, so nothing
+    here is paired across sizes. The improvement share is keyed differently
+    and deliberately drops the size; see `evaluate_setting_share`. Both
+    schemes appear in one report, so each result names the one behind it.
+    """
     entropy = np.random.SeedSequence([root_seed, seed, size])
     return int(entropy.generate_state(1, dtype=np.uint32)[0])
+
+
+def evaluate_setting_share(
+    record: Mapping[str, object],
+    *,
+    root_seed: int = ROOT_SEED,
+    n_resamples: int = BOOTSTRAP_RESAMPLES,
+    confidence: float = CONFIDENCE,
+) -> dict:
+    """Decompose one setting's improvement over the affine feature-only control.
+
+    The ladder is taken from `design.py` and this function exposes no argument
+    that could reorder or substitute a rung. A reversed ladder is undetectable
+    from method names alone, so fixing it here is what rules it out.
+
+    Nothing is fitted. The record already holds the untouched test rows and the
+    prediction map for every rung, so the decomposition regenerates from the
+    record alone.
+
+    The stream key carries the regime and the seed and drops the training size,
+    because the two sizes inside one regime score identical test circuits and
+    their comparison has to be paired. That differs from `_setting_stream_seed`,
+    which keys the demoted cross-regime contrast and does mix the size in.
+
+    The unmitigated reference R rides the same rows and the same draws as a
+    reference method, so a reader sees the scale the improvement is measured
+    against rather than a ratio with no units beside it. It is not a rung: it
+    enters no gap, moves neither T nor the share, and the ladder is unchanged.
+    `SHARE_REFERENCE_SCOPE` says why R - A carries a point but no interval.
+
+    The result carries `publication_path`, and no branch of this function makes
+    it permit publication. `estimated` says the arithmetic held on the rows
+    supplied, which a rehearsal and a filtered record can both satisfy.
+    """
+
+    return _decompose_share(
+        build_ladder_tables(
+            record["test_items"],
+            _share_predictions(record),
+            methods=tuple(SHARE_LADDER) + (SHARE_REFERENCE_METHOD,),
+        ),
+        regime=str(record["regime"]),
+        seed=int(record["seed"]),
+        size=int(record["size"]),
+        setting=str(record["setting"]),
+        record_present=True,
+        root_seed=root_seed,
+        n_resamples=n_resamples,
+        confidence=confidence,
+    )
+
+
+def _decompose_share(
+    tables: Mapping[str, object],
+    *,
+    regime: str,
+    seed: int,
+    size: int,
+    setting: str,
+    record_present: bool,
+    root_seed: int,
+    n_resamples: int,
+    confidence: float,
+) -> dict:
+    """Run the frozen ladder over one setting's tables and label the result.
+
+    An empty mapping is the setting that produced no record. The estimator then
+    reports every required family as missing, so an absent setting carries the
+    keys a supplied one carries rather than a shape invented beside it.
+    """
+    components = (regime, seed)
+    result = estimate_improvement_share(
+        tables,
+        ladder=SHARE_LADDER,
+        rung_labels=SHARE_RUNG_LABELS,
+        gap_labels=SHARE_GAP_LABELS,
+        # No span is declared. Every contiguous span on this three-rung
+        # ladder is already a gap or the total. R - A is a point difference
+        # beside the ladder; a reference cannot be a span endpoint.
+        required_families=FAMILIES,
+        setting_label=setting,
+        evaluation_role="untouched_test",
+        # Read from the frozen keys rather than stamped. Every entry of the grid
+        # used to arrive labelled primary, including both regimes, both training
+        # sizes and any rehearsal, so the six the paper reports together were the
+        # ones a reader had to pick out of twenty-four by hand.
+        share_role=setting_share_role(regime, seed, size),
+        share_interpretation=SHARE_INTERPRETATION,
+        stream_components=components,
+        reference_methods=(SHARE_REFERENCE_METHOD,),
+        confidence=confidence,
+        n_resamples=n_resamples,
+        root_seed=root_seed,
+    )
+    # The size is reported beside the estimate and absent from the key that drew
+    # it. Recording both here means a reader can see the exclusion rather than
+    # having to trust the docstring of `evaluate_setting_share`.
+    result["regime"] = components[0]
+    result["seed"] = components[1]
+    result["size"] = size
+    result["record_present"] = record_present
+    result["resample_stream_scheme"] = SHARE_STREAM_SCHEME
+    result["reference_method"] = SHARE_REFERENCE_METHOD
+    result["reference_definition"] = SHARE_REFERENCE_DEFINITION
+    result["reference_scope"] = SHARE_REFERENCE_SCOPE
+    # A share reaches a caller unverified, whatever its arithmetic says. This
+    # module reads a record and never the dataset behind it, so it cannot tell
+    # a complete retained projection from a filtered one, and it opens no
+    # manifest. `evaluate_campaign` narrows this to the rehearsal or unaudited
+    # value where either applies; no branch of either function widens it.
+    result["publication_path"] = "unverified_not_publishable"
+    return result
+
+
+def _setting_shares(
+    indexed: Mapping[tuple[str, int, int], Mapping[str, object]],
+    *,
+    root_seed: int,
+    n_resamples: int,
+    confidence: float,
+) -> dict:
+    """One share entry per expected setting, whether or not a record supplied it.
+
+    Iterating the supplied records alone would leave a consumer no placeholder
+    for a setting that failed, so reading this map would itself be a way to see
+    only the settings that produced a number. That is the selection the freeze
+    exists to prevent, and it is the one an exporter written against this map
+    would inherit. Every expected setting appears with the same keys, and an
+    absent one carries the estimator's own not-estimable result for every
+    required family beside the reason it is absent.
+    """
+    expected = {
+        (regime, seed, size)
+        for regime in REGIMES for seed in SEEDS for size in SIZES
+    }
+    shares = {}
+    for key in sorted(expected | set(indexed)):
+        name = setting_key(*key)
+        record = indexed.get(key)
+        if record is None:
+            shares[name] = _decompose_share(
+                {},
+                regime=key[0],
+                seed=key[1],
+                size=key[2],
+                setting=name,
+                record_present=False,
+                root_seed=root_seed,
+                n_resamples=n_resamples,
+                confidence=confidence,
+            )
+        else:
+            shares[name] = evaluate_setting_share(
+                record,
+                root_seed=root_seed,
+                n_resamples=n_resamples,
+                confidence=confidence,
+            )
+    return shares
+
+
+def _share_predictions(
+    record: Mapping[str, object],
+) -> dict[str, Mapping[str, float]]:
+    """The four fitted prediction maps plus the unmitigated reference.
+
+    R is the noisy expectation scored as a predictor: the identity map from an
+    item to its own measurement, with no model, no fit and no selection behind
+    it. Deriving it from the retained rows rather than storing a fifth
+    prediction map is what keeps it the same measurement the rows carry; a
+    stored copy could drift from them and nothing would notice.
+    """
+    predictions = dict(record["test_predictions"])
+    if SHARE_REFERENCE_METHOD in predictions:
+        raise ValueError(
+            f"{record['setting']}: a fitted arm is named "
+            f"{SHARE_REFERENCE_METHOD!r}, which the unmitigated reference also "
+            "names; one of the two would silently displace the other"
+        )
+    predictions[SHARE_REFERENCE_METHOD] = {
+        str(row["item_id"]): float(row["noisy_expectation"])
+        for row in record["test_items"]
+    }
+    return predictions
 
 
 def _replication(
@@ -1233,11 +1603,113 @@ def _publication_path(*, successes: int, reversals: int) -> str:
     return "no_headline_inconclusive"
 
 
+def _share_quantities(entry: Mapping[str, object]) -> list[tuple[str, object, dict]]:
+    """R, the three rungs, the two gaps, the total and the share, with intervals.
+
+    R is the unmitigated reference and rides beside the ladder rather than in
+    it, so it is first and enters no gap; `reference_scope` in the report says
+    what a reader may do with R - A. T and S are the estimator's own names for
+    the total and the share, from `total_definition` and `share_definition`.
+    """
+    points = entry["point_values"] or {}
+    named: list[tuple[str, object, object]] = [(
+        "R",
+        (points.get("reference_errors") or {}).get(SHARE_REFERENCE_METHOD),
+        (entry["reference_errors"] or {}).get(SHARE_REFERENCE_METHOD),
+    )]
+    named.extend(
+        (label, (points.get("errors") or {}).get(label),
+         (entry["errors"] or {}).get(label))
+        for label in SHARE_RUNG_LABELS
+    )
+    named.extend(
+        (label, (points.get("gaps") or {}).get(label),
+         (entry["gaps"] or {}).get(label))
+        for label in SHARE_GAP_LABELS
+    )
+    named.append(("T", points.get("total"), entry["total"]))
+    named.append(("S", entry["share"]["point"], entry["share"]["interval"]))
+    return [(label, point, interval or {}) for label, point, interval in named]
+
+
+def _share_grid(report: Mapping[str, object]) -> list[dict]:
+    """Every decomposition the report carries, flattened into one ordered table.
+
+    The rows come from the report's own `shares` map, so the export can neither
+    hold a setting the report withheld nor drop one it carried. A setting that
+    produced no record is a row of nulls beside the reason they are null, for
+    the same reason `_setting_shares` emits it at all: a table that simply
+    lacked those rows would read as the grid.
+
+    Nothing here ranks, selects, averages or pools. Six rows carry the primary
+    label, and the eighteen secondary rows of the frozen grid travel beside them
+    along with any rehearsal, which is what the reporting rule asks a reader to
+    see.
+    """
+    rows = []
+    for setting, share in report["shares"].items():
+        for family in sorted(share["families"]):
+            entry = share["families"][family]
+            role = share_role(
+                str(share["regime"]), int(share["seed"]), int(share["size"]),
+                family)
+            if role != share["share_role"]:
+                raise ValueError(
+                    f"{setting}/{family}: the setting carries role "
+                    f"{share['share_role']!r} and this family's key is {role!r}"
+                )
+            row = {
+                "setting": setting,
+                "regime": share["regime"],
+                "seed": share["seed"],
+                "size": share["size"],
+                "family": family,
+                "share_role": role,
+                "record_present": share["record_present"],
+                "status": entry["status"],
+                "share_status": entry["share"]["status"],
+                # The refusal reasons ride in the row that lacks the number,
+                # rather than in a second table a reader would have to join.
+                "reasons": list(entry["reasons"]),
+                "share_reasons": list(entry["share"]["reasons"]),
+                "n_circuits": entry["n_circuits"],
+            }
+            for label, point, interval in _share_quantities(entry):
+                row[label] = point
+                row[f"{label}_lower"] = interval.get("lower")
+                row[f"{label}_upper"] = interval.get("upper")
+            row.update({
+                "design_frozen": share["design_frozen"],
+                "audit_complete": share["audit_complete"],
+                "fitted_from_a_clean_tree": share["fitted_from_a_clean_tree"],
+                # Written by the analysis driver, which is the layer that opens
+                # the freeze and the fit receipts. A library caller opens
+                # neither, so these are absent rather than false there.
+                "freeze_verified": share.get("freeze_verified"),
+                "freeze_manifest_sha256": share.get("freeze_manifest_sha256"),
+                "fit_bindings_verified": share.get("fit_bindings_verified"),
+                "publication_path": share["publication_path"],
+            })
+            rows.append(row)
+    _assert_primary_projection(
+        (row["regime"], row["seed"], row["size"], row["family"])
+        for row in rows if row["share_role"] == "primary"
+    )
+    return rows
+
+
 def build_campaign_tables(report: Mapping[str, object]) -> dict:
     """Flatten the report into the rows the manuscript's tables print.
 
     Every number here comes from the report, which comes from the records, so a
     printed table cannot disagree with the file that produced it.
+
+    `shares` is the whole decomposition grid, every entry labelled with its
+    role. It used to be absent, which left manual extraction from `report` the
+    only route to the paper's result, and the roles used to read primary
+    throughout, which left no record of which six that extraction should keep.
+    The renderer that turns these rows into a printed table can follow; what
+    could not follow is the choice of which rows are the committed ones.
     """
     if report.get("schema_version") != REPORT_SCHEMA_VERSION:
         raise ValueError(f"expected schema_version {REPORT_SCHEMA_VERSION!r}")
@@ -1344,6 +1816,10 @@ def build_campaign_tables(report: Mapping[str, object]) -> dict:
     return {
         "schema_version": REPORT_SCHEMA_VERSION,
         "failed_settings": list(report["failed_settings"]),
+        # The keys travel with the grid, so a renderer prints the committed six
+        # rather than deciding which six they are.
+        "primary_share_keys": [list(key) for key in primary_share_keys()],
+        "shares": _share_grid(report),
         "endpoints": endpoints,
         "contrasts": contrasts,
         "replication": replication,

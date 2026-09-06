@@ -3,8 +3,16 @@
 A freeze that only writes a file proves nothing. What makes it useful is that
 `verify` afterwards names every field that moved, so a reader can tell whether
 the run that produced the numbers is the run the freeze describes.
+
+Every field it compares is a recorded value against a recomputed one, and an
+uncommitted edit is the one difference that comparison cannot see: the revision
+string stays the same while the bytes behind it change. So the freeze refuses a
+dirty tree rather than archiving the dirty bytes, which is the cheaper half of
+that choice and the one that lets the analysis driver treat a verified manifest
+as a checkable claim.
 """
 
+import argparse
 import json
 
 import pytest
@@ -14,6 +22,7 @@ from tools.freeze_campaign import (
     _differences,
     _digest,
     _payload,
+    freeze,
 )
 
 
@@ -99,6 +108,54 @@ def test_an_unchanged_manifest_reports_no_drift(manifest):
             if key not in ("frozen_utc", "manifest_sha256")}
 
     assert _differences(body, json.loads(json.dumps(body))) == []
+
+
+def _freeze(tmp_path, monkeypatch, code):
+    """Freeze into a scratch root with the working-tree state stated outright.
+
+    The revision is stubbed rather than read from a fixture repository, because
+    what is under test is the refusal, and a fixture repository would make the
+    test depend on a git binary to establish a condition the guard reads from
+    one dictionary.
+    """
+    monkeypatch.setattr(
+        "tools.freeze_campaign._code_revision", lambda repository: code)
+    return freeze(argparse.Namespace(
+        root=tmp_path, repository=tmp_path,
+        out=tmp_path / "campaign-manifest.json"))
+
+
+def test_the_freeze_refuses_a_dirty_working_tree(tmp_path, monkeypatch):
+    """A dirty revision names bytes nobody can check out again.
+
+    It used to warn and write the file anyway, which left the manifest naming a
+    revision that never existed and `verify` comparing that name against itself.
+    """
+    with pytest.raises(SystemExit, match="clean committed revision"):
+        _freeze(tmp_path, monkeypatch, {
+            "revision": "abc123", "clean": False,
+            "uncommitted_paths": ["qem_bench/campaign/design.py"]})
+    assert not (tmp_path / "campaign-manifest.json").exists()
+
+
+def test_the_freeze_refuses_a_tree_with_no_resolvable_revision(
+    tmp_path, monkeypatch,
+):
+    """Outside a repository there is no revision to freeze, only an empty one."""
+    with pytest.raises(SystemExit, match="clean committed revision"):
+        _freeze(tmp_path, monkeypatch, {
+            "revision": None, "clean": False, "uncommitted_paths": []})
+
+
+def test_a_clean_revision_is_frozen_and_hashed(tmp_path, monkeypatch):
+    assert _freeze(tmp_path, monkeypatch, {
+        "revision": "abc123", "clean": True, "uncommitted_paths": []}) == 0
+
+    written = json.loads(
+        (tmp_path / "campaign-manifest.json").read_text(encoding="utf-8"))
+    assert written["code"] == {"revision": "abc123", "clean": True,
+                               "uncommitted_paths": []}
+    assert written["manifest_sha256"] == _digest(written)
 
 
 def test_a_field_that_appears_or_disappears_is_named(manifest):

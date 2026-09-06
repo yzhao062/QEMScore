@@ -14,6 +14,11 @@ Two subcommands:
 
 `verify` reports rather than raises, because the useful output after a campaign
 is the complete list of what drifted. It exits non-zero when anything did.
+
+`freeze` refuses a dirty or unresolvable working tree. Everything else here
+compares a recorded field against a recomputed one, and an uncommitted edit is
+the one difference that comparison cannot see, so the manifest is worth checking
+only if the revision it names is one that can be checked out again.
 """
 
 from __future__ import annotations
@@ -82,7 +87,11 @@ def _code_revision(root: Path) -> dict:
         result = subprocess.run(
             ["git", "-C", str(root), *arguments],
             capture_output=True, text=True, check=False)
-        return result.stdout.strip() if result.returncode == 0 else None
+        # Only the trailing newline is stripped. `git status --porcelain` puts
+        # the status in the first two columns, so stripping whitespace would
+        # eat the leading space of the first entry and `line[3:]` would then
+        # drop a character from that path.
+        return result.stdout.strip("\n") if result.returncode == 0 else None
 
     revision = run("rev-parse", "HEAD")
     dirty = run("status", "--porcelain")
@@ -160,6 +169,13 @@ def _differences(recorded, current, path=""):
 
 def freeze(args) -> int:
     payload = _payload(args.root, args.repository)
+    # A dirty tree names a revision nobody can check out again, so the manifest
+    # would freeze a revision string rather than the code that ran. Recording the
+    # uncommitted bytes instead would be a second provenance format to maintain;
+    # refusing the run is the cheaper half of that choice, and it is what lets
+    # `run_campaign_analysis` treat a verified manifest as a checkable claim.
+    if not payload["code"]["revision"] or not payload["code"]["clean"]:
+        raise SystemExit("campaign freeze requires a clean committed revision")
     payload["manifest_sha256"] = _digest(payload)
     out = args.out or args.root / "campaign-manifest.json"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -174,9 +190,6 @@ def freeze(args) -> int:
         "code_clean": payload["code"]["clean"],
         "datasets": len(payload["datasets"]),
     }, indent=2), flush=True)
-    if not payload["code"]["clean"]:
-        print("warning: the working tree is dirty, so this revision is not "
-              "reproducible from the recorded hash alone", flush=True)
     return 0
 
 
