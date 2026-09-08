@@ -31,7 +31,9 @@ than one that travels beside the download.
 
 The tree fingerprint over those 67 files, hashing the UTF-8 concatenation of
 `<file SHA-256>  <relative POSIX path>\n` in sorted relative-path order, is
-`c3b79a0766c1d48117995826a2ee48a1f0b2a1955931f314a9d298dbc9611821`.
+`c3b79a0766c1d48117995826a2ee48a1f0b2a1955931f314a9d298dbc9611821`. That is the
+SHA-256 of `SHA256SUMS.txt` itself, because the file is that concatenation. It is
+one number to carry, not a second independent check.
 
 ## What is in it
 
