@@ -35,14 +35,14 @@ import sys
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qem_bench.campaign.design import (
+from qemscore.campaign.design import (
     campaign_setting_keys,
     declared_design,
     expected_circuits,
     role_counts,
 )
-from qem_bench.reproducibility import environment_contract
-from qem_bench.validation import validate_split_artifact
+from qemscore.reproducibility import environment_contract
+from qemscore.validation import validate_split_artifact
 
 SCHEMA_VERSION = "qem-bench-campaign-manifest-v1"
 # Every package whose version can change a stored histogram or a fitted model.

@@ -8,11 +8,11 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from qem_bench.baselines.zne import ZNEMitigator
-from qem_bench.budget import Method, TIERS
-from qem_bench.datasets.generate import generate, group_shots
-from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
-from qem_bench.runner.run import (
+from qemscore.baselines.zne import ZNEMitigator
+from qemscore.budget import Method, TIERS
+from qemscore.datasets.generate import generate, group_shots
+from qemscore.datasets.split_generate import SPLIT_PRESETS, generate_split
+from qemscore.runner.run import (
     MethodOutput,
     MethodRegistration,
     _budget_preflight,
@@ -26,7 +26,7 @@ from qem_bench.runner.run import (
     unregister_method,
     validate_run_artifact,
 )
-from qem_bench.validation import split_spec_hash
+from qemscore.validation import split_spec_hash
 
 
 def _only_budget_cell(results):

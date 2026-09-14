@@ -3,7 +3,7 @@ requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "qem-bench"
+name = "QEMScore"
 version = "0.1.0"
 description = "A controlled benchmark for distribution-shift reliability in learned quantum error mitigation"
 readme = "README.md"
@@ -45,27 +45,27 @@ dev = [
 ]
 
 [project.scripts]
-qem-bench = "qem_bench.cli:main"
+qemscore = "qemscore.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/yzhao062/qem-bench"
-Repository = "https://github.com/yzhao062/qem-bench"
-Issues = "https://github.com/yzhao062/qem-bench/issues"
+Homepage = "https://github.com/yzhao062/QEMScore"
+Repository = "https://github.com/yzhao062/QEMScore"
+Issues = "https://github.com/yzhao062/QEMScore/issues"
 
 [tool.setuptools.packages.find]
-include = ["qem_bench*"]
+include = ["qemscore*"]
 
 [tool.setuptools.package-data]
-"qem_bench.noise" = ["data/*.json"]
+"qemscore.noise" = ["data/*.json"]
 
 [tool.setuptools.data-files]
-"share/qem-bench" = ["CITATION.cff"]
+"share/qemscore" = ["CITATION.cff"]
 
-[tool.qem-bench.reproducibility]
+[tool.qemscore.reproducibility]
 # These compatibility windows support ordinary installs. They do not protect frozen
 # hashes: qiskit>=1.0,<3 admits transpiler changes within the 2.5 release line.
 # CI and every headline command install this exact transitive lock first, then install
-# qem-bench editable with --no-deps. Artifact manifests must record the lock SHA-256.
+# QEMScore editable with --no-deps. Artifact manifests must record the lock SHA-256.
 ci-lock = "requirements/ci-py312.lock"
 ci-lock-sha256 = "20ce2461bc2e6f70e14eeb0feaf3fe7e3cb9e9af75031da04671eab99c2bfd70"
 

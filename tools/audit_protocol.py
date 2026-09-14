@@ -4,7 +4,7 @@ Round 4 of the plan review made the point precisely: an audit that calls the sam
 circuit builder, the same label routine and the same noise model can show that a
 recorded execution disagrees with the declared protocol and seeds, but a fault
 inside those shared functions is invisible to it. This module is the independent
-half. Nothing here imports from `qem_bench`.
+half. Nothing here imports from `qemscore`.
 
 The protocols, written from their specification rather than from the code:
 

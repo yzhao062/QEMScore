@@ -15,8 +15,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from qem_bench.circuits.tfi import TFIParams, build_tfi_circuit
-from qem_bench.datasets.generate import (
+from qemscore.circuits.tfi import TFIParams, build_tfi_circuit
+from qemscore.datasets.generate import (
     LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
     LEGACY_TFI_ROUNDED_IDENTITY_ENCODING_PROFILE,
     PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
@@ -24,19 +24,19 @@ from qem_bench.datasets.generate import (
     generate,
     validate_physical_identity_encoding_profiles,
 )
-from qem_bench.datasets.schema import FAMILY_STRATA
-from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
-from qem_bench.datasets.splits import ROLES, SplitSpec, resolve_split_spec
-from qem_bench.reports import generate_report
-from qem_bench.reports.generate import _load_runs, _merge_cell_records
-from qem_bench.runner.metrics import (
+from qemscore.datasets.schema import FAMILY_STRATA
+from qemscore.datasets.split_generate import SPLIT_PRESETS, generate_split
+from qemscore.datasets.splits import ROLES, SplitSpec, resolve_split_spec
+from qemscore.reports import generate_report
+from qemscore.reports.generate import _load_runs, _merge_cell_records
+from qemscore.runner.metrics import (
     CELL_GROUPINGS,
     DEFAULT_CELL_GROUPING,
     build_cell_records,
     headline_metrics,
     pooled_method_metrics,
 )
-from qem_bench.runner.run import (
+from qemscore.runner.run import (
     _load,
     _dataset_item_stream_hashes,
     _require_run_match,
@@ -44,7 +44,7 @@ from qem_bench.runner.run import (
     run,
     validate_run_artifact,
 )
-from qem_bench.stats import (
+from qemscore.stats import (
     PlannedComparisonFamily,
     circuit_blocked_bootstrap,
     critical_difference,
@@ -57,8 +57,8 @@ from qem_bench.stats import (
     wilcoxon_holm_power_analysis,
     wilcoxon_rank_sums,
 )
-from qem_bench.stats.plots import critical_difference_diagram
-from qem_bench.validation import (
+from qemscore.stats.plots import critical_difference_diagram
+from qemscore.validation import (
     _validate_split_tfi_profile_rows,
     validate_split_artifact,
 )
@@ -965,7 +965,7 @@ def test_legacy_loader_recomputes_every_family_seed_stream(
         "near_clifford": "t0-nc-micro",
     }
     assert set(preset_by_family) == set(FAMILY_STRATA)
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
     config = copy.deepcopy(generate_module.PRESETS[preset_by_family[family]])
     config.update(
         {
@@ -1158,7 +1158,7 @@ def test_split_tfi_profile_replay_covers_every_role_pool_and_report_boundary(
     monkeypatch,
     tmp_path,
 ):
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
     original = generate_module._sample_and_build_circuit
     spec = replace(SPLIT_PRESETS["s0-t0-micro"], budget_tier="H")
 
@@ -1809,7 +1809,7 @@ def test_report_manifest_rejects_duplicate_run_artifact_ids(monkeypatch, tmp_pat
     for filename in ("first.json", "second.json"):
         (tmp_path / filename).write_text(json.dumps(artifact), encoding="utf-8")
     monkeypatch.setattr(
-        "qem_bench.reports.generate.validate_run_artifact", lambda value: value
+        "qemscore.reports.generate.validate_run_artifact", lambda value: value
     )
     manifest = {
         "schema_version": "qem-bench-report-manifest-v1",

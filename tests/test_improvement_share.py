@@ -20,9 +20,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from qem_bench.stats import improvement_share
-from qem_bench.stats.gain_contrast import CELL_FIELDS
-from qem_bench.stats.improvement_share import (
+from qemscore.stats import improvement_share
+from qemscore.stats.gain_contrast import CELL_FIELDS
+from qemscore.stats.improvement_share import (
     FAILURE_REASONS,
     SCHEMA_VERSION,
     LadderTable,
@@ -1218,7 +1218,7 @@ def test_the_campaign_wrapper_fixes_the_ladder_from_the_frozen_design():
     inside the estimator can detect. This test covers files the round-one
     estimator change does not touch, so it fails until the campaign wiring lands.
     """
-    from qem_bench.campaign import analysis, design
+    from qemscore.campaign import analysis, design
 
     assert tuple(design.SHARE_LADDER) == ("feat-only", "liao-feat-only", "liao")
     assert tuple(design.SHARE_RUNG_LABELS) == ("A", "C", "F")
@@ -1750,7 +1750,7 @@ def test_the_module_imports_only_the_cell_definition_from_the_older_estimator():
         assert "_bootstrap_gains" not in line
         assert "_macro_mae" not in line
         head, _, tail = line.partition(" import ")
-        assert head == "from qem_bench.stats.gain_contrast"
+        assert head == "from qemscore.stats.gain_contrast"
         imported.update(name.strip() for name in tail.split(","))
     assert imported == {"CELL_FIELDS"}
 

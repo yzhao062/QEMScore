@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from qem_bench.runner.run import validate_run_artifact
+from qemscore.runner.run import validate_run_artifact
 
 
 EXAMPLE_ROOT = Path(__file__).parents[1] / "examples" / "report-walking-skeleton"

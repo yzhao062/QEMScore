@@ -8,29 +8,29 @@ import shutil
 
 import pytest
 
-import qem_bench.noise as noise_package
-from qem_bench.datasets.generate import PRESETS, dataset_hash, generate
-from qem_bench.datasets.schema import (
+import qemscore.noise as noise_package
+from qemscore.datasets.generate import PRESETS, dataset_hash, generate
+from qemscore.datasets.schema import (
     FAMILY_LABEL_METHODS,
     FAMILY_STRATA,
     FEATURES,
     build_features,
 )
-from qem_bench.noise import (
+from qemscore.noise import (
     DEFAULT_NOISE_FAMILY,
     NOISE_FAMILIES,
     SEVERITY_GRIDS,
     average_gate_infidelities,
 )
-from qem_bench.noise.models import (
+from qemscore.noise.models import (
     DEFAULT_NOISE_FAMILY as MODELS_DEFAULT_NOISE_FAMILY,
 )
-from qem_bench.noise.models import NOISE_FAMILIES as MODELS_NOISE_FAMILIES
-from qem_bench.noise.models import SEVERITY_GRIDS as MODELS_SEVERITY_GRIDS
-from qem_bench.noise.models import (
+from qemscore.noise.models import NOISE_FAMILIES as MODELS_NOISE_FAMILIES
+from qemscore.noise.models import SEVERITY_GRIDS as MODELS_SEVERITY_GRIDS
+from qemscore.noise.models import (
     average_gate_infidelities as models_average_gate_infidelities,
 )
-from qem_bench.runner.run import _load, run
+from qemscore.runner.run import _load, run
 
 
 FROZEN_HASHES = {

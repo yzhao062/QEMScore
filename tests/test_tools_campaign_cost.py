@@ -3,15 +3,15 @@ import json
 
 import pytest
 
-from qem_bench.budget import (
+from qemscore.budget import (
     ROSTER,
     BudgetInputs,
     Method,
     campaign_budget,
     method_budget,
 )
-from qem_bench.datasets.generate import generate
-from qem_bench.runner.run import run
+from qemscore.datasets.generate import generate
+from qemscore.runner.run import run
 from tools.campaign_cost import estimate_core_hours, estimate_wall_hours, main
 
 

@@ -37,14 +37,14 @@ import time
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qem_bench.campaign.analysis import (
+from qemscore.campaign.analysis import (
     TEST_ROW_FIELDS,
     assert_campaign_structure,
     build_campaign_tables,
     build_setting_record,
     evaluate_campaign,
 )
-from qem_bench.campaign.design import (
+from qemscore.campaign.design import (
     BOOTSTRAP_RESAMPLES,
     REGIMES,
     SEEDS,
@@ -54,9 +54,9 @@ from qem_bench.campaign.design import (
     is_frozen_setting,
     setting_key,
 )
-from qem_bench.datasets.split_generate import generate_split
-from qem_bench.runner.run import run, validate_run_artifact
-from qem_bench.validation import validate_split_artifact
+from qemscore.datasets.split_generate import generate_split
+from qemscore.runner.run import run, validate_run_artifact
+from qemscore.validation import validate_split_artifact
 
 
 def _parse_setting(key: str) -> tuple[str, int, int]:

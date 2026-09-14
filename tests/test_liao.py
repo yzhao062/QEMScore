@@ -7,8 +7,8 @@ import json
 import numpy as np
 import pytest
 
-import qem_bench.baselines.liao as liao_module
-from qem_bench.baselines.liao import (
+import qemscore.baselines.liao as liao_module
+from qemscore.baselines.liao import (
     LiaoMLPMitigator,
     LiaoMitigator,
     LiaoRandomForestMitigator,
@@ -21,10 +21,10 @@ from qem_bench.baselines.liao import (
     UNVERIFIED_MLP_HYPERPARAMETERS,
     select_one_standard_error,
 )
-from qem_bench.budget import BudgetInputs, Method, method_budget
-from qem_bench.datasets.generate import generate, group_shots
-from qem_bench.datasets.schema import FEATURES
-from qem_bench.validation import LEGACY_SCHEMA_VERSION
+from qemscore.budget import BudgetInputs, Method, method_budget
+from qemscore.datasets.generate import generate, group_shots
+from qemscore.datasets.schema import FEATURES
+from qemscore.validation import LEGACY_SCHEMA_VERSION
 
 
 @pytest.fixture(scope="module")
@@ -300,7 +300,7 @@ def test_random_forest_hyperparameters_match_the_paper():
     does not reproduce the published feature encoding. Any departure belongs in
     LiaoMLPDeclarations-style declared fields rather than in a silent constant.
     """
-    from qem_bench.baselines.liao import LiaoRandomForestMitigator
+    from qemscore.baselines.liao import LiaoRandomForestMitigator
 
     config = LiaoRandomForestMitigator(random_state=0).config_
     assert config["scope"] == "one-independent-forest-per-observable"

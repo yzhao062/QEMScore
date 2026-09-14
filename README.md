@@ -2,7 +2,7 @@
 
 <div align="center">
 
-# qem-bench
+# QEMScore
 
 **Benchmark primitives for distribution-shift reliability in learned quantum error mitigation.**
 
@@ -13,7 +13,7 @@
 
 </div>
 
-`qem-bench` is a classically simulated benchmark for studying whether learned quantum error
+`QEMScore` is a classically simulated benchmark for studying whether learned quantum error
 mitigation (QEM) remains reliable under distribution shift with explicit circuit-evaluation budget
 accounting. It generates deterministic circuit datasets, runs the methods implemented in this
 release, and writes accuracy, harm, and ledger results. The split-v2 runner enforces declared tier
@@ -36,7 +36,7 @@ and assume that environment is active. From a downloaded release wheel, with no 
 ```powershell
 $env:MKL_THREADING_LAYER = "SEQUENTIAL"
 $env:PYTHONDONTWRITEBYTECODE = "1"
-python -m pip install ./qem_bench-0.1.0-py3-none-any.whl
+python -m pip install ./qemscore-0.1.0-py3-none-any.whl
 python -m pip check
 ```
 
@@ -56,8 +56,8 @@ data. The source distribution includes the tests, lock, verification tools, and 
 Run these commands from a writable directory, including outside a source checkout:
 
 ```powershell
-qem-bench generate --preset t0-micro --out data/t0-micro
-qem-bench run --data data/t0-micro --out results/t0-micro
+qemscore generate --preset t0-micro --out data/t0-micro
+qemscore run --data data/t0-micro --out results/t0-micro
 ```
 
 The first command writes `items.jsonl` and `manifest.json`. It generates 32 observable items and
@@ -70,15 +70,15 @@ OOD reliability. Treat its numerical output as a smoke-test result.
 For the built-in split-v2 S0 preset, which also has a source-validation role:
 
 ```powershell
-qem-bench generate --preset s0-t0-micro --out data/s0-t0-micro
-qem-bench run --data data/s0-t0-micro --tier L --out results/s0-t0-micro
-python -c "from qem_bench.validation import validate_split_artifact; items, manifest = validate_split_artifact('data/s0-t0-micro'); print(len(items), 'validated items')"
+qemscore generate --preset s0-t0-micro --out data/s0-t0-micro
+qemscore run --data data/s0-t0-micro --tier L --out results/s0-t0-micro
+python -c "from qemscore.validation import validate_split_artifact; items, manifest = validate_split_artifact('data/s0-t0-micro'); print(len(items), 'validated items')"
 ```
 
 Use a new output directory for each split-v2 generation. The console script has exactly two
-subcommands, `generate` and `run`; `qem-bench --help` lists them. Validation is a Python API,
+subcommands, `generate` and `run`; `qemscore --help` lists them. Validation is a Python API,
 including `validate_split_artifact` for split-v2 datasets and
-`qem_bench.runner.run.validate_run_artifact` for result dictionaries. There is no `validate`
+`qemscore.runner.run.validate_run_artifact` for result dictionaries. There is no `validate`
 subcommand or config-file CLI. Custom OOD datasets use the Python `SplitSpec` and `generate_split`
 APIs; the only built-in split-v2 CLI preset is `s0-t0-micro`.
 
@@ -86,9 +86,9 @@ Reports use a separate module entry point and require the `report` extra. With t
 available, render the quickstart result using:
 
 ```powershell
-python -m pip install "./qem_bench-0.1.0-py3-none-any.whl[report]"
+python -m pip install "./qemscore-0.1.0-py3-none-any.whl[report]"
 python -c "import json; from pathlib import Path; Path('results/report-manifest.json').write_text(json.dumps({'schema_version': 'qem-bench-report-manifest-v1', 'runs': [{'results': 't0-micro/results.json'}]}), encoding='utf-8')"
-python -m qem_bench.reports --manifest results/report-manifest.json --out results/report
+python -m qemscore.reports --manifest results/report-manifest.json --out results/report
 ```
 
 For a source install, the extra is `python -m pip install '.[report]'`. A report manifest is
@@ -108,7 +108,7 @@ default report covers `raw`, `ridge`, and `zne` and writes `table1.tex`, `figure
 | Splits | S0 plus S1, S2, S3, S4, S6 generation, validation, and runner support; S5 has grammar and validation definitions but refuses generation |
 | Accounting | Training, mitigation-extra, and test-prediction ledgers; split-v2 preflight uses per-method-cell combined caps L 2,500,000, M 25,000,000, and H 250,000,000 |
 | Analysis | Per-cell metrics, statistical summaries, inference utilities, the `evaluate_incremental_value` gate, and a report layer |
-| Calibration | A [severity-calibration proposal](qem_bench/noise/data/severity-calibration.proposal.json) that does not alter the shipped placeholder grids |
+| Calibration | A [severity-calibration proposal](qemscore/noise/data/severity-calibration.proposal.json) that does not alter the shipped placeholder grids |
 | Outputs | Canonical item streams, manifests, method and harm metrics, per-method ledgers, and report artifacts |
 
 The local digital ZNE path uses deterministic global unitary folding at scale factors 1, 3, and 5.
@@ -135,7 +135,7 @@ Random Clifford data are labeled as the Clifford-control stratum, and `generate_
 enforces the separation: Clifford-control runs never enter the continuous-regression
 headline, and they are rendered as their own stratum section.
 
-The Python API `qem_bench.stats.evaluate_incremental_value` compares a full model with the
+The Python API `qemscore.stats.evaluate_incremental_value` compares a full model with the
 `feat-only` and `noisy-only` controls on source validation, using circuit-blocked paired
 intervals. It returns a dictionary whose `status` is `passed`, `failed`, or `not_evaluable`;
 compare that field explicitly, because the dictionary is always truthy. The runner does not
@@ -203,8 +203,8 @@ if ($LASTEXITCODE -ne 0) { throw "CI lock verification failed" }
 python -m pip install --only-binary=:all: -r requirements/ci-py312.lock
 python -m pip install --no-deps .
 python -m pip check
-qem-bench generate --preset t0-micro --out data/frozen/t0-micro
-qem-bench generate --preset t0-smoke --out data/frozen/t0-smoke
+qemscore generate --preset t0-micro --out data/frozen/t0-micro
+qemscore generate --preset t0-smoke --out data/frozen/t0-smoke
 python tools/assert_frozen_hashes.py --root data/frozen
 ```
 
@@ -228,4 +228,4 @@ rule, and CI gate. Participation is governed by [`CODE_OF_CONDUCT.md`](CODE_OF_C
 
 ## License
 
-`qem-bench` is distributed under the [BSD 2-Clause License](LICENSE).
+`QEMScore` is distributed under the [BSD 2-Clause License](LICENSE).

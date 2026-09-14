@@ -10,20 +10,20 @@ import numpy as np
 import pytest
 from qiskit import QuantumCircuit, transpile
 
-import qem_bench.baselines.zne as zne_module
-import qem_bench.sampling as sampling_module
-from qem_bench.baselines.zne import (
+import qemscore.baselines.zne as zne_module
+import qemscore.sampling as sampling_module
+from qemscore.baselines.zne import (
     RICHARDSON_WEIGHTS,
     SCALE_FACTORS,
     ZNEMitigator,
     extrapolate_zero_noise,
     fold_for_execution,
 )
-from qem_bench.circuits.tfi import TFIParams, build_tfi_circuit
-from qem_bench.labels.statevector import ideal_expectation
-from qem_bench.noise.models import BASIS_GATES
-from qem_bench.observables import z_expectation_from_counts
-from qem_bench.sampling import sample_counts
+from qemscore.circuits.tfi import TFIParams, build_tfi_circuit
+from qemscore.labels.statevector import ideal_expectation
+from qemscore.noise.models import BASIS_GATES
+from qemscore.observables import z_expectation_from_counts
+from qemscore.sampling import sample_counts
 
 
 def _params(steps: int = 2) -> TFIParams:
@@ -206,7 +206,7 @@ def test_noiseless_folds_and_richardson_agree_with_the_exact_value(monkeypatch):
 class _MitiqCircuit:
     """Small wrapper that avoids Mitiq 1.0's optional QASM parser dependency."""
 
-    __module__ = "qem_bench_zne_crosscheck"
+    __module__ = "qemscore_zne_crosscheck"
 
     def __init__(self, circuit: QuantumCircuit):
         self.circuit = circuit

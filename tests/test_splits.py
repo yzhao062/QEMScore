@@ -12,16 +12,16 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from qem_bench.circuits.heisenberg import sample_heisenberg_params
-from qem_bench.circuits.near_clifford import sample_near_clifford_params
-from qem_bench.circuits.qaoa import sample_qaoa_params
-from qem_bench.circuits.random_clifford import sample_random_clifford_params
-from qem_bench.circuits.tfi import (
+from qemscore.circuits.heisenberg import sample_heisenberg_params
+from qemscore.circuits.near_clifford import sample_near_clifford_params
+from qemscore.circuits.qaoa import sample_qaoa_params
+from qemscore.circuits.random_clifford import sample_random_clifford_params
+from qemscore.circuits.tfi import (
     TFIParams,
     build_tfi_circuit,
     sample_tfi_params,
 )
-from qem_bench.datasets.generate import (
+from qemscore.datasets.generate import (
     LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE,
     PHYSICAL_IDENTITY_ENCODING_PROFILES_FIELD,
     PRESETS,
@@ -32,22 +32,22 @@ from qem_bench.datasets.generate import (
     generate,
     group_shots,
 )
-from qem_bench.datasets.split_generate import (
+from qemscore.datasets.split_generate import (
     _transpile_seed_from_circuit_id,
     generate_split,
 )
-from qem_bench.datasets.splits import (
+from qemscore.datasets.splits import (
     ROLES,
     SPLIT_ALLOWED_COUPLINGS,
     SPLIT_AXES,
     SplitSpec,
     resolve_split_spec,
 )
-from qem_bench.noise.models import DEFAULT_NOISE_FAMILY
-from qem_bench.observables import z_support_label
-from qem_bench.reproducibility import CI_LOCK_SHA256, CI_LOCK_SHA256_ENV
-from qem_bench.runner.run import _load
-from qem_bench.validation import (
+from qemscore.noise.models import DEFAULT_NOISE_FAMILY
+from qemscore.observables import z_support_label
+from qemscore.reproducibility import CI_LOCK_SHA256, CI_LOCK_SHA256_ENV
+from qemscore.runner.run import _load
+from qemscore.validation import (
     canonical_hash,
     canonical_item_lines,
     cell_item_stream_hashes,
@@ -456,8 +456,8 @@ def test_split_spec_sampling_domains_are_at_least_as_strict_as_samplers(family):
 def test_fully_hashed_artifact_rejects_impossible_sampling_domain(
     monkeypatch, tmp_path, family, family_parameters, message
 ):
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
-    validation_module = importlib.import_module("qem_bench.validation")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
+    validation_module = importlib.import_module("qemscore.validation")
     with monkeypatch.context() as bypass:
         bypass.setattr(validation_module, "validate_split_spec", lambda spec: None)
         if family == "qaoa":
@@ -668,9 +668,9 @@ def test_split_v2_is_byte_deterministic_and_seed_sensitive(tmp_path):
 def test_equivalent_local_instances_keep_distinct_execution_and_row_identity(
     monkeypatch, tmp_path
 ):
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
     split_generate_module = importlib.import_module(
-        "qem_bench.datasets.split_generate"
+        "qemscore.datasets.split_generate"
     )
     transpile_seeds = []
 
@@ -1040,7 +1040,7 @@ def test_split_v2_observable_extrapolation_cannot_emit_an_artifact(tmp_path):
 def test_split_profile_generation_rejects_an_unknown_profile(
     monkeypatch, tmp_path
 ):
-    generation_module = importlib.import_module("qem_bench.datasets.generate")
+    generation_module = importlib.import_module("qemscore.datasets.generate")
     monkeypatch.setattr(
         generation_module,
         "LEGACY_BINARY64_IDENTITY_ENCODING_PROFILE",
@@ -1328,7 +1328,7 @@ def test_generation_is_write_once(tmp_path):
 def test_legacy_schema_is_explicit_and_has_no_runtime_hash_allow_list(tmp_path):
     data = tmp_path / "legacy"
     manifest = generate("t0-micro", data)
-    generation_module = importlib.import_module("qem_bench.datasets.generate")
+    generation_module = importlib.import_module("qemscore.datasets.generate")
 
     assert manifest["dataset_schema_version"] == "legacy-v1"
     assert not hasattr(generation_module, "FROZEN_ITEM_STREAMS")

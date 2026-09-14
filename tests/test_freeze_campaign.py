@@ -134,7 +134,7 @@ def test_the_freeze_refuses_a_dirty_working_tree(tmp_path, monkeypatch):
     with pytest.raises(SystemExit, match="clean committed revision"):
         _freeze(tmp_path, monkeypatch, {
             "revision": "abc123", "clean": False,
-            "uncommitted_paths": ["qem_bench/campaign/design.py"]})
+            "uncommitted_paths": ["qemscore/campaign/design.py"]})
     assert not (tmp_path / "campaign-manifest.json").exists()
 
 

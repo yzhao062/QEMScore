@@ -9,21 +9,21 @@ from qiskit import QuantumCircuit
 from qiskit.exceptions import QiskitError
 from qiskit.quantum_info import Clifford, Operator, SparsePauliOp
 
-from qem_bench.circuits.near_clifford import (
+from qemscore.circuits.near_clifford import (
     MAX_NEAR_CLIFFORD_QUBITS,
     NearCliffordParams,
     build_near_clifford_circuit,
     sample_near_clifford_params,
 )
-from qem_bench.circuits.random_clifford import (
+from qemscore.circuits.random_clifford import (
     MAX_RANDOM_CLIFFORD_QUBITS,
     RandomCliffordParams,
     build_random_clifford_circuit,
     sample_random_clifford_params,
 )
-from qem_bench.labels.statevector import ideal_expectation as statevector_expectation
-from qem_bench.labels.stim_labels import ideal_expectation as stim_expectation
-from qem_bench.observables import z_support_label
+from qemscore.labels.statevector import ideal_expectation as statevector_expectation
+from qemscore.labels.stim_labels import ideal_expectation as stim_expectation
+from qemscore.observables import z_support_label
 
 
 @pytest.mark.parametrize(

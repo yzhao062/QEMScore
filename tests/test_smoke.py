@@ -2,8 +2,8 @@
 
 import json
 
-from qem_bench.datasets.generate import generate
-from qem_bench.runner.run import run
+from qemscore.datasets.generate import generate
+from qemscore.runner.run import run
 
 
 def test_generate_is_deterministic(tmp_path):

@@ -4,18 +4,18 @@ import numpy as np
 import pytest
 from qiskit.quantum_info import Operator
 
-from qem_bench.circuits.heisenberg import (
+from qemscore.circuits.heisenberg import (
     HeisenbergParams,
     build_heisenberg_circuit,
     sample_heisenberg_params,
 )
-from qem_bench.circuits.qaoa import (
+from qemscore.circuits.qaoa import (
     GRAPH_CLASSES,
     QAOAParams,
     build_qaoa_circuit,
     sample_qaoa_params,
 )
-from qem_bench.circuits.tfi import sample_tfi_params
+from qemscore.circuits.tfi import sample_tfi_params
 
 
 I = np.eye(2, dtype=complex)

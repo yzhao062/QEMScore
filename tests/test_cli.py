@@ -4,9 +4,9 @@ import json
 
 import pytest
 
-from qem_bench.budget import TIERS
-from qem_bench.cli import main
-from qem_bench.validation import SPLIT_SCHEMA_VERSION, validate_split_artifact
+from qemscore.budget import TIERS
+from qemscore.cli import main
+from qemscore.validation import SPLIT_SCHEMA_VERSION, validate_split_artifact
 
 
 def test_cli_generates_validates_and_runs_split_v2_by_role(tmp_path, capsys):

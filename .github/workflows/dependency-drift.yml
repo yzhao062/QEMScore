@@ -78,8 +78,8 @@ jobs:
         if: steps.contract.outputs.available == 'true'
         working-directory: baseline
         run: |
-          qem-bench generate --preset t0-micro --out .drift/data/t0-micro
-          qem-bench generate --preset t0-smoke --out .drift/data/t0-smoke
+          qemscore generate --preset t0-micro --out .drift/data/t0-micro
+          qemscore generate --preset t0-smoke --out .drift/data/t0-smoke
           python tools/dependency_drift_snapshot.py --dataset-root .drift/data --output .drift/baseline.json
       - name: Assert baseline frozen hashes
         if: steps.contract.outputs.available == 'true'
@@ -118,8 +118,8 @@ jobs:
       - name: Generate candidate snapshot
         working-directory: candidate
         run: |
-          qem-bench generate --preset t0-micro --out .drift/data/t0-micro
-          qem-bench generate --preset t0-smoke --out .drift/data/t0-smoke
+          qemscore generate --preset t0-micro --out .drift/data/t0-micro
+          qemscore generate --preset t0-smoke --out .drift/data/t0-smoke
           python tools/dependency_drift_snapshot.py --dataset-root .drift/data --output .drift/candidate.json
       - name: Cross-check local ZNE against Mitiq
         working-directory: candidate

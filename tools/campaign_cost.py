@@ -12,14 +12,14 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qem_bench.budget import (
+from qemscore.budget import (
     CampaignBudget,
     Method,
     PAPER_TIER_MODE,
     ROSTER,
     campaign_budget,
 )
-from qem_bench.runner.run import validate_run_artifact
+from qemscore.runner.run import validate_run_artifact
 
 
 _RUNNER_METHOD_NAMES = {

@@ -11,9 +11,9 @@ import json
 
 import pytest
 
-from qem_bench.datasets.split_generate import generate_split
-from qem_bench.datasets.splits import SplitSpec
-from qem_bench.validation import validate_split_artifact
+from qemscore.datasets.split_generate import generate_split
+from qemscore.datasets.splits import SplitSpec
+from qemscore.validation import validate_split_artifact
 from tools.audit_campaign import (
     AUDIT_INDICES,
     CHECK_COVERAGE,
@@ -119,11 +119,11 @@ def test_an_extra_consumed_draw_is_caught_although_every_seed_is_intact(tmp_path
     """
     import importlib
 
-    # `qem_bench.datasets.generate` resolves to the package's re-exported
+    # `qemscore.datasets.generate` resolves to the package's re-exported
     # function rather than the submodule, so the module has to be fetched by
     # name; patching the attribute of the function would silently do nothing and
     # the test would pass against an unfaulted dataset.
-    module = importlib.import_module("qem_bench.datasets.generate")
+    module = importlib.import_module("qemscore.datasets.generate")
     original = module.sample_heisenberg_params
     calls = {"n": 0}
 
@@ -180,8 +180,8 @@ def test_a_label_routine_that_drifts_is_caught_only_by_the_independent_one(tmp_p
     """
     import importlib
 
-    generator = importlib.import_module("qem_bench.datasets.split_generate")
-    validator = importlib.import_module("qem_bench.validation")
+    generator = importlib.import_module("qemscore.datasets.split_generate")
+    validator = importlib.import_module("qemscore.validation")
     original = generator.statevector_expectation
     calls = {"n": 0}
 
@@ -401,7 +401,7 @@ def test_a_tampered_counts_sidecar_never_reaches_the_audit(artifact, tmp_path):
 @pytest.fixture(scope="module")
 def roster(artifact, tmp_path_factory):
     """The shipped roster's own scoring of the same artifact, ZNE among it."""
-    from qem_bench.runner.run import run, validate_run_artifact
+    from qemscore.runner.run import run, validate_run_artifact
 
     result = run(artifact, tmp_path_factory.mktemp("roster"))
     validate_run_artifact(result)

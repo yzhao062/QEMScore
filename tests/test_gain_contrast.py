@@ -6,7 +6,7 @@ import math
 import numpy as np
 import pytest
 
-from qem_bench.stats.gain_contrast import evaluate_gain_contrast
+from qemscore.stats.gain_contrast import evaluate_gain_contrast
 
 
 SEVERITIES = ("L1", "L3")

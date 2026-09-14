@@ -30,7 +30,7 @@ that basis.
 
 What is independent. `audit_protocol.py` writes both Trotter protocols out from
 their specification and evolves the state with plain arrays, importing nothing
-from `qem_bench`. Each sampled circuit's gate sequence is compared against the
+from `qemscore`. Each sampled circuit's gate sequence is compared against the
 one the shipped builder produced, and each sampled label against an independent
 evolution. That is the fault class the rest cannot reach: a label routine or a
 builder that is simply wrong agrees with itself in the generator, in the
@@ -79,22 +79,22 @@ from qiskit import transpile
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qem_bench.baselines.zne import (
+from qemscore.baselines.zne import (
     SCALE_FACTORS,
     extrapolate_zero_noise,
     fold_for_execution,
 )
-from qem_bench.datasets.schema import (
+from qemscore.datasets.schema import (
     FAMILY_REQUIRED_FIELDS,
     build_circuit_from_canonical_descriptor,
     canonical_physical_circuit_identity,
 )
-from qem_bench.datasets.split_generate import _transpile_seed_from_circuit_id
-from qem_bench.noise.models import BASIS_GATES
-from qem_bench.labels.statevector import ideal_expectation as statevector_expectation
-from qem_bench.observables import z_expectation_from_counts, z_support_label
-from qem_bench.sampling import sample_counts
-from qem_bench.validation import validate_split_artifact
+from qemscore.datasets.split_generate import _transpile_seed_from_circuit_id
+from qemscore.noise.models import BASIS_GATES
+from qemscore.labels.statevector import ideal_expectation as statevector_expectation
+from qemscore.observables import z_expectation_from_counts, z_support_label
+from qemscore.sampling import sample_counts
+from qemscore.validation import validate_split_artifact
 
 if __package__ in (None, ""):
     from audit_protocol import (

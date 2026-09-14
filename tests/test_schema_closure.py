@@ -15,8 +15,8 @@ import numpy as np
 import pytest
 from qiskit.quantum_info import Operator
 
-from qem_bench.baselines.zne import _rebuild_circuit
-from qem_bench.circuits import (
+from qemscore.baselines.zne import _rebuild_circuit
+from qemscore.circuits import (
     HeisenbergParams,
     NearCliffordParams,
     QAOAParams,
@@ -28,13 +28,13 @@ from qem_bench.circuits import (
     build_random_clifford_circuit,
     build_tfi_circuit,
 )
-from qem_bench.datasets.generate import (
+from qemscore.datasets.generate import (
     _family_parameter_fields,
     dataset_hash,
     generate,
     group_shots,
 )
-from qem_bench.datasets.schema import (
+from qemscore.datasets.schema import (
     FAMILY_REQUIRED_FIELDS,
     LEGACY_SCHEMA_VERSION,
     SPLIT_ITEM_FIELDS,
@@ -44,12 +44,12 @@ from qem_bench.datasets.schema import (
     canonical_physical_circuit_identity,
     validate_item,
 )
-from qem_bench.datasets.splits import SplitSpec
-from qem_bench.noise.models import DEFAULT_NOISE_FAMILY
-from qem_bench.observables import z_expectation_from_counts
-from qem_bench.runner.metrics import normalized_bootstrap_ids
-from qem_bench.runner.run import _load
-from qem_bench.validation import (
+from qemscore.datasets.splits import SplitSpec
+from qemscore.noise.models import DEFAULT_NOISE_FAMILY
+from qemscore.observables import z_expectation_from_counts
+from qemscore.runner.metrics import normalized_bootstrap_ids
+from qemscore.runner.run import _load
+from qemscore.validation import (
     canonical_json,
     canonical_item_lines,
     cell_item_stream_hashes,
@@ -533,7 +533,7 @@ def test_neighboring_binary64_tfi_parameters_have_distinct_circuit_ids():
 def test_split_tfi_descriptor_reconstructs_the_producing_operator(
     monkeypatch, tmp_path
 ):
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
     original_builder = generate_module._sample_and_build_circuit
     produced = {}
 
@@ -581,7 +581,7 @@ def test_frozen_legacy_tfi_replay_reaches_every_physical_consumer(
     expected_dataset_hash,
     expected_items_sha256_by_newline,
 ):
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
     original_builder = generate_module._sample_and_build_circuit
     produced = {}
 
@@ -647,7 +647,7 @@ def test_frozen_legacy_tfi_replay_reaches_every_physical_consumer(
 def test_dependency_drift_snapshot_folds_loaded_recovered_tfi(
     monkeypatch, tmp_path
 ):
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
     snapshot_module = importlib.import_module("tools.dependency_drift_snapshot")
     original_builder = generate_module._sample_and_build_circuit
     original_rebuild = snapshot_module._rebuild_circuit
@@ -734,7 +734,7 @@ def test_dependency_drift_snapshot_folds_loaded_recovered_tfi(
 def test_declared_legacy_tfi_profile_fails_closed_without_replay(
     monkeypatch, tmp_path
 ):
-    run_module = importlib.import_module("qem_bench.runner.run")
+    run_module = importlib.import_module("qemscore.runner.run")
     original_replay = run_module._validate_legacy_tfi_profile_rows
 
     def omit_first_descriptor(items, manifest, profile):

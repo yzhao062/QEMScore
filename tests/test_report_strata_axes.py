@@ -7,18 +7,18 @@ from pathlib import Path
 
 import pytest
 
-from qem_bench.datasets.generate import PRESETS, generate
-from qem_bench.datasets.schema import FAMILY_STRATA
-from qem_bench.datasets.split_generate import generate_split
-from qem_bench.datasets.splits import SPLIT_AXES, SplitSpec
-from qem_bench.reports import generate_report
-from qem_bench.reports.generate import (
+from qemscore.datasets.generate import PRESETS, generate
+from qemscore.datasets.schema import FAMILY_STRATA
+from qemscore.datasets.split_generate import generate_split
+from qemscore.datasets.splits import SPLIT_AXES, SplitSpec
+from qemscore.reports import generate_report
+from qemscore.reports.generate import (
     METHOD_LABELS,
     _merge_cell_records,
     _report_description,
 )
-from qem_bench.runner.metrics import build_cell_records
-from qem_bench.runner.run import _run_artifact_id, run, validate_run_artifact
+from qemscore.runner.metrics import build_cell_records
+from qemscore.runner.run import _run_artifact_id, run, validate_run_artifact
 
 
 @pytest.mark.parametrize("grouping", ["six-part", "observable-excluded"])

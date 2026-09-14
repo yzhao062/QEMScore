@@ -21,17 +21,17 @@ if __package__ in (None, ""):
 
 import numpy as np
 
-from qem_bench.baselines.controls import shuffle_noisy_items
-from qem_bench.datasets.split_generate import generate_split
-from qem_bench.datasets.splits import SplitSpec
-from qem_bench.runner.metrics import build_cell_records, headline_metrics
-from qem_bench.runner.run import (
+from qemscore.baselines.controls import shuffle_noisy_items
+from qemscore.datasets.split_generate import generate_split
+from qemscore.datasets.splits import SplitSpec
+from qemscore.runner.metrics import build_cell_records, headline_metrics
+from qemscore.runner.run import (
     _prediction_items, _prediction_manifest, registered_methods, run,
     validate_run_artifact,
 )
-from qem_bench.stats.incremental_value import evaluate_incremental_value
-from qem_bench.stats.bootstrap import circuit_blocked_bootstrap
-from qem_bench.validation import validate_split_artifact
+from qemscore.stats.incremental_value import evaluate_incremental_value
+from qemscore.stats.bootstrap import circuit_blocked_bootstrap
+from qemscore.validation import validate_split_artifact
 
 
 def _family_mae(rows, predictions):

@@ -154,11 +154,11 @@ def _publish(staging_root: Path) -> None:
 def regenerate() -> None:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
-    from qem_bench.datasets.generate import PRESETS as DATASET_PRESETS
-    from qem_bench.datasets.generate import generate
-    from qem_bench.reports import generate_report
-    from qem_bench.reproducibility import CI_LOCK_SHA256, CI_LOCK_SHA256_ENV
-    from qem_bench.runner.run import run, validate_run_artifact
+    from qemscore.datasets.generate import PRESETS as DATASET_PRESETS
+    from qemscore.datasets.generate import generate
+    from qemscore.reports import generate_report
+    from qemscore.reproducibility import CI_LOCK_SHA256, CI_LOCK_SHA256_ENV
+    from qemscore.runner.run import run, validate_run_artifact
 
     lock_sha256 = _canonical_lock_sha256()
     if lock_sha256 != CI_LOCK_SHA256:

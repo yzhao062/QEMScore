@@ -25,10 +25,10 @@ import json
 
 import pytest
 
-from qem_bench.campaign.analysis import RECORD_SCHEMA_VERSION, TEST_ROW_FIELDS
-from qem_bench.campaign.design import campaign_split_spec, setting_key
-from qem_bench.datasets.split_generate import generate_split
-from qem_bench.validation import validate_split_artifact
+from qemscore.campaign.analysis import RECORD_SCHEMA_VERSION, TEST_ROW_FIELDS
+from qemscore.campaign.design import campaign_split_spec, setting_key
+from qemscore.datasets.split_generate import generate_split
+from qemscore.validation import validate_split_artifact
 from tools.freeze_campaign import SCHEMA_VERSION as FREEZE_SCHEMA_VERSION
 from tools.run_campaign_analysis import (
     _assert_fit_bindings,

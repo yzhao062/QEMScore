@@ -20,8 +20,8 @@ from qiskit_aer.noise import (
     phase_damping_error,
 )
 
-from qem_bench.circuits.tfi import TFIParams, build_tfi_circuit
-from qem_bench.noise.models import (
+from qemscore.circuits.tfi import TFIParams, build_tfi_circuit
+from qemscore.noise.models import (
     BASIS_GATES,
     CORRELATED_CROSSTALK_SEVERITY_GRID,
     COHERENT_OVERROTATION_SEVERITY_GRID,
@@ -32,7 +32,7 @@ from qem_bench.noise.models import (
     average_gate_infidelities,
     build_noise_model,
 )
-from qem_bench.noise.calibration import (
+from qemscore.noise.calibration import (
     MATCHING_RELATIVE_TOLERANCE,
     PRIMARY_GATE_COUNT_WEIGHTING,
     PRIMARY_REFERENCE_SHAPE,

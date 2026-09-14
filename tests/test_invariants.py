@@ -12,13 +12,13 @@ from qiskit import transpile
 from qiskit.quantum_info import Operator
 from sklearn.model_selection import GroupKFold
 
-from qem_bench.baselines.ridge import RidgeMitigator
-from qem_bench.circuits.tfi import TFIParams, build_tfi_circuit
-from qem_bench.datasets.generate import dataset_hash, generate
-from qem_bench.datasets.schema import FAMILY_STRATA, FEATURE_SPEC_VERSION, FEATURES
-from qem_bench.noise.models import BASIS_GATES, SEVERITY_GRID, build_noise_model
-from qem_bench.observables import z_expectation_from_counts, z_support_label
-from qem_bench.runner.run import run
+from qemscore.baselines.ridge import RidgeMitigator
+from qemscore.circuits.tfi import TFIParams, build_tfi_circuit
+from qemscore.datasets.generate import dataset_hash, generate
+from qemscore.datasets.schema import FAMILY_STRATA, FEATURE_SPEC_VERSION, FEATURES
+from qemscore.noise.models import BASIS_GATES, SEVERITY_GRID, build_noise_model
+from qemscore.observables import z_expectation_from_counts, z_support_label
+from qemscore.runner.run import run
 
 
 def _rewrite_dataset(src, dst, mutate_row=None, mutate_manifest=None):
@@ -344,7 +344,7 @@ def test_cli_subprocess_determinism(tmp_path):
             [
                 sys.executable,
                 "-m",
-                "qem_bench.cli",
+                "qemscore.cli",
                 "generate",
                 "--preset",
                 "t0-micro",

@@ -8,7 +8,7 @@ package people install.
 ## Get it
 
 ```
-curl -L -O https://github.com/yzhao062/qem-bench/releases/download/campaign-archive-v1/campaign-archive-v1.tar.gz
+curl -L -O https://github.com/yzhao062/QEMScore/releases/download/campaign-archive-v1/campaign-archive-v1.tar.gz
 ```
 
 | | |

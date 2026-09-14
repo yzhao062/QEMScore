@@ -7,10 +7,10 @@ import json
 
 import pytest
 
-from qem_bench.datasets.generate import generate
-from qem_bench.reproducibility import CI_LOCK_SHA256, CI_LOCK_SHA256_ENV
-from qem_bench.runner.run import run, validate_run_artifact
-from qem_bench.validation import validate_split_artifact
+from qemscore.datasets.generate import generate
+from qemscore.reproducibility import CI_LOCK_SHA256, CI_LOCK_SHA256_ENV
+from qemscore.runner.run import run, validate_run_artifact
+from qemscore.validation import validate_split_artifact
 
 MISMATCHING_LOCK_SHA256 = "0" * 64
 SECOND_MISMATCHING_LOCK_SHA256 = "1" * 64

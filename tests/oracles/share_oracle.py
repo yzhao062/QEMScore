@@ -24,7 +24,7 @@ The point estimate is the same evaluator called on the identity index vector,
 which is the one piece of structure worth sharing, because two aggregation paths
 that disagree are the defect this file is meant to find.
 
-Nothing from ``qem_bench`` is imported, and numpy is not imported. The estimator
+Nothing from ``qemscore`` is imported, and numpy is not imported. The estimator
 depends on numpy, so a numpy result reached through this module would be a shared
 failure mode rather than a second opinion.
 

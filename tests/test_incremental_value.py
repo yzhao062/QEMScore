@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from qem_bench.stats.incremental_value import evaluate_incremental_value
+from qemscore.stats.incremental_value import evaluate_incremental_value
 
 
 def _case(families=("tfi", "heisenberg"), circuits=4):

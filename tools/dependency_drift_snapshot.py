@@ -7,12 +7,12 @@ import hashlib
 import json
 from pathlib import Path
 
-from qem_bench.baselines.zne import (
+from qemscore.baselines.zne import (
     SCALE_FACTORS,
     _rebuild_circuit,
     fold_for_execution,
 )
-from qem_bench.runner.run import _load
+from qemscore.runner.run import _load
 
 PRESETS = ("t0-micro", "t0-smoke")
 

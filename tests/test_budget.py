@@ -2,7 +2,7 @@
 
 import pytest
 
-from qem_bench.budget import (
+from qemscore.budget import (
     PAPER_TIER_MODE,
     ROSTER,
     TIERS,

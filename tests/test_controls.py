@@ -11,16 +11,16 @@ import json
 import numpy as np
 import pytest
 
-from qem_bench.baselines.controls import (
+from qemscore.baselines.controls import (
     FeatureOnlyControl,
     NoisyOnlyControl,
     ShuffledNoisyControl,
     ShrinkageControl,
     shuffle_noisy_items,
 )
-from qem_bench.baselines.ridge import RidgeMitigator
-from qem_bench.datasets.generate import generate
-from qem_bench.runner.run import run
+from qemscore.baselines.ridge import RidgeMitigator
+from qemscore.datasets.generate import generate
+from qemscore.runner.run import run
 
 
 @pytest.fixture(scope="module")
@@ -46,7 +46,7 @@ def test_control_columns_are_exactly_the_stated_contract():
     """Freeze the control family: noisy-only is exactly (noisy_expectation,
     log2_shots); feature-only is exactly every versioned feature except
     noisy_expectation. A partial-column mutation must fail here."""
-    from qem_bench.datasets.schema import FEATURES
+    from qemscore.datasets.schema import FEATURES
 
     noisy_names = tuple(FEATURES[i] for i in NoisyOnlyControl.columns)
     assert noisy_names == ("noisy_expectation", "log2_shots")
@@ -198,7 +198,7 @@ def test_shrinkage_requires_nonempty_fit():
 
 
 def test_generic_shuffle_changes_only_noisy_values_and_supports_liao(micro_run):
-    from qem_bench.baselines.liao import LiaoRandomForestMitigator
+    from qemscore.baselines.liao import LiaoRandomForestMitigator
 
     items, _ = micro_run
     train = [item for item in items if item["split"] == "train"]

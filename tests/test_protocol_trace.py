@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from qem_bench.protocol_trace import load_protocol_rules
+from qemscore.protocol_trace import load_protocol_rules
 
 pytest_plugins = ("pytester",)
 
@@ -114,15 +114,15 @@ def test_protocol_trace_source_catalog_inspects_source_text():
 def test_protocol_trace_rejects_a_missing_implementation_symbol():
     with pytest.raises(AssertionError, match="implementation symbol is missing"):
         _assert_implementation_symbol(
-            "qem_bench/runner/metrics.py::definitely_missing", "QEM-P001"
+            "qemscore/runner/metrics.py::definitely_missing", "QEM-P001"
         )
 
 
 @pytest.mark.parametrize(
     "implementation",
     (
-        "qem_bench/runner/metrics.py",
-        "qem_bench/runner/metrics.py::headline_metrics::extra",
+        "qemscore/runner/metrics.py",
+        "qemscore/runner/metrics.py::headline_metrics::extra",
     ),
 )
 def test_protocol_trace_requires_exact_path_symbol_references(implementation):

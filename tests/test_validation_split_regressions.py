@@ -13,20 +13,20 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import qem_bench.validation as validation_module
-from qem_bench.circuits.qaoa import QAOAParams
-from qem_bench.circuits.tfi import sample_tfi_params
-from qem_bench.datasets.generate import generate
-from qem_bench.datasets.schema import (
+import qemscore.validation as validation_module
+from qemscore.circuits.qaoa import QAOAParams
+from qemscore.circuits.tfi import sample_tfi_params
+from qemscore.datasets.generate import generate
+from qemscore.datasets.schema import (
     LEGACY_SCHEMA_VERSION,
     SPLIT_SCHEMA_VERSION,
     canonical_physical_circuit_identity,
     validate_item,
 )
-from qem_bench.datasets.split_generate import SPLIT_PRESETS, generate_split
-from qem_bench.datasets.splits import SplitSpec, resolve_split_spec
-from qem_bench.observables import z_support_label
-from qem_bench.validation import (
+from qemscore.datasets.split_generate import SPLIT_PRESETS, generate_split
+from qemscore.datasets.splits import SplitSpec, resolve_split_spec
+from qemscore.observables import z_support_label
+from qemscore.validation import (
     canonical_hash,
     canonical_item_lines,
     canonical_json,
@@ -590,7 +590,7 @@ def _old_subset_sidecar_check(item: dict, circuit: dict) -> bool:
     )
 
 
-def test_validation_is_the_first_qem_bench_import_in_isolated_process(tmp_path):
+def test_validation_is_the_first_qemscore_import_in_isolated_process(tmp_path):
     root = Path(__file__).resolve().parents[1]
     dependency_paths = [
         value for value in os.environ.get("PYTHONPATH", "").split(os.pathsep) if value
@@ -599,8 +599,8 @@ def test_validation_is_the_first_qem_bench_import_in_isolated_process(tmp_path):
         "import sys; "
         f"sys.path[:0] = {dependency_paths!r}; "
         f"sys.path.insert(0, {str(root)!r}); "
-        "import qem_bench.validation; "
-        "from qem_bench.datasets import "
+        "import qemscore.validation; "
+        "from qemscore.datasets import "
         "PRESETS, SPLIT_PRESETS, generate, generate_split; "
         "assert callable(generate) and callable(generate_split); "
         "print('ok')"
@@ -618,9 +618,9 @@ def test_validation_is_the_first_qem_bench_import_in_isolated_process(tmp_path):
 
 def test_public_generate_export_remains_callable_after_submodule_import():
     import importlib
-    import qem_bench.datasets as datasets
+    import qemscore.datasets as datasets
 
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
 
     assert datasets.generate is generate_module.generate
     assert "generate" in dir(datasets)
@@ -1076,7 +1076,7 @@ def test_rehashed_noise_sidecar_is_bound_to_installed_generator_registry(tmp_pat
 def test_rehashed_observable_support_is_derived_from_observable_id(
     monkeypatch, tmp_path
 ):
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
     original_support = generate_module._observable_support
 
     def moved_z_mid(name, params):
@@ -1139,7 +1139,7 @@ def test_rehashed_pauli_label_is_derived_from_observable_id(tmp_path):
 
 
 def test_all_generator_defined_observable_ids_validate(tmp_path):
-    generate_module = importlib.import_module("qem_bench.datasets.generate")
+    generate_module = importlib.import_module("qemscore.datasets.generate")
     base = _single_family_spec("qaoa", {"graph_classes": ["path"]})
     spec = replace(
         base,
@@ -1200,7 +1200,7 @@ def test_rehashed_ground_truth_is_recomputed_by_every_family_label_generator(
     family, label_method, monkeypatch, tmp_path
 ):
     split_generate_module = importlib.import_module(
-        "qem_bench.datasets.split_generate"
+        "qemscore.datasets.split_generate"
     )
     calls = 0
     injected_label = 0.123456789012

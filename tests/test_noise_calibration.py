@@ -8,11 +8,11 @@ import json
 import pytest
 from qiskit import transpile
 
-from qem_bench.circuits.random_clifford import (
+from qemscore.circuits.random_clifford import (
     RandomCliffordParams,
     build_random_clifford_circuit,
 )
-from qem_bench.noise.calibration import (
+from qemscore.noise.calibration import (
     ANCHOR_FAMILY,
     GATE_COUNT_WEIGHTINGS,
     LEVELS,
@@ -30,7 +30,7 @@ from qem_bench.noise.calibration import (
     solve_family_against_anchor,
     solve_proposed_grids,
 )
-from qem_bench.noise.models import BASIS_GATES, SEVERITY_GRIDS, average_gate_infidelities
+from qemscore.noise.models import BASIS_GATES, SEVERITY_GRIDS, average_gate_infidelities
 
 HOMOGENEOUS_FAMILIES = tuple(
     family for family in SEVERITY_GRIDS if family != "mixed_heterogeneous"

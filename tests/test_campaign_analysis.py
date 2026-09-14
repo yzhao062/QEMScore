@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from qem_bench.campaign.analysis import (
+from qemscore.campaign.analysis import (
     RECORD_SCHEMA_VERSION,
     REPORT_SCHEMA_VERSION,
     TEST_ROW_FIELDS,
@@ -26,7 +26,7 @@ from qem_bench.campaign.analysis import (
     evaluate_setting_share,
     regenerate_setting_diagnostics,
 )
-from qem_bench.campaign.design import (
+from qemscore.campaign.design import (
     ARMS,
     campaign_setting_keys,
     campaign_split_spec,
@@ -35,10 +35,10 @@ from qem_bench.campaign.design import (
     role_counts,
     setting_key,
 )
-from qem_bench.datasets.split_generate import generate_split
-from qem_bench.datasets.splits import SplitSpec
-from qem_bench.stats.improvement_share import draw_matrix
-from qem_bench.validation import validate_split_artifact
+from qemscore.datasets.split_generate import generate_split
+from qemscore.datasets.splits import SplitSpec
+from qemscore.stats.improvement_share import draw_matrix
+from qemscore.validation import validate_split_artifact
 
 SEVERITIES = ("L1", "L3")
 OBSERVABLES = ("z_mid", "zz_mid")

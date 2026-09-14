@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from qem_bench.protocol_trace import load_protocol_rules
+from qemscore.protocol_trace import load_protocol_rules
 
 _PASSED_GUARDS = pytest.StashKey[set[tuple[str, str]]]()
 _ACTIVE_GUARDS = pytest.StashKey[set[tuple[str, str]]]()

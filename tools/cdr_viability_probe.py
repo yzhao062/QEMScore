@@ -39,14 +39,14 @@ from qiskit.quantum_info import SparsePauliOp, Statevector
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit_aer import AerSimulator
 
-from qem_bench.circuits.heisenberg import (
+from qemscore.circuits.heisenberg import (
     build_heisenberg_circuit,
     sample_heisenberg_params,
 )
-from qem_bench.circuits.qaoa import build_qaoa_circuit, sample_qaoa_params
-from qem_bench.circuits.tfi import build_tfi_circuit, sample_tfi_params
-from qem_bench.noise.models import BASIS_GATES, SEVERITY_GRIDS, build_noise_model
-from qem_bench.observables import z_support_label
+from qemscore.circuits.qaoa import build_qaoa_circuit, sample_qaoa_params
+from qemscore.circuits.tfi import build_tfi_circuit, sample_tfi_params
+from qemscore.noise.models import BASIS_GATES, SEVERITY_GRIDS, build_noise_model
+from qemscore.observables import z_support_label
 
 
 SCHEMA_VERSION = "cdr-viability-probe-v1"

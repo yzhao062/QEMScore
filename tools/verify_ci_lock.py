@@ -34,7 +34,7 @@ def main() -> int:
     args = parser.parse_args()
 
     config = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
-    policy = config["tool"]["qem-bench"]["reproducibility"]
+    policy = config["tool"]["qemscore"]["reproducibility"]
     recorded_path = Path(policy["ci-lock"])
     recorded_hash = str(policy["ci-lock-sha256"]).lower()
     lock_path = args.lock or recorded_path

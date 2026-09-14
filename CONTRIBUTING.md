@@ -1,4 +1,4 @@
-# Contributing to qem-bench
+# Contributing to QEMScore
 
 Contributions should preserve the public, executable contract in the source, generated manifests,
 `PROTOCOL-TRACE.md`, and tests. Open an issue before a change that alters benchmark semantics,
@@ -20,8 +20,8 @@ Run the complete suite and the end-to-end frozen checks:
 ```powershell
 python -m pytest -q --strict-markers tests
 $env:PYTHONHASHSEED = "0"
-qem-bench generate --preset t0-micro --out data/frozen/t0-micro
-qem-bench generate --preset t0-smoke --out data/frozen/t0-smoke
+qemscore generate --preset t0-micro --out data/frozen/t0-micro
+qemscore generate --preset t0-smoke --out data/frozen/t0-smoke
 python tools/assert_frozen_hashes.py --root data/frozen
 ```
 
