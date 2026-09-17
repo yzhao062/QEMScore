@@ -1,6 +1,6 @@
 # Campaign archive
 
-The outputs of the frozen controlled campaign reported in the QEM-Bench paper.
+The outputs of the frozen controlled campaign reported in the QEMScore paper.
 This directory carries the manifest and the checksums; the archive itself is a
 release asset, because it is 60 MB and does not belong in the git history of a
 package people install.

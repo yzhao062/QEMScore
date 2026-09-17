@@ -1,6 +1,8 @@
-# QEM-Bench campaign archive, version 1
+# QEMScore campaign archive, version 1
 
-The outputs of the frozen controlled campaign reported in the QEM-Bench paper.
+The outputs of the frozen controlled campaign reported in the QEMScore paper.
+The archive was produced under the artifact's former name, QEM-Bench, so that name
+may appear inside the asset; the asset is immutable and its contents are unchanged.
 This archive exists so that every number the paper states about that campaign can
 be checked by someone who did not run it.
 
