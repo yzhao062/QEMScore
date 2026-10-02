@@ -1,0 +1,295 @@
+{
+  "tag": "S1",
+  "system": "S1 ML-QEM (Liao et al., Nature Machine Intelligence 6, 1478-1486, 2024)",
+  "scoped_experiment": "4-qubit TFIM Trotter on ibm_algiers hardware; RF over tabular circuit features; target = noiseless Z expectation value on each of 4 spins",
+  "scoreable": true,
+  "phase": "2 of 3 (score), complete",
+  "declared_before_fitting": {
+    "source": "phase1/RUN-RECORD-S1.json, written before any arm existed",
+    "loss": "per-row L2 distance between predicted and ideal 4-vector, averaged over rows (the system's own metric, h36 cell 51)",
+    "resample_unit": "one test row (one circuit execution on ibm_algiers, evaluated on all 4 observables jointly)",
+    "resample_count": 2000,
+    "interval": "95% pointwise percentile, S formed inside each draw",
+    "rf_seed": 0,
+    "arms": {
+      "A": "LinearRegression per observable on descriptor columns 0..164",
+      "C": "RandomForestRegressor(n_estimators=100, random_state=0) per observable on descriptor columns 0..164",
+      "F_refitted": "RandomForestRegressor(n_estimators=100, random_state=0) per observable on all columns 0..168",
+      "F_released": "docs/paper_figures/hardware_over_depth.pk df['rfr_list'], the table that produced the published figure"
+    }
+  },
+  "DECLARED_READING": {
+    "with_calibration": {
+      "refitted_F": {
+        "S": 0.5985243146261983,
+        "interval": [
+          0.5808355633047024,
+          0.6171523205920232
+        ],
+        "reading": "PRESENT"
+      },
+      "released_F": {
+        "S": 0.5976784800313552,
+        "interval": [
+          0.5798079787459604,
+          0.616291990013828
+        ],
+        "reading": "PRESENT"
+      }
+    },
+    "without_calibration": {
+      "refitted_F": {
+        "S": 0.5985243146261983,
+        "interval": [
+          0.5808355633047024,
+          0.6171523205920232
+        ],
+        "reading": "PRESENT"
+      },
+      "released_F": {
+        "S": 0.5976784800313552,
+        "interval": [
+          0.5798079787459604,
+          0.616291990013828
+        ],
+        "reading": "PRESENT"
+      }
+    },
+    "split_on_calibration": false,
+    "why_not_split": "encode_data_v2_ecr builds vec = [] (mlp.py:157) and its X[:, vec_slice] assignment (mlp.py:170) is commented out; feature width is exactly 5 + 160 + 4 = 169. The scoped experiment's released data directory holds only the circuit batches, results.pk, results_unshuffled.pk and index_order.json, with no backend-properties artifact, and h36 imports get_backend_properties_v1 without ever calling it."
+  },
+  "T_K_D_refitted_F": {
+    "T": [
+      0.34135300336513164,
+      0.32999607928967173,
+      0.35349310175453136
+    ],
+    "K": [
+      0.20430807238470974,
+      0.19550520285745474,
+      0.21367988705678068
+    ],
+    "D": [
+      0.13704493098042192,
+      0.12907000166989493,
+      0.14526710452672034
+    ],
+    "arm_levels_mean_per_row_L2": {
+      "A": 0.4418754903329561,
+      "C": 0.23756741794824635,
+      "F": 0.10052248696782443
+    }
+  },
+  "saturation": {
+    "r2_held_out": 0.6804763819956965,
+    "model": "RandomForest n=2000",
+    "per_observable": [
+      0.7578944067135014,
+      0.6717662982332788,
+      0.6367744474701248,
+      0.6554703755658806
+    ],
+    "leakfree_qualification": {
+      "r2": 0.5848538218175673,
+      "model": "RandomForest n=2000",
+      "rows": 2223,
+      "status": "qualification; the declared number is the all-rows one"
+    },
+    "verdict": "HIGH: the released descriptors carry substantial information about the target, so this is not a low-saturation case",
+    "capacity_match_not_binding": {
+      "C_matched_RF100_meanL2": 0.23756741794824635,
+      "RF2000_meanL2": 0.23595632576774142,
+      "S_with_unmatched_control": 0.603244039264981,
+      "S_with_unmatched_control_interval": [
+        0.5851534281446168,
+        0.6218005899882495
+      ],
+      "reading": "PRESENT"
+    }
+  },
+  "released_vs_refitted_F": {
+    "released_mean_L2": 0.10003940419180642,
+    "refitted_mean_L2": 0.10052248696782443,
+    "gap_released_minus_refitted": -0.00048308277601800953,
+    "rows_agreeing_to_1e-9": 83,
+    "max_abs_row_difference": 0.10915612553246318,
+    "note": "reported, not reconciled; the plan forbids adjusting the recipe after seeing this gap"
+  },
+  "leak_check_4": {
+    "verdict": "FIRES, recorded and reported per the plan, not aborted",
+    "contaminated_test_rows": 277,
+    "total_test_rows": 2500,
+    "fraction": 0.1108,
+    "direction": "favours the descriptor arms, therefore favours a PRESENT reading",
+    "qualification_diagnostics": [
+      {
+        "label": "leak-free rows only",
+        "rows": 2223,
+        "refitted_F": {
+          "A": 0.4588747892796119,
+          "C": 0.2667878399844404,
+          "F": 0.11176237856981465,
+          "T": 0.34711241070979726,
+          "K": 0.1920869492951715,
+          "D": 0.15502546141462575,
+          "S": 0.5533854260709954,
+          "S_interval": [
+            0.5347587686750255,
+            0.573042970270905
+          ],
+          "reading": "PRESENT"
+        },
+        "released_F": {
+          "A": 0.4588747892796119,
+          "C": 0.2667878399844404,
+          "F": 0.11127104953631813,
+          "T": 0.3476037397432938,
+          "K": 0.1920869492951715,
+          "D": 0.15551679044812228,
+          "S": 0.552603229864639,
+          "S_interval": [
+            0.5338523527585964,
+            0.5720244995836812
+          ],
+          "reading": "PRESENT"
+        }
+      },
+      {
+        "label": "leak-4 contaminated rows",
+        "rows": 277,
+        "refitted_F": {
+          "A": 0.3054515135877724,
+          "C": 0.003065619441172736,
+          "F": 0.010319313569902776,
+          "T": 0.2951322000178696,
+          "K": 0.30238589414659967,
+          "D": -0.00725369412873004,
+          "S": 1.0245777794774371,
+          "S_interval": [
+            1.0132756263878542,
+            1.0384478920890021
+          ],
+          "reading": "PRESENT"
+        },
+        "released_F": {
+          "A": 0.3054515135877724,
+          "C": 0.003065619441172736,
+          "F": 0.009902409242891014,
+          "T": 0.29554910434488135,
+          "K": 0.30238589414659967,
+          "D": -0.006836789801718278,
+          "S": 1.0231325004921699,
+          "S_interval": [
+            1.0119720396295713,
+            1.0370414776527652
+          ],
+          "reading": "PRESENT"
+        }
+      },
+      {
+        "label": "Trotter steps 2-9 only",
+        "rows": 2000,
+        "refitted_F": {
+          "A": 0.4620716664665241,
+          "C": 0.2697307498505361,
+          "F": 0.1174924091808707,
+          "T": 0.3445792572856534,
+          "K": 0.192340916615988,
+          "D": 0.15223834066966538,
+          "S": 0.5581906413378184,
+          "S_interval": [
+            0.5371459194918546,
+            0.5784972250268695
+          ],
+          "reading": "PRESENT"
+        },
+        "released_F": {
+          "A": 0.4620716664665241,
+          "C": 0.2697307498505361,
+          "F": 0.11719066949156604,
+          "T": 0.34488099697495805,
+          "K": 0.192340916615988,
+          "D": 0.15254008035897004,
+          "S": 0.5577022749964793,
+          "S_interval": [
+            0.5366195450360325,
+            0.5779178067116854
+          ],
+          "reading": "PRESENT"
+        }
+      }
+    ]
+  },
+  "qualifications": {
+    "1_leak4": "277 of 2500 test rows (11.1%) share a descriptor block with a training row, all 250 step-0 rows plus 27 step-1 rows. It favours the descriptor arms and therefore favours a PRESENT reading. On the 2223 leak-free rows with the declared arms, S = 0.5534 [0.5348, 0.5730], still PRESENT.",
+    "2_weak_affine_arm": {
+      "spec": "OLS on 165 descriptor columns, 500 training rows",
+      "r2_in_sample": 0.36002117057344785,
+      "r2_held_out": 0.027366640386011915,
+      "mean_per_row_L2": 0.4418754903329561,
+      "verdict": "overfitting, not degenerate: it fits the training rows and generalizes poorly",
+      "why_it_matters": "S = (A-C)/(A-F) increases with A, so a weak affine arm pushes S toward 1"
+    },
+    "3_C_does_not_beat_doing_nothing": {
+      "A_affine_control": 0.4418754903329561,
+      "A_ridge_control": 0.4061764548515428,
+      "C_capacity_matched_control": 0.23756741794824635,
+      "unmitigated_noisy": 0.20970683300841556,
+      "zne": 0.18681891056616498,
+      "F_refitted": 0.10052248696782443,
+      "F_released": 0.10003940419180642,
+      "C_minus_unmitigated": 0.02786058493983079,
+      "C_minus_unmitigated_interval": [
+        0.020063574359602897,
+        0.03544668618840064
+      ],
+      "C_beats_doing_nothing": false
+    },
+    "4_joint_stress": {
+      "what": "the strongest affine arm (RidgeCV, cross-validated on training rows only) applied to the leak-free rows",
+      "result": {
+        "variant": "JOINT STRESS: ridge-A, leak-free rows",
+        "rows": 2223,
+        "refitted_F": {
+          "S": 0.4730206639380056,
+          "interval": [
+            0.4509378707202904,
+            0.4954719270561539
+          ],
+          "reading": "ABSENT"
+        },
+        "released_F": {
+          "S": 0.4722319521162596,
+          "interval": [
+            0.44991583729773715,
+            0.4946745034490126
+          ],
+          "reading": "ABSENT"
+        }
+      },
+      "meaning": "the declared PRESENT reading is robust to each qualification on its own but not to both together"
+    },
+    "5_affine_ceiling_sweep": {
+      "readings_all_2500_rows": [
+        "PRESENT"
+      ],
+      "readings_leakfree_rows": [
+        "ABSENT",
+        "INDETERMINATE",
+        "PRESENT"
+      ],
+      "affine_ceiling_r2": 0.1277160126131605,
+      "nonlinear_saturation_for_contrast": 0.6805,
+      "meaning": "on the declared evaluation set every affine arm in the sweep reads PRESENT; on the leak-free subset the reading depends on which affine arm is used"
+    }
+  },
+  "scripts": [
+    "phase2_verify.py       re-verifies the phase-1 handoff and re-runs all four leak checks",
+    "phase2_score.py        builds A, C, F; both calibration rungs; T, K, D, S inside each draw",
+    "phase2_saturation.py   descriptor-saturation diagnostic",
+    "phase2_appendix.py     affine-arm weakness, trivial baselines, capacity-match check",
+    "phase2_stress.py       joint stress of the two qualifications",
+    "phase2_affine_ceiling.py  bounds how far a stronger affine arm can move S",
+    "debug_identity.py      isolates the n_jobs=-1 float-summation nondeterminism"
+  ]
+}

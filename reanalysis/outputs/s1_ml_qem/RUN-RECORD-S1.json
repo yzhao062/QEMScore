@@ -1,0 +1,134 @@
+{
+  "phase": "1 of 3 (acquire). Nothing has been fitted.",
+  "written_before_any_fit": true,
+  "system": {
+    "tag": "S1",
+    "name": "ML-QEM",
+    "citation": "Liao, Wang, Sitdikov, Salcedo, Seif, Minev, Nature Machine Intelligence 6, 1478-1486 (2024)",
+    "release_github": "https://github.com/qiskit-community/ml-qem",
+    "branch": "research",
+    "commit": "b1eccf8cf5ef4e9e498f3fe66e03951bc6b4a4d3",
+    "commit_date": "2024-11-22T13:42:11-05:00",
+    "release_zenodo": "https://doi.org/10.5281/zenodo.13769804 -> https://zenodo.org/records/13769804 (HTTP 200, not used; GitHub tree used instead)",
+    "local_path": "<local-path-redacted>"
+  },
+  "scoped_experiment": {
+    "name": "4-qubit TFIM Trotter circuits executed on ibm_algiers; random forest over tabular circuit features; target is the noiseless (ideal) Z expectation value on each of 4 spins",
+    "why_this_one": [
+      "It is one of the two entry points the release's own README lists under Instructions for Use, so the scope is the authors' rather than mine.",
+      "It is the real-hardware result (paper figure fig_4q_hardware.pdf), not a simulator study.",
+      "Every input needed to refit is in the release: circuits, hardware noisy values, ZNE values, noiseless targets, the shuffle order, and a deterministic split written in the notebook.",
+      "A released per-row prediction table exists, so released-F and refitted-F can both be reported."
+    ],
+    "notebooks": {
+      "data_generation": "docs/tutorials/h35_ising_4q_hardware.ipynb",
+      "train_and_evaluate": "docs/tutorials/h36_ising_4q_hardware_plot.ipynb",
+      "published_mirror": "docs/demos/demo2_ising_4q_hardware_plot.ipynb"
+    },
+    "considered_and_not_chosen": {
+      "docs/demos/demo1_rf_mimic_zne_100q_twirl.ipynb (h33)": "target is the ZNE value being mimicked, not the ideal value",
+      "docs/tutorials/h15_random_forest.ipynb / h17_compare_over_steps.ipynb": "simulator (FakeLima) studies; they do use the encoder that carries a calibration vector, but that vector is row-invariant there (see calibration note), so choosing them would not buy a live calibration contrast",
+      "docs/tutorials/h23_mimic_zne_hardware.ipynb (paper_figures/mimic_zne_hardware.pk, 400 rows)": "mimicry target again; kept as a fallback"
+    }
+  },
+  "files_used": {
+    "docs/tutorials/data/ising_init_from_qasm_hardware/shuffled/batch_00.pk .. batch_59.pk": "60 files, each {circuit_batch: 50 QuantumCircuit, index_order_batch, start_ind, batch_size} = 3000 transpiled 27-qubit circuits",
+    "docs/tutorials/data/ising_init_from_qasm_hardware/shuffled/results.pk": "sha256:68fe36c7717f77cf..., 327136 bytes, {ideal: 3000x4, noisy: 60x200, zne_mitigated: 60x200}",
+    "docs/tutorials/data/ising_init_from_qasm_hardware/shuffled/results_unshuffled.pk": "sha256:c26bfb488dd04d14..., 360117 bytes, same three keys already unshuffled; used as an independent cross-check",
+    "docs/tutorials/data/ising_init_from_qasm_hardware/shuffled/index_order.json": "sha256:c4e5d3c2802f7e09..., 16890 bytes, permutation of 0..2999",
+    "docs/tutorials/mlp.py": "encode_data_v2_ecr, the released encoder; its function bodies were lifted by AST and executed verbatim",
+    "docs/paper_figures/hardware_over_depth.pk": "{df_mean, df_ste, df}; df is the released per-row prediction table, 2500 rows",
+    "docs/tutorials/model/ising_init_from_qasm_hardware/rfr_list.pk": "released fitted model, 4 RandomForestRegressor(n_estimators=100, n_features_in_=169); EXCLUDED as F, see released_artifact_conflict"
+  },
+  "row_counts_asserted": {
+    "rows_total": 3000,
+    "rows_train": 500,
+    "rows_test": 2500,
+    "rows_per_trotter_step": 300,
+    "trotter_steps": 10,
+    "feature_width": 169,
+    "target_width": 4,
+    "all_assertions": "PASS (see extract_features.py output); the only FAIL was leak check 4, which the plan makes a record-and-report, not an abort"
+  },
+  "target": {
+    "column": "ideal — the noiseless expectation value of Z on each of the 4 spins, a 4-vector per row",
+    "provenance": "qiskit.primitives.Estimator run on the de-idled circuit with final measurements removed (h36 cell 10); stored as results.pk['ideal'] and returned as y by encode_data_v2_ecr",
+    "appears_in_features": "no (leak check 1 passed: no identity column and no |corr| > 0.999 column, for any of the 4 observables)"
+  },
+  "feature_groups": {
+    "execution_independent_descriptors": {
+      "columns": "0-164 (165 columns)",
+      "0-4": "gate counts from circ.count_ops() for ['cx','sx','x','id','rz'], scaled by 0.01; col 3 (id) is identically zero",
+      "5-164": "160 rotation-angle bin counts for rx/ry/rz single-qubit gates, bin width 0.025*pi over [-2pi, 2pi], scaled by 0.01; 101 of 160 bins are non-constant and carry 100% of the mass",
+      "note": "these depend on the transpiled circuit, so they depend on the device coupling map and basis set, but not on any measurement outcome"
+    },
+    "execution_derived": {
+      "columns": "165-168 (4 columns)",
+      "content": "the hardware noisy expectation value of Z on each of the 4 spins, read back from the ibm_algiers job"
+    },
+    "device_calibration": {
+      "columns": "none",
+      "finding": "the released encoder for this experiment, encode_data_v2_ecr, builds vec = [] (mlp.py line 157) and its X[:, vec_slice] assignment is commented out (line 170), so the feature width is exactly 5 + 160 + 4 = 169 with no room for a calibration vector. Confirmed independently: the released fitted model reports n_features_in_ = 169.",
+      "the_other_encoder": "encode_data (mlp.py lines 198-252) does build the 8-entry gate-error / readout-error / t1 / t2 vector the screen recorded, but it takes ONE properties dict per call and writes it to every row (X[:, vec_slice] = vec[None, :], line 228). Its 8 columns therefore have exactly zero variance inside any single tabular fit and cannot change a linear fit or a tree split.",
+      "consequence_for_the_plan": "S1's declared calibration third group is empty in this scoped experiment and zero-variance in the alternative tabular ones. Both rungs of the pre-declared calibration ladder coincide by construction; they will be reported as the same number rather than as a contrast. Calibration varies per row nowhere in S1's tabular releases; it varies only across backends in the graph-neural-network path (circuit_to_graph_data_json), which is a different learner family."
+    }
+  },
+  "arms_as_they_will_be_built": {
+    "A": "affine: one sklearn LinearRegression per observable q in 0..3, on columns 0-164",
+    "C": "capacity matched: one RandomForestRegressor(n_estimators=100) per observable q in 0..3, on columns 0-164 — same family, same (absent) selection rule as the released model",
+    "F": "full: one RandomForestRegressor(n_estimators=100) per observable q in 0..3, on all columns 0-168; plus released-F, the per-row prediction table in hardware_over_depth.pk",
+    "released_recipe_evidence": "h36 cell 45 and demo2 cell 39: for q in range(4): RandomForestRegressor(n_estimators=100).fit(X_train, y_train.iloc[:, q]). No hyperparameter search, no random_state, no scaling, no early stopping anywhere in the released path.",
+    "seed_policy_declared_now": "the release fixes no RF seed; C and F will use the same matched seed schedule (random_state = 0 for every forest) so that the only difference between them is the four execution-derived columns"
+  },
+  "metric_and_resampling_declared_before_fitting": {
+    "loss": "per-row L2 distance between the predicted 4-vector and the ideal 4-vector, averaged over evaluated rows. This is the system's own reported metric: the released notebook computes L2_noisy / L2_zne / L2_rfr_list per row and plots the per-step mean (h36 cells 51-52), and it is the quantity stored in hardware_over_depth.pk.",
+    "A_C_F_are_error_levels": "so T = A - F is the error reduction the full arm achieves relative to the affine control, K = A - C the reduction the descriptor control achieves, and S = K / T the reproduced share",
+    "resample_unit": "one test row, i.e. one circuit execution on ibm_algiers evaluated on all 4 observables jointly. This is the system's own evaluation unit: the released error bars are the within-step row standard deviation divided by sqrt(rows in that step) (h36 cell 51).",
+    "resample_count": 2000,
+    "resample_scheme": "nonparametric bootstrap over the 2500 test rows with replacement, conditional on the fitted and selected models; T, K, D, S formed inside each draw and never from separately averaged numbers",
+    "interval": "pointwise percentile interval, reported with the count 2000 beside it"
+  },
+  "split_structure": {
+    "how_it_is_built": "rows are assembled in two released blocks (rows 0-1999 give 200 rows per Trotter step, rows 2000-2999 give 100 more per step), stably sorted by step, then train = the first 50 rows of each step and test = the last 250 rows of each step",
+    "is_it_shuffled_by_row": "no random row shuffle at split time. The 3000 rows were shuffled before submission to hardware and unshuffled by index_order.json before splitting; the split itself is a deterministic head/tail within each Trotter step.",
+    "but_leak_check_4_still_fires": true
+  },
+  "leak_checks": {
+    "1_target_not_in_features": "PASS. ideal is used only for y in encode_data_v2_ecr (line 192). No feature column equals any target column, and none correlates with one above 0.999. max |noisy - ideal| over all rows is 0.9765, so the execution-derived block is not a copy of the target.",
+    "2_no_oracle_quantity_read": "PASS. The only oracle quantity here is the noiseless target itself. The ZNE comparator is a measured quantity, and no feature column equals any ZNE column either. There is no support-size or entropy oracle in this experiment (that clause was written for S3).",
+    "3_row_counts_and_schema": "PASS. 3000 rows and the three-key results schema assert cleanly; concat of the 60 per-batch index_order_batch arrays equals index_order.json exactly; unshuffling results.pk reproduces results_unshuffled.pk to floating point; the released prediction table's ideal / noisy / zne / step columns match the reconstructed test split row for row (max deviation 3e-08 on ideal, exact on noisy and zne); and the released fitted model's n_features_in_ = 169 equals the reconstructed feature width.",
+    "4_rows_of_one_circuit_on_both_sides": {
+      "verdict": "FIRES — recorded and reported, not aborted",
+      "what_happens": "all 300 rows at Trotter step 0 are repeat hardware executions of only 3 distinct circuits, and those 3 circuits carry only 2 distinct ideal target vectors. head(50)/tail(250) therefore puts all 3 circuits on both sides.",
+      "magnitude": "250 of 2500 test rows (10.0%) are repeat executions of a circuit that also appears in training. Counting descriptor blocks rather than whole circuits, 277 of 2500 test rows (11.1%) have a descriptor block that also occurs in training: all 250 step-0 rows plus 27 step-1 rows. Steps 2 through 9 have no overlap at all, and steps 1-9 contain no duplicate circuits.",
+      "direction_of_the_bias": "it favours the descriptor arms. On those rows a descriptor-only model can recover the target exactly, because the target is a deterministic function of the circuit and the circuit was seen in training. Any PRESENT reading for S1 must carry this qualification in the same sentence.",
+      "step_0_is_additionally_degenerate": "its 250 test rows hold only 2 distinct target vectors, and the released model already reaches RMSE 0.015 there against 0.076 unmitigated"
+    }
+  },
+  "released_artifact_conflict": {
+    "finding": "the release ships two F artifacts and they are not the same model",
+    "detail": "docs/paper_figures/hardware_over_depth.pk['df']['rfr_list'] gives RMSE 0.07426 against the ideal target on the 2500 test rows. The saved model docs/tutorials/model/ising_init_from_qasm_hardware/rfr_list.pk, applied to the same reconstructed X_test, gives 0.04345. They agree to 1e-9 on only 87 of 2500 rows and differ by up to 0.82.",
+    "reading": "the saved model artifact appears to have been fitted on a superset of the released test rows (its step-0 RMSE is 0.0015, and h36 cell 57 sweeps train_size_per_step up to 200 of the 300 rows per step, which would absorb test rows). Scoring against it would be scoring against a model that saw the evaluation set.",
+    "decision": "released-F is the per-row prediction table in hardware_over_depth.pk — the artifact that produced the published figure and that is row-aligned with the released split. The saved model is excluded, and this gap is reported rather than reconciled.",
+    "descriptive_numbers_only": {
+      "note": "these are released numbers, not arms; no arm has been fitted",
+      "rmse_unmitigated_noisy_vs_ideal": 0.11713,
+      "rmse_zne_vs_ideal": 0.10451,
+      "rmse_released_prediction_table_vs_ideal": 0.07426,
+      "rmse_released_saved_model_vs_ideal": 0.04345
+    }
+  },
+  "refit_feasibility": {
+    "can_refit": true,
+    "blocker_resolved": "the released circuit pickles were written by qiskit-terra 0.24.x and will not unpickle under qiskit 2.5 (CircuitInstruction slot layout changed) or under terra 0.25.3 (_legacy_format_cache removed). A dedicated venv at <local-path-redacted>/qkv with qiskit-terra 0.24.2, numpy 1.26.4 and symengine 0.9.2 reads them cleanly.",
+    "released_model_needs_old_sklearn": "docs/tutorials/model/.../rfr_list.pk needs scikit-learn < 1.3 (the node dtype predates missing_go_to_left); it loads under the qlear310 env at scikit-learn 1.2.2. It is excluded from scoring anyway.",
+    "pandas_shim": "hardware_over_depth.pk was pickled under pandas 1.x and needs a pandas.core.indexes.numeric shim to load under pandas 2.3",
+    "handoff": "phase1/s1_hw4q.npz holds X_train, y_train, X_test, y_test, the noisy/zne/step/source-row companions and the group widths, so phase 2 fits entirely in py312 with no old-qiskit dependency"
+  },
+  "environments": {
+    "modelling": "<local-path-redacted>/python.exe (numpy 2.2.6, pandas 2.3.3, scikit-learn 1.9.0)",
+    "reading_released_circuits": "<local-path-redacted>/python.exe (python 3.10.11, qiskit-terra 0.24.2, numpy 1.26.4, symengine 0.9.2)",
+    "reading_released_fitted_model": "<local-path-redacted>/python.exe (scikit-learn 1.2.2)"
+  },
+  "correction_to_the_briefing_note": "the briefing said encode_data_v2_ecr writes a device gate-error vector into X. It does not. That vector belongs to encode_data, the other encoder in the same file. encode_data_v2_ecr writes gate counts, angle bins and noisy expectation values only."
+}

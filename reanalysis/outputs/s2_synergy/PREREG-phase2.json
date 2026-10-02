@@ -1,0 +1,138 @@
+{
+  "tag": "S2",
+  "system": "Synergy CNN, Cantori, Mari, Vitali, Pilati, EPJ Quantum Technology 11, 45 (2024)",
+  "phase": "2 of 3, SCORE",
+  "written": "before any arm was fitted on any released row",
+  "governing_document": "<local-path-redacted>/PLAN-independent-instance-score.md",
+
+  "verification_completed_before_this_file": {
+    "script": "s01_verify.py",
+    "zip_md5_match": true,
+    "schema_and_row_counts": "21 arrays, every shape matched an expectation written before loading",
+    "leak_check_1_target_not_in_features": "PASS",
+    "leak_check_2_no_oracle_quantity": "PASS",
+    "leak_check_3_row_counts_and_schema": "PASS",
+    "leak_check_4_row_shuffled_split": "NOT TRIGGERED, RECORDED",
+    "refusal_triggered": false,
+    "independent_finding": "mz_exact was recomputed from theta alone by exact state-vector simulation of the released generator, worst-case error 1.334e-13 over all 300 rows. The target is an exact deterministic function of the released descriptors."
+  },
+
+  "scope_decisions": [
+    {
+      "decision": "The three panels are scored SEPARATELY. No S is averaged across panels and no draws are pooled.",
+      "reason": "Fig8a is configuration A, Fig8b and Fig8c are configuration B, and b and c differ in p_noise. Each panel's mz_predicted comes from a separately trained network, and the authors' own descriptor-only arm succeeds on configuration A and fails on configuration B. Pooling would average over the distinction that decides the question."
+    },
+    {
+      "decision": "Panel a uses a one-dimensional analogue of the released architecture.",
+      "reason": "The paper states configuration A uses a 1D CNN of input shape (N,3); the release ships only cnn_2D.py. The analogue is a literal 1D translation: Conv1D(128,k=3,same,relu) x3, GlobalAveragePooling1D, Dense(512,relu) x4, Dense(1), MSE, adam. Panels b and c use the released cnn_2D.py verbatim. Recorded as a reconstruction."
+    },
+    {
+      "decision": "The released r2() metric in cnn_2D.py is replaced by a Keras-3 equivalent.",
+      "reason": "It calls keras.backend.sum/square, removed in Keras 3. It is a reporting metric only: it is not the loss and not the selection rule, so the trained model is unchanged."
+    }
+  ],
+
+  "arms": {
+    "A": {
+      "definition": "affine (linear) model over the execution-independent descriptors",
+      "features": "ordinary least squares on [1, theta]; 17 parameters for panel a (16 angles), 21 for panels b and c (20 angles)",
+      "qubits_dropped": "the 16 qubits columns have exactly zero variance on every released row, so they are collinear with the intercept and are dropped for rank reasons. Mechanical necessity, not feature selection."
+    },
+    "C": {
+      "definition": "capacity-matched descriptor control: the SAME model family and selection rule as the system's own released model, over the SAME descriptors as A, reading NO execution-derived input",
+      "implementation": "the released architecture with synergy=False, that is the authors' own CNN(theta, q), two input channels: channel 0 = q' = q/10 (the paper's normalization), channel 1 = theta. Configuration B tiles theta across N and q across P exactly as the paper states."
+    },
+    "F_released": {
+      "definition": "PLAN clause 'Where a system cannot be refitted': F is the released prediction",
+      "implementation": "Fig8{a,b,c}_mz_predicted.npy, the hybrid CNN(theta, q, z_noisy) trained by the authors on Ktrain ~ 6e5 circuits at N<=10 and transferred to N=16",
+      "status": "primary under PLAN section 'Where a system cannot be refitted'"
+    },
+    "F_refit_matched": {
+      "definition": "the system's own released feature set refitted under the matched recipe, on the same rows and folds as A and C",
+      "implementation": "the released architecture with synergy=True, three input channels: q', theta, z_noisy",
+      "status": "declared BEFORE fitting as the second F variant. Both F variants are reported. The gap between them is a reportable quantity and is NOT reconciled by adjusting the recipe.",
+      "why_declared": "F_released carries ~6e5 training circuits while A and C get at most 100 rows minus the split. F_refit_matched is the only construction in which T is not confounded by that training-budget gap, and it is the construction in which 'only the inputs move' is literally true."
+    }
+  },
+
+  "matched_recipe_held_fixed_across_C_and_F_refit": {
+    "loss": "mean squared error (as released)",
+    "optimizer": "adam, Keras default learning rate 1e-3 (as released)",
+    "batch_size": 8,
+    "max_epochs": 400,
+    "selection_rule": "within each fold's training rows, 20% held out as a validation set; EarlyStopping on val_loss with patience 60 and restore_best_weights=True",
+    "input_scaling": "the paper's own q' = q/10; theta and z_noisy left raw, as the paper intends (all channels of the same order)",
+    "target_scaling": "none; the network predicts mz directly, as released",
+    "ensemble": "3 seeds per fold, predictions averaged; identical for C and F_refit",
+    "seeds": "12527150 + 1000*fold + repeat, identical for C and F_refit so the only difference between the two arms is the number of input channels",
+    "only_thing_that_moves": "the number of input channels (2 for C, 3 for F_refit)"
+  },
+
+  "split": {
+    "scheme": "10-fold cross-validation, fixed fold assignment",
+    "fold_seed": 12527150,
+    "evaluation_rows": "all 100 rows of the panel, via out-of-fold predictions for A, C and F_refit_matched",
+    "why": "the released model was trained on separate unreleased circuits, so all 100 released rows are genuinely held out for F_released. Out-of-fold prediction makes them genuinely held out for A, C and F_refit_matched too, so all arms are evaluated on the SAME rows.",
+    "released_split_for_the_arms": "none exists; this split is declared here",
+    "row_shuffled_hazard": "does not arise: one row is one circuit realization, all 100 theta rows are unique in every panel, and no theta row is shared between panels"
+  },
+
+  "metric": {
+    "per_row": "squared error (y - yhat)^2",
+    "arm_error": "mean squared error over the evaluation rows in the draw",
+    "invariance_note": "S = K/T is unchanged if every arm's error is divided by the draw's own target variance, so MSE and the paper's own normalized error 1 - R2 give an identical S. Both are reported for readability; S is computed from MSE.",
+    "orientation": "lower is better, so T = A - F > 0 means the full arm improves on the affine control"
+  },
+
+  "estimand": {
+    "T": "err(A) - err(F)",
+    "K": "err(A) - err(C)",
+    "D": "err(C) - err(F)",
+    "S": "K / T",
+    "formation": "formed INSIDE each bootstrap draw from that draw's resampled rows, never from separately averaged numbers"
+  },
+
+  "resampling": {
+    "unit": "the circuit, that is one released row of the panel",
+    "n_per_draw": 100,
+    "count": 10000,
+    "interval": "percentile, 95%, [2.5, 97.5]",
+    "seed": "12527150 + panel index",
+    "conditional_on": "the fitted and selected models, which are fixed before resampling",
+    "instability_diagnostic": "the share of draws with T <= 0 is reported beside every interval, because S = K/T is unstable when T crosses zero"
+  },
+
+  "reading_rule": {
+    "above_0.5": "failure mode PRESENT in this system",
+    "below_0.5": "failure mode ABSENT in this system",
+    "spans_0.5": "INDETERMINATE for this system",
+    "boundary": "0.5, not tuned, not to be retuned after seeing any number"
+  },
+
+  "calibration_variants": {
+    "carries_calibration": false,
+    "evidence": "the release ships no gate-error, t1, t2 or readout vector and no analogue of S3's esp_m. Noise enters only through the static FakeGuadalupe backend model, a fixed snapshot rather than a per-row covariate. The one descriptor that indexes device position, qubits, is byte-identical across all 300 rows.",
+    "handling": "the pipeline is nonetheless RUN TWICE, with an explicit flag cal_available in {true, false}, where the S2 calibration block is the empty set in both runs. Both are reported. Neither is selected. They cannot land on opposite sides of the reading rule because they are the same computation on the same inputs; that identity is asserted numerically rather than assumed.",
+    "declared": "before any fit, from the release contents"
+  },
+
+  "saturation_diagnostic": {
+    "learned": "the strongest descriptor-only predictor the released data supports, fitted on theta alone with no capacity match and no measurement input, held-out R2 under the same 10-fold split. Family sweep: OLS, ridge, degree-2 polynomial ridge, kernel ridge (RBF), Gaussian process, random forest, extra trees, gradient boosting, k-NN, MLP. The maximum held-out R2 is reported.",
+    "analytic": "the released generator circ_gen.py plus theta reproduces mz_exact to 1.3e-13 with no measurement input and no training, so the information-theoretic descriptor saturation is exactly 1.0.",
+    "reporting_constraint": "a low LEARNED saturation on 100 rows is a finite-sample statement about recovering a 16- or 20-dimensional function from 100 samples. It must NOT be reported as the PLAN's 'the descriptors never carried the information' branch, because the analytic result refutes that branch for this system."
+  },
+
+  "pre_recorded_asymmetries": [
+    {"name": "training-budget gap", "detail": "F_released carries ~6e5 training circuits; A and C get 90 training rows per fold.", "bias": "inflates T = A - F, biases S DOWNWARD, favours reading ABSENT"},
+    {"name": "test-size transfer gap", "detail": "F_released was trained at N<=10 and transferred to N=16; A and C are fitted directly at N=16, in distribution.", "bias": "biases S UPWARD, favours reading PRESENT"},
+    {"name": "matched-budget refit", "detail": "F_refit_matched removes the first asymmetry and the second, since it is fitted on the same rows and folds as A and C.", "bias": "none of the two above; it carries instead the reduced-scope limitation that 100 rows is far below the released training budget for every arm"}
+  ],
+
+  "forbidden_here": [
+    "dropping a panel after seeing its result",
+    "retuning the 0.5 boundary",
+    "averaging S across panels or pooling their draws",
+    "reading a zero-crossing interval as absence",
+    "reconciling the released-vs-refitted gap by adjusting the recipe after seeing it"
+  ]
+}

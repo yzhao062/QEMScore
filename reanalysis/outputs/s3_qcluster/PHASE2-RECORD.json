@@ -1,0 +1,816 @@
+{
+  "tag": "S3",
+  "system": "Q-Cluster (Patil, Baron, Zhou, IEEE QCE 2025)",
+  "phase": "2 of 3, SCORE",
+  "governing_document": "directions/qem-bench/release-round-2026-09-04/PLAN-independent-instance-score.md",
+  "pre_registration": "PRE-REGISTRATION.json, written before any arm was fitted",
+  "scoreable": true,
+  "scoped_experiment": "the regression stage: predict Target (iloc[:,11], the effective bit-flip rate) from the released 145-row table; the only learned component of Q-Cluster and the only place the arms' inputs differ",
+  "evaluation_unit": "one row = one (circuit, machine) pair",
+  "resample_unit": "one row of the released 145-row table, i.e. one (circuit, machine) pair",
+  "resample_count": 10000,
+  "interval": "two-sided 95 percent percentile interval, the 2.5th and 97.5th percentiles of the bootstrap distribution of S",
+  "leak_checks": {
+    "1_target_in_any_arm": "PASS, re-derived from the released bytes in score_00_verify.py",
+    "2_oracle_read_by_an_arm": "PASS, re-derived; no arm reads ip Entropy, the ideal distribution or its support size, and the ip-Entropy case filter is not applied",
+    "3_row_counts_and_schema": "PASS, sha256 of both released pickles asserted before anything else; 145 x 12, 29 algorithms x 5 machines complete",
+    "4_row_shuffled_split": "RECORDED AND REPORTED, not a refusal; carried in the same sentence as every PRESENT reading below"
+  },
+  "primary_panels_random_state_40": {
+    "rs40|with_calibration": {
+      "random_state": 40,
+      "ladder": "with_calibration",
+      "winner_C": "ExtraTrees",
+      "winner_F": "ExtraTrees",
+      "A_mse": 0.0019893561059737834,
+      "C_mse": 0.0006384549391729207,
+      "F_mse": 0.00045329593560124696,
+      "A_r2": 0.8534720540336436,
+      "C_r2": 0.9529739846233864,
+      "F_r2": 0.9666120499195211,
+      "T": 0.0015360601703725365,
+      "K": 0.0013509011668008627,
+      "D": 0.00018515900357167378,
+      "S": 0.8794584957392863,
+      "S_lo": 0.7723325044697,
+      "S_hi": 0.9658417695043446,
+      "T_lo": 0.001011483636450967,
+      "T_hi": 0.0021683096508131783,
+      "K_lo": 0.000869359120720494,
+      "K_hi": 0.0019273656499175906,
+      "D_lo": 4.863383054214283e-05,
+      "D_hi": 0.0003848982947258291,
+      "frac_T_nonpos": 0.0,
+      "n_nonfinite_S": 0,
+      "n_boot": 10000,
+      "reading": "PRESENT",
+      "S_mae": 0.8337729968261242,
+      "S_mae_lo": 0.7329456125796768,
+      "S_mae_hi": 0.9178257480317517
+    },
+    "rs40|without_calibration": {
+      "random_state": 40,
+      "ladder": "without_calibration",
+      "winner_C": "GradientBoosting",
+      "winner_F": "ExtraTrees",
+      "A_mse": 0.0028587942441325566,
+      "C_mse": 0.0006431440550410129,
+      "F_mse": 0.00045329593560124696,
+      "A_r2": 0.7894327479754364,
+      "C_r2": 0.9526286032638166,
+      "F_r2": 0.9666120499195211,
+      "T": 0.0024054983085313097,
+      "K": 0.0022156501890915436,
+      "D": 0.00018984811943976591,
+      "S": 0.9210774255103596,
+      "S_lo": 0.8480234091130207,
+      "S_hi": 0.9715729465409543,
+      "T_lo": 0.0014973019985209867,
+      "T_hi": 0.003521836842492731,
+      "K_lo": 0.0013218720332698315,
+      "K_hi": 0.0033161521615368336,
+      "D_lo": 6.600051567891543e-05,
+      "D_hi": 0.0003354011785417307,
+      "frac_T_nonpos": 0.0,
+      "n_nonfinite_S": 0,
+      "n_boot": 10000,
+      "reading": "PRESENT",
+      "S_mae": 0.8756282267834576,
+      "S_mae_lo": 0.7898469700477214,
+      "S_mae_hi": 0.9557021116746826
+    }
+  },
+  "secondary_panels_random_state_42": {
+    "rs42|with_calibration": {
+      "random_state": 42,
+      "ladder": "with_calibration",
+      "winner_C": "XGBoost",
+      "winner_F": "XGBoost",
+      "A_mse": 0.0019814255748153062,
+      "C_mse": 0.0009158123970784583,
+      "F_mse": 0.000743381018229796,
+      "A_r2": 0.8540561849680621,
+      "C_r2": 0.9325449530974018,
+      "F_r2": 0.9452455528979958,
+      "T": 0.00123804455658551,
+      "K": 0.0010656131777368478,
+      "D": 0.0001724313788486623,
+      "S": 0.8607228003778613,
+      "S_lo": 0.6381894008194846,
+      "S_hi": 1.0399170473900983,
+      "T_lo": 0.0006992988592585518,
+      "T_hi": 0.0018132517719066177,
+      "K_lo": 0.000556381319382293,
+      "K_hi": 0.0016365900999388673,
+      "D_lo": -3.949654128039136e-05,
+      "D_hi": 0.00042502503241568086,
+      "frac_T_nonpos": 0.0,
+      "n_nonfinite_S": 0,
+      "n_boot": 10000,
+      "reading": "PRESENT",
+      "S_mae": 0.8313913737904867,
+      "S_mae_lo": 0.6766918565188589,
+      "S_mae_hi": 0.9518314504529611
+    },
+    "rs42|without_calibration": {
+      "random_state": 42,
+      "ladder": "without_calibration",
+      "winner_C": "XGBoost",
+      "winner_F": "XGBoost",
+      "A_mse": 0.004109707160154604,
+      "C_mse": 0.000931626578825025,
+      "F_mse": 0.000743381018229796,
+      "A_r2": 0.697295548598669,
+      "C_r2": 0.9313801442622692,
+      "F_r2": 0.9452455528979958,
+      "T": 0.0033663261419248076,
+      "K": 0.003178080581329579,
+      "D": 0.00018824556059522895,
+      "S": 0.9440798209505651,
+      "S_lo": 0.8215648061897106,
+      "S_hi": 1.0058490170928587,
+      "T_lo": 0.0014839832532269593,
+      "T_hi": 0.006476247718961247,
+      "K_lo": 0.0013029245292060338,
+      "K_hi": 0.00628699347233554,
+      "D_lo": -1.9049493142471598e-05,
+      "D_hi": 0.0004269930405705703,
+      "frac_T_nonpos": 0.0,
+      "n_nonfinite_S": 0,
+      "n_boot": 10000,
+      "reading": "PRESENT",
+      "S_mae": 0.876236935186612,
+      "S_mae_lo": 0.7712677605143728,
+      "S_mae_hi": 0.9520643537617044
+    }
+  },
+  "pinned_family_robustness": {
+    "why": "arm C's 'same model family and selection rule' has two readings; both are reported so the score does not turn on which is taken",
+    "rs40": {
+      "rs40_pinned_ExtraTrees|with_calibration": {
+        "A": 0.0019893561059737834,
+        "C": 0.0006384549391729206,
+        "F": 0.00045329593560124696,
+        "T": 0.0015360601703725365,
+        "K": 0.0013509011668008629,
+        "D": 0.00018515900357167367,
+        "S": 0.8794584957392864,
+        "S_lo": 0.7723325044697,
+        "S_hi": 0.9658417695043446,
+        "reading": "PRESENT",
+        "circuit_lo": 0.7701531397028727,
+        "circuit_hi": 0.9621737833843752
+      },
+      "rs40_pinned_ExtraTrees|without_calibration": {
+        "A": 0.002858794244132557,
+        "C": 0.0006663187882393096,
+        "F": 0.00045329593560124696,
+        "T": 0.00240549830853131,
+        "K": 0.0021924754558932474,
+        "D": 0.00021302285263806263,
+        "S": 0.9114433579593223,
+        "S_lo": 0.7860101102911261,
+        "S_hi": 0.9803141074493804,
+        "reading": "PRESENT",
+        "circuit_lo": 0.7501540504621904,
+        "circuit_hi": 0.9805779517292552
+      }
+    },
+    "rs42": {
+      "rs42_pinned_ExtraTrees|with_calibration": {
+        "A": 0.0019814255748153062,
+        "C": 0.0009995917178665505,
+        "F": 0.0007690245213984562,
+        "T": 0.00121240105341685,
+        "K": 0.0009818338569487558,
+        "D": 0.00023056719646809428,
+        "S": 0.8098259682154695,
+        "S_lo": 0.5691100408035867,
+        "S_hi": 0.9342536063222591,
+        "frac_T_nonpos": 0.0,
+        "reading": "PRESENT"
+      },
+      "rs42_pinned_ExtraTrees|without_calibration": {
+        "A": 0.004109707160154605,
+        "C": 0.0010790910580271572,
+        "F": 0.0007690245213984562,
+        "T": 0.0033406826387561484,
+        "K": 0.0030306161021274474,
+        "D": 0.000310066536628701,
+        "S": 0.9071846774573745,
+        "S_lo": 0.7509514254703256,
+        "S_hi": 0.971250281881737,
+        "frac_T_nonpos": 0.0,
+        "reading": "PRESENT"
+      }
+    }
+  },
+  "circuit_level_bootstrap_diagnostic": {
+    "rs=40, with_calibration": {
+      "S": 0.8794584957392864,
+      "row_lo": 0.7723325044697,
+      "row_hi": 0.9658417695043446,
+      "row_reading": "PRESENT",
+      "circuit_lo": 0.7701531397028727,
+      "circuit_hi": 0.9621737833843752,
+      "circuit_reading": "PRESENT",
+      "circuit_frac_T_nonpos": 0.0,
+      "width_row": 0.1935092650346446,
+      "width_circuit": 0.1920206436815025
+    },
+    "rs=40, without_calibration": {
+      "S": 0.9210774255103596,
+      "row_lo": 0.8480234091130207,
+      "row_hi": 0.9715729465409543,
+      "row_reading": "PRESENT",
+      "circuit_lo": 0.8028325668031591,
+      "circuit_hi": 0.9675712994703278,
+      "circuit_reading": "PRESENT",
+      "circuit_frac_T_nonpos": 0.0,
+      "width_row": 0.12354953742793362,
+      "width_circuit": 0.16473873266716876
+    },
+    "rs=42, with_calibration": {
+      "S": 0.8607228003778613,
+      "row_lo": 0.6381894008194846,
+      "row_hi": 1.0399170473900983,
+      "row_reading": "PRESENT",
+      "circuit_lo": 0.5056682263500252,
+      "circuit_hi": 1.0727915216640824,
+      "circuit_reading": "PRESENT",
+      "circuit_frac_T_nonpos": 0.0,
+      "width_row": 0.40172764657061366,
+      "width_circuit": 0.5671232953140573
+    },
+    "rs=42, without_calibration": {
+      "S": 0.9440798209505651,
+      "row_lo": 0.8215648061897106,
+      "row_hi": 1.0058490170928587,
+      "row_reading": "PRESENT",
+      "circuit_lo": 0.729414045727782,
+      "circuit_hi": 0.9994078335442149,
+      "circuit_reading": "PRESENT",
+      "circuit_frac_T_nonpos": 0.0,
+      "width_row": 0.18428421090314806,
+      "width_circuit": 0.2699937878164329
+    }
+  },
+  "grouped_split_diagnostic": {
+    "grouped_diagnostic|with_calibration": {
+      "A": 0.012180539076498074,
+      "C": 0.002669298908499249,
+      "F": 0.0023398791638208037,
+      "T": 0.00984065991267727,
+      "K": 0.009511240167998826,
+      "D": 0.0003294197446784453,
+      "S": 0.9665246286731168,
+      "S_lo": 0.8454732645313787,
+      "S_hi": 1.0312049371772123,
+      "frac_T_nonpos": 0.0,
+      "reading": "n/a (diagnostic)"
+    },
+    "grouped_diagnostic_clusterboot|with_calibration": {
+      "A": 0.012180539076498074,
+      "C": 0.002669298908499249,
+      "F": 0.0023398791638208037,
+      "T": 0.00984065991267727,
+      "K": 0.009511240167998826,
+      "D": 0.0003294197446784453,
+      "S": 0.9665246286731168,
+      "S_lo": -0.19534363336845506,
+      "S_hi": 1.4057702912939554,
+      "frac_T_nonpos": 0.032,
+      "reading": "n/a (diagnostic)"
+    },
+    "grouped_diagnostic|without_calibration": {
+      "A": 0.015022804285064558,
+      "C": 0.002536958618015539,
+      "F": 0.0023398791638208037,
+      "T": 0.012682925121243754,
+      "K": 0.012485845667049019,
+      "D": 0.00019707945419473539,
+      "S": 0.9844610409419962,
+      "S_lo": 0.9066669240893943,
+      "S_hi": 1.0329413097305415,
+      "frac_T_nonpos": 0.0,
+      "reading": "n/a (diagnostic)"
+    },
+    "grouped_diagnostic_clusterboot|without_calibration": {
+      "A": 0.015022804285064558,
+      "C": 0.002536958618015539,
+      "F": 0.0023398791638208037,
+      "T": 0.012682925121243754,
+      "K": 0.012485845667049019,
+      "D": 0.00019707945419473539,
+      "S": 0.9844610409419962,
+      "S_lo": 0.39021269738431225,
+      "S_hi": 1.350318125194987,
+      "frac_T_nonpos": 0.0205,
+      "reading": "n/a (diagnostic)"
+    }
+  },
+  "selection_optimism_diagnostic": {
+    "why": "arms C and F are both chosen by the released bake-off on the folds they are then scored on, while arm A pays no selection cost; shared optimism of size d moves S = (K + d) / (T + d) toward 1 and so biases the reading toward PRESENT",
+    "test": "identical bake-off, selected inside each outer training fold instead",
+    "result": {
+      "rs40|with_calibration": {
+        "A": 0.0019893561059737834,
+        "C": 0.0006384549391729206,
+        "F": 0.00045329593560124696,
+        "T": 0.0015360601703725365,
+        "K": 0.0013509011668008629,
+        "D": 0.00018515900357167367,
+        "S": 0.8794584957392864,
+        "S_lo": 0.7723325044697,
+        "S_hi": 0.9658417695043446,
+        "reading_if_applied": "PRESENT",
+        "picked_C": [
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees"
+        ],
+        "picked_F": [
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees"
+        ]
+      },
+      "rs40|without_calibration": {
+        "A": 0.002858794244132557,
+        "C": 0.0006663187882393096,
+        "F": 0.00045329593560124696,
+        "T": 0.00240549830853131,
+        "K": 0.0021924754558932474,
+        "D": 0.00021302285263806263,
+        "S": 0.9114433579593223,
+        "S_lo": 0.7860101102911261,
+        "S_hi": 0.9803141074493804,
+        "reading_if_applied": "PRESENT",
+        "picked_C": [
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees"
+        ],
+        "picked_F": [
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees"
+        ]
+      },
+      "rs42|with_calibration": {
+        "A": 0.0019814255748153062,
+        "C": 0.0009995917178665505,
+        "F": 0.0007690245213984562,
+        "T": 0.00121240105341685,
+        "K": 0.0009818338569487558,
+        "D": 0.00023056719646809428,
+        "S": 0.8098259682154695,
+        "S_lo": 0.5691100408035867,
+        "S_hi": 0.9342536063222591,
+        "reading_if_applied": "PRESENT",
+        "picked_C": [
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees"
+        ],
+        "picked_F": [
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees"
+        ]
+      },
+      "rs42|without_calibration": {
+        "A": 0.004109707160154605,
+        "C": 0.0013003285843889631,
+        "F": 0.0007690245213984562,
+        "T": 0.0033406826387561484,
+        "K": 0.0028093785757656413,
+        "D": 0.0005313040629905069,
+        "S": 0.8409594324145888,
+        "S_lo": 0.5469895215949889,
+        "S_hi": 0.9547979988510475,
+        "reading_if_applied": "PRESENT",
+        "picked_C": [
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "DecisionTree"
+        ],
+        "picked_F": [
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees",
+          "ExtraTrees"
+        ]
+      }
+    }
+  },
+  "tied_input_floor": {
+    "note": "rows sharing every input a descriptor arm may read set a floor no such arm can beat; the floor is far below what any arm reaches, so ties are not what separates C from F",
+    "descriptors_only": {
+      "tied_rows": 47,
+      "best_possible_MSE_all_rows": 1.7e-05
+    },
+    "descriptors_plus_calibration": {
+      "tied_rows": 10,
+      "best_possible_MSE_all_rows": 4e-06
+    },
+    "arm_F_out_of_fold_MSE_rs40": 0.000453,
+    "script": "score_09_tied_inputs.py"
+  },
+  "saturation": {
+    "released row-shuffled split (random_state=40) | descriptors only (6)": {
+      "flat_best_model": "XGB(lr=0.05,d=3)",
+      "flat_R2": 0.9545912749814385,
+      "flat_MSE": 0.0006164975819759399,
+      "nested_R2": 0.9347718670283934,
+      "nested_MSE": 0.0008855784045326706,
+      "nested_picked": [
+        "SVRscaled(C=1,g=1.0)",
+        "SVRscaled(C=10,g=scale)",
+        "XGB(lr=0.1,d=3)",
+        "SVRscaled(C=1,g=1.0)",
+        "GradBoost(lr=0.05,d=3)"
+      ],
+      "flat_top10": [
+        [
+          "XGB(lr=0.05,d=3)",
+          0.9545912749814385,
+          0.0006164975819759399
+        ],
+        [
+          "XGB(lr=0.1,d=3)",
+          0.952210013206243,
+          0.0006488270985139977
+        ],
+        [
+          "RandomForest(mf=0.5,leaf=1)",
+          0.9520254450139131,
+          0.0006513329130735249
+        ],
+        [
+          "ExtraTrees(mf=0.5,leaf=1)",
+          0.9516696832446806,
+          0.000656162959951116
+        ],
+        [
+          "ExtraTrees(mf=1,leaf=1)",
+          0.9507845801838739,
+          0.0006681796791292872
+        ],
+        [
+          "GradBoost(lr=0.05,d=3)",
+          0.9502914434879408,
+          0.000674874814931979
+        ],
+        [
+          "GradBoost(lr=0.1,d=3)",
+          0.9477979314146958,
+          0.0007087283125396524
+        ],
+        [
+          "SVRscaled(C=1,g=1.0)",
+          0.9476788393753084,
+          0.0007103451814185927
+        ],
+        [
+          "RandomForest(mf=1,leaf=1)",
+          0.9470355677549872,
+          0.0007190786439485285
+        ],
+        [
+          "ExtraTrees(mf=1,leaf=2)",
+          0.9460081181757355,
+          0.0007330279495269608
+        ]
+      ]
+    },
+    "released row-shuffled split (random_state=40) | descriptors + calibration (7)": {
+      "flat_best_model": "ExtraTrees(mf=0.5,leaf=1)",
+      "flat_R2": 0.9541323520557542,
+      "flat_MSE": 0.0006227282099859091,
+      "nested_R2": 0.9385294819998358,
+      "nested_MSE": 0.0008345626461526711,
+      "nested_picked": [
+        "GaussianProcess",
+        "SVRscaled(C=10,g=0.1)",
+        "XGB(lr=0.05,d=3)",
+        "SVRscaled(C=1,g=1.0)",
+        "ExtraTrees(mf=1,leaf=1)"
+      ],
+      "flat_top10": [
+        [
+          "ExtraTrees(mf=0.5,leaf=1)",
+          0.9541323520557542,
+          0.0006227282099859091
+        ],
+        [
+          "ExtraTrees(mf=1,leaf=1)",
+          0.9537599546440966,
+          0.0006277841128708108
+        ],
+        [
+          "ExtraTrees(mf=1,leaf=2)",
+          0.9495574940925384,
+          0.0006848393763102896
+        ],
+        [
+          "SVRscaled(C=10,g=scale)",
+          0.9478994620342591,
+          0.000707349868607749
+        ],
+        [
+          "RandomForest(mf=0.5,leaf=1)",
+          0.9471239760194526,
+          0.0007178783574122439
+        ],
+        [
+          "GradBoost(lr=0.05,d=3)",
+          0.9464062376828447,
+          0.0007276228271992594
+        ],
+        [
+          "GaussianProcess",
+          0.9450767340558344,
+          0.0007456730096464673
+        ],
+        [
+          "XGB(lr=0.05,d=3)",
+          0.9441762789636966,
+          0.0007578981577155636
+        ],
+        [
+          "XGB(lr=0.1,d=3)",
+          0.9441303603832742,
+          0.0007585215774170997
+        ],
+        [
+          "GradBoost(lr=0.1,d=3)",
+          0.9437906964707934,
+          0.0007631330696059535
+        ]
+      ]
+    },
+    "DIAGNOSTIC grouped-by-circuit split (NOT the released recipe) | descriptors only (6)": {
+      "flat_best_model": "SVRscaled(C=10,g=0.01)",
+      "flat_R2": 0.8426376757911395,
+      "flat_MSE": 0.002136450480149368,
+      "nested_R2": 0.7596762104837335,
+      "nested_MSE": 0.003262787824751976,
+      "nested_picked": [
+        "SVRscaled(C=10,g=0.1)",
+        "SVRscaled(C=1,g=scale)",
+        "SVRscaled(C=100,g=0.01)",
+        "ExtraTrees(mf=0.5,leaf=1)",
+        "ExtraTrees(mf=1,leaf=2)"
+      ],
+      "flat_top10": [
+        [
+          "SVRscaled(C=10,g=0.01)",
+          0.8426376757911395,
+          0.002136450480149368
+        ],
+        [
+          "SVRscaled(C=1,g=scale)",
+          0.8360754471872813,
+          0.0022255434477453126
+        ],
+        [
+          "SVRscaled(C=1,g=0.1)",
+          0.8319514770623355,
+          0.002281533075490439
+        ],
+        [
+          "SVRscaled(C=10,g=scale)",
+          0.8295466272962647,
+          0.0023141828375172757
+        ],
+        [
+          "RandomForest(mf=0.5,leaf=1)",
+          0.8292706524203443,
+          0.002317929647048297
+        ],
+        [
+          "RandomForest(mf=0.5,leaf=2)",
+          0.8248211563732835,
+          0.0023783388206796464
+        ],
+        [
+          "RandomForest(mf=1,leaf=2)",
+          0.817405929999523,
+          0.0024790126257107034
+        ],
+        [
+          "RandomForest(mf=1,leaf=4)",
+          0.8161838911213044,
+          0.0024956037987329447
+        ],
+        [
+          "RandomForest(mf=1,leaf=1)",
+          0.815612174024143,
+          0.002503365791782304
+        ],
+        [
+          "ExtraTrees(mf=1,leaf=2)",
+          0.811633990225868,
+          0.0025573761321142515
+        ]
+      ]
+    },
+    "DIAGNOSTIC grouped-by-circuit split (NOT the released recipe) | descriptors + calibration (7)": {
+      "flat_best_model": "SVRscaled(C=1,g=0.1)",
+      "flat_R2": 0.8573434543963983,
+      "flat_MSE": 0.0019367955251267455,
+      "nested_R2": 0.7756609717947798,
+      "nested_MSE": 0.003045768591274392,
+      "nested_picked": [
+        "SVRscaled(C=10,g=0.01)",
+        "ExtraTrees(mf=1,leaf=1)",
+        "ExtraTrees(mf=1,leaf=1)",
+        "ExtraTrees(mf=0.5,leaf=1)",
+        "KNNscaled(k=2)"
+      ],
+      "flat_top10": [
+        [
+          "SVRscaled(C=1,g=0.1)",
+          0.8573434543963983,
+          0.0019367955251267455
+        ],
+        [
+          "SVRscaled(C=10,g=scale)",
+          0.8341347787929208,
+          0.002251891189771792
+        ],
+        [
+          "SVRscaled(C=1,g=scale)",
+          0.8234922828478558,
+          0.0023963804484690874
+        ],
+        [
+          "RandomForest(mf=0.5,leaf=1)",
+          0.8218077756761317,
+          0.0024192503836580745
+        ],
+        [
+          "SVRscaled(C=10,g=0.1)",
+          0.8157720961501538,
+          0.002501194587813248
+        ],
+        [
+          "ExtraTrees(mf=1,leaf=1)",
+          0.8154867970173639,
+          0.0025050679893551943
+        ],
+        [
+          "RandomForest(mf=1,leaf=4)",
+          0.8138625120585121,
+          0.002527120309678277
+        ],
+        [
+          "RandomForest(mf=1,leaf=1)",
+          0.8135463792105537,
+          0.0025314123292465387
+        ],
+        [
+          "RandomForest(mf=1,leaf=2)",
+          0.8116026833582008,
+          0.0025578011739582625
+        ],
+        [
+          "ExtraTrees(mf=1,leaf=2)",
+          0.8069264563692207,
+          0.002621288590314887
+        ]
+      ]
+    }
+  },
+  "released_versus_refit": {
+    "regression_stage": "reproduces the released cell-6 aggregates; ExtraTrees mean 5-fold R2 0.9643 released and 0.9643 here, and the released selection (ExtraTrees) is reproduced. Only GradientBoosting differs, 0.9517 released against 0.9512 here.",
+    "no_released_per_row_predictions": true,
+    "downstream_stage": "not comparable. The released clustering stage is a function of Python's per-process string-hash seed as well as of its inputs: the same circuit at the same p returns 0.058 to 0.708 across hash seeds, and the released cell-9 value 0.707513 is one draw from that spread. Reported, not reconciled.",
+    "downstream_hash_seed_evidence": "score_06_hashseed.py"
+  },
+  "downstream_corroboration": {
+    "status": "corroborating only, never scoreable; 6 rows, no interval computed",
+    "paired_across_hash_seeds": [
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.2662282877067617,
+        "A_without_calib": 0.265941521903712,
+        "C_with_calib": 0.2370216929366218,
+        "C_without_calib": 0.23589787579437294,
+        "F": 0.23821539337668227
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.3390754560734366,
+        "A_without_calib": 0.3391345589880692,
+        "C_with_calib": 0.3238371200031208,
+        "C_without_calib": 0.323014835842753,
+        "F": 0.3243010643349406
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.2803823112363793,
+        "A_without_calib": 0.27999417594778,
+        "C_with_calib": 0.268607441113106,
+        "C_without_calib": 0.2673023567685064,
+        "F": 0.27097094980661757
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.35238198410723376,
+        "A_without_calib": 0.3523797246057236,
+        "C_with_calib": 0.3248115891560365,
+        "C_without_calib": 0.32398535854598154,
+        "F": 0.3262761992733482
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.29975207289532885,
+        "A_without_calib": 0.29950068755648274,
+        "C_with_calib": 0.28741075348806217,
+        "C_without_calib": 0.2861659853133262,
+        "F": 0.2898211996313426
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.3462385436429072,
+        "A_without_calib": 0.3460627226303434,
+        "C_with_calib": 0.32998983167707246,
+        "C_without_calib": 0.3288829831610965,
+        "F": 0.33128181620853364
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.2287564342314329,
+        "A_without_calib": 0.2287388979197472,
+        "C_with_calib": 0.1814671476765568,
+        "C_without_calib": 0.1804150822297019,
+        "F": 0.18146356473816327
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.3353838018254311,
+        "A_without_calib": 0.3353700736905693,
+        "C_with_calib": 0.3134691925445669,
+        "C_without_calib": 0.3126076819826932,
+        "F": 0.3135166448486652
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.27303297067503324,
+        "A_without_calib": 0.27295912373748027,
+        "C_with_calib": 0.23665252812906354,
+        "C_without_calib": 0.23550307175357055,
+        "F": 0.2375495537854921
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.2615248069607483,
+        "A_without_calib": 0.2614275287973529,
+        "C_with_calib": 0.26154531714779417,
+        "C_without_calib": 0.2606282494189809,
+        "F": 0.2633584444496771
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.23131723827588627,
+        "A_without_calib": 0.23119621069569055,
+        "C_with_calib": 0.22941150297487026,
+        "C_without_calib": 0.22815510507900053,
+        "F": 0.2306416313434203
+      },
+      {
+        "noisy": 0.23107423122815085,
+        "A_with_calib": 0.323403357136219,
+        "A_without_calib": 0.3231950119709764,
+        "C_with_calib": 0.3120062055388468,
+        "C_without_calib": 0.3108526523795529,
+        "F": 0.3127157347584724
+      }
+    ],
+    "n_seeds": 12
+  },
+  "reading": {
+    "rule": "S interval entirely above 0.5 -> PRESENT; entirely below -> ABSENT; spanning 0.5 -> INDETERMINATE",
+    "with_calibration": "PRESENT",
+    "without_calibration": "PRESENT",
+    "split_on_calibration_access": false,
+    "verdict": "PRESENT"
+  }
+}

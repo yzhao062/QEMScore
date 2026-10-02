@@ -1,0 +1,54 @@
+{
+  "status": "appendix; the declared reading is in S1_score.json and is unchanged by anything here",
+  "affine_arm_A": {
+    "spec": "OLS on 165 descriptor columns, 500 training rows",
+    "r2_in_sample": 0.36002117057344785,
+    "r2_held_out": 0.027366640386011915,
+    "mean_per_row_L2": 0.4418754903329561,
+    "verdict": "overfitting, not degenerate: it fits the training rows and generalizes poorly",
+    "why_it_matters": "S = (A-C)/(A-F) increases with A, so a weak affine arm pushes S toward 1"
+  },
+  "sensitivity_strongest_affine_arm": {
+    "spec": "RidgeCV over standardized descriptors, still affine and still descriptor-only",
+    "r2_held_out": 0.1277160126131605,
+    "mean_per_row_L2": 0.4061764548515428,
+    "S_refitted_F": 0.5516337251261902,
+    "S_refitted_F_interval": [
+      0.5297557823958524,
+      0.5744168917887635
+    ],
+    "S_released_F": 0.5507632497926596,
+    "S_released_F_interval": [
+      0.5289929726478251,
+      0.5732220685261274
+    ],
+    "reading_refitted": "PRESENT",
+    "reading_released": "PRESENT",
+    "note": "this sensitivity can only move S toward 0.5, so it tests the declared reading rather than favouring it"
+  },
+  "baselines_mean_per_row_L2": {
+    "A_affine_control": 0.4418754903329561,
+    "A_ridge_control": 0.4061764548515428,
+    "C_capacity_matched_control": 0.23756741794824635,
+    "unmitigated_noisy": 0.20970683300841556,
+    "zne": 0.18681891056616498,
+    "F_refitted": 0.10052248696782443,
+    "F_released": 0.10003940419180642,
+    "C_minus_unmitigated": 0.02786058493983079,
+    "C_minus_unmitigated_interval": [
+      0.020063574359602897,
+      0.03544668618840064
+    ],
+    "C_beats_doing_nothing": false
+  },
+  "capacity_match_is_not_binding": {
+    "C_matched_RF100_meanL2": 0.23756741794824635,
+    "RF2000_meanL2": 0.23595632576774142,
+    "S_with_unmatched_control": 0.603244039264981,
+    "S_with_unmatched_control_interval": [
+      0.5851534281446168,
+      0.6218005899882495
+    ],
+    "reading": "PRESENT"
+  }
+}

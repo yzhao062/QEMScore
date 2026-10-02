@@ -1,0 +1,119 @@
+{
+  "tag": "S2",
+  "system": "Synergy CNN, Cantori, Mari, Vitali, Pilati, EPJ Quantum Technology 11, 45 (2024)",
+  "phase": "1 of 3, ACQUIRE. No arm was fitted.",
+  "acquired_utc_date": "2026-09-06",
+
+  "release": {
+    "zenodo_record": 12527150,
+    "zenodo_version": "1.4",
+    "zenodo_doi": "10.5281/zenodo.12527150",
+    "concept_doi": "10.5281/zenodo.11204575",
+    "publication_date": "2024-06-25",
+    "license": "cc-by-4.0",
+    "single_file": "simonecantori/Synergy-...-error-mitigation-1.4.zip",
+    "zip_bytes": 82408,
+    "zip_md5_declared": "c8939101e068e9e5b23599f0e5e81730",
+    "zip_md5_downloaded": "c8939101e068e9e5b23599f0e5e81730",
+    "md5_match": true,
+    "github": "simonecantori/Synergy-between-noisy-quantum-computers-and-scalable-classical-deep-learning-for-error-mitigation",
+    "github_head_sha": "ccf8731",
+    "github_tags": ["1.0", "1.1", "1.2", "1.3", "1.4"],
+    "github_head_equals_tag_1_4": true,
+    "entries": 26,
+    "npy_count": 21,
+    "local_dir": "<local-path-redacted>"
+  },
+
+  "scoped_experiment": {
+    "figure": "journal Fig. 7 and Fig. 8 (same test cases); arXiv v1 Fig. 7. Files are named Fig8*.",
+    "panels": {
+      "Fig8a": {"configuration": "A (per-qubit angles, same across layers)", "N_qubits": 16, "P_layers": 20, "p_noise": 1.0, "theta_width": 16},
+      "Fig8b": {"configuration": "B (per-layer angles, same across qubits)", "N_qubits": 16, "P_layers": 20, "p_noise": 1.0, "theta_width": 20},
+      "Fig8c": {"configuration": "B", "N_qubits": 16, "P_layers": 20, "p_noise": 0.25, "theta_width": 20}
+    },
+    "rows_per_panel": 100,
+    "rows_total": 300,
+    "backend_noise_model": "FakeGuadalupe (static fake backend)",
+    "shots": 10000,
+    "shot_grid_verified": "all z_noisy values are exact multiples of 2/10^4"
+  },
+
+  "target_column": {
+    "files": ["Fig8a_mz_exact.npy", "Fig8b_mz_exact.npy", "Fig8c_mz_exact.npy"],
+    "shape": [100],
+    "dtype": "float64",
+    "definition": "mz = (1/N) sum_n <psi_out| Z_n |psi_out>, exact average magnetization per qubit, from state-vector simulation (paper Eq. 5)",
+    "deterministic_in_descriptors": true,
+    "determinism_argument": "The ideal circuit is fixed by theta given q, the RZZ angle phi=-pi/2, the Guadalupe connectivity and |0>^N. q is constant across every released row. The target is computed by StatevectorEstimator on the untranspiled logical circuit, so it carries no shot noise and no transpilation dependence. Therefore mz_exact = f(theta) exactly."
+  },
+
+  "feature_groups": {
+    "execution_independent_descriptors": {
+      "theta": {"files": "Fig8{a,b,c}_theta.npy", "shape_a": [100, 16], "shape_bc": [100, 20], "dtype": "float64", "range": "[0, pi/2]", "unique_rows": 100, "varies": true},
+      "qubits": {"files": "Fig8{a,b,c}_qubits.npy", "shape": [100, 16], "dtype": "int64", "value": [0, 1, 2, 3, 5, 8, 9, 11, 14, 13, 12, 15, 10, 7, 6, 4], "constant_across_rows": true, "identical_across_panels": true, "per_column_std": 0.0, "varies": false, "note": "paper normalizes as q' = q/10; zero variance in the released rows, so it carries no information for any arm fitted on them"}
+    },
+    "execution_derived": {
+      "z_noisy": {"files": "Fig8{a,b,c}_z_noisy.npy", "shape": [100, 16], "dtype": "float64", "definition": "noisy single-qubit <Z_n> from the FakeGuadalupe simulation at 10^4 shots"},
+      "mz_zne": {"shape": [100], "definition": "Richardson ZNE (Mitiq, lambda=1,2,3) applied to the noisy values; a released baseline, never an arm input"},
+      "mz_linear": {"shape": [100], "definition": "released affine baseline, mz = c1*mz_noisy + c2 (paper text); reads an execution-derived input, so it is NOT arm A", "identified_coefficients": {"Fig8a": {"c2": -0.0351230349, "c1": 1.7937771470}, "Fig8b": {"c2": -0.1243096238, "c1": 1.7997081922}, "Fig8c": {"c2": -0.0578181865, "c1": 1.4148623415}}, "max_abs_residual": 2.8e-16},
+      "mz_predicted": {"shape": [100], "dtype": "float32", "definition": "released prediction of the hybrid CNN(theta, q, z_noisy), trained on Ktrain ~ 6e5 circuits with N<=10; this is arm F"}
+    },
+    "device_calibration": {
+      "present": false,
+      "reason": "The release ships no gate-error, t1, t2 or readout vector. Noise enters only through the static FakeGuadalupe model, and q, the sole device-position descriptor, is constant across every released row. There is nothing to make available to A and C in one scoring and withhold in the other.",
+      "consequence": "S2 is scored once, not twice. This follows from the release contents and was recorded before any fit."
+    }
+  },
+
+  "refit_status": {
+    "can_refit_under_matched_recipe": false,
+    "reason": "Ktrain ~ 6e5 training circuits (N<=10) are absent from the Zenodo record, from every GitHub tag 1.0-1.4, and from every blob in the repository's full history. circ_gen.py is a generator stub (num_samples=1) requiring qiskit-aer simulation, which is a recipe to regenerate rather than released training material. cnn_2D.py releases the configuration-B architecture only; the configuration-A 1D variant used for panel a is not released.",
+    "governing_clause": "PLAN 'Where a system cannot be refitted': F is the released prediction; A and C are fitted on the released rows under a declared split; the reduced scope is stated in the same sentence as the result."
+  },
+
+  "split_structure": {
+    "released_split": "none for the arms. All 300 released rows are test rows for the released model.",
+    "row_shuffled_hazard": false,
+    "row_shuffled_argument": "One row is one circuit realization. theta rows are 100/100 unique within every panel, Fig8b and Fig8c share zero theta rows, and no target value is shared between any two panels. A row-shuffled split therefore cannot place rows of the same circuit on both sides, so PLAN leak check 4's specific hazard does not arise.",
+    "declared_asymmetries_recorded_before_fitting": [
+      {"name": "training-budget gap", "detail": "F carries ~6e5 training circuits; A and C get at most 100 rows minus the split.", "bias_direction": "inflates T = A - F, biases S DOWNWARD, favours reading ABSENT"},
+      {"name": "test-size transfer gap", "detail": "F was trained at N<=10 and transferred to N=16; A and C would be fitted directly at N=16.", "bias_direction": "biases S UPWARD, favours reading PRESENT"}
+    ]
+  },
+
+  "leak_checks": {
+    "1_target_not_in_features": {"result": "PASS", "evidence": "mz_exact equals no column of theta, qubits or z_noisy at 1e-9, and does not equal mean(z_noisy) (max abs diff 0.4025 / 0.2376 / 0.1139 by panel). mz_zne, mz_linear and mz_predicted are other methods' outputs and are excluded from every arm's feature set."},
+    "2_no_oracle_quantity": {"result": "PASS", "evidence": "No released input carries an ideal quantity. mz_zne is Richardson extrapolation over noisy executions, not an oracle. No evaluation case is filtered by any ideal quantity: all 100 rows per panel are present and unfiltered. The S3-specific exclusions do not apply here."},
+    "3_row_count_and_schema": {"result": "PASS", "evidence": "21 .npy asserted and found; every one of the 21 shapes matched the pre-declared expectation; Zenodo MD5 matched the record."},
+    "4_row_shuffled_split": {"result": "NOT TRIGGERED, RECORDED", "evidence": "see split_structure.row_shuffled_argument"},
+    "refusal_triggered": false
+  },
+
+  "corroboration_of_identity": {
+    "note": "The released arrays reproduce the journal's reported scores exactly, which confirms mz_predicted is the hybrid CNN and mz_linear is the paper's linear scheme.",
+    "cnn_r2_paper": [0.98, 0.91, 0.98],
+    "cnn_r2_computed": [0.984011, 0.909054, 0.980039],
+    "linear_r2_paper": [0.88, 0.54, 0.94],
+    "linear_r2_computed": [0.881684, 0.539315, 0.941004]
+  },
+
+  "authors_own_descriptor_only_arm": {
+    "model": "CNN(theta, q), two input channels, cnn_2D.py CNN(synergy=False)",
+    "is_plan_arm_C": true,
+    "predictions_released": false,
+    "paper_result_config_A": "achieves satisfactory accuracies (Fig. 3)",
+    "paper_result_config_B": "fails to reach reasonable accuracies R2 ~ 1, even with as many as Ktrain ~ 1e6 training circuits (Fig. 5)",
+    "training_budget_of_that_claim": "1e6 circuits, four orders of magnitude above the 100 released rows"
+  },
+
+  "decisions_phase_2_must_declare_before_fitting": [
+    "Whether the three panels are scored separately or as one S2 verdict. Recommendation: separately, because configuration A and configuration B are different circuit families, p_noise differs between b and c, each panel's mz_predicted comes from a separately trained CNN, and the authors' own descriptor-only arm succeeds on A and fails on B. Pooling would average over the distinction that decides the question.",
+    "The scalar performance measure per arm, and that A, C and F are all evaluated on the SAME held-out rows within each draw. F's released predictions exist on every row, so restricting F to the held-out subset keeps the comparison on identical rows.",
+    "The resample unit (the circuit, that is the row) and the bootstrap count, both before fitting.",
+    "Whether a matched-budget refitted F (a hybrid theta+q+z_noisy model fitted on the same <=100 rows as A and C) is reported alongside released-F. The plan mandates released-F here and encourages reporting any released-vs-refitted gap; the matched-budget refit is the only construction in which T is not confounded by the training-budget gap. Declare before fitting, report both, reconcile neither.",
+    "That constant columns (all 16 of qubits) are dropped for rank reasons in the affine arm. This is a mechanical necessity, not feature selection."
+  ],
+
+  "saturation_note_for_phase_3": "Information-theoretic saturation is 1.0 by construction: the target is an exact deterministic function of the released descriptors. Any low measured saturation on these 100 rows is a statement about learning a 16- or 20-dimensional function from 100 samples, not about the descriptors lacking the information. The report must not convert it into the plan's 'descriptors never carried the information' branch."
+}

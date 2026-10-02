@@ -1,0 +1,286 @@
+{
+  "schema_version": "qem-bench-polynomial-refit-v1",
+  "created_utc": "2026-10-02T01:47:37.593841+00:00",
+  "environment": {
+    "python": "3.12.14 (main, Sep  3 2026, 03:46:19) [Clang 21.1.8 ]",
+    "numpy": "2.2.6",
+    "scikit_learn": "1.9.1"
+  },
+  "archive": {
+    "name": "campaign-archive-v1",
+    "sha256sums_digest": "c3b79a0766c1d48117995826a2ee48a1f0b2a1955931f314a9d298dbc9611821"
+  },
+  "fit_recipe": "Separate polynomial ordinary-least-squares for each family and observable, fixed degree 5, inputs centered and scaled on training rows only, training target collapsed to one per physical circuit and observable (640 training circuits per family), evaluated on untouched test rows without quantum measurement.",
+  "primary_evaluations": [
+    {
+      "setting": "shipped-s101-n640",
+      "seed": 101,
+      "family": "heisenberg",
+      "n_params": 56,
+      "control_C": 0.003064761781356483,
+      "full_F": 0.0034498930632485257,
+      "refit_poly5_mae": 0.0002556158675003684,
+      "historical_poly5_mae": 0.000255615868,
+      "abs_diff_vs_historical": 4.99631586103888e-13,
+      "rel_diff_vs_historical": 1.9546188192975877e-09,
+      "refit_poly_over_F_pct": 7.409385242210163,
+      "reduction_beyond_F_pct": 92.59061475778984,
+      "paper_table": {
+        "C": 0.00306,
+        "F": 0.00345,
+        "poly5": 0.000256,
+        "poly_f_pct": 7.4
+      },
+      "cell_maes_poly5": {
+        "L1_z_mid": 0.00010709014084035704,
+        "L1_zz_mid": 0.0004041415941603798,
+        "L3_z_mid": 0.00010709014084035704,
+        "L3_zz_mid": 0.0004041415941603798
+      },
+      "cell_maes_control_C": {
+        "L1_z_mid": 0.002764306694536275,
+        "L1_zz_mid": 0.00336521686817669,
+        "L3_z_mid": 0.002764306694536275,
+        "L3_zz_mid": 0.00336521686817669
+      },
+      "cell_maes_full_F": {
+        "L1_z_mid": 0.004883906138720357,
+        "L1_zz_mid": 0.003251940081923056,
+        "L3_z_mid": 0.0030490466257043656,
+        "L3_zz_mid": 0.0026146794066463246
+      },
+      "paired_circuit_bootstrap": {
+        "diff_F_minus_poly5": 0.0031942771957481574,
+        "ci_95_low": 0.002889105073733328,
+        "ci_95_high": 0.0035192942966857797,
+        "n_resamples": 10000,
+        "bootstrap_seed": 20261005
+      }
+    },
+    {
+      "setting": "shipped-s101-n640",
+      "seed": 101,
+      "family": "tfi",
+      "n_params": 21,
+      "control_C": 0.004800141120959353,
+      "full_F": 0.0023389227919253866,
+      "refit_poly5_mae": 4.237413887199428e-05,
+      "historical_poly5_mae": 4.23741389e-05,
+      "abs_diff_vs_historical": 2.8005721385612053e-14,
+      "rel_diff_vs_historical": 6.609154100264691e-10,
+      "refit_poly_over_F_pct": 1.811694640724423,
+      "reduction_beyond_F_pct": 98.18830535927557,
+      "paper_table": {
+        "C": 0.0048,
+        "F": 0.00234,
+        "poly5": 4.2e-05,
+        "poly_f_pct": 1.8
+      },
+      "cell_maes_poly5": {
+        "L1_z_mid": 1.7862039589161897e-05,
+        "L1_zz_mid": 6.688623815482667e-05,
+        "L3_z_mid": 1.7862039589161897e-05,
+        "L3_zz_mid": 6.688623815482667e-05
+      },
+      "cell_maes_control_C": {
+        "L1_z_mid": 0.005289625846384423,
+        "L1_zz_mid": 0.004310656395534282,
+        "L3_z_mid": 0.005289625846384423,
+        "L3_zz_mid": 0.004310656395534282
+      },
+      "cell_maes_full_F": {
+        "L1_z_mid": 0.0030039537166372415,
+        "L1_zz_mid": 0.0020968044583426493,
+        "L3_z_mid": 0.002537033966796015,
+        "L3_zz_mid": 0.001717899025925642
+      },
+      "paired_circuit_bootstrap": {
+        "diff_F_minus_poly5": 0.0022965486530533924,
+        "ci_95_low": 0.002176696526245445,
+        "ci_95_high": 0.0024171815194106274,
+        "n_resamples": 10000,
+        "bootstrap_seed": 20261005
+      }
+    },
+    {
+      "setting": "shipped-s211-n640",
+      "seed": 211,
+      "family": "heisenberg",
+      "n_params": 56,
+      "control_C": 0.004472028186139129,
+      "full_F": 0.0034672702756933923,
+      "refit_poly5_mae": 0.00029232265914005403,
+      "historical_poly5_mae": 0.000292322659,
+      "abs_diff_vs_historical": 1.4005403824526863e-13,
+      "rel_diff_vs_historical": 4.791077049051768e-10,
+      "refit_poly_over_F_pct": 8.430916424062,
+      "reduction_beyond_F_pct": 91.56908357593801,
+      "paper_table": {
+        "C": 0.00447,
+        "F": 0.00347,
+        "poly5": 0.000292,
+        "poly_f_pct": 8.4
+      },
+      "cell_maes_poly5": {
+        "L1_z_mid": 0.00011679736073676242,
+        "L1_zz_mid": 0.0004678479575433457,
+        "L3_z_mid": 0.00011679736073676242,
+        "L3_zz_mid": 0.0004678479575433457
+      },
+      "cell_maes_control_C": {
+        "L1_z_mid": 0.005372393195845914,
+        "L1_zz_mid": 0.0035716631764323437,
+        "L3_z_mid": 0.005372393195845914,
+        "L3_zz_mid": 0.0035716631764323437
+      },
+      "cell_maes_full_F": {
+        "L1_z_mid": 0.0034368658761488604,
+        "L1_zz_mid": 0.0037275807349215683,
+        "L3_z_mid": 0.003683810989716641,
+        "L3_zz_mid": 0.003020823501986499
+      },
+      "paired_circuit_bootstrap": {
+        "diff_F_minus_poly5": 0.0031749476165533383,
+        "ci_95_low": 0.002949319779794854,
+        "ci_95_high": 0.003409882137273787,
+        "n_resamples": 10000,
+        "bootstrap_seed": 20261115
+      }
+    },
+    {
+      "setting": "shipped-s211-n640",
+      "seed": 211,
+      "family": "tfi",
+      "n_params": 21,
+      "control_C": 0.0029958174142408756,
+      "full_F": 0.0018393856502324335,
+      "refit_poly5_mae": 5.142946936767512e-05,
+      "historical_poly5_mae": 5.14294694e-05,
+      "abs_diff_vs_historical": 3.232487790893329e-14,
+      "rel_diff_vs_historical": 6.285283182200844e-10,
+      "refit_poly_over_F_pct": 2.7960134059530284,
+      "reduction_beyond_F_pct": 97.20398659404698,
+      "paper_table": {
+        "C": 0.003,
+        "F": 0.00184,
+        "poly5": 5.1e-05,
+        "poly_f_pct": 2.8
+      },
+      "cell_maes_poly5": {
+        "L1_z_mid": 2.236165233487821e-05,
+        "L1_zz_mid": 8.049728640047204e-05,
+        "L3_z_mid": 2.236165233487821e-05,
+        "L3_zz_mid": 8.049728640047204e-05
+      },
+      "cell_maes_control_C": {
+        "L1_z_mid": 0.0035911641739916843,
+        "L1_zz_mid": 0.0024004706544900668,
+        "L3_z_mid": 0.0035911641739916843,
+        "L3_zz_mid": 0.0024004706544900668
+      },
+      "cell_maes_full_F": {
+        "L1_z_mid": 0.0014143945469279444,
+        "L1_zz_mid": 0.0016417647839152734,
+        "L3_z_mid": 0.0016525790990498854,
+        "L3_zz_mid": 0.0026488041710366313
+      },
+      "paired_circuit_bootstrap": {
+        "diff_F_minus_poly5": 0.0017879561808647583,
+        "ci_95_low": 0.0016414411903746336,
+        "ci_95_high": 0.0019424916425714543,
+        "n_resamples": 10000,
+        "bootstrap_seed": 20261115
+      }
+    },
+    {
+      "setting": "shipped-s307-n640",
+      "seed": 307,
+      "family": "heisenberg",
+      "n_params": 56,
+      "control_C": 0.0040941451811066076,
+      "full_F": 0.0032937034365766323,
+      "refit_poly5_mae": 0.0002657688161310111,
+      "historical_poly5_mae": 0.000265768816,
+      "abs_diff_vs_historical": 1.310110873953274e-13,
+      "rel_diff_vs_historical": 4.92951315233791e-10,
+      "refit_poly_over_F_pct": 8.068996533799732,
+      "reduction_beyond_F_pct": 91.93100346620027,
+      "paper_table": {
+        "C": 0.00409,
+        "F": 0.00329,
+        "poly5": 0.000266,
+        "poly_f_pct": 8.1
+      },
+      "cell_maes_poly5": {
+        "L1_z_mid": 0.00012401731003146564,
+        "L1_zz_mid": 0.00040752032223055656,
+        "L3_z_mid": 0.00012401731003146564,
+        "L3_zz_mid": 0.00040752032223055656
+      },
+      "cell_maes_control_C": {
+        "L1_z_mid": 0.004385326962269098,
+        "L1_zz_mid": 0.0038029633999441177,
+        "L3_z_mid": 0.004385326962269098,
+        "L3_zz_mid": 0.0038029633999441177
+      },
+      "cell_maes_full_F": {
+        "L1_z_mid": 0.0038038559203997886,
+        "L1_zz_mid": 0.003302644261329285,
+        "L3_z_mid": 0.002703756575502832,
+        "L3_zz_mid": 0.003364556989074624
+      },
+      "paired_circuit_bootstrap": {
+        "diff_F_minus_poly5": 0.0030279346204456214,
+        "ci_95_low": 0.0027833528805669477,
+        "ci_95_high": 0.0032829802008289837,
+        "n_resamples": 10000,
+        "bootstrap_seed": 20261211
+      }
+    },
+    {
+      "setting": "shipped-s307-n640",
+      "seed": 307,
+      "family": "tfi",
+      "n_params": 21,
+      "control_C": 0.0074527032820527715,
+      "full_F": 0.001905990402392148,
+      "refit_poly5_mae": 5.1229288991137675e-05,
+      "historical_poly5_mae": 5.1229289e-05,
+      "abs_diff_vs_historical": 8.862322768005138e-15,
+      "rel_diff_vs_historical": 1.7299328062126994e-10,
+      "refit_poly_over_F_pct": 2.687804142499428,
+      "reduction_beyond_F_pct": 97.31219585750057,
+      "paper_table": {
+        "C": 0.00745,
+        "F": 0.00191,
+        "poly5": 5.1e-05,
+        "poly_f_pct": 2.7
+      },
+      "cell_maes_poly5": {
+        "L1_z_mid": 2.2469881588881718e-05,
+        "L1_zz_mid": 7.998869639339363e-05,
+        "L3_z_mid": 2.2469881588881718e-05,
+        "L3_zz_mid": 7.998869639339363e-05
+      },
+      "cell_maes_control_C": {
+        "L1_z_mid": 0.00909895683108514,
+        "L1_zz_mid": 0.005806449733020402,
+        "L3_z_mid": 0.00909895683108514,
+        "L3_zz_mid": 0.005806449733020402
+      },
+      "cell_maes_full_F": {
+        "L1_z_mid": 0.0013215477416813183,
+        "L1_zz_mid": 0.0022995197650537203,
+        "L3_z_mid": 0.0014994993795964247,
+        "L3_zz_mid": 0.002503394723237129
+      },
+      "paired_circuit_bootstrap": {
+        "diff_F_minus_poly5": 0.0018547611134010103,
+        "ci_95_low": 0.0017250247611461061,
+        "ci_95_high": 0.001995167138614727,
+        "n_resamples": 10000,
+        "bootstrap_seed": 20261211
+      }
+    }
+  ]
+}

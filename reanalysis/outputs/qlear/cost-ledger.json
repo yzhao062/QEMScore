@@ -1,0 +1,121 @@
+{
+ "hardware": {
+  "states_per_application": {
+   "groundstate": 16.0,
+   "pricingcall": 32.0,
+   "pricingput": 32.0,
+   "qaoa": 32.0,
+   "routing": 4.0,
+   "tsp": 16.0
+  },
+  "mean_states": 22.0,
+  "macro_added_evaluations": {
+   "C-O": 1024.0,
+   "O-F": 3072.0
+  },
+  "per_application_added_evaluations": {
+   "C-O": {
+    "groundstate": 1024,
+    "pricingcall": 1024,
+    "pricingput": 1024,
+    "qaoa": 1024,
+    "routing": 1024,
+    "tsp": 1024
+   },
+   "O-F": {
+    "groundstate": 3072,
+    "pricingcall": 3072,
+    "pricingput": 3072,
+    "qaoa": 3072,
+    "routing": 3072,
+    "tsp": 3072
+   }
+  },
+  "released_path": {
+   "units": "hardware shots for generation, ideal-simulator shots for supervision",
+   "formula": "6 circuits x 1024 shots, batched once per application circuit and reused for every output state",
+   "per_circuit_count_varies_by_application": false,
+   "generation_shots_per_circuit": 6144,
+   "ideal_supervision_shots_per_circuit": 1024
+  },
+  "gaps": {
+   "C-O": 0.19692319365251745,
+   "O-F": 0.022199869066833473
+  },
+  "per_evaluation": {
+   "C-O": 0.00019230780630128658,
+   "O-F": 7.226519878526521e-06
+  },
+  "efficiency_ratio_C_O_over_O_F": 26.611399336591585
+ },
+ "simulator": {
+  "states_per_application": {
+   "groundstate": 16.0,
+   "pricingcall": 31.625,
+   "pricingput": 31.875,
+   "qaoa": 31.875,
+   "routing": 4.0,
+   "tsp": 16.0
+  },
+  "mean_states": 21.895833333333332,
+  "macro_added_evaluations": {
+   "C-O": 44842.666666666664,
+   "O-F": 134528.0
+  },
+  "per_application_added_evaluations": {
+   "C-O": {
+    "groundstate": 32768.0,
+    "pricingcall": 64768.0,
+    "pricingput": 65280.0,
+    "qaoa": 65280.0,
+    "routing": 8192.0,
+    "tsp": 32768.0
+   },
+   "O-F": {
+    "groundstate": 98304.0,
+    "pricingcall": 194304.0,
+    "pricingput": 195840.0,
+    "qaoa": 195840.0,
+    "routing": 24576.0,
+    "tsp": 98304.0
+   }
+  },
+  "released_path": {
+   "units": "noisy-simulator shots for generation, ideal-simulator shots for supervision",
+   "formula": "s x (5 calls x 2 repetitions x 1024 shots) + 1024 noisy enumeration, for a circuit with s output states",
+   "per_circuit_count_varies_by_application": true,
+   "generation_shots_mean_per_circuit_by_application": {
+    "groundstate": 164864.0,
+    "pricingcall": 324864.0,
+    "pricingput": 327424.0,
+    "qaoa": 327424.0,
+    "routing": 41984.0,
+    "tsp": 164864.0
+   },
+   "generation_shots_mean_per_circuit": 225237.33333333334,
+   "ideal_supervision_shots_per_circuit": 1024,
+   "generation_plus_supervision_mean_per_circuit": 226261.33333333334
+  },
+  "gaps": {
+   "C-O": 0.44072432729215477,
+   "O-F": 0.009882665238576985
+  },
+  "per_evaluation": {
+   "C-O": 9.828236366232044e-06,
+   "O-F": 7.346177181387506e-08
+  },
+  "efficiency_ratio_C_O_over_O_F": 133.78708576663732
+ },
+ "corpus_generation": {
+  "ideal_supervision_shots_included_in_totals": 507904,
+  "training_rows": 9486,
+  "validation_rows": 1050,
+  "training_circuits": 56,
+  "testing_circuits": 6,
+  "backends": 8,
+  "simulator_shots_per_state": 10240,
+  "simulator_shots_per_circuit_fixed": 2048,
+  "training_simulator_shots": 98054144,
+  "validation_simulator_shots": 10850304
+ }
+}

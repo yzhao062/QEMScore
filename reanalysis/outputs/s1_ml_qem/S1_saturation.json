@@ -1,0 +1,214 @@
+{
+  "system": "S1 ML-QEM",
+  "diagnostic": "descriptor saturation: the strongest descriptor-only predictor the released data supports, no capacity match, no measurement input",
+  "design": "165 execution-independent columns (5 gate counts + 160 rotation-angle bin counts); 500 training rows; held out = the released 2500-row test split",
+  "metric": "R2 on held-out rows, uniform average across the 4 observables (variance-weighted and per-observable also reported)",
+  "selection": "the maximum over the sweep, taken on held-out rows because the quantity wanted is an upper bound; the full table is reported so the optimism is visible",
+  "saturation_all_rows": {
+    "r2": 0.6804763819956965,
+    "model": "RandomForest n=2000",
+    "per_observable": [
+      0.7578944067135014,
+      0.6717662982332788,
+      0.6367744474701248,
+      0.6554703755658806
+    ]
+  },
+  "saturation_leakfree_rows": {
+    "r2": 0.5848538218175673,
+    "model": "RandomForest n=2000",
+    "rows": 2223,
+    "status": "qualification; the declared number is the all-rows one"
+  },
+  "target_variance_per_observable_heldout": [
+    0.012645310924304116,
+    0.18746915994489838,
+    0.028560084105139095,
+    0.060000426341969094
+  ],
+  "leak4_contaminated_heldout_rows": 277,
+  "table": [
+    {
+      "model": "LinearRegression (= arm A)",
+      "r2_uniform_all": 0.027366640386011915,
+      "r2_variance_weighted_all": 0.022840225745690355,
+      "r2_per_observable_all": [
+        0.06810143782224898,
+        0.06421401495859569,
+        0.15696286965998896,
+        -0.17981176089678597
+      ],
+      "r2_uniform_leakfree": -0.1815528054089997,
+      "mean_per_row_L2_all": 0.4418754903329558
+    },
+    {
+      "model": "RidgeCV",
+      "r2_uniform_all": 0.12848434231129785,
+      "r2_variance_weighted_all": 0.1266553061413845,
+      "r2_per_observable_all": [
+        0.151361579333821,
+        0.1513744465939164,
+        0.20362396291996665,
+        0.007577380397487343
+      ],
+      "r2_uniform_leakfree": 0.011772049517755095,
+      "mean_per_row_L2_all": 0.4065835063358414
+    },
+    {
+      "model": "RandomForest n=100 (= arm C)",
+      "r2_uniform_all": 0.6769331666628697,
+      "r2_variance_weighted_all": 0.66272992908651,
+      "r2_per_observable_all": [
+        0.7564513482398465,
+        0.6621184374854734,
+        0.6275097831767142,
+        0.6616530977494448
+      ],
+      "r2_uniform_leakfree": 0.5792359341872628,
+      "mean_per_row_L2_all": 0.23756741794824635
+    },
+    {
+      "model": "RandomForest n=2000",
+      "r2_uniform_all": 0.6804763819956965,
+      "r2_variance_weighted_all": 0.6686901196418195,
+      "r2_per_observable_all": [
+        0.7578944067135014,
+        0.6717662982332788,
+        0.6367744474701248,
+        0.6554703755658806
+      ],
+      "r2_uniform_leakfree": 0.5848538218175673,
+      "mean_per_row_L2_all": 0.23595632576774142
+    },
+    {
+      "model": "RandomForest n=2000 max_features=1.0",
+      "r2_uniform_all": 0.6804763819956965,
+      "r2_variance_weighted_all": 0.6686901196418195,
+      "r2_per_observable_all": [
+        0.7578944067135014,
+        0.6717662982332788,
+        0.6367744474701248,
+        0.6554703755658806
+      ],
+      "r2_uniform_leakfree": 0.5848538218175673,
+      "mean_per_row_L2_all": 0.23595632576774142
+    },
+    {
+      "model": "ExtraTrees n=2000",
+      "r2_uniform_all": 0.6707194389227706,
+      "r2_variance_weighted_all": 0.6757317243447227,
+      "r2_per_observable_all": [
+        0.7200697955275766,
+        0.6840645886731374,
+        0.6044725806873354,
+        0.6742707908030333
+      ],
+      "r2_uniform_leakfree": 0.5683149948258505,
+      "mean_per_row_L2_all": 0.23142062241044992
+    },
+    {
+      "model": "ExtraTrees n=2000 max_features=1.0",
+      "r2_uniform_all": 0.6707194389227706,
+      "r2_variance_weighted_all": 0.6757317243447227,
+      "r2_per_observable_all": [
+        0.7200697955275766,
+        0.6840645886731374,
+        0.6044725806873354,
+        0.6742707908030333
+      ],
+      "r2_uniform_leakfree": 0.5683149948258505,
+      "mean_per_row_L2_all": 0.23142062241044992
+    },
+    {
+      "model": "GradientBoosting n=500",
+      "r2_uniform_all": 0.5919748807421682,
+      "r2_variance_weighted_all": 0.5883566056487097,
+      "r2_per_observable_all": [
+        0.6835024393958211,
+        0.6117788658554836,
+        0.5676302441447573,
+        0.5049879735726107
+      ],
+      "r2_uniform_leakfree": 0.4755043836133126,
+      "mean_per_row_L2_all": 0.26966188791418005
+    },
+    {
+      "model": "HistGradientBoosting max_iter=1000",
+      "r2_uniform_all": 0.6656157229260302,
+      "r2_variance_weighted_all": 0.6609830501604688,
+      "r2_per_observable_all": [
+        0.7403987970124404,
+        0.6653028604492535,
+        0.5942454895039313,
+        0.662515744738496
+      ],
+      "r2_uniform_leakfree": 0.5623290406657544,
+      "mean_per_row_L2_all": 0.246624390339148
+    },
+    {
+      "model": "kNN k=1",
+      "r2_uniform_all": -0.33682767173649913,
+      "r2_variance_weighted_all": -0.35353444068607964,
+      "r2_per_observable_all": [
+        -0.24140330718470238,
+        -0.2874558773347826,
+        -0.126990435367899,
+        -0.6914610670586125
+      ],
+      "r2_uniform_leakfree": -0.7031941937391519,
+      "mean_per_row_L2_all": 0.46377014047769044
+    },
+    {
+      "model": "kNN k=3",
+      "r2_uniform_all": 0.08634273522041366,
+      "r2_variance_weighted_all": 0.0669437434742972,
+      "r2_per_observable_all": [
+        0.14370191558836298,
+        0.10183035761321424,
+        0.24085570297425962,
+        -0.1410170352941822
+      ],
+      "r2_uniform_leakfree": -0.1633539809318985,
+      "mean_per_row_L2_all": 0.3979395873638053
+    },
+    {
+      "model": "kNN k=5 distance-weighted",
+      "r2_uniform_all": 0.16350911040283156,
+      "r2_variance_weighted_all": 0.1432439705057087,
+      "r2_per_observable_all": [
+        0.2209982187709011,
+        0.1743192343550909,
+        0.30681506730024144,
+        -0.048096078814907184
+      ],
+      "r2_uniform_leakfree": -0.06600925157604137,
+      "mean_per_row_L2_all": 0.3810090047345897
+    },
+    {
+      "model": "MLP (256,256,128)",
+      "r2_uniform_all": -0.07653135355699842,
+      "r2_variance_weighted_all": 0.04903542617887711,
+      "r2_per_observable_all": [
+        -0.2944076794680621,
+        0.1487700741085033,
+        0.01215910688840538,
+        -0.1726469157568402
+      ],
+      "r2_uniform_leakfree": -0.394451097659231,
+      "mean_per_row_L2_all": 0.4217841327267889
+    },
+    {
+      "model": "MLP (512,256) tanh",
+      "r2_uniform_all": -0.23892799399219888,
+      "r2_variance_weighted_all": -0.06781892725928969,
+      "r2_per_observable_all": [
+        -0.5438671849302841,
+        0.07336692759435759,
+        -0.08456065063524298,
+        -0.40065106799762606
+      ],
+      "r2_uniform_leakfree": -0.5978345371074822,
+      "mean_per_row_L2_all": 0.4546424815202337
+    }
+  ]
+}

@@ -1,0 +1,524 @@
+{
+  "Fig8a": {
+    "panel": "Fig8a",
+    "config": "A",
+    "n": 100,
+    "calibration_variants_identical": {
+      "affine_design_identical": true,
+      "C_channels_identical": true,
+      "F_channels_identical": true
+    },
+    "full_sample": {
+      "A": {
+        "mse": 0.005640617900466088,
+        "one_minus_r2": 0.20851651620449096,
+        "r2": 0.791483483795509
+      },
+      "C": {
+        "mse": 0.006505923693446982,
+        "one_minus_r2": 0.24050424389457817,
+        "r2": 0.7594957561054219
+      },
+      "F_refit_matched": {
+        "mse": 0.003166200518340388,
+        "one_minus_r2": 0.11704481908527044,
+        "r2": 0.8829551809147296
+      },
+      "F_released": {
+        "mse": 0.00043250817910464937,
+        "one_minus_r2": 0.015988514082720878,
+        "r2": 0.9840114859172792
+      },
+      "target_variance": 0.027051180420328745
+    },
+    "variants": {
+      "F_released": {
+        "with_calibration": {
+          "point": {
+            "T": 0.005208109721361438,
+            "K": -0.0008653057929808947,
+            "D": 0.006073415514342333,
+            "S": -0.16614584547475653
+          },
+          "interval_S": [
+            -0.543061500470204,
+            0.12977947365869483
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.003962024476842282,
+            0.00655832915400479
+          ],
+          "interval_K": [
+            -0.002610705465846103,
+            0.0007232429360085921
+          ],
+          "interval_D": [
+            0.004377151710277806,
+            0.008005404648610203
+          ],
+          "median_S": -0.16560510969061318,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.8517,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        },
+        "without_calibration": {
+          "point": {
+            "T": 0.005208109721361438,
+            "K": -0.0008653057929808947,
+            "D": 0.006073415514342333,
+            "S": -0.16614584547475653
+          },
+          "interval_S": [
+            -0.543061500470204,
+            0.12977947365869483
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.003962024476842282,
+            0.00655832915400479
+          ],
+          "interval_K": [
+            -0.002610705465846103,
+            0.0007232429360085921
+          ],
+          "interval_D": [
+            0.004377151710277806,
+            0.008005404648610203
+          ],
+          "median_S": -0.16560510969061318,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.8517,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        }
+      },
+      "F_refit_matched": {
+        "with_calibration": {
+          "point": {
+            "T": 0.0024744173821256996,
+            "K": -0.0008653057929808947,
+            "D": 0.0033397231751065943,
+            "S": -0.3497008221941667
+          },
+          "interval_S": [
+            -1.8127201288664443,
+            0.22055279170529946
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.0012172909190409633,
+            0.0037956634290291467
+          ],
+          "interval_K": [
+            -0.002610705465846103,
+            0.0007232429360085921
+          ],
+          "interval_D": [
+            0.0021028308555898502,
+            0.004695791240267788
+          ],
+          "median_S": -0.3464933005002089,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.8517,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        },
+        "without_calibration": {
+          "point": {
+            "T": 0.0024744173821256996,
+            "K": -0.0008653057929808947,
+            "D": 0.0033397231751065943,
+            "S": -0.3497008221941667
+          },
+          "interval_S": [
+            -1.8127201288664443,
+            0.22055279170529946
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.0012172909190409633,
+            0.0037956634290291467
+          ],
+          "interval_K": [
+            -0.002610705465846103,
+            0.0007232429360085921
+          ],
+          "interval_D": [
+            0.0021028308555898502,
+            0.004695791240267788
+          ],
+          "median_S": -0.3464933005002089,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.8517,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        }
+      }
+    },
+    "released_vs_refit_gap": {
+      "mse_F_released": 0.00043250817910464937,
+      "mse_F_refit_matched": 0.003166200518340388,
+      "r2_F_released": 0.9840114859172792,
+      "r2_F_refit_matched": 0.8829551809147296,
+      "delta_mse_refit_minus_released": 0.0027336923392357387
+    }
+  },
+  "Fig8b": {
+    "panel": "Fig8b",
+    "config": "B",
+    "n": 100,
+    "calibration_variants_identical": {
+      "affine_design_identical": true,
+      "C_channels_identical": true,
+      "F_channels_identical": true
+    },
+    "full_sample": {
+      "A": {
+        "mse": 0.007017259438668233,
+        "one_minus_r2": 1.1413277354547602,
+        "r2": -0.14132773545476018
+      },
+      "C": {
+        "mse": 0.00679520348828839,
+        "one_minus_r2": 1.1052112690184874,
+        "r2": -0.10521126901848743
+      },
+      "F_refit_matched": {
+        "mse": 0.0024666641443491684,
+        "one_minus_r2": 0.4011925491145565,
+        "r2": 0.5988074508854435
+      },
+      "F_released": {
+        "mse": 0.0005591690068492219,
+        "one_minus_r2": 0.09094648728632859,
+        "r2": 0.9090535127136714
+      },
+      "target_variance": 0.006148329897434953
+    },
+    "variants": {
+      "F_released": {
+        "with_calibration": {
+          "point": {
+            "T": 0.006458090431819012,
+            "K": 0.00022205595037984305,
+            "D": 0.006236034481439169,
+            "S": 0.034384150040044865
+          },
+          "interval_S": [
+            -0.2228576053321078,
+            0.18980295791721344
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.0035106782726804,
+            0.010510966932223175
+          ],
+          "interval_K": [
+            -0.0010728511427671346,
+            0.0015096078098600437
+          ],
+          "interval_D": [
+            0.003534287142888596,
+            0.009598601084060672
+          ],
+          "median_S": 0.03638539201898475,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.364,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        },
+        "without_calibration": {
+          "point": {
+            "T": 0.006458090431819012,
+            "K": 0.00022205595037984305,
+            "D": 0.006236034481439169,
+            "S": 0.034384150040044865
+          },
+          "interval_S": [
+            -0.2228576053321078,
+            0.18980295791721344
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.0035106782726804,
+            0.010510966932223175
+          ],
+          "interval_K": [
+            -0.0010728511427671346,
+            0.0015096078098600437
+          ],
+          "interval_D": [
+            0.003534287142888596,
+            0.009598601084060672
+          ],
+          "median_S": 0.03638539201898475,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.364,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        }
+      },
+      "F_refit_matched": {
+        "with_calibration": {
+          "point": {
+            "T": 0.004550595294319065,
+            "K": 0.00022205595037984305,
+            "D": 0.004328539343939222,
+            "S": 0.04879712125951001
+          },
+          "interval_S": [
+            -0.31878644514382726,
+            0.27540306982542223
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.002441578117765452,
+            0.00726891834244196
+          ],
+          "interval_K": [
+            -0.0010728511427671346,
+            0.0015096078098600437
+          ],
+          "interval_D": [
+            0.0024224243569660265,
+            0.006550872946615342
+          ],
+          "median_S": 0.05115385908959906,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.364,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        },
+        "without_calibration": {
+          "point": {
+            "T": 0.004550595294319065,
+            "K": 0.00022205595037984305,
+            "D": 0.004328539343939222,
+            "S": 0.04879712125951001
+          },
+          "interval_S": [
+            -0.31878644514382726,
+            0.27540306982542223
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.002441578117765452,
+            0.00726891834244196
+          ],
+          "interval_K": [
+            -0.0010728511427671346,
+            0.0015096078098600437
+          ],
+          "interval_D": [
+            0.0024224243569660265,
+            0.006550872946615342
+          ],
+          "median_S": 0.05115385908959906,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.364,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        }
+      }
+    },
+    "released_vs_refit_gap": {
+      "mse_F_released": 0.0005591690068492219,
+      "mse_F_refit_matched": 0.0024666641443491684,
+      "r2_F_released": 0.9090535127136714,
+      "r2_F_refit_matched": 0.5988074508854435,
+      "delta_mse_refit_minus_released": 0.0019074951374999465
+    }
+  },
+  "Fig8c": {
+    "panel": "Fig8c",
+    "config": "B",
+    "n": 100,
+    "calibration_variants_identical": {
+      "affine_design_identical": true,
+      "C_channels_identical": true,
+      "F_channels_identical": true
+    },
+    "full_sample": {
+      "A": {
+        "mse": 0.0033999396473486593,
+        "one_minus_r2": 1.164936696869858,
+        "r2": -0.164936696869858
+      },
+      "C": {
+        "mse": 0.003195547795705066,
+        "one_minus_r2": 1.0949049924228453,
+        "r2": -0.09490499242284534
+      },
+      "F_refit_matched": {
+        "mse": 0.0001701195538578483,
+        "one_minus_r2": 0.058288832067557216,
+        "r2": 0.9417111679324428
+      },
+      "F_released": {
+        "mse": 5.825638045002255e-05,
+        "one_minus_r2": 0.019960647085593274,
+        "r2": 0.9800393529144067
+      },
+      "target_variance": 0.0029185617179750384
+    },
+    "variants": {
+      "F_released": {
+        "with_calibration": {
+          "point": {
+            "T": 0.0033416832668986367,
+            "K": 0.00020439185164359327,
+            "D": 0.0031372914152550434,
+            "S": 0.061164340040307325
+          },
+          "interval_S": [
+            -0.20380289349796948,
+            0.2523946816940295
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.002299266523716483,
+            0.004543598299950162
+          ],
+          "interval_K": [
+            -0.0005809985684996889,
+            0.0009566079690286798
+          ],
+          "interval_D": [
+            0.0021831216572921965,
+            0.004221216224504705
+          ],
+          "median_S": 0.06558435858815262,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.2965,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        },
+        "without_calibration": {
+          "point": {
+            "T": 0.0033416832668986367,
+            "K": 0.00020439185164359327,
+            "D": 0.0031372914152550434,
+            "S": 0.061164340040307325
+          },
+          "interval_S": [
+            -0.20380289349796948,
+            0.2523946816940295
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.002299266523716483,
+            0.004543598299950162
+          ],
+          "interval_K": [
+            -0.0005809985684996889,
+            0.0009566079690286798
+          ],
+          "interval_D": [
+            0.0021831216572921965,
+            0.004221216224504705
+          ],
+          "median_S": 0.06558435858815262,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.2965,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        }
+      },
+      "F_refit_matched": {
+        "with_calibration": {
+          "point": {
+            "T": 0.003229820093490811,
+            "K": 0.00020439185164359327,
+            "D": 0.0030254282418472177,
+            "S": 0.06328273579556724
+          },
+          "interval_S": [
+            -0.21486972312989588,
+            0.2584974742462916
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.0022033754199801627,
+            0.004413688880452407
+          ],
+          "interval_K": [
+            -0.0005809985684996889,
+            0.0009566079690286798
+          ],
+          "interval_D": [
+            0.0021040568514261878,
+            0.004056346936362379
+          ],
+          "median_S": 0.06780976721077253,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.2965,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        },
+        "without_calibration": {
+          "point": {
+            "T": 0.003229820093490811,
+            "K": 0.00020439185164359327,
+            "D": 0.0030254282418472177,
+            "S": 0.06328273579556724
+          },
+          "interval_S": [
+            -0.21486972312989588,
+            0.2584974742462916
+          ],
+          "reading": "ABSENT",
+          "interval_T": [
+            0.0022033754199801627,
+            0.004413688880452407
+          ],
+          "interval_K": [
+            -0.0005809985684996889,
+            0.0009566079690286798
+          ],
+          "interval_D": [
+            0.0021040568514261878,
+            0.004056346936362379
+          ],
+          "median_S": 0.06780976721077253,
+          "frac_draws_T_le_0": 0.0,
+          "frac_draws_K_le_0": 0.2965,
+          "frac_draws_D_le_0": 0.0,
+          "resample_unit": "circuit (one released row)",
+          "resample_count": 10000,
+          "interval_type": "percentile 95%"
+        }
+      }
+    },
+    "released_vs_refit_gap": {
+      "mse_F_released": 5.825638045002255e-05,
+      "mse_F_refit_matched": 0.0001701195538578483,
+      "r2_F_released": 0.9800393529144067,
+      "r2_F_refit_matched": 0.9417111679324428,
+      "delta_mse_refit_minus_released": 0.00011186317340782575
+    }
+  }
+}

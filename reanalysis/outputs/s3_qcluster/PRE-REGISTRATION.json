@@ -1,0 +1,80 @@
+{
+  "tag": "S3",
+  "system": "Q-Cluster (Patil, Baron, Zhou, IEEE QCE 2025)",
+  "phase": "2 of 3, SCORE",
+  "written": "before any arm is fitted; score_00_verify.py had already passed at this point and no arm had been constructed",
+  "governing_document": "directions/qem-bench/release-round-2026-09-04/PLAN-independent-instance-score.md",
+
+  "scoped_experiment": "the regression stage: predict Target (iloc[:,11], the effective bit-flip rate) from the released 145-row table; the only learned component of Q-Cluster and the only place the arms' inputs differ",
+
+  "evaluation_unit": "one row = one (circuit, machine) pair",
+  "n_evaluation_units": 145,
+
+  "resample_unit": "one row of the released 145-row table, i.e. one (circuit, machine) pair",
+  "resample_count": 10000,
+  "resample_scheme": "nonparametric bootstrap, rows drawn with replacement, 145 rows per draw; models are fitted and selected once on the actual data and held fixed, so the interval is conditional on the fitted and selected models exactly as the plan requires",
+  "interval": "two-sided 95 percent percentile interval, the 2.5th and 97.5th percentiles of the bootstrap distribution of S",
+  "rng_seed": 20260904,
+
+  "estimand": {
+    "metric": "mean squared error of the out-of-fold prediction, the released cell-6 criterion",
+    "note_on_metric": "S is invariant to using MSE or R2, because within a single bootstrap draw all three arms share the same target variance and the two forms of S differ by a factor that cancels; this is stated as a fact, not a choice",
+    "T": "A - F, the full arm's improvement over the affine control",
+    "K": "A - C, the descriptor control's share of that improvement",
+    "D": "C - F, what the execution-derived inputs add beyond descriptors",
+    "S": "K / T",
+    "formation": "T, K, D and S are all formed INSIDE each bootstrap draw from that draw's resampled rows; no separately averaged number is divided by another"
+  },
+
+  "arms": {
+    "recipe_held_fixed": "KFold(n_splits=5, shuffle=True, random_state=40), the released cell-6 and cell-7 split; out-of-fold predictions for every one of the 145 rows; identical folds for every arm",
+    "A": "affine control: LinearRegression (ordinary least squares) on that ladder's descriptor set",
+    "C": "capacity-matched descriptor control: the released 7-regressor bake-off (RandomForest, GradientBoosting, ExtraTrees, DecisionTree, SVR, KNN, XGBoost, with the released hyperparameters), scored by mean 5-fold MSE, winner taken; run over the SAME descriptor set as A",
+    "F": "the released feature set (Qubit, Measure, rz, sx, x, ecr, entropy, esp_m), refitted under the same bake-off and the same selection rule; F is identical under both calibration ladders because the ladder moves only what A and C may read",
+    "released_predictions": "none exist per row; the notebook builds res_d in memory and discards it, so F is the refit and the released-versus-refit comparison is made on the cell-6 stored aggregates"
+  },
+
+  "calibration_ladder": {
+    "with_calibration": "A and C read Qubit, Measure, rz, sx, x, ecr, esp_m",
+    "without_calibration": "A and C read Qubit, Measure, rz, sx, x, ecr",
+    "why_esp_m_is_dropped_whole": "esp_m is a circuit-times-calibration product computed by get_esp_modified_therm over the transpiled DAG; it has no pure-circuit part to keep",
+    "selection": "neither variant is selected; both are reported, and if they land on opposite sides of the reading rule the system is reported as split on calibration access"
+  },
+
+  "reading_rule": {
+    "above_0.5": "failure mode PRESENT in this system",
+    "below_0.5": "failure mode ABSENT in this system",
+    "spans_0.5": "INDETERMINATE for this system",
+    "applied_to": "the primary S interval of each calibration variant, under random_state=40"
+  },
+
+  "saturation_diagnostic": {
+    "definition": "the strongest descriptor-only predictor the released data supports, no capacity match, no measurement input; share of target variance explained on held-out rows",
+    "search": "a candidate set larger than the released bake-off with a small hyperparameter grid, scored by out-of-fold R2 under the same folds",
+    "reported": "both the optimistically-selected maximum (an upper bound, which is the conservative direction for a bound) and a nested-CV value that pays for the selection",
+    "ladders": "reported for the descriptors-only set and for the descriptors-plus-calibration set, since those are the two sets a descriptor control may read"
+  },
+
+  "secondary_and_sensitivity": {
+    "random_state_42": "the same scoring repeated under the cell-9 fold seed, reported beside the primary, not substituted for it",
+    "MAE_variant": "S recomputed on mean absolute error, reported as a labeled sensitivity only; the reading rule is applied to the primary MSE form",
+    "downstream_6_rows": "Hellinger fidelity of QCluster(prob=p_hat) on the 6 master_dict rows, run without the fit_x comparator and without the ip-Entropy filter; a corroborating check only, explicitly not scoreable and carrying no interval"
+  },
+
+  "instability_rule_declared_now": "the fraction of bootstrap draws with T <= 0 is reported beside the interval; the percentile interval on S remains the primary reported quantity whatever that fraction is, and separate intervals for T, K and D are reported alongside so a small or sign-changing denominator is visible rather than hidden",
+
+  "leak_checks_at_this_point": {
+    "1_target_in_features": "PASS, re-run independently in score_00_verify.py",
+    "2_oracle_read_by_an_arm": "PASS, re-run independently; no arm reads ip Entropy, the ideal support size, or the ideal distribution, and the ip-Entropy case filter is not applied",
+    "3_row_counts_and_schema": "PASS, asserted against the released bytes by sha256 before anything else",
+    "4_row_shuffled_split": "RECORDED AND REPORTED, not a refusal; 29 of 29 algorithms straddle folds under both released seeds, 94.2 percent of target variance is between circuits and 1.5 percent between machines, so a descriptor arm that merely fingerprints the circuit recovers most of the target; this favours the descriptor arms and therefore favours finding the failure mode, and any PRESENT reading carries the qualification in the same sentence"
+  },
+
+  "forbidden_here": [
+    "dropping this system after seeing its result",
+    "retuning the 0.5 boundary",
+    "averaging or pooling S with any other system",
+    "reading a zero-crossing interval as absence",
+    "reconciling a released-versus-refit gap by adjusting the recipe after seeing it"
+  ]
+}

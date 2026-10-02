@@ -1,0 +1,411 @@
+{
+  "system": "S1 ML-QEM (Liao et al., Nature Machine Intelligence 6, 1478-1486, 2024)",
+  "scoped_experiment": "4-qubit TFIM Trotter on ibm_algiers hardware; RF over tabular circuit features; target = noiseless Z expectation value on each of 4 spins",
+  "loss": "per-row L2 distance between predicted and ideal 4-vector, averaged over rows (the system's own metric, h36 cell 51)",
+  "arms": {
+    "A": "LinearRegression per observable on descriptor columns 0..164",
+    "C": "RandomForestRegressor(n_estimators=100, random_state=0) per observable on descriptor columns 0..164",
+    "F_refitted": "RandomForestRegressor(n_estimators=100, random_state=0) per observable on all columns 0..168",
+    "F_released": "docs/paper_figures/hardware_over_depth.pk df['rfr_list'], the table that produced the published figure"
+  },
+  "resample_unit": "one test row (one circuit execution on ibm_algiers, evaluated on all 4 observables jointly)",
+  "resample_count": 2000,
+  "bootstrap_seed": 12345,
+  "interval": "95% pointwise percentile, S formed inside each draw",
+  "calibration_ladder": {
+    "third_group_columns": 0,
+    "why_empty": "encode_data_v2_ecr builds vec = [] (mlp.py:157) and its X[:, vec_slice] assignment (mlp.py:170) is commented out; feature width is exactly 5 + 160 + 4 = 169. The scoped experiment's released data directory holds only the circuit batches, results.pk, results_unshuffled.pk and index_order.json, with no backend-properties artifact, and h36 imports get_backend_properties_v1 without ever calling it.",
+    "rungs_bit_identical": true,
+    "consequence": "the with-calibration and without-calibration rungs coincide by construction and are reported as the same number, not staged as a contrast"
+  },
+  "with_calibration": {
+    "variant": "with_calibration",
+    "fit_seconds": 1.9,
+    "A_features": 165,
+    "F_features": 169,
+    "refitted_F": {
+      "F_arm": "refitted (RF n=100, all 169 columns, seed 0)",
+      "point": {
+        "A_mean_L2": 0.44187549033295453,
+        "C_mean_L2": 0.23756741794824635,
+        "F_mean_L2": 0.10052248696782443,
+        "T": 0.3413530033651301,
+        "K": 0.2043080723847082,
+        "D": 0.13704493098042192,
+        "S": 0.5985243146261964
+      },
+      "interval_95_percentile": {
+        "T": [
+          0.3299960792896704,
+          0.3534931017545301
+        ],
+        "K": [
+          0.19550520285745362,
+          0.21367988705678
+        ],
+        "D": [
+          0.12907000166989493,
+          0.14526710452672034
+        ],
+        "S": [
+          0.5808355633046999,
+          0.6171523205920212
+        ]
+      },
+      "resample_unit": "one test row (one circuit execution on ibm_algiers, evaluated on all 4 observables jointly)",
+      "resample_count": 2000,
+      "draws_with_T_le_0": 0,
+      "draws_with_S_outside_0_1": 0,
+      "reading": "PRESENT"
+    },
+    "released_F": {
+      "F_arm": "released prediction table (hardware_over_depth.pk df['rfr_list'])",
+      "point": {
+        "A_mean_L2": 0.44187549033295453,
+        "C_mean_L2": 0.23756741794824635,
+        "F_mean_L2": 0.10003940419180642,
+        "T": 0.34183608614114813,
+        "K": 0.2043080723847082,
+        "D": 0.13752801375643992,
+        "S": 0.5976784800313534
+      },
+      "interval_95_percentile": {
+        "T": [
+          0.3305440340529686,
+          0.3538757900959029
+        ],
+        "K": [
+          0.19550520285745362,
+          0.21367988705678
+        ],
+        "D": [
+          0.12955129297139997,
+          0.14572031199063615
+        ],
+        "S": [
+          0.5798079787459579,
+          0.6162919900138262
+        ]
+      },
+      "resample_unit": "one test row (one circuit execution on ibm_algiers, evaluated on all 4 observables jointly)",
+      "resample_count": 2000,
+      "draws_with_T_le_0": 0,
+      "draws_with_S_outside_0_1": 0,
+      "reading": "PRESENT"
+    },
+    "released_vs_refitted_gap": {
+      "released_mean_L2": 0.10003940419180642,
+      "refitted_mean_L2": 0.10052248696782443,
+      "gap_released_minus_refitted": -0.00048308277601800953,
+      "rows_agreeing_to_1e-9": 83,
+      "max_abs_row_difference": 0.10915612553246318,
+      "note": "reported, not reconciled; the plan forbids adjusting the recipe after seeing this gap"
+    }
+  },
+  "without_calibration": {
+    "variant": "without_calibration",
+    "fit_seconds": 1.9,
+    "A_features": 165,
+    "F_features": 169,
+    "refitted_F": {
+      "F_arm": "refitted (RF n=100, all 169 columns, seed 0)",
+      "point": {
+        "A_mean_L2": 0.44187549033295453,
+        "C_mean_L2": 0.23756741794824635,
+        "F_mean_L2": 0.10052248696782443,
+        "T": 0.3413530033651301,
+        "K": 0.2043080723847082,
+        "D": 0.13704493098042192,
+        "S": 0.5985243146261964
+      },
+      "interval_95_percentile": {
+        "T": [
+          0.3299960792896704,
+          0.3534931017545301
+        ],
+        "K": [
+          0.19550520285745362,
+          0.21367988705678
+        ],
+        "D": [
+          0.12907000166989493,
+          0.14526710452672034
+        ],
+        "S": [
+          0.5808355633046999,
+          0.6171523205920212
+        ]
+      },
+      "resample_unit": "one test row (one circuit execution on ibm_algiers, evaluated on all 4 observables jointly)",
+      "resample_count": 2000,
+      "draws_with_T_le_0": 0,
+      "draws_with_S_outside_0_1": 0,
+      "reading": "PRESENT"
+    },
+    "released_F": {
+      "F_arm": "released prediction table (hardware_over_depth.pk df['rfr_list'])",
+      "point": {
+        "A_mean_L2": 0.44187549033295453,
+        "C_mean_L2": 0.23756741794824635,
+        "F_mean_L2": 0.10003940419180642,
+        "T": 0.34183608614114813,
+        "K": 0.2043080723847082,
+        "D": 0.13752801375643992,
+        "S": 0.5976784800313534
+      },
+      "interval_95_percentile": {
+        "T": [
+          0.3305440340529686,
+          0.3538757900959029
+        ],
+        "K": [
+          0.19550520285745362,
+          0.21367988705678
+        ],
+        "D": [
+          0.12955129297139997,
+          0.14572031199063615
+        ],
+        "S": [
+          0.5798079787459579,
+          0.6162919900138262
+        ]
+      },
+      "resample_unit": "one test row (one circuit execution on ibm_algiers, evaluated on all 4 observables jointly)",
+      "resample_count": 2000,
+      "draws_with_T_le_0": 0,
+      "draws_with_S_outside_0_1": 0,
+      "reading": "PRESENT"
+    },
+    "released_vs_refitted_gap": {
+      "released_mean_L2": 0.10003940419180642,
+      "refitted_mean_L2": 0.10052248696782443,
+      "gap_released_minus_refitted": -0.00048308277601800953,
+      "rows_agreeing_to_1e-9": 83,
+      "max_abs_row_difference": 0.10915612553246318,
+      "note": "reported, not reconciled; the plan forbids adjusting the recipe after seeing this gap"
+    }
+  },
+  "leak_check_4": {
+    "verdict": "FIRES, recorded and reported per the plan, not aborted",
+    "contaminated_test_rows": 277,
+    "total_test_rows": 2500,
+    "fraction": 0.1108,
+    "direction": "favours the descriptor arms, therefore favours a PRESENT reading",
+    "qualification_diagnostics": [
+      {
+        "label": "leak-free rows only",
+        "rows": 2223,
+        "refitted_F": {
+          "A": 0.45887478927961023,
+          "C": 0.2667878399844404,
+          "F": 0.11176237856981465,
+          "T": 0.3471124107097956,
+          "K": 0.19208694929516984,
+          "D": 0.15502546141462575,
+          "S": 0.5533854260709933,
+          "S_interval": [
+            0.534758768675023,
+            0.5730429702709046
+          ],
+          "reading": "PRESENT"
+        },
+        "released_F": {
+          "A": 0.45887478927961023,
+          "C": 0.2667878399844404,
+          "F": 0.11127104953631813,
+          "T": 0.3476037397432921,
+          "K": 0.19208694929516984,
+          "D": 0.15551679044812228,
+          "S": 0.5526032298646368,
+          "S_interval": [
+            0.533852352758594,
+            0.572024499583679
+          ],
+          "reading": "PRESENT"
+        }
+      },
+      {
+        "label": "leak-4 contaminated rows",
+        "rows": 277,
+        "refitted_F": {
+          "A": 0.30545151358777234,
+          "C": 0.003065619441172736,
+          "F": 0.010319313569902776,
+          "T": 0.29513220001786955,
+          "K": 0.3023858941465996,
+          "D": -0.00725369412873004,
+          "S": 1.0245777794774371,
+          "S_interval": [
+            1.0132756263878542,
+            1.0384478920890026
+          ],
+          "reading": "PRESENT"
+        },
+        "released_F": {
+          "A": 0.30545151358777234,
+          "C": 0.003065619441172736,
+          "F": 0.009902409242891014,
+          "T": 0.29554910434488135,
+          "K": 0.3023858941465996,
+          "D": -0.006836789801718278,
+          "S": 1.0231325004921696,
+          "S_interval": [
+            1.0119720396295713,
+            1.037041477652765
+          ],
+          "reading": "PRESENT"
+        }
+      },
+      {
+        "label": "Trotter steps 2-9 only",
+        "rows": 2000,
+        "refitted_F": {
+          "A": 0.46207166646652226,
+          "C": 0.2697307498505361,
+          "F": 0.1174924091808707,
+          "T": 0.34457925728565153,
+          "K": 0.19234091661598618,
+          "D": 0.15223834066966538,
+          "S": 0.5581906413378162,
+          "S_interval": [
+            0.537145919491853,
+            0.5784972250268675
+          ],
+          "reading": "PRESENT"
+        },
+        "released_F": {
+          "A": 0.46207166646652226,
+          "C": 0.2697307498505361,
+          "F": 0.11719066949156604,
+          "T": 0.3448809969749562,
+          "K": 0.19234091661598618,
+          "D": 0.15254008035897004,
+          "S": 0.557702274996477,
+          "S_interval": [
+            0.536619545036029,
+            0.5779178067116827
+          ],
+          "reading": "PRESENT"
+        }
+      }
+    ]
+  },
+  "per_trotter_step": {
+    "0": {
+      "rows": 250,
+      "A": 0.30490173056316744,
+      "C": 8.177853537934746e-17,
+      "F": 0.009139534426721035,
+      "F_released": 0.008884175865571215,
+      "S_refitted": 1.0309016316017094
+    },
+    "1": {
+      "rows": 250,
+      "A": 0.41727984103420046,
+      "C": 0.21782818067817447,
+      "F": 0.056146061804557446,
+      "F_released": 0.053984510119964545,
+      "S_refitted": 0.5522930056044294
+    },
+    "2": {
+      "rows": 250,
+      "A": 0.44925525917436676,
+      "C": 0.22684113801264472,
+      "F": 0.08070701737466122,
+      "F_released": 0.08017944272300767,
+      "S_refitted": 0.6034871312250003
+    },
+    "3": {
+      "rows": 250,
+      "A": 0.5078789690738883,
+      "C": 0.18096578910817024,
+      "F": 0.09327164502759686,
+      "F_released": 0.09181042158737172,
+      "S_refitted": 0.7884886759241566
+    },
+    "4": {
+      "rows": 250,
+      "A": 0.5250661633278453,
+      "C": 0.34294895868716857,
+      "F": 0.11555293252722146,
+      "F_released": 0.11459987729632795,
+      "S_refitted": 0.4447162898366586
+    },
+    "5": {
+      "rows": 250,
+      "A": 0.5519668582456099,
+      "C": 0.30107086923517384,
+      "F": 0.11971413491283307,
+      "F_released": 0.11999117405638074,
+      "S_refitted": 0.5804381915189917
+    },
+    "6": {
+      "rows": 250,
+      "A": 0.47944074288325916,
+      "C": 0.2878649962701578,
+      "F": 0.12468296236473002,
+      "F_released": 0.12501826560018048,
+      "S_refitted": 0.5400184495829409
+    },
+    "7": {
+      "rows": 250,
+      "A": 0.4747720359918829,
+      "C": 0.3425955926284669,
+      "F": 0.13518073703890282,
+      "F_released": 0.1370339541364101,
+      "S_refitted": 0.38922211426187686
+    },
+    "8": {
+      "rows": 250,
+      "A": 0.3527577293674248,
+      "C": 0.2520315381055052,
+      "F": 0.11927127465818688,
+      "F_released": 0.11735464148865005,
+      "S_refitted": 0.4314005769086455
+    },
+    "9": {
+      "rows": 250,
+      "A": 0.35543557366790096,
+      "C": 0.22352711675700146,
+      "F": 0.1515585695428333,
+      "F_released": 0.15153757904419957,
+      "S_refitted": 0.6470001728590279
+    }
+  },
+  "seed_spread_appendix": {
+    "status": "descriptive only; the declared reading uses random_state=0 as fixed in the run record before fitting",
+    "rows": [
+      {
+        "seed": 0,
+        "C": 0.23756741794824635,
+        "F": 0.10052248696782443,
+        "S_refitted": 0.5985243146261964
+      },
+      {
+        "seed": 1,
+        "C": 0.23598298188808212,
+        "F": 0.10044169810253688,
+        "S_refitted": 0.6030232306529437
+      },
+      {
+        "seed": 2,
+        "C": 0.23780919752468258,
+        "F": 0.09981801141500284,
+        "S_refitted": 0.5965848004663004
+      },
+      {
+        "seed": 3,
+        "C": 0.23639485685995354,
+        "F": 0.10034470790673843,
+        "S_refitted": 0.6016460127350096
+      },
+      {
+        "seed": 4,
+        "C": 0.23559444229478635,
+        "F": 0.1008767913548597,
+        "S_refitted": 0.6049320676482092
+      }
+    ]
+  }
+}

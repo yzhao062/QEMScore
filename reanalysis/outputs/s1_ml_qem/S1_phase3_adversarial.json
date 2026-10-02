@@ -1,0 +1,189 @@
+{
+  "structural_leak1": {
+    "descriptor_max_integer_residual": 5.7220458984375e-06,
+    "execution_block_max_integer_residual": 0.5
+  },
+  "max_corr": {
+    "overall_r": 0.9611969836165043,
+    "overall_col": 166,
+    "overall_is_execution_derived": true,
+    "descriptor_only_r": 0.3022038382070217,
+    "descriptor_only_col": 85
+  },
+  "design": {
+    "rank_with_intercept": 106,
+    "nonconstant_columns": 105,
+    "distinct_descriptor_rows_train": 449,
+    "distinct_descriptor_rows_test": 2201,
+    "ols_in_sample_r2": 0.36002117057345046,
+    "ols_coef_norm_obs0": 155.24300161623952
+  },
+  "interval_robustness": {
+    "row bootstrap, declared seed 12345 (PCG64)": {
+      "percentile": [
+        0.5808355633046999,
+        0.6171523205920212
+      ],
+      "reading_percentile": "PRESENT",
+      "basic": [
+        0.5798963086603716,
+        0.6162130659476929
+      ],
+      "reading_basic": "PRESENT",
+      "normal": [
+        0.5796934253174024,
+        0.6173552039349903
+      ],
+      "reading_normal": "PRESENT"
+    },
+    "row bootstrap, seed 99991 (PCG64)": {
+      "percentile": [
+        0.579303671443041,
+        0.6167235017064499
+      ],
+      "reading_percentile": "PRESENT",
+      "basic": [
+        0.5803251275459429,
+        0.6177449578093518
+      ],
+      "reading_basic": "PRESENT",
+      "normal": [
+        0.5800670216910513,
+        0.6169816075613415
+      ],
+      "reading_normal": "PRESENT"
+    },
+    "row bootstrap, seed 2 (legacy MT19937)": {
+      "percentile": [
+        0.5806239224530936,
+        0.6165834950320496
+      ],
+      "reading_percentile": "PRESENT",
+      "basic": [
+        0.5804651342203432,
+        0.6164247067992992
+      ],
+      "reading_basic": "PRESENT",
+      "normal": [
+        0.5804283479940531,
+        0.6166202812583397
+      ],
+      "reading_normal": "PRESENT"
+    },
+    "row bootstrap, 20000 draws": {
+      "percentile": [
+        0.5798866962002497,
+        0.6171509303939522
+      ],
+      "reading_percentile": "PRESENT",
+      "basic": [
+        0.5798976988584406,
+        0.6171619330521431
+      ],
+      "reading_basic": "PRESENT",
+      "normal": [
+        0.5800113218616874,
+        0.6170373073907054
+      ],
+      "reading_normal": "PRESENT"
+    },
+    "cluster bootstrap seed 777": {
+      "percentile": [
+        0.5525445199240626,
+        0.6487510005360345
+      ],
+      "reading_percentile": "PRESENT"
+    },
+    "cluster bootstrap seed 31337": {
+      "percentile": [
+        0.5518721057309475,
+        0.6514125633477138
+      ],
+      "reading_percentile": "PRESENT"
+    },
+    "cluster bootstrap released-F": {
+      "percentile": [
+        0.5516788815775923,
+        0.6478347896100579
+      ],
+      "reading_percentile": "PRESENT"
+    }
+  },
+  "extra_stress": {
+    "declared OLS-A, steps 2-9": {
+      "rows": 2000,
+      "S": 0.5581906413378162,
+      "interval": [
+        0.537145919491853,
+        0.5784972250268675
+      ],
+      "reading": "PRESENT"
+    },
+    "ridge-A, steps 2-9": {
+      "rows": 2000,
+      "S": 0.45921603031070857,
+      "interval": [
+        0.4339348230343182,
+        0.48391609508797145
+      ],
+      "reading": "ABSENT"
+    },
+    "ridge-A, steps 1-9": {
+      "rows": 2250,
+      "S": 0.4826753489256688,
+      "interval": [
+        0.46121940284483937,
+        0.5044084710178104
+      ],
+      "reading": "INDETERMINATE"
+    },
+    "declared OLS-A, all rows": {
+      "rows": 2500,
+      "S": 0.5985243146261964,
+      "interval": [
+        0.5808355633046999,
+        0.6171523205920212
+      ],
+      "reading": "PRESENT"
+    },
+    "ridge-A, leak-free rows": {
+      "rows": 2223,
+      "S": 0.4730206639380058,
+      "interval": [
+        0.45093787072029085,
+        0.49547192705615406
+      ],
+      "reading": "ABSENT"
+    }
+  },
+  "alternative_reference": {
+    "unmitigated_mean_L2": 0.20970683300841556,
+    "S_if_referenced_to_unmitigated_instead_of_A": -0.2551701406854893,
+    "note": "NOT the declared estimand; the plan fixes A as the reference. Reported only to show how far the descriptor control is from the system's own baseline."
+  },
+  "recomputed": {
+    "A": 0.44187549033295453,
+    "C": 0.23756741794824635,
+    "F_refit": 0.10052248696782443,
+    "F_released": 0.10003940419180642,
+    "T": 0.3413530033651301,
+    "K": 0.2043080723847082,
+    "D": 0.13704493098042192,
+    "S_refit": 0.5985243146261964,
+    "S_released": 0.5976784800313534
+  },
+  "passed": [
+    "every descriptor column is an integer count / 100 :: max |x*100 - round(x*100)| = 5.72e-06",
+    "the 4 execution-derived columns are NOT integer counts (they are expvals) :: max residual = 0.5",
+    "the highest-correlating column is execution-derived, not a descriptor :: column 166 of 169",
+    "no descriptor column is a near-copy of a target (|corr| < 0.9) :: max descriptor |corr| = 0.3022",
+    "the declared reading survives every interval construction tried :: ['PRESENT']",
+    "S refitted matches the reported value :: 0.5985243146 vs 0.5985243146",
+    "S released matches the reported value :: 0.5976784800 vs 0.5976784800",
+    "T, K, D match the reported values",
+    "K + D == T exactly (the decomposition closes) :: residual 0",
+    "the with- and without-calibration rungs are reported as identical",
+    "leak-4 count matches the independently recomputed mask :: 277 vs 277"
+  ],
+  "failed": []
+}
