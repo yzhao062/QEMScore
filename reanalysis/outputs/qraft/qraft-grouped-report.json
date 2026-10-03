@@ -1,0 +1,542 @@
+{
+  "task": "QRAFT matched retraining with grouped (circuit-level) validation",
+  "description": "Grouped holdout split ensuring no partial-circuit group appears in both train and test",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "test_fraction": 0.15,
+  "score": "per-row mean absolute error in probability points",
+  "weighting": "rows equal within machine, machines equal across",
+  "group_counts": {
+    "processed_inputs_7_descriptors": 3800,
+    "processed_inputs_6_circuit_descriptors": 1038,
+    "processed_inputs_6_descriptors_structure_only": 864,
+    "released_predictions_7_descriptors": 1210,
+    "released_predictions_6_circuit_descriptors": 735,
+    "released_predictions_6_descriptors_structure_only": 655,
+    "tuples_on_more_than_one_machine": 106,
+    "machines_per_recurring_tuple_histogram": {
+      "2": 66,
+      "3": 21,
+      "4": 10,
+      "5": 9
+    }
+  },
+  "grouped_retraining_7_descriptors": {
+    "total_groups": 3800,
+    "arms": {
+      "Q3": {
+        "per_seed_macro_mae": {
+          "0": 13.235562612887986,
+          "1": 14.249799356145127,
+          "2": 13.241728689946195,
+          "3": 13.9974262171983,
+          "4": 13.453990508289474,
+          "5": 14.312705768760733,
+          "6": 13.608830627017534,
+          "7": 13.61732305265121,
+          "8": 12.791475774037707,
+          "9": 13.471456527207625
+        },
+        "ten_seed_mean": 13.59802991341419,
+        "ten_seed_min": 12.791475774037707,
+        "ten_seed_max": 14.312705768760733,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight"
+        ]
+      },
+      "Q2": {
+        "per_seed_macro_mae": {
+          "0": 2.063932259671028,
+          "1": 2.16277751663261,
+          "2": 2.3163518312291256,
+          "3": 2.184635090920644,
+          "4": 2.136229465699264,
+          "5": 2.278560053475405,
+          "6": 2.3238610734967677,
+          "7": 2.1398235168066697,
+          "8": 2.225676731192337,
+          "9": 2.2960078131178663
+        },
+        "ten_seed_mean": 2.212785535224172,
+        "ten_seed_min": 2.063932259671028,
+        "ten_seed_max": 2.3238610734967677,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight",
+          "StateUpProb25",
+          "StateUpProb50",
+          "StateUpProb75"
+        ]
+      },
+      "Q1": {
+        "per_seed_macro_mae": {
+          "0": 2.0497289714571125,
+          "1": 2.0722004353615384,
+          "2": 2.140799407621926,
+          "3": 2.0183920097631622,
+          "4": 2.0080535954139203,
+          "5": 2.129734067090269,
+          "6": 2.197764817214566,
+          "7": 2.0001470181011585,
+          "8": 2.13767294793617,
+          "9": 2.114629754005234
+        },
+        "ten_seed_mean": 2.086912302396506,
+        "ten_seed_min": 2.0001470181011585,
+        "ten_seed_max": 2.197764817214566,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight",
+          "StateUpProb25",
+          "StateUpProb50",
+          "StateUpProb75",
+          "TotalUpDnErr25",
+          "TotalUpDnErr50",
+          "TotalUpDnErr75",
+          "StateUpDnErr25",
+          "StateUpDnErr50",
+          "StateUpDnErr75",
+          "ComputerID"
+        ]
+      }
+    },
+    "ratio_q3_over_q2": 6.145209147906242,
+    "difference_q3_minus_q2": 11.38524437819002,
+    "difference_q2_minus_q1": 0.12587323282766594,
+    "bootstrap": {
+      "n_draws": 10000,
+      "seed": 20261002,
+      "resample_unit": "partial-circuit groups",
+      "difference_q3_minus_q2_95_ci": [
+        10.994050691406029,
+        11.77136853061737
+      ],
+      "ratio_q3_over_q2_95_ci": [
+        5.881123142679533,
+        6.40406532954879
+      ],
+      "q3_macro_mae_95_ci": [
+        13.199900321454567,
+        13.990293016604635
+      ],
+      "q2_macro_mae_95_ci": [
+        2.1358174713385,
+        2.2969037380319053
+      ],
+      "q1_macro_mae_95_ci": [
+        2.012094441216005,
+        2.1691880099634457
+      ]
+    }
+  },
+  "grouped_retraining_6_circuit_descriptors": {
+    "total_groups": 1038,
+    "arms": {
+      "Q3": {
+        "per_seed_macro_mae": {
+          "0": 15.27585028001539,
+          "1": 14.205065034429737,
+          "2": 13.728953139225847,
+          "3": 12.543094940035525,
+          "4": 13.48236247677265,
+          "5": 12.728358888594704,
+          "6": 12.254012491717004,
+          "7": 12.882632091883945,
+          "8": 12.481581457153169,
+          "9": 13.291248596753992
+        },
+        "ten_seed_mean": 13.287315939658196,
+        "ten_seed_min": 12.254012491717004,
+        "ten_seed_max": 15.27585028001539,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight"
+        ]
+      },
+      "Q2": {
+        "per_seed_macro_mae": {
+          "0": 2.388396102876916,
+          "1": 2.1727267340854226,
+          "2": 2.199479815644742,
+          "3": 2.0459680028159553,
+          "4": 2.45181107508214,
+          "5": 2.1514040279577964,
+          "6": 2.366654580982405,
+          "7": 2.206102787738834,
+          "8": 2.501702138789039,
+          "9": 2.4520003598890563
+        },
+        "ten_seed_mean": 2.2936245625862304,
+        "ten_seed_min": 2.0459680028159553,
+        "ten_seed_max": 2.501702138789039,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight",
+          "StateUpProb25",
+          "StateUpProb50",
+          "StateUpProb75"
+        ]
+      },
+      "Q1": {
+        "per_seed_macro_mae": {
+          "0": 2.2242303898792435,
+          "1": 1.9823800856195546,
+          "2": 2.115344503640239,
+          "3": 1.8344362859792245,
+          "4": 2.264366770453018,
+          "5": 1.9838191582284286,
+          "6": 2.242377501526967,
+          "7": 1.9965343626892147,
+          "8": 2.280971435249722,
+          "9": 2.3258464647978525
+        },
+        "ten_seed_mean": 2.1250306958063465,
+        "ten_seed_min": 1.8344362859792245,
+        "ten_seed_max": 2.3258464647978525,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight",
+          "StateUpProb25",
+          "StateUpProb50",
+          "StateUpProb75",
+          "TotalUpDnErr25",
+          "TotalUpDnErr50",
+          "TotalUpDnErr75",
+          "StateUpDnErr25",
+          "StateUpDnErr50",
+          "StateUpDnErr75",
+          "ComputerID"
+        ]
+      }
+    },
+    "ratio_q3_over_q2": 5.793152094898988,
+    "difference_q3_minus_q2": 10.993691377071965,
+    "difference_q2_minus_q1": 0.16859386677988386,
+    "bootstrap": {
+      "n_draws": 10000,
+      "seed": 20261002,
+      "resample_unit": "partial-circuit groups",
+      "difference_q3_minus_q2_95_ci": [
+        10.523260676840371,
+        11.594658072197213
+      ],
+      "ratio_q3_over_q2_95_ci": [
+        5.476495561714026,
+        6.152710795367722
+      ],
+      "q3_macro_mae_95_ci": [
+        12.836853276229967,
+        13.87638171470024
+      ],
+      "q2_macro_mae_95_ci": [
+        2.2020897488432816,
+        2.3958516127960396
+      ],
+      "q1_macro_mae_95_ci": [
+        2.0321495833623024,
+        2.2214959991118453
+      ]
+    }
+  },
+  "grouped_retraining_6_descriptors_structure_only": {
+    "total_groups": 864,
+    "arms": {
+      "Q3": {
+        "per_seed_macro_mae": {
+          "0": 12.00689621107926,
+          "1": 13.293348337111507,
+          "2": 13.140285861188525,
+          "3": 12.66816136032002,
+          "4": 12.188270632264478,
+          "5": 13.413343297552625,
+          "6": 12.632734152255077,
+          "7": 12.007364995020758,
+          "8": 12.053933831878782,
+          "9": 14.802758652831528
+        },
+        "ten_seed_mean": 12.820709733150256,
+        "ten_seed_min": 12.00689621107926,
+        "ten_seed_max": 14.802758652831528,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight"
+        ]
+      },
+      "Q2": {
+        "per_seed_macro_mae": {
+          "0": 2.269132411279815,
+          "1": 2.5735123958299737,
+          "2": 2.2607997378114573,
+          "3": 2.103117047700616,
+          "4": 2.689608353680131,
+          "5": 2.499061769228859,
+          "6": 2.266177088987967,
+          "7": 2.3571303341678984,
+          "8": 2.2427053881786407,
+          "9": 2.2527622646043253
+        },
+        "ten_seed_mean": 2.351400679146969,
+        "ten_seed_min": 2.103117047700616,
+        "ten_seed_max": 2.689608353680131,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight",
+          "StateUpProb25",
+          "StateUpProb50",
+          "StateUpProb75"
+        ]
+      },
+      "Q1": {
+        "per_seed_macro_mae": {
+          "0": 2.122839750663526,
+          "1": 2.3532412878455653,
+          "2": 2.093907690721963,
+          "3": 2.104973508321029,
+          "4": 2.4877286326377006,
+          "5": 2.2601763047246086,
+          "6": 2.136077953901572,
+          "7": 2.10758193881748,
+          "8": 2.091097823749771,
+          "9": 2.072857260485951
+        },
+        "ten_seed_mean": 2.1830482151869166,
+        "ten_seed_min": 2.072857260485951,
+        "ten_seed_max": 2.4877286326377006,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight",
+          "StateUpProb25",
+          "StateUpProb50",
+          "StateUpProb75",
+          "TotalUpDnErr25",
+          "TotalUpDnErr50",
+          "TotalUpDnErr75",
+          "StateUpDnErr25",
+          "StateUpDnErr50",
+          "StateUpDnErr75",
+          "ComputerID"
+        ]
+      }
+    },
+    "ratio_q3_over_q2": 5.452371366075006,
+    "difference_q3_minus_q2": 10.469309054003286,
+    "difference_q2_minus_q1": 0.1683524639600522,
+    "bootstrap": {
+      "n_draws": 10000,
+      "seed": 20261002,
+      "resample_unit": "partial-circuit groups",
+      "difference_q3_minus_q2_95_ci": [
+        9.945028419859115,
+        11.197154778038945
+      ],
+      "ratio_q3_over_q2_95_ci": [
+        5.141128222247482,
+        5.842097569577947
+      ],
+      "q3_macro_mae_95_ci": [
+        12.29828281142008,
+        13.555155743119013
+      ],
+      "q2_macro_mae_95_ci": [
+        2.2480680518054075,
+        2.4675683720818644
+      ],
+      "q1_macro_mae_95_ci": [
+        2.080547315797936,
+        2.291959376813078
+      ]
+    }
+  },
+  "grouped_retraining_structure_only": {
+    "total_groups": 864,
+    "arms": {
+      "Q3": {
+        "per_seed_macro_mae": {
+          "0": 12.00689621107926,
+          "1": 13.293348337111507,
+          "2": 13.140285861188525,
+          "3": 12.66816136032002,
+          "4": 12.188270632264478,
+          "5": 13.413343297552625,
+          "6": 12.632734152255077,
+          "7": 12.007364995020758,
+          "8": 12.053933831878782,
+          "9": 14.802758652831528
+        },
+        "ten_seed_mean": 12.820709733150256,
+        "ten_seed_min": 12.00689621107926,
+        "ten_seed_max": 14.802758652831528,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight"
+        ]
+      },
+      "Q2": {
+        "per_seed_macro_mae": {
+          "0": 2.269132411279815,
+          "1": 2.5735123958299737,
+          "2": 2.2607997378114573,
+          "3": 2.103117047700616,
+          "4": 2.689608353680131,
+          "5": 2.499061769228859,
+          "6": 2.266177088987967,
+          "7": 2.3571303341678984,
+          "8": 2.2427053881786407,
+          "9": 2.2527622646043253
+        },
+        "ten_seed_mean": 2.351400679146969,
+        "ten_seed_min": 2.103117047700616,
+        "ten_seed_max": 2.689608353680131,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight",
+          "StateUpProb25",
+          "StateUpProb50",
+          "StateUpProb75"
+        ]
+      },
+      "Q1": {
+        "per_seed_macro_mae": {
+          "0": 2.122839750663526,
+          "1": 2.3532412878455653,
+          "2": 2.093907690721963,
+          "3": 2.104973508321029,
+          "4": 2.4877286326377006,
+          "5": 2.2601763047246086,
+          "6": 2.136077953901572,
+          "7": 2.10758193881748,
+          "8": 2.091097823749771,
+          "9": 2.072857260485951
+        },
+        "ten_seed_mean": 2.1830482151869166,
+        "ten_seed_min": 2.072857260485951,
+        "ten_seed_max": 2.4877286326377006,
+        "features": [
+          "CircuitWidth",
+          "CircuitDepth",
+          "CircuitNumU1Gates",
+          "CircuitNumU2Gates",
+          "CircuitNumU3Gates",
+          "CircuitNumCXGates",
+          "StateHammingWeight",
+          "StateUpProb25",
+          "StateUpProb50",
+          "StateUpProb75",
+          "TotalUpDnErr25",
+          "TotalUpDnErr50",
+          "TotalUpDnErr75",
+          "StateUpDnErr25",
+          "StateUpDnErr50",
+          "StateUpDnErr75",
+          "ComputerID"
+        ]
+      }
+    },
+    "ratio_q3_over_q2": 5.452371366075006,
+    "difference_q3_minus_q2": 10.469309054003286,
+    "difference_q2_minus_q1": 0.1683524639600522,
+    "bootstrap": {
+      "n_draws": 10000,
+      "seed": 20261002,
+      "resample_unit": "partial-circuit groups",
+      "difference_q3_minus_q2_95_ci": [
+        9.945028419859115,
+        11.197154778038945
+      ],
+      "ratio_q3_over_q2_95_ci": [
+        5.141128222247482,
+        5.842097569577947
+      ],
+      "q3_macro_mae_95_ci": [
+        12.29828281142008,
+        13.555155743119013
+      ],
+      "q2_macro_mae_95_ci": [
+        2.2480680518054075,
+        2.4675683720818644
+      ],
+      "q1_macro_mae_95_ci": [
+        2.080547315797936,
+        2.291959376813078
+      ]
+    }
+  },
+  "structure_group_analysis": {
+    "post_hoc": true,
+    "machine_plus_6_descriptor_groups": 1038,
+    "six_descriptor_tuples": 864,
+    "tuples_on_more_than_one_machine": 106,
+    "machines_per_recurring_tuple_histogram": {
+      "2": 66,
+      "3": 21,
+      "4": 10,
+      "5": 9
+    }
+  }
+}

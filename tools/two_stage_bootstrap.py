@@ -28,6 +28,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import json
 import os
@@ -59,8 +60,21 @@ def _sha256(path: Path) -> str:
 
 
 def _row_inputs(run_dir: Path, key: str, family: str, seeds: list[int]) -> dict:
-    with open(run_dir / "cache" / f"{key}.pkl", "rb") as handle:
-        data = pickle.load(handle)
+    cache_gz = run_dir / "cache" / f"{key}.json.gz"
+    cache_json = run_dir / "cache" / f"{key}.json"
+    cache_pkl = run_dir / "cache" / f"{key}.pkl"
+    if not cache_gz.is_file() and not cache_pkl.is_file() and (run_dir / "inputs" / "cache" / f"{key}.json.gz").is_file():
+        cache_gz = run_dir / "inputs" / "cache" / f"{key}.json.gz"
+
+    if cache_gz.is_file():
+        with gzip.open(cache_gz, "rt", encoding="utf-8") as handle:
+            data = json.load(handle)
+    elif cache_json.is_file():
+        with open(cache_json, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+    else:
+        with open(cache_pkl, "rb") as handle:
+            data = pickle.load(handle)
     test = data["test"]
     index = [i for i, row in enumerate(test) if str(row["family"]) == family]
     rows = [test[i] for i in index]
@@ -78,6 +92,10 @@ def _row_inputs(run_dir: Path, key: str, family: str, seeds: list[int]) -> dict:
     if not np.all(incidence >= 1):
         raise ValueError(f"{key}/{family}: a circuit lacks a row in some cell")
 
+    fits_dir = run_dir / "fits"
+    if not fits_dir.is_dir() and (run_dir / "inputs" / "fits").is_dir():
+        fits_dir = run_dir / "inputs" / "fits"
+
     errors = {arm: np.empty((len(seeds), len(rows))) for arm in ARMS}
     flags = {arm: np.zeros(len(seeds), dtype=bool) for arm in ARMS}
     flags_secondary = {arm: np.zeros(len(seeds), dtype=bool) for arm in ARMS}
@@ -85,9 +103,9 @@ def _row_inputs(run_dir: Path, key: str, family: str, seeds: list[int]) -> dict:
     for s, k in enumerate(seeds):
         for arm in ARMS:
             stem = f"{key}__k{k:02d}__{arm}"
-            meta = json.loads((run_dir / "fits" / f"{stem}.json").read_text(
+            meta = json.loads((fits_dir / f"{stem}.json").read_text(
                 encoding="utf-8"))
-            predictions = np.load(run_dir / "fits" / f"{stem}.npz")["test"]
+            predictions = np.load(fits_dir / f"{stem}.npz")["test"]
             values = predictions[index]
             errors[arm][s] = np.abs(values - ideal)
             flags[arm][s] = bool(meta["flagged_non_converged"])
@@ -187,6 +205,10 @@ def main(argv=None) -> int:
     started = time.perf_counter()
     run_dir = args.run_dir.resolve()
     summary_path = run_dir / "summary.json"
+    if not summary_path.is_file() and (run_dir / "inputs" / "summary.json").is_file():
+        summary_path = run_dir / "inputs" / "summary.json"
+    elif not summary_path.is_file() and (run_dir.parent / "summary.json").is_file():
+        summary_path = run_dir.parent / "summary.json"
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     seeds = [int(value) for value in summary["learner_seeds"]]
     if summary["fits_missing"]:

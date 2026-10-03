@@ -27,14 +27,14 @@ if [ ! -d "QLEAR" ]; then
     git clone https://github.com/AsmarMuqeet/QLEAR.git QLEAR
     (
         cd QLEAR
-        git checkout 64117b6be799c80d507119ff3a059b0221356c9a
+        git checkout 64117b600edf5a0cf587d298fd890a721d9ab7e0
         echo "Q-LEAR checked out at commit $(git rev-parse --short HEAD)"
     )
 else
     echo "QLEAR directory already exists; verifying commit..."
     (
         cd QLEAR
-        git checkout 64117b6be799c80d507119ff3a059b0221356c9a
+        git checkout 64117b600edf5a0cf587d298fd890a721d9ab7e0
     )
 fi
 

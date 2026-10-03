@@ -213,6 +213,12 @@ def main():
         help="Output file for bootstrap results JSON",
     )
     parser.add_argument(
+        "--inputs-dir",
+        type=str,
+        default=None,
+        help="Root directory containing released inputs (e.g. artifacts/near-clifford-positive-control/inputs)",
+    )
+    parser.add_argument(
         "--dataset-seeds",
         nargs="+",
         type=int,
@@ -221,8 +227,12 @@ def main():
     )
     args = parser.parse_args()
 
-    data_root = Path(args.data_dir).resolve()
-    results_root = Path(args.results_dir).resolve()
+    if args.inputs_dir:
+        data_root = Path(args.inputs_dir).resolve()
+        results_root = Path(args.inputs_dir).resolve()
+    else:
+        data_root = Path(args.data_dir).resolve()
+        results_root = Path(args.results_dir).resolve()
     out_file = Path(args.output_file).resolve()
     out_file.parent.mkdir(parents=True, exist_ok=True)
 
@@ -242,27 +252,60 @@ def main():
         ds_dir = data_root / f"nc-s{master_seed}-n640"
 
         summary_file = seed_dir / "summary.json"
+        if not summary_file.exists():
+            summary_file = results_root / f"summary-s{master_seed}.json"
+
         preds_file = seed_dir / "test_predictions.json.gz"
-        items_file = ds_dir / "items.jsonl"
+
+        candidate_items = [
+            seed_dir / "test_items.json.gz",
+            seed_dir / "test_items.json",
+            ds_dir / "test_items.json.gz",
+            ds_dir / "items.jsonl.gz",
+            ds_dir / "items.jsonl",
+            data_root / f"test_items-s{master_seed}.json.gz",
+        ]
+        items_file = next((p for p in candidate_items if p.exists()), None)
 
         if not summary_file.exists():
             raise FileNotFoundError(f"Missing summary.json at {summary_file}")
         if not preds_file.exists():
             raise FileNotFoundError(f"Missing test_predictions.json.gz at {preds_file}")
-        if not items_file.exists():
-            raise FileNotFoundError(f"Missing items.jsonl at {items_file}")
+        if items_file is None:
+            raise FileNotFoundError(f"Missing items file for seed {master_seed} (checked: {[str(p) for p in candidate_items]})")
 
-        with open(summary_file) as f:
+        with open(summary_file, "r", encoding="utf-8") as f:
             summary = json.load(f)
 
         with gzip.open(preds_file, "rt", encoding="utf-8") as f:
             preds_data = json.load(f)
 
-        test_items = [
-            json.loads(line)
-            for line in items_file.read_text(encoding="utf-8").splitlines()
-            if line.strip() and json.loads(line).get("split") == "test"
-        ]
+        if str(items_file).endswith(".gz"):
+            with gzip.open(items_file, "rt", encoding="utf-8") as f:
+                first_char = f.read(1)
+                f.seek(0)
+                if first_char == "[":
+                    raw_items = json.load(f)
+                    test_items = [it for it in raw_items if it.get("split", "test") == "test"]
+                else:
+                    test_items = [
+                        json.loads(line)
+                        for line in f
+                        if line.strip() and json.loads(line).get("split", "test") == "test"
+                    ]
+        else:
+            with open(items_file, "r", encoding="utf-8") as f:
+                first_char = f.read(1)
+                f.seek(0)
+                if first_char == "[":
+                    raw_items = json.load(f)
+                    test_items = [it for it in raw_items if it.get("split", "test") == "test"]
+                else:
+                    test_items = [
+                        json.loads(line)
+                        for line in f
+                        if line.strip() and json.loads(line).get("split", "test") == "test"
+                    ]
 
         learner_seeds = [it["seed"] for it in summary["per_seed_results"]]
         per_seed_results = summary["per_seed_results"]
@@ -299,6 +342,8 @@ def main():
             print(f"  Sensitivity analysis: 0 unflagged fits remain; sensitivity evaluation not evaluable without unflagged fits.")
             sensitivity_intervals = None
             sens_supports = None
+            if pass_decision_sensitivity is True:
+                pass_decision_sensitivity = "not_estimable"
         elif len(valid_indices) < len(learner_seeds):
             print(f"  Flagged fits detected: {len(learner_seeds) - len(valid_indices)} flagged seeds, {len(valid_indices)} unflagged.")
             sensitivity_intervals = run_two_stage_bootstrap(

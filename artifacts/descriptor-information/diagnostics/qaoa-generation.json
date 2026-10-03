@@ -1,0 +1,296 @@
+{
+ "schema": "qaoa-intermediate-generation-v1",
+ "frozen_rule": "docs/frozen-rules/2026-10-02-descriptor-information.md",
+ "attempts": [
+  {
+   "n_qubits": 10,
+   "split_spec": {
+    "split_id": "S0",
+    "split_axis": "circuit_instance",
+    "role_domains": {
+     "test": "target",
+     "train": "source",
+     "validation": "source"
+    },
+    "source_domain": {
+     "circuit_instance": [
+      "sampled"
+     ]
+    },
+    "target_domain": {
+     "circuit_instance": [
+      "sampled"
+     ]
+    },
+    "fixed_axes": {
+     "circuit_family": [
+      "qaoa"
+     ],
+     "family_native_depth": [
+      1,
+      2
+     ],
+     "noise_family": [
+      "depolarizing_readout"
+     ],
+     "noise_strength": [
+      "L1",
+      "L3"
+     ],
+     "observable_class": [
+      "zz_mid"
+     ],
+     "shots": [
+      2048
+     ]
+    },
+    "n_qubits": [
+     10
+    ],
+    "role_counts": {
+     "test": 160,
+     "train": 640,
+     "validation": 320
+    },
+    "family_parameters": {
+     "qaoa": {
+      "er_edge_probability": 0.3,
+      "graph_classes": [
+       "3_regular",
+       "erdos_renyi"
+      ]
+     }
+    },
+    "allowed_couplings": [],
+    "replicates": [
+     0
+    ],
+    "partition_id": "headline",
+    "budget_tier": "H",
+    "test_group_shot_budget": null
+   },
+   "split_spec_hash": "31cd5e3d1fc8be80f19179e4b312612beb4165781c69af59fad2e4df1d1fc291",
+   "datasets": [
+    {
+     "seed": 101,
+     "n_qubits": 10,
+     "data_dir": "<ladder>/runs/qaoa-data/qaoa-s101-n640",
+     "generated_now": true,
+     "generation_seconds": 391.4604040829872,
+     "validation_seconds": 2.911568042007275,
+     "validated": true,
+     "dataset_hash": "26fb43c7d68b4ae555141556c4d6b1f3fb865aca90a03c0f54ba54318ce1fa9b",
+     "split_spec_hash": "31cd5e3d1fc8be80f19179e4b312612beb4165781c69af59fad2e4df1d1fc291",
+     "master_seed": 101,
+     "items_jsonl_sha256": "fea88d37d13daa9ae7c4b965fe2f1578853086f5d30e35625b16dc19ce6f3e53",
+     "manifest_sha256": "17f3ceeefa17f06ee4b9596d9309760dbaa376cc4681e261a9102f5f71c49955",
+     "n_items": {
+      "train": 1280,
+      "validation": 640,
+      "test": 320
+     },
+     "n_circuits": {
+      "train": 640,
+      "validation": 320,
+      "test": 160
+     },
+     "graph_class_circuits": {
+      "train": {
+       "erdos_renyi": 340,
+       "3_regular": 300
+      },
+      "validation": {
+       "erdos_renyi": 175,
+       "3_regular": 145
+      },
+      "test": {
+       "erdos_renyi": 80,
+       "3_regular": 80
+      }
+     },
+     "p_circuits": {
+      "train": {
+       "1": 320,
+       "2": 320
+      },
+      "validation": {
+       "1": 160,
+       "2": 160
+      },
+      "test": {
+       "1": 80,
+       "2": 80
+      }
+     },
+     "cells": [
+      "depolarizing_readout/L1/zz_mid",
+      "depolarizing_readout/L3/zz_mid"
+     ],
+     "edge_count": {
+      "min": 5,
+      "max": 25,
+      "mean": 14.320535714285715
+     },
+     "distinct_edge_sets": 1120,
+     "versions": {
+      "python": "3.12.14",
+      "numpy": "2.2.6",
+      "scikit-learn": "1.9.1",
+      "qiskit": "2.5.2",
+      "qiskit-aer": "0.17.2",
+      "stim": "1.16.0",
+      "qemscore": "0.1.0"
+     }
+    },
+    {
+     "seed": 211,
+     "n_qubits": 10,
+     "data_dir": "<ladder>/runs/qaoa-data/qaoa-s211-n640",
+     "generated_now": true,
+     "generation_seconds": 390.4971692499821,
+     "validation_seconds": 3.208942333003506,
+     "validated": true,
+     "dataset_hash": "d095dee069fd3ac4e50b2d93c6a170ac991f2b95e3e57e733caf19df0060bfbd",
+     "split_spec_hash": "31cd5e3d1fc8be80f19179e4b312612beb4165781c69af59fad2e4df1d1fc291",
+     "master_seed": 211,
+     "items_jsonl_sha256": "333202e4d5329039db71b6844a78d1fa740833680deefc2e9883c4b2bec82010",
+     "manifest_sha256": "7490ab45a18e8958915258498dfd71a25f20e07fd897320bd6307719d963a5a8",
+     "n_items": {
+      "train": 1280,
+      "validation": 640,
+      "test": 320
+     },
+     "n_circuits": {
+      "train": 640,
+      "validation": 320,
+      "test": 160
+     },
+     "graph_class_circuits": {
+      "train": {
+       "erdos_renyi": 324,
+       "3_regular": 316
+      },
+      "validation": {
+       "erdos_renyi": 173,
+       "3_regular": 147
+      },
+      "test": {
+       "erdos_renyi": 86,
+       "3_regular": 74
+      }
+     },
+     "p_circuits": {
+      "train": {
+       "1": 320,
+       "2": 320
+      },
+      "validation": {
+       "1": 160,
+       "2": 160
+      },
+      "test": {
+       "1": 80,
+       "2": 80
+      }
+     },
+     "cells": [
+      "depolarizing_readout/L1/zz_mid",
+      "depolarizing_readout/L3/zz_mid"
+     ],
+     "edge_count": {
+      "min": 4,
+      "max": 22,
+      "mean": 14.270535714285714
+     },
+     "distinct_edge_sets": 1120,
+     "versions": {
+      "python": "3.12.14",
+      "numpy": "2.2.6",
+      "scikit-learn": "1.9.1",
+      "qiskit": "2.5.2",
+      "qiskit-aer": "0.17.2",
+      "stim": "1.16.0",
+      "qemscore": "0.1.0"
+     }
+    },
+    {
+     "seed": 307,
+     "n_qubits": 10,
+     "data_dir": "<ladder>/runs/qaoa-data/qaoa-s307-n640",
+     "generated_now": true,
+     "generation_seconds": 389.75880412501283,
+     "validation_seconds": 3.495926874980796,
+     "validated": true,
+     "dataset_hash": "c644f3da4d13f3ecaa0dbb2619ef35874d9362b8b5418e02289a899b3e39a2f4",
+     "split_spec_hash": "31cd5e3d1fc8be80f19179e4b312612beb4165781c69af59fad2e4df1d1fc291",
+     "master_seed": 307,
+     "items_jsonl_sha256": "4c7e0d1fdca26ab2b556eca4ac47d06f50110da83342555a0fc988c7427fed07",
+     "manifest_sha256": "d6824dfdf1a4db49068074c38cb147d4bde7f5541799dcdac13bf420db98e2f1",
+     "n_items": {
+      "train": 1280,
+      "validation": 640,
+      "test": 320
+     },
+     "n_circuits": {
+      "train": 640,
+      "validation": 320,
+      "test": 160
+     },
+     "graph_class_circuits": {
+      "train": {
+       "erdos_renyi": 336,
+       "3_regular": 304
+      },
+      "validation": {
+       "erdos_renyi": 159,
+       "3_regular": 161
+      },
+      "test": {
+       "erdos_renyi": 83,
+       "3_regular": 77
+      }
+     },
+     "p_circuits": {
+      "train": {
+       "1": 320,
+       "2": 320
+      },
+      "validation": {
+       "1": 160,
+       "2": 160
+      },
+      "test": {
+       "1": 80,
+       "2": 80
+      }
+     },
+     "cells": [
+      "depolarizing_readout/L1/zz_mid",
+      "depolarizing_readout/L3/zz_mid"
+     ],
+     "edge_count": {
+      "min": 4,
+      "max": 25,
+      "mean": 14.207142857142857
+     },
+     "distinct_edge_sets": 1120,
+     "versions": {
+      "python": "3.12.14",
+      "numpy": "2.2.6",
+      "scikit-learn": "1.9.1",
+      "qiskit": "2.5.2",
+      "qiskit-aer": "0.17.2",
+      "stim": "1.16.0",
+      "qemscore": "0.1.0"
+     }
+    }
+   ],
+   "all_validated": true
+  }
+ ],
+ "chosen_n_qubits": 10,
+ "zz_mid_only_accepted": true,
+ "resolved_cells": 12,
+ "resolved_pools": 6,
+ "fallback_used": false
+}

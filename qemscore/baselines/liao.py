@@ -16,7 +16,7 @@ source and test measurement groups once, even when it trains both arms.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import asdict, dataclass
 
 import numpy as np
@@ -52,6 +52,10 @@ _ADAM_EPSILON = 1e-8
 
 Item = Mapping[str, object]
 ObservableKey = tuple[int, str]
+# Maps one item row to its model input vector, in the order of the names that
+# accompany it. ``None`` means the versioned schema: ``build_features`` with
+# ``FEATURES``, which is the campaign's path and stays byte for byte unchanged.
+FeatureBuilder = Callable[[dict], Sequence[float]]
 
 
 def _items(items: Sequence[Item], label: str) -> list[Item]:
@@ -61,28 +65,80 @@ def _items(items: Sequence[Item], label: str) -> list[Item]:
     return rows
 
 
-def _dropped_columns(drop_features: Sequence[str]) -> tuple[int, ...]:
+def _feature_spec(
+    feature_builder: FeatureBuilder | None,
+    feature_names: Sequence[str] | None,
+) -> tuple[FeatureBuilder | None, tuple[str, ...]]:
+    """Resolve the optional feature builder and the names of its columns.
+
+    Without a builder the names are the schema's ``FEATURES``; a builder must
+    name every column it returns, because ``drop_features`` is resolved against
+    those names and a positional guess could withhold the wrong input.
+    """
+    if feature_builder is None:
+        if feature_names is not None:
+            raise ValueError("feature_names requires a feature_builder")
+        return None, tuple(FEATURES)
+    if not callable(feature_builder):
+        raise TypeError("feature_builder must be callable")
+    if feature_names is None or isinstance(feature_names, (str, bytes)):
+        raise ValueError("a feature_builder requires a sequence of feature_names")
+    names = tuple(feature_names)
+    if not names:
+        raise ValueError("feature_names must not be empty")
+    if any(not isinstance(name, str) or not name for name in names):
+        raise ValueError("feature_names must be nonempty strings")
+    if len(set(names)) != len(names):
+        raise ValueError("feature_names must not repeat a name")
+    return feature_builder, names
+
+
+def _builder_label(feature_builder: FeatureBuilder) -> str:
+    label = getattr(feature_builder, "name", None)
+    if isinstance(label, str) and label:
+        return label
+    return str(getattr(feature_builder, "__qualname__", type(feature_builder).__name__))
+
+
+def _dropped_columns(
+    drop_features: Sequence[str], feature_names: Sequence[str] | None = None
+) -> tuple[int, ...]:
     """Resolve feature names to column indices, refusing anything unknown.
 
     A silently ignored name would produce a control that still reads the input
-    it was built to withhold, and nothing downstream could detect it.
+    it was built to withhold, and nothing downstream could detect it. Names are
+    resolved against ``feature_names`` when a feature builder supplies them and
+    against the schema's ``FEATURES`` otherwise.
     """
+    known = list(FEATURES) if feature_names is None else list(feature_names)
     names = tuple(drop_features)
     if len(set(names)) != len(names):
         raise ValueError("drop_features must not repeat a name")
-    unknown = [name for name in names if name not in FEATURES]
+    unknown = [name for name in names if name not in known]
     if unknown:
         raise ValueError(f"unknown feature names: {sorted(unknown)}")
-    if len(names) >= len(FEATURES):
+    if len(names) >= len(known):
         raise ValueError("drop_features must leave at least one column")
-    return tuple(FEATURES.index(name) for name in names)
+    return tuple(known.index(name) for name in names)
 
 
 def _matrix(
-    items: Sequence[Item], label: str, drop_columns: Sequence[int] = ()
+    items: Sequence[Item],
+    label: str,
+    drop_columns: Sequence[int] = (),
+    feature_builder: FeatureBuilder | None = None,
+    n_features: int | None = None,
 ) -> np.ndarray:
     rows = _items(items, label)
-    matrix = np.asarray([build_features(dict(item)) for item in rows], dtype=float)
+    if feature_builder is None:
+        matrix = np.asarray([build_features(dict(item)) for item in rows], dtype=float)
+    else:
+        matrix = np.asarray([feature_builder(dict(item)) for item in rows], dtype=float)
+        if matrix.ndim != 2 or matrix.shape[1] != n_features:
+            raise ValueError(
+                f"{label} feature builder returned shape {matrix.shape}; "
+                f"its feature_names declare {n_features} columns"
+            )
     if matrix.ndim != 2 or not np.all(np.isfinite(matrix)):
         raise ValueError(f"{label} features must be a finite matrix")
     if drop_columns:
@@ -149,6 +205,21 @@ def _require_disjoint_groups(
         raise ValueError("train and validation measurement groups must be disjoint")
 
 
+def _with_builder(
+    config: dict[str, object],
+    feature_builder: FeatureBuilder | None,
+    feature_names: Sequence[str],
+) -> dict[str, object]:
+    """Record a custom builder; the default path keeps its configuration unchanged."""
+    if feature_builder is None:
+        return config
+    return {
+        **config,
+        "feature_builder": _builder_label(feature_builder),
+        "feature_names": list(feature_names),
+    }
+
+
 class LiaoRandomForestMitigator:
     """Reported B7 RF architecture applied to the restricted feature vector.
 
@@ -158,12 +229,26 @@ class LiaoRandomForestMitigator:
     """
 
     def __init__(
-        self, random_state: int = 0, *, drop_features: Sequence[str] = ()
+        self,
+        random_state: int = 0,
+        *,
+        drop_features: Sequence[str] = (),
+        feature_builder: FeatureBuilder | None = None,
+        feature_names: Sequence[str] | None = None,
     ) -> None:
         self.random_state = random_state
+        self.feature_builder, self.feature_names = _feature_spec(
+            feature_builder, feature_names)
         self.drop_features = tuple(drop_features)
-        self._drop_columns = _dropped_columns(self.drop_features)
+        self._drop_columns = _dropped_columns(
+            self.drop_features,
+            None if self.feature_builder is None else self.feature_names,
+        )
         self._models: dict[ObservableKey, RandomForestRegressor] = {}
+
+    def _features(self, items: Sequence[Item], label: str) -> np.ndarray:
+        return _matrix(items, label, self._drop_columns,
+                       self.feature_builder, len(self.feature_names))
 
     def fit(self, train_items: Sequence[Item]) -> "LiaoRandomForestMitigator":
         self._models = {}
@@ -188,7 +273,7 @@ class LiaoRandomForestMitigator:
                 n_jobs=1,
             )
             model.fit(
-                _matrix(group, "train_items", self._drop_columns),
+                self._features(group, "train_items"),
                 _targets(group, "train_items"),
             )
             models[key] = model
@@ -203,7 +288,7 @@ class LiaoRandomForestMitigator:
 
     @property
     def config_(self) -> dict[str, object]:
-        return {
+        config = {
             "model": RANDOM_FOREST_NAME,
             "scope": "one-independent-forest-per-observable",
             "observable_key_fields": ["n_qubits", "pauli_label"],
@@ -215,6 +300,7 @@ class LiaoRandomForestMitigator:
             "random_state": self.random_state,
             "dropped_features": list(self.drop_features),
         }
+        return _with_builder(config, self.feature_builder, self.feature_names)
 
     def predict(self, items: Sequence[Item]) -> np.ndarray:
         rows = _items(items, "items")
@@ -231,7 +317,7 @@ class LiaoRandomForestMitigator:
         for key, indices in grouped_indices.items():
             group = [rows[index] for index in indices]
             predictions[indices] = self._models[key].predict(
-                _matrix(group, "items", self._drop_columns))
+                self._features(group, "items"))
         return predictions
 
 
@@ -272,6 +358,8 @@ class LiaoMLPMitigator:
         patience: int = 20,
         min_delta: float = 0.0,
         drop_features: Sequence[str] = (),
+        feature_builder: FeatureBuilder | None = None,
+        feature_names: Sequence[str] | None = None,
     ) -> None:
         if isinstance(epochs, bool) or not isinstance(epochs, int) or epochs <= 0:
             raise ValueError("epochs must be a positive integer")
@@ -287,8 +375,13 @@ class LiaoMLPMitigator:
             raise ValueError("min_delta must be finite and nonnegative")
 
         self.random_state = random_state
+        self.feature_builder, self.feature_names = _feature_spec(
+            feature_builder, feature_names)
         self.drop_features = tuple(drop_features)
-        self._drop_columns = _dropped_columns(self.drop_features)
+        self._drop_columns = _dropped_columns(
+            self.drop_features,
+            None if self.feature_builder is None else self.feature_names,
+        )
         self.epochs = epochs
         self.stopping_rule = stopping_rule
         self.dropout = float(dropout)
@@ -303,6 +396,10 @@ class LiaoMLPMitigator:
         self.n_iter_: int = 0
         self._parameters: dict[str, np.ndarray] | None = None
 
+    def _features(self, items: Sequence[Item], label: str) -> np.ndarray:
+        return _matrix(items, label, self._drop_columns,
+                       self.feature_builder, len(self.feature_names))
+
     @property
     def declarations(self) -> LiaoMLPDeclarations:
         return LiaoMLPDeclarations(
@@ -314,7 +411,7 @@ class LiaoMLPMitigator:
 
     @property
     def config_(self) -> dict[str, object]:
-        return {
+        config = {
             "model": MLP_NAME,
             "hidden_layer_sizes": list(MLP_HIDDEN_WIDTHS),
             "activation": "relu",
@@ -330,6 +427,7 @@ class LiaoMLPMitigator:
             "min_delta": self.min_delta,
             "n_iter": self.n_iter_,
         }
+        return _with_builder(config, self.feature_builder, self.feature_names)
 
     def _initialize(self, n_features: int, rng: np.random.Generator) -> None:
         widths = (n_features, *MLP_HIDDEN_WIDTHS, 1)
@@ -406,7 +504,7 @@ class LiaoMLPMitigator:
         validation_items: Sequence[Item] | None = None,
     ) -> "LiaoMLPMitigator":
         train_rows = _items(train_items, "train_items")
-        x = _matrix(train_rows, "train_items", self._drop_columns)
+        x = self._features(train_rows, "train_items")
         y = _targets(train_rows, "train_items").reshape(-1, 1)
 
         validation_x: np.ndarray | None = None
@@ -416,8 +514,7 @@ class LiaoMLPMitigator:
                 raise ValueError("validation_patience requires validation_items")
             validation_rows = _items(validation_items, "validation_items")
             _require_disjoint_groups(train_rows, validation_rows)
-            validation_x = _matrix(
-                validation_rows, "validation_items", self._drop_columns)
+            validation_x = self._features(validation_rows, "validation_items")
             validation_y = _targets(validation_rows, "validation_items").reshape(-1, 1)
 
         self.feature_mean_ = np.mean(x, axis=0)
@@ -492,7 +589,7 @@ class LiaoMLPMitigator:
         return self
 
     def predict(self, items: Sequence[Item]) -> np.ndarray:
-        x = self._standardize(_matrix(items, "items", self._drop_columns))
+        x = self._standardize(self._features(items, "items"))
         predictions, _ = self._forward(x)
         return np.asarray(predictions[:, 0], dtype=float)
 
@@ -603,10 +700,27 @@ class LiaoMitigator:
         patience: int = 20,
         min_delta: float = 0.0,
         drop_features: Sequence[str] = (),
+        feature_builder: FeatureBuilder | None = None,
+        feature_names: Sequence[str] | None = None,
     ) -> None:
         self.random_state = random_state
+        self.feature_builder, self.feature_names = _feature_spec(
+            feature_builder, feature_names)
         self.drop_features = tuple(drop_features)
-        _dropped_columns(self.drop_features)
+        _dropped_columns(
+            self.drop_features,
+            None if self.feature_builder is None else self.feature_names,
+        )
+        # Both candidates read the same columns, so the hook cannot give the
+        # forest and the network different inputs.
+        self._feature_arguments: dict[str, object] = (
+            {}
+            if self.feature_builder is None
+            else {
+                "feature_builder": self.feature_builder,
+                "feature_names": self.feature_names,
+            }
+        )
         self._mlp_arguments = {
             "epochs": epochs,
             "stopping_rule": stopping_rule,
@@ -615,6 +729,7 @@ class LiaoMitigator:
             "patience": patience,
             "min_delta": min_delta,
             "drop_features": self.drop_features,
+            **self._feature_arguments,
         }
         self.candidate_models_: dict[str, object] = {}
         self.validation_scores_: tuple[LiaoValidationScore, ...] = ()
@@ -632,7 +747,8 @@ class LiaoMitigator:
         _require_disjoint_groups(train_rows, validation_rows)
 
         random_forest = LiaoRandomForestMitigator(
-            self.random_state, drop_features=self.drop_features).fit(train_rows)
+            self.random_state, drop_features=self.drop_features,
+            **self._feature_arguments).fit(train_rows)
         mlp = LiaoMLPMitigator(self.random_state, **self._mlp_arguments)
         if mlp.stopping_rule == "validation_patience":
             mlp.fit(train_rows, validation_items=validation_rows)
@@ -677,7 +793,7 @@ class LiaoMitigator:
     def config_(self) -> dict[str, object]:
         if self.selected_model_name_ is None:
             raise RuntimeError("fit first")
-        return {
+        config = {
             "selected_model": self.selected_model_name_,
             "selection_rule": "source-validation one-standard-error",
             "dropped_features": list(self.drop_features),
@@ -694,6 +810,7 @@ class LiaoMitigator:
                 MLP_NAME: self.candidate_models_[MLP_NAME].config_,
             },
         }
+        return _with_builder(config, self.feature_builder, self.feature_names)
 
     def predict(self, items: Sequence[Item]) -> np.ndarray:
         return self.selected_model_.predict(items)
@@ -704,6 +821,7 @@ __all__ = [
     "DEFAULT_MLP_EPOCHS",
     "DEFAULT_MLP_STOPPING_RULE",
     "DEFAULT_MLP_WEIGHT_DECAY",
+    "FeatureBuilder",
     "LiaoMLPDeclarations",
     "LiaoMLPMitigator",
     "LiaoMitigator",

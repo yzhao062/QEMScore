@@ -1,0 +1,363 @@
+{
+ "schema": "descriptor-information-r0-gate-v2",
+ "frozen_rule": "docs/frozen-rules/2026-10-02-descriptor-information.md",
+ "rule_file_sha256": "e49ffce069171e63ddb25b4c87a20d9f279f6c4ad9a15545f869fc2d4d7265cf",
+ "criterion_id": "archive",
+ "criterion": "max |refit - archived| over the selected candidate's test predictions of F and C at the original learner seed, through the feature-builder hook with build_features and FEATURES, at most the tolerance",
+ "tolerance": 1.4e-11,
+ "frozen_criterion": {
+  "criterion_id": "archive",
+  "criterion": "max |refit - archived| over the selected candidate's test predictions of F and C at the original learner seed, through the feature-builder hook with build_features and FEATURES, at most the tolerance",
+  "tolerance": 1e-11
+ },
+ "amended": true,
+ "amendment": "Amendment to the R0 gate, made 2026-10-02 after the gate run and before any fit on a new rung or dataset. The frozen tolerance of 1e-11 was tighter than the reproduction bound that Appendix M.4 already reports (1.4e-11 or better). Through the hook, the original-seed refits reproduce the archived predictions to 1.37e-11 (largest: C at dataset seed 307), while F stays within 1.5e-13 and A within 1e-13. On the same machine, the hooked refits equal the pre-hook M.4 refits exactly (maximum difference 0). The gate therefore uses a tolerance of 1.4e-11, the bound M.4 states.",
+ "datasets": {
+  "shipped-s101-n640": {
+   "setting": "shipped-s101-n640",
+   "data_dir": "<data>/regen-shipped-s101-n640",
+   "items_jsonl_sha256": "867c518483af261d161e6cc688da7416fc1036761ca8761eb211302240e8b824",
+   "manifest_dataset_hash": "668df524395f3fe0ebeb49591916528f21bd29065c71e2fc7b5b785b652ece16",
+   "archived_dataset_hash": "668df524395f3fe0ebeb49591916528f21bd29065c71e2fc7b5b785b652ece16",
+   "dataset_hash_matches_archive": true,
+   "split_spec_hash_matches_archive": true,
+   "validate_split_artifact": "passed",
+   "structure_counts": {
+    "tfi": {
+     "train": {
+      "circuits": 640,
+      "items": 2560
+     },
+     "validation": {
+      "circuits": 320,
+      "items": 1280
+     },
+     "test": {
+      "circuits": 160,
+      "items": 640
+     }
+    },
+    "heisenberg": {
+     "train": {
+      "circuits": 640,
+      "items": 2560
+     },
+     "validation": {
+      "circuits": 320,
+      "items": 1280
+     },
+     "test": {
+      "circuits": 160,
+      "items": 640
+     }
+    }
+   },
+   "test_items_identical_to_archive": true,
+   "validation_items_identical_to_archive": true,
+   "n_items": {
+    "train": 5120,
+    "validation": 2560,
+    "test": 1280
+   },
+   "exact_match": true,
+   "load_and_verify_seconds": 10.277223166980548
+  },
+  "shipped-s211-n640": {
+   "setting": "shipped-s211-n640",
+   "data_dir": "<data>/regen-shipped-s211-n640",
+   "items_jsonl_sha256": "e1c53d6e6a7c770ccf7b251ef865b83a53be2dccd136ba09c14d0873f83c3410",
+   "manifest_dataset_hash": "bd38104ecb8370b5b86524993793a36ecb45a68adf3dd0a333c5a5ec4ce40c88",
+   "archived_dataset_hash": "21f1bd594f8c1799b8126ede8990da35038f68e76121d517e72a24875e082397",
+   "dataset_hash_matches_archive": false,
+   "split_spec_hash_matches_archive": true,
+   "validate_split_artifact": "passed",
+   "structure_counts": {
+    "tfi": {
+     "train": {
+      "circuits": 640,
+      "items": 2560
+     },
+     "validation": {
+      "circuits": 320,
+      "items": 1280
+     },
+     "test": {
+      "circuits": 160,
+      "items": 640
+     }
+    },
+    "heisenberg": {
+     "train": {
+      "circuits": 640,
+      "items": 2560
+     },
+     "validation": {
+      "circuits": 320,
+      "items": 1280
+     },
+     "test": {
+      "circuits": 160,
+      "items": 640
+     }
+    }
+   },
+   "test_items_identical_to_archive": true,
+   "validation_items_identical_to_archive": false,
+   "n_items": {
+    "train": 5120,
+    "validation": 2560,
+    "test": 1280
+   },
+   "exact_match": false,
+   "deviation": {
+    "comparable_row_counts": true,
+    "differing_fields": {
+     "ideal_expectation": 2
+    },
+    "max_abs_ideal_difference": 9.999778782798785e-13,
+    "examples": [
+     {
+      "role": "validation",
+      "item_id": "item-3db3ef3b5d08d8c683628d29390f5e431a32c21d5e1dc0ab7d3d79ce325cca1d",
+      "field": "ideal_expectation",
+      "regenerated": 0.909990119786,
+      "archived": 0.909990119785,
+      "family": "heisenberg",
+      "severity": "L1",
+      "observable": "z_mid"
+     },
+     {
+      "role": "validation",
+      "item_id": "item-60362b2cc8c1b7a20a4e10d5e7e6bc0c12f7bb2030361f6c9b53acc3c7872c27",
+      "field": "ideal_expectation",
+      "regenerated": 0.909990119786,
+      "archived": 0.909990119785,
+      "family": "heisenberg",
+      "severity": "L3",
+      "observable": "z_mid"
+     }
+    ],
+    "cells_with_differing_item_stream_hash": [
+     {
+      "cell_id": "cell-5f6f5a56dd46f60a548446eabe7d6f8208c7e1ae8559451717d54c0a202d9c66",
+      "split": "train",
+      "family": "heisenberg",
+      "severity": "L3"
+     },
+     {
+      "cell_id": "cell-766a885065e5c35801ccc42bd17ed825f5b5b59dd36ccea608dbf314bfaf7f5c",
+      "split": "validation",
+      "family": "heisenberg",
+      "severity": "L1"
+     },
+     {
+      "cell_id": "cell-b9e11c2ae7310634d3e9d86fe38f7a319bff4008fa86b11e46e24c77fa7314e5",
+      "split": "train",
+      "family": "heisenberg",
+      "severity": "L1"
+     },
+     {
+      "cell_id": "cell-baf917427db999cf897dd9dfbf04bd7d191fd10119dea7cb3cd904f768e63085",
+      "split": "validation",
+      "family": "heisenberg",
+      "severity": "L3"
+     }
+    ],
+    "note": "the archive keeps no training rows, so a training-row difference is visible only through the cell hashes above"
+   },
+   "deviation_tolerated": true,
+   "label_tolerance": 1e-11,
+   "load_and_verify_seconds": 10.341226999997161
+  },
+  "shipped-s307-n640": {
+   "setting": "shipped-s307-n640",
+   "data_dir": "<data>/regen-shipped-s307-n640",
+   "items_jsonl_sha256": "c90e26e46be366c2bec64daf5c991494770d7b17ad2f5efe452f0c474e625bdf",
+   "manifest_dataset_hash": "05babeea98e0a8e748074325fb9d84c990162376348621406cca174998bf054f",
+   "archived_dataset_hash": "05babeea98e0a8e748074325fb9d84c990162376348621406cca174998bf054f",
+   "dataset_hash_matches_archive": true,
+   "split_spec_hash_matches_archive": true,
+   "validate_split_artifact": "passed",
+   "structure_counts": {
+    "tfi": {
+     "train": {
+      "circuits": 640,
+      "items": 2560
+     },
+     "validation": {
+      "circuits": 320,
+      "items": 1280
+     },
+     "test": {
+      "circuits": 160,
+      "items": 640
+     }
+    },
+    "heisenberg": {
+     "train": {
+      "circuits": 640,
+      "items": 2560
+     },
+     "validation": {
+      "circuits": 320,
+      "items": 1280
+     },
+     "test": {
+      "circuits": 160,
+      "items": 640
+     }
+    }
+   },
+   "test_items_identical_to_archive": true,
+   "validation_items_identical_to_archive": true,
+   "n_items": {
+    "train": 5120,
+    "validation": 2560,
+    "test": 1280
+   },
+   "exact_match": true,
+   "load_and_verify_seconds": 10.380472832999658
+  }
+ },
+ "rows": {
+  "shipped-s101-n640": {
+   "F": {
+    "method": "liao",
+    "learner_seed": 101,
+    "feature_builder": null,
+    "n_features": 30,
+    "selected_model": "mlp",
+    "archived_selected_model": "mlp",
+    "max_abs_diff_test": 1.9539925233402755e-14,
+    "max_abs_diff_validation": 2.170486013142181e-14,
+    "flagged_non_converged": true,
+    "error": null,
+    "max_abs_diff_test_vs_pre_hook_refit": 0.0,
+    "max_abs_diff_validation_vs_pre_hook_refit": 0.0
+   },
+   "C": {
+    "method": "liao-feat-only",
+    "learner_seed": 101,
+    "feature_builder": null,
+    "n_features": 30,
+    "selected_model": "mlp",
+    "archived_selected_model": "mlp",
+    "max_abs_diff_test": 2.6345592374354965e-13,
+    "max_abs_diff_validation": 2.944311461305915e-13,
+    "flagged_non_converged": true,
+    "error": null,
+    "max_abs_diff_test_vs_pre_hook_refit": 0.0,
+    "max_abs_diff_validation_vs_pre_hook_refit": 0.0
+   },
+   "A": {
+    "method": "feat-only",
+    "max_abs_diff_test": 9.414691248821327e-14,
+    "max_abs_diff_validation": 9.581224702515101e-14,
+    "selected_alpha": 10.0,
+    "archived_selected_alpha": 10.0,
+    "error": null
+   }
+  },
+  "shipped-s211-n640": {
+   "F": {
+    "method": "liao",
+    "learner_seed": 211,
+    "feature_builder": null,
+    "n_features": 30,
+    "selected_model": "mlp",
+    "archived_selected_model": "mlp",
+    "max_abs_diff_test": 1.4233059175694507e-13,
+    "max_abs_diff_validation": 1.8463008899516353e-13,
+    "flagged_non_converged": true,
+    "error": null,
+    "max_abs_diff_test_vs_pre_hook_refit": 0.0,
+    "max_abs_diff_validation_vs_pre_hook_refit": 0.0
+   },
+   "C": {
+    "method": "liao-feat-only",
+    "learner_seed": 211,
+    "feature_builder": null,
+    "n_features": 30,
+    "selected_model": "mlp",
+    "archived_selected_model": "mlp",
+    "max_abs_diff_test": 1.3235412765766341e-11,
+    "max_abs_diff_validation": 1.0612510870089409e-11,
+    "flagged_non_converged": true,
+    "error": null,
+    "max_abs_diff_test_vs_pre_hook_refit": 0.0,
+    "max_abs_diff_validation_vs_pre_hook_refit": 0.0
+   },
+   "A": {
+    "method": "feat-only",
+    "max_abs_diff_test": 9.381384558082573e-14,
+    "max_abs_diff_validation": 9.325873406851315e-14,
+    "selected_alpha": 10.0,
+    "archived_selected_alpha": 10.0,
+    "error": null
+   }
+  },
+  "shipped-s307-n640": {
+   "F": {
+    "method": "liao",
+    "learner_seed": 307,
+    "feature_builder": null,
+    "n_features": 30,
+    "selected_model": "mlp",
+    "archived_selected_model": "mlp",
+    "max_abs_diff_test": 2.6645352591003757e-15,
+    "max_abs_diff_validation": 2.886579864025407e-15,
+    "flagged_non_converged": true,
+    "error": null,
+    "max_abs_diff_test_vs_pre_hook_refit": 0.0,
+    "max_abs_diff_validation_vs_pre_hook_refit": 0.0
+   },
+   "C": {
+    "method": "liao-feat-only",
+    "learner_seed": 307,
+    "feature_builder": null,
+    "n_features": 30,
+    "selected_model": "mlp",
+    "archived_selected_model": "mlp",
+    "max_abs_diff_test": 1.365596524749435e-11,
+    "max_abs_diff_validation": 1.6310286454768175e-11,
+    "flagged_non_converged": true,
+    "error": null,
+    "max_abs_diff_test_vs_pre_hook_refit": 0.0,
+    "max_abs_diff_validation_vs_pre_hook_refit": 0.0
+   },
+   "A": {
+    "method": "feat-only",
+    "max_abs_diff_test": 7.271960811294775e-14,
+    "max_abs_diff_validation": 7.127631818093505e-14,
+    "selected_alpha": 1.0,
+    "archived_selected_alpha": 1.0,
+    "error": null
+   }
+  }
+ },
+ "run": {
+  "pending_at_start": 0,
+  "crashes": [],
+  "wall_seconds": 0.00974433301598765
+ },
+ "blas_fpe_probe": {
+  "operation": "standard-normal (32, 9) @ (9, 64) float64, seed 0",
+  "inputs_and_output_finite": true,
+  "max_abs_output": 12.882542103341992,
+  "warnings": [
+   "divide by zero encountered in matmul",
+   "overflow encountered in matmul",
+   "invalid value encountered in matmul"
+  ],
+  "numpy_version": "2.2.6",
+  "blas": "accelerate"
+ },
+ "max_abs_diff_test": 1.365596524749435e-11,
+ "passed": true,
+ "frozen_criterion_passed": false,
+ "supplementary": {
+  "affine_A_at_R0_max_abs_diff_test": 9.414691248821327e-14,
+  "hook_vs_pre_hook_refit_max_abs_diff": 0.0,
+  "note": "outside the pass criterion: arm A at R0 against the archived feat-only control, and the hooked refits against the pre-hook original-seed refits of Appendix M.4 on this machine"
+ }
+}

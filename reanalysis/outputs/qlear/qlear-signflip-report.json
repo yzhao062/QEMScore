@@ -1,0 +1,213 @@
+{
+  "schema": "qlear-signflip-report-v1",
+  "description": "Exact two-sided sign-flip permutation tests and joint resampling intervals for Q-LEAR ladder contrasts",
+  "input_report": "outputs/qlear/field-report.json",
+  "n_draws": 10000,
+  "seed": 20261002,
+  "panels": {
+    "hardware": {
+      "A-C": {
+        "per_application": {
+          "groundstate": -0.006168255067546124,
+          "pricingcall": 0.02011320075909264,
+          "pricingput": 0.017292094763225054,
+          "qaoa": -0.012211024533629,
+          "routing": -0.016523564783801636,
+          "tsp": -0.0021721051952272807
+        },
+        "ten_fit_mean": 5.5057657018942064e-05,
+        "count_positive": 2,
+        "sign_flip_p": 1.0,
+        "sign_flip_count": 64,
+        "joint_percentile_interval": {
+          "lower": -0.010555159757561206,
+          "upper": 0.01175914771933568,
+          "confidence": 0.95
+        },
+        "paper_validation": {
+          "expected": 5.5e-05,
+          "tolerance": 5e-07,
+          "diff": 5.765701894206246e-08,
+          "status": "PASS"
+        }
+      },
+      "C-O": {
+        "per_application": {
+          "groundstate": 0.17308898130860964,
+          "pricingcall": 0.07893384417280064,
+          "pricingput": 0.11261119311923262,
+          "qaoa": 0.04778110422062418,
+          "routing": 0.5328795698298759,
+          "tsp": 0.23624446926396142
+        },
+        "ten_fit_mean": 0.19692319365251743,
+        "count_positive": 6,
+        "sign_flip_p": 0.03125,
+        "sign_flip_count": 2,
+        "joint_percentile_interval": {
+          "lower": 0.09077458182441986,
+          "upper": 0.3414686148216978,
+          "confidence": 0.95
+        },
+        "paper_validation": {
+          "expected": 0.1969,
+          "tolerance": 5e-05,
+          "diff": 2.319365251743366e-05,
+          "status": "PASS"
+        }
+      },
+      "O-F": {
+        "per_application": {
+          "groundstate": 0.020315329895845995,
+          "pricingcall": 0.04406954991324852,
+          "pricingput": 0.027922330836121813,
+          "qaoa": 0.005330396979020891,
+          "routing": 0.03258144797552517,
+          "tsp": 0.002980158801238608
+        },
+        "ten_fit_mean": 0.022199869066833498,
+        "count_positive": 6,
+        "sign_flip_p": 0.03125,
+        "sign_flip_count": 2,
+        "joint_percentile_interval": {
+          "lower": 0.010152660849337587,
+          "upper": 0.03529913123251149,
+          "confidence": 0.95
+        },
+        "paper_validation": {
+          "expected": 0.0222,
+          "tolerance": 5e-05,
+          "diff": 1.309331665033664e-07,
+          "status": "PASS"
+        }
+      },
+      "C-F": {
+        "per_application": {
+          "groundstate": 0.19340431120445561,
+          "pricingcall": 0.12300339408604914,
+          "pricingput": 0.1405335239553544,
+          "qaoa": 0.05311150119964507,
+          "routing": 0.5654610178054011,
+          "tsp": 0.2392246280652
+        },
+        "ten_fit_mean": 0.2191230627193509,
+        "count_positive": 6,
+        "sign_flip_p": 0.03125,
+        "sign_flip_count": 2,
+        "joint_percentile_interval": {
+          "lower": 0.11173085227895643,
+          "upper": 0.3666356848248008,
+          "confidence": 0.95
+        },
+        "paper_validation": {
+          "expected": 0.2191,
+          "tolerance": 5e-05,
+          "diff": 2.306271935090254e-05,
+          "status": "PASS"
+        }
+      }
+    },
+    "simulator": {
+      "A-C": {
+        "per_application": {
+          "groundstate": -0.0058077560624877345,
+          "pricingcall": 0.02021367810896587,
+          "pricingput": 0.017233545134640926,
+          "qaoa": -0.012417879988535174,
+          "routing": -0.016523564783801646,
+          "tsp": -0.0021514854596938913
+        },
+        "ten_fit_mean": 9.108949151472511e-05,
+        "count_positive": 2,
+        "sign_flip_p": 1.0,
+        "sign_flip_count": 64,
+        "joint_percentile_interval": {
+          "lower": -0.010524872287094564,
+          "upper": 0.011795395173082661,
+          "confidence": 0.95
+        },
+        "paper_validation": {
+          "expected": 9.1e-05,
+          "tolerance": 5e-07,
+          "diff": 8.949151472511195e-08,
+          "status": "PASS"
+        }
+      },
+      "C-O": {
+        "per_application": {
+          "groundstate": 0.43757635842882625,
+          "pricingcall": 0.4403883728272177,
+          "pricingput": 0.3982664898229554,
+          "qaoa": 0.3983325166858104,
+          "routing": 0.5978322297767512,
+          "tsp": 0.37194999621136754
+        },
+        "ten_fit_mean": 0.44072432729215477,
+        "count_positive": 6,
+        "sign_flip_p": 0.03125,
+        "sign_flip_count": 2,
+        "joint_percentile_interval": {
+          "lower": 0.3929138058037238,
+          "upper": 0.5079348529822592,
+          "confidence": 0.95
+        },
+        "paper_validation": {
+          "expected": 0.4407,
+          "tolerance": 5e-05,
+          "diff": 2.4327292154791014e-05,
+          "status": "PASS"
+        }
+      },
+      "O-F": {
+        "per_application": {
+          "groundstate": 0.010356827539956948,
+          "pricingcall": -0.012602476545762081,
+          "pricingput": 0.027080135738232265,
+          "qaoa": 0.00042471653567250354,
+          "routing": 0.03164470130442216,
+          "tsp": 0.002392086858940154
+        },
+        "ten_fit_mean": 0.009882665238576992,
+        "count_positive": 5,
+        "sign_flip_p": 0.21875,
+        "sign_flip_count": 14,
+        "joint_percentile_interval": {
+          "lower": -0.0038305761692333947,
+          "upper": 0.023745831952969202,
+          "confidence": 0.95
+        },
+        "paper_validation": {
+          "expected": 0.0099,
+          "tolerance": 5e-05,
+          "diff": 1.733476142300877e-05,
+          "status": "PASS"
+        }
+      },
+      "C-F": {
+        "per_application": {
+          "groundstate": 0.4479331859687831,
+          "pricingcall": 0.42778589628145564,
+          "pricingput": 0.4253466255611877,
+          "qaoa": 0.39875723322148293,
+          "routing": 0.6294769310811733,
+          "tsp": 0.37434208307030764
+        },
+        "ten_fit_mean": 0.4506069925307317,
+        "count_positive": 6,
+        "sign_flip_p": 0.03125,
+        "sign_flip_count": 2,
+        "joint_percentile_interval": {
+          "lower": 0.3983182734095522,
+          "upper": 0.5266828481026259,
+          "confidence": 0.95
+        },
+        "paper_validation": {
+          "expected": 0.4506,
+          "tolerance": 5e-05,
+          "diff": 6.992530731719793e-06,
+          "status": "PASS"
+        }
+      }
+    }
+  }
+}

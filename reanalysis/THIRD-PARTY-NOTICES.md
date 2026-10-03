@@ -212,7 +212,7 @@ The following files located in `outputs/s1_ml_qem/` are derived from the upstrea
 
 ## 2. Q-LEAR (Muqeet et al. 2024) and QRAFT (Patel et al. 2021)
 - **Repository**: https://github.com/AsmarMuqeet/QLEAR
-- **Pinned Commit**: `64117b6be799c80d507119ff3a059b0221356c9a`
+- **Pinned Commit**: `64117b600edf5a0cf587d298fd890a721d9ab7e0`
 - **Zenodo DOI**: 10.5281/zenodo.11181417
 - **License**: MIT License
 - **Redistribution Policy**: No raw upstream training data, benchmark circuit files, or model weights are redistributed in `outputs/qlear` or `outputs/qraft`. Files in those directories (`field-report.json`, `cost-ledger.json`, `qraft-panel-report.json`) are this study's own generated evaluation and cost outputs. Upstream code and data are retrieved on demand by `download_upstream.sh`.
