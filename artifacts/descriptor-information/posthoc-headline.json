@@ -1,0 +1,1696 @@
+{
+ "schema": "descriptor-information-posthoc-headline-v1",
+ "status": "post hoc, descriptive",
+ "note": "Replaces single-fit headline Finding 1 with 20-learner-seed averaged estimands and shrinkage control",
+ "analysis_script": "tools/headline_seed_averaged.py",
+ "analysis_script_sha256": "f65d4dd567e40f35c4141f3ecbd3a672411fc54f9f5cbc991109b27ac1911efe",
+ "bootstrap": {
+  "seed": 20261002,
+  "draws": 10000,
+  "nominal_seeds": 20,
+  "percentiles": [
+   2.5,
+   97.5
+  ],
+  "method": "two-stage percentile bootstrap (learner seeds then circuits)"
+ },
+ "table_columns": [
+  "row",
+  "single-fit S",
+  "seed-mean S [CI]",
+  "S_shr [CI]",
+  "mean C",
+  "mean F",
+  "R",
+  "A",
+  "Sh",
+  "D [CI]",
+  "D/C [CI]"
+ ],
+ "table_rows": [
+  {
+   "row": "shipped-s101-n640/tfi",
+   "single_fit_s_point": 0.9410983613654285,
+   "single_fit_s_str": "0.94110",
+   "single_fit_s_full": "0.94110 [0.93275, 0.94944]",
+   "seed_mean_s_str": "1.00755 [0.98628, 1.03274]",
+   "s_shr_str": "1.00145 [0.99729, 1.00618]",
+   "mean_c_str": "0.00236",
+   "mean_f_str": "0.00267",
+   "r_str": "0.26010",
+   "a_str": "0.04412",
+   "sh_str": "0.21793",
+   "d_str": "-0.00031 [-0.00132, +0.00058]",
+   "d_over_c_str": "-0.13253 [-0.63177, +0.21846]"
+  },
+  {
+   "row": "shipped-s101-n640/heisenberg",
+   "single_fit_s_point": 1.0040517252791732,
+   "single_fit_s_str": "1.00405",
+   "single_fit_s_full": "1.00405 [0.99969, 1.00838]",
+   "seed_mean_s_str": "1.00205 [0.99158, 1.01216]",
+   "s_shr_str": "1.00209 [0.99138, 1.01238]",
+   "mean_c_str": "0.00400",
+   "mean_f_str": "0.00419",
+   "r_str": "0.60258",
+   "a_str": "0.09850",
+   "sh_str": "0.09674",
+   "d_str": "-0.00019 [-0.00114, +0.00079]",
+   "d_over_c_str": "-0.04826 [-0.32482, +0.17527]"
+  },
+  {
+   "row": "shipped-s211-n640/tfi",
+   "single_fit_s_point": 0.9732625191578264,
+   "single_fit_s_str": "0.97326",
+   "single_fit_s_full": "0.97326 [0.96658, 0.97954]",
+   "seed_mean_s_str": "0.98669 [0.94981, 1.01577]",
+   "s_shr_str": "0.99743 [0.99030, 1.00301]",
+   "mean_c_str": "0.00338",
+   "mean_f_str": "0.00282",
+   "r_str": "0.28133",
+   "a_str": "0.04509",
+   "sh_str": "0.22150",
+   "d_str": "+0.00056 [-0.00066, +0.00211]",
+   "d_over_c_str": "+0.16623 [-0.27014, +0.43361]"
+  },
+  {
+   "row": "shipped-s211-n640/heisenberg",
+   "single_fit_s_point": 0.9884485527793613,
+   "single_fit_s_str": "0.98845",
+   "single_fit_s_full": "0.98845 [0.98414, 0.99249]",
+   "seed_mean_s_str": "0.99977 [0.98738, 1.01168]",
+   "s_shr_str": "0.99977 [0.98704, 1.01196]",
+   "mean_c_str": "0.00399",
+   "mean_f_str": "0.00397",
+   "r_str": "0.60916",
+   "a_str": "0.09045",
+   "sh_str": "0.08866",
+   "d_str": "+0.00002 [-0.00100, +0.00110]",
+   "d_over_c_str": "+0.00493 [-0.30214, +0.22978]"
+  },
+  {
+   "row": "shipped-s307-n640/tfi",
+   "single_fit_s_point": 0.8773178207240573,
+   "single_fit_s_str": "0.87732",
+   "single_fit_s_full": "0.87732 [0.86277, 0.89029]",
+   "seed_mean_s_str": "1.00243 [0.98307, 1.02075]",
+   "s_shr_str": "1.00051 [0.99645, 1.00435]",
+   "mean_c_str": "0.00283",
+   "mean_f_str": "0.00294",
+   "r_str": "0.25090",
+   "a_str": "0.04712",
+   "sh_str": "0.21445",
+   "d_str": "-0.00011 [-0.00091, +0.00075]",
+   "d_over_c_str": "-0.03796 [-0.40175, +0.21248]"
+  },
+  {
+   "row": "shipped-s307-n640/heisenberg",
+   "single_fit_s_point": 0.9920103181687531,
+   "single_fit_s_str": "0.99201",
+   "single_fit_s_full": "0.99201 [0.98752, 0.99644]",
+   "seed_mean_s_str": "1.01004 [0.99854, 1.02480]",
+   "s_shr_str": "1.01011 [0.99854, 1.02492]",
+   "mean_c_str": "0.00325",
+   "mean_f_str": "0.00425",
+   "r_str": "0.59649",
+   "a_str": "0.10348",
+   "sh_str": "0.10272",
+   "d_str": "-0.00100 [-0.00238, +0.00014]",
+   "d_over_c_str": "-0.30617 [-0.78396, +0.04119]"
+  }
+ ],
+ "rows": {
+  "shipped-s101-n640/tfi": {
+   "setting": "shipped-s101-n640",
+   "family": "tfi",
+   "label": "s101 TFI",
+   "row_key": "shipped-s101-n640/tfi",
+   "single_fit_S": {
+    "point": 0.9410983613654285,
+    "interval": {
+     "lower": 0.9327459302461364,
+     "upper": 0.949444308705228
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "A": 0.04412414958847477,
+    "C": 0.004800141120959352,
+    "F": 0.002338922791925387,
+    "R": 0.26009765090021875,
+    "D": 0.002461218329033965
+   },
+   "seed_mean_S": {
+    "status": "estimated",
+    "point": 1.0075484606982827,
+    "interval": {
+     "lower": 0.9862773184992542,
+     "upper": 1.0327392576331338
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.011777070036991605,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(A - mean C) / (A - mean F), ratio of means inside each draw"
+   },
+   "S_shr": {
+    "status": "estimated",
+    "point": 1.0014535421789001,
+    "interval": {
+     "lower": 0.9972857804441125,
+     "upper": 1.00618268346193
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.002257063315810034,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(Sh - mean C) / (Sh - mean F), ratio of means inside each draw"
+   },
+   "mean_C": {
+    "status": "estimated",
+    "point": 0.0023609442733868594,
+    "interval": {
+     "lower": 0.0019866095231326915,
+     "upper": 0.002801659659640202
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00020771586280139101,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "mean_F": {
+    "status": "estimated",
+    "point": 0.002673830378871794,
+    "interval": {
+     "lower": 0.002035246946966652,
+     "upper": 0.0035064157645578325
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00037868729151371616,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "R": {
+    "status": "estimated",
+    "point": 0.26009765090021875,
+    "interval": {
+     "lower": 0.24349960692825254,
+     "upper": 0.2765522638666366
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.008445848145267673,
+    "draws_seed_count": 20
+   },
+   "A": {
+    "status": "estimated",
+    "point": 0.04412414958847221,
+    "interval": {
+     "lower": 0.04084488300895372,
+     "upper": 0.047419606969787594
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0016635160540240518,
+    "draws_seed_count": 20
+   },
+   "Sh": {
+    "status": "estimated",
+    "point": 0.2179315023107918,
+    "interval": {
+     "lower": 0.2003056640188268,
+     "upper": 0.23639141505527927
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.009199857093342484,
+    "draws_seed_count": 20
+   },
+   "D": {
+    "status": "estimated",
+    "point": -0.0003128861054849353,
+    "interval": {
+     "lower": -0.0013231395481977186,
+     "upper": 0.0005848934261017482
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0004844963280918467,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "D_over_C": {
+    "status": "estimated",
+    "point": -0.13252583257125716,
+    "interval": {
+     "lower": -0.6317683248291649,
+     "upper": 0.21845613564637908
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.2162734193130334,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   }
+  },
+  "shipped-s101-n640/heisenberg": {
+   "setting": "shipped-s101-n640",
+   "family": "heisenberg",
+   "label": "s101 Heisenberg",
+   "row_key": "shipped-s101-n640/heisenberg",
+   "single_fit_S": {
+    "point": 1.0040517252791732,
+    "interval": {
+     "lower": 0.999690243487358,
+     "upper": 1.008377909332003
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "A": 0.0985035443736432,
+    "C": 0.003064761781356483,
+    "F": 0.0034498930632485257,
+    "R": 0.6025809297276532,
+    "D": -0.0003851312818920426
+   },
+   "seed_mean_S": {
+    "status": "estimated",
+    "point": 1.0020468255418464,
+    "interval": {
+     "lower": 0.9915824817910515,
+     "upper": 1.0121557760095727
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00529272084012458,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(A - mean C) / (A - mean F), ratio of means inside each draw"
+   },
+   "S_shr": {
+    "status": "estimated",
+    "point": 1.0020859163293054,
+    "interval": {
+     "lower": 0.9913795320013956,
+     "upper": 1.0123768438970044
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00539634481038836,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(Sh - mean C) / (Sh - mean F), ratio of means inside each draw"
+   },
+   "mean_C": {
+    "status": "estimated",
+    "point": 0.004000073044431321,
+    "interval": {
+     "lower": 0.003315906070663311,
+     "upper": 0.004744276361795965
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0003685311634612833,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "mean_F": {
+    "status": "estimated",
+    "point": 0.004193110050267046,
+    "interval": {
+     "lower": 0.0035512912390116454,
+     "upper": 0.004913353046568051
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00034855503527259844,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "R": {
+    "status": "estimated",
+    "point": 0.6025809297276532,
+    "interval": {
+     "lower": 0.5887599408876263,
+     "upper": 0.6151431236852735
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.006828533791175169,
+    "draws_seed_count": 20
+   },
+   "A": {
+    "status": "estimated",
+    "point": 0.0985035443736384,
+    "interval": {
+     "lower": 0.08798360246811843,
+     "upper": 0.11012204990322462
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00563446120881677,
+    "draws_seed_count": 20
+   },
+   "Sh": {
+    "status": "estimated",
+    "point": 0.09673613448691651,
+    "interval": {
+     "lower": 0.08592460662620394,
+     "upper": 0.10857310980665161
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.005789789422513832,
+    "draws_seed_count": 20
+   },
+   "D": {
+    "status": "estimated",
+    "point": -0.00019303700583572377,
+    "interval": {
+     "lower": -0.0011372771734500626,
+     "upper": 0.0007949417753686914
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0004957316113011808,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "D_over_C": {
+    "status": "estimated",
+    "point": -0.04825837020762887,
+    "interval": {
+     "lower": -0.32482495598901895,
+     "upper": 0.17527454882470214
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.12818707457485368,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   }
+  },
+  "shipped-s211-n640/tfi": {
+   "setting": "shipped-s211-n640",
+   "family": "tfi",
+   "label": "s211 TFI",
+   "row_key": "shipped-s211-n640/tfi",
+   "single_fit_S": {
+    "point": 0.9732625191578264,
+    "interval": {
+     "lower": 0.9665797636796564,
+     "upper": 0.9795431795501411
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "A": 0.045090721512224805,
+    "C": 0.0029958174142408764,
+    "F": 0.0018393856502324335,
+    "R": 0.281327300543878,
+    "D": 0.001156431764008443
+   },
+   "seed_mean_S": {
+    "status": "estimated",
+    "point": 0.9866901069759955,
+    "interval": {
+     "lower": 0.9498071005352345,
+     "upper": 1.0157667657518925
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.017034455184729402,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(A - mean C) / (A - mean F), ratio of means inside each draw"
+   },
+   "S_shr": {
+    "status": "estimated",
+    "point": 0.9974272746774772,
+    "interval": {
+     "lower": 0.9902976916502519,
+     "upper": 1.0030092913073079
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.003283859564270923,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(Sh - mean C) / (Sh - mean F), ratio of means inside each draw"
+   },
+   "mean_C": {
+    "status": "estimated",
+    "point": 0.0033843756361094076,
+    "interval": {
+     "lower": 0.0022325909371559913,
+     "upper": 0.005056043125323347
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0007400209752094493,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "mean_F": {
+    "status": "estimated",
+    "point": 0.0028217805537136664,
+    "interval": {
+     "lower": 0.0022768592896802472,
+     "upper": 0.003576605454478336
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00034140348402542217,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "R": {
+    "status": "estimated",
+    "point": 0.2813273005438781,
+    "interval": {
+     "lower": 0.26472527858776923,
+     "upper": 0.2976905567952499
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.008379116957572008,
+    "draws_seed_count": 20
+   },
+   "A": {
+    "status": "estimated",
+    "point": 0.04509072151222433,
+    "interval": {
+     "lower": 0.04146727341789236,
+     "upper": 0.04866705487571985
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00184489562846257,
+    "draws_seed_count": 20
+   },
+   "Sh": {
+    "status": "estimated",
+    "point": 0.22149848011061468,
+    "interval": {
+     "lower": 0.20614673763238536,
+     "upper": 0.23808155529779976
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.008216573015175466,
+    "draws_seed_count": 20
+   },
+   "D": {
+    "status": "estimated",
+    "point": 0.0005625950823957409,
+    "interval": {
+     "lower": -0.0006619082228564278,
+     "upper": 0.002106561203184462
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.000715462322117702,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "D_over_C": {
+    "status": "estimated",
+    "point": 0.16623304942665465,
+    "interval": {
+     "lower": -0.2701444512088078,
+     "upper": 0.4336117560145178
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.18368040804339844,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   }
+  },
+  "shipped-s211-n640/heisenberg": {
+   "setting": "shipped-s211-n640",
+   "family": "heisenberg",
+   "label": "s211 Heisenberg",
+   "row_key": "shipped-s211-n640/heisenberg",
+   "single_fit_S": {
+    "point": 0.9884485527793613,
+    "interval": {
+     "lower": 0.9841371114811263,
+     "upper": 0.9924871813922211
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "A": 0.09044839837629741,
+    "C": 0.004472028186139129,
+    "F": 0.0034672702756933923,
+    "R": 0.6091582865507126,
+    "D": 0.0010047579104457364
+   },
+   "seed_mean_S": {
+    "status": "estimated",
+    "point": 0.9997726251926208,
+    "interval": {
+     "lower": 0.9873793443674111,
+     "upper": 1.0116773846397706
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0062135739903242115,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(A - mean C) / (A - mean F), ratio of means inside each draw"
+   },
+   "S_shr": {
+    "status": "estimated",
+    "point": 0.999767819693725,
+    "interval": {
+     "lower": 0.9870401628369129,
+     "upper": 1.0119639339918372
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.006349063251683094,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(Sh - mean C) / (Sh - mean F), ratio of means inside each draw"
+   },
+   "mean_C": {
+    "status": "estimated",
+    "point": 0.003985326951777466,
+    "interval": {
+     "lower": 0.003223210677323598,
+     "upper": 0.004859959737957798
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0004205234907805425,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "mean_F": {
+    "status": "estimated",
+    "point": 0.003965662956469744,
+    "interval": {
+     "lower": 0.003432668945628633,
+     "upper": 0.004540423766556702
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0002852096070231148,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "R": {
+    "status": "estimated",
+    "point": 0.6091582865507125,
+    "interval": {
+     "lower": 0.597656667854791,
+     "upper": 0.6203652721412638
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.005789061955495865,
+    "draws_seed_count": 20
+   },
+   "A": {
+    "status": "estimated",
+    "point": 0.09044839837629398,
+    "interval": {
+     "lower": 0.08158665743300605,
+     "upper": 0.10001078984078704
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.004748964244812532,
+    "draws_seed_count": 20
+   },
+   "Sh": {
+    "status": "estimated",
+    "point": 0.08865844169896357,
+    "interval": {
+     "lower": 0.07949014748443492,
+     "upper": 0.09844151723543146
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.004874739034604217,
+    "draws_seed_count": 20
+   },
+   "D": {
+    "status": "estimated",
+    "point": 1.9663995307723038e-05,
+    "interval": {
+     "lower": -0.0010012340156788089,
+     "upper": 0.0010956962700346962
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0005343229292912399,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "D_over_C": {
+    "status": "estimated",
+    "point": 0.004934098392843991,
+    "interval": {
+     "lower": -0.3021350017655167,
+     "upper": 0.2297834936139238
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.13587412988101594,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   }
+  },
+  "shipped-s307-n640/tfi": {
+   "setting": "shipped-s307-n640",
+   "family": "tfi",
+   "label": "s307 TFI",
+   "row_key": "shipped-s307-n640/tfi",
+   "single_fit_S": {
+    "point": 0.8773178207240573,
+    "interval": {
+     "lower": 0.8627730204047567,
+     "upper": 0.8902864513059364
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "A": 0.04711804085989739,
+    "C": 0.007452703282052775,
+    "F": 0.0019059904023921478,
+    "R": 0.2509046733667313,
+    "D": 0.005546712879660627
+   },
+   "seed_mean_S": {
+    "status": "estimated",
+    "point": 1.0024316629743,
+    "interval": {
+     "lower": 0.9830666059360018,
+     "upper": 1.02075396885172
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.009638849757136803,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(A - mean C) / (A - mean F), ratio of means inside each draw"
+   },
+   "S_shr": {
+    "status": "estimated",
+    "point": 1.0005079117070081,
+    "interval": {
+     "lower": 0.9964506388750648,
+     "upper": 1.0043523817609326
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0020138008416658868,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(Sh - mean C) / (Sh - mean F), ratio of means inside each draw"
+   },
+   "mean_C": {
+    "status": "estimated",
+    "point": 0.0028303637977982704,
+    "interval": {
+     "lower": 0.002174379777936676,
+     "upper": 0.003656238622048082
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00038095563944717803,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "mean_F": {
+    "status": "estimated",
+    "point": 0.0029377952652063577,
+    "interval": {
+     "lower": 0.0025373442558550004,
+     "upper": 0.0033727507338896542
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00021509671707278355,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "R": {
+    "status": "estimated",
+    "point": 0.2509046733667312,
+    "interval": {
+     "lower": 0.2354788874826639,
+     "upper": 0.2666260792427725
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.007945544378728108,
+    "draws_seed_count": 20
+   },
+   "A": {
+    "status": "estimated",
+    "point": 0.047118040859898305,
+    "interval": {
+     "lower": 0.04390991125256525,
+     "upper": 0.05022039048306786
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0016117001341583565,
+    "draws_seed_count": 20
+   },
+   "Sh": {
+    "status": "estimated",
+    "point": 0.21445382438158606,
+    "interval": {
+     "lower": 0.19760673701967052,
+     "upper": 0.23110998000272395
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00861602479026648,
+    "draws_seed_count": 20
+   },
+   "D": {
+    "status": "estimated",
+    "point": -0.00010743146740808782,
+    "interval": {
+     "lower": -0.0009125330468304093,
+     "upper": 0.000752675220066261
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0004244106530980192,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "D_over_C": {
+    "status": "estimated",
+    "point": -0.037956769900624916,
+    "interval": {
+     "lower": -0.40175280076844444,
+     "upper": 0.2124771895605944
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.1584251885789214,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   }
+  },
+  "shipped-s307-n640/heisenberg": {
+   "setting": "shipped-s307-n640",
+   "family": "heisenberg",
+   "label": "s307 Heisenberg",
+   "row_key": "shipped-s307-n640/heisenberg",
+   "single_fit_S": {
+    "point": 0.9920103181687531,
+    "interval": {
+     "lower": 0.9875214082449791,
+     "upper": 0.9964393335016093
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "A": 0.10347813648865614,
+    "C": 0.0040941451811066076,
+    "F": 0.0032937034365766323,
+    "R": 0.5964901288624218,
+    "D": 0.0008004417445299753
+   },
+   "seed_mean_S": {
+    "status": "estimated",
+    "point": 1.0100350515964078,
+    "interval": {
+     "lower": 0.9985416460920723,
+     "upper": 1.0247986787367398
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.006723473096304803,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(A - mean C) / (A - mean F), ratio of means inside each draw"
+   },
+   "S_shr": {
+    "status": "estimated",
+    "point": 1.0101120410500506,
+    "interval": {
+     "lower": 0.9985365296358701,
+     "upper": 1.0249213433000055
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.006774393618958294,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "definition": "(Sh - mean C) / (Sh - mean F), ratio of means inside each draw"
+   },
+   "mean_C": {
+    "status": "estimated",
+    "point": 0.003252402156228066,
+    "interval": {
+     "lower": 0.0028306519178076706,
+     "upper": 0.0037183421217677984
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.00022630232333328056,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "mean_F": {
+    "status": "estimated",
+    "point": 0.004248179890598861,
+    "interval": {
+     "lower": 0.0032882311396873385,
+     "upper": 0.005513198081602641
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0005871059799972905,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "R": {
+    "status": "estimated",
+    "point": 0.5964901288624219,
+    "interval": {
+     "lower": 0.581288335082593,
+     "upper": 0.6107427989448013
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.007487301122724754,
+    "draws_seed_count": 20
+   },
+   "A": {
+    "status": "estimated",
+    "point": 0.10347813648865506,
+    "interval": {
+     "lower": 0.09094324592931473,
+     "upper": 0.11712475408353817
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0066873704876155024,
+    "draws_seed_count": 20
+   },
+   "Sh": {
+    "status": "estimated",
+    "point": 0.10272263519018661,
+    "interval": {
+     "lower": 0.09028946693499126,
+     "upper": 0.1165199779706107
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0067146415149793226,
+    "draws_seed_count": 20
+   },
+   "D": {
+    "status": "estimated",
+    "point": -0.0009957777343707946,
+    "interval": {
+     "lower": -0.002384438056789528,
+     "upper": 0.00014300935681625603
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0006525746813840846,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "D_over_C": {
+    "status": "estimated",
+    "point": -0.30616685346366757,
+    "interval": {
+     "lower": -0.7839611304070854,
+     "upper": 0.04118629332793468
+    },
+    "excludes_zero_above": false,
+    "excludes_zero_below": false,
+    "draw_sd": 0.2129706387964111,
+    "n_seeds": 20,
+    "learner_seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   }
+  }
+ }
+}

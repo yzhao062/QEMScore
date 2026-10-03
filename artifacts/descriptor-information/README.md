@@ -27,6 +27,8 @@ frozen at commit `4c95174`.
   - `analysis-a.json`: Full bootstrap analysis output from `tools/descriptor_ladder_analysis.py` (Script A).
   - `analysis-b.json`: Independent bootstrap analysis output from `tools/descriptor_ladder_analysis_b.py` (Script B).
   - `posthoc-arm-minus-raw.json`: post hoc paired contrasts F - R and C - R on Part B (`tools/descriptor_ladder_posthoc.py`). The frozen rule states no reading for a learned arm against the raw estimate, so the paper labels these post hoc.
+  - `posthoc-headline.json`: post hoc twenty-learner-seed values for the six primary R0 rows (`tools/headline_seed_averaged.py`): C, F, A, D, D/C, the share S, the share against the shrinkage control, and the single-fit S from `campaign-archive-v1`. It reuses script A's estimator and draws and asserts agreement with `analysis-a.json`.
+  - `posthoc-measurement-floor.json`: post hoc measurement-only floor (test error of a per-cell linear calibration of the noisy estimate at 2,048 shots) and the stacking increment of the noisy estimate over the recalibrated control at every Part A rung (`tools/measurement_floor.py`).
   - `reconcile.json`: Cross-script reconciliation report confirming point estimates, confidence intervals, labels, and rung statements agree to rule tolerance.
 
   - `reconcile.json`: the output of `tools/descriptor_ladder_reconcile.py` on the two analyses: 63 cells, 1,668 compared values, largest difference 2.8e-15, identical labels and rung statements (passed).
@@ -68,6 +70,15 @@ python tools/descriptor_ladder_reconcile.py artifacts/descriptor-information/ana
 
 # 6. Post hoc (not in the rule): F - R and C - R on Part B, reusing script A's estimator and draws.
 python tools/descriptor_ladder_posthoc.py runs artifacts/descriptor-information/posthoc-arm-minus-raw.json
+
+# 7. Post hoc: seed-averaged headline, measurement floor, and near-Clifford label strata.
+#    ASSET is the unpacked descriptor-information-v1 release asset (below).
+python tools/headline_seed_averaged.py --fits $ASSET/fits --cache $ASSET/cache --archive $ARCHIVE \
+    --out artifacts/descriptor-information/posthoc-headline.json
+python tools/measurement_floor.py --fits-dir $ASSET/fits --data-dir data \
+    --out-json artifacts/descriptor-information/posthoc-measurement-floor.json
+python tools/near_clifford_strata.py --fits-dir $ASSET/fits --cache-dir $ASSET/cache --nc-data-dir data \
+    --out-json artifacts/near-clifford-positive-control/posthoc-label-strata.json
 ```
 
 Every subcommand prints its options with `--help`. Both analysis scripts also run on the release asset below, which needs no fit: point `--fits` at its `fits/` directory and `--cache` at its `cache/` directory.

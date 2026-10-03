@@ -7,6 +7,7 @@ This directory contains the release artifact for the near-Clifford positive cont
 - `bootstrap_results.json`: Two-stage percentile bootstrap results (10,000 draws, seed 20261001) for the capacity-matched gap $D = C - F$, $S$, $P - F$, and $P - C$.
 - `summary-s{101,211,307}.json`: Per-dataset-seed execution summaries with candidate choices, arm errors, and runtime diagnostics.
 - `all_summary.json`: Combined execution summary for all three dataset seeds.
+- `posthoc-label-strata.json`: post hoc label distribution of the three near-Clifford datasets, test errors and the gap D split into items with a zero label and items with a nonzero label, and the continuous-label comparison (R5 against R3-TFI from the descriptor-information experiment). Written by `tools/near_clifford_strata.py`; the command is step 7 of `artifacts/descriptor-information/README.md`.
 - `inputs/`: Self-contained input files required to recompute the bootstrap intervals from scratch:
   - `s101/`, `s211/`, `s307/`:
     - `summary.json`: Dataset-seed run summary.

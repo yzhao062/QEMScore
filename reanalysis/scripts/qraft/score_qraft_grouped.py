@@ -195,6 +195,96 @@ def run_grouped_matched(rows, group_ids, rng_seed=BOOTSTRAP_SEED):
     ci_q2 = [float(x) for x in np.percentile(q2_boots, [2.5, 97.5])]
     ci_q1 = [float(x) for x in np.percentile(q1_boots, [2.5, 97.5])]
 
+    # Joint group-level bootstrap across 10 seeds:
+    # Resamples unique test groups that occur in any split once per draw,
+    # giving one multiplicity per group applied to every split whose test set contains it.
+    u_joint = np.unique(np.concatenate([rec["groups"] for rec in seed_records]))
+    K_joint = len(u_joint)
+    rng_joint = np.random.default_rng(rng_seed)
+    draws_joint = rng_joint.integers(0, K_joint, size=(BOOTSTRAP_DRAWS, K_joint))
+    W_joint = np.zeros((BOOTSTRAP_DRAWS, K_joint), dtype=float)
+    for b in range(BOOTSTRAP_DRAWS):
+        W_joint[b] = np.bincount(draws_joint[b], minlength=K_joint)
+
+    q3_boots_joint = np.zeros(BOOTSTRAP_DRAWS, dtype=float)
+    q2_boots_joint = np.zeros(BOOTSTRAP_DRAWS, dtype=float)
+    q1_boots_joint = np.zeros(BOOTSTRAP_DRAWS, dtype=float)
+
+    for rec in seed_records:
+        t_groups = rec["groups"]
+        t_machs = rec["machines"]
+        u_groups = np.unique(t_groups)
+        K = len(u_groups)
+
+        unique_machs = sorted(set(t_machs))
+        mach_to_idx = {m: i for i, m in enumerate(unique_machs)}
+        n_m = len(unique_machs)
+
+        row_group = np.searchsorted(u_groups, t_groups)
+        row_mach = np.array([mach_to_idx[m] for m in t_machs], dtype=int)
+        counts = np.zeros((K, n_m), dtype=float)
+        np.add.at(counts, (row_group, row_mach), 1.0)
+        err_sums = {}
+        for arm in ("Q3", "Q2", "Q1"):
+            err_sums[arm] = np.zeros((K, n_m), dtype=float)
+            np.add.at(err_sums[arm], (row_group, row_mach), rec["errs"][arm])
+            # Identity resample assertion (per-(group, machine) bookkeeping)
+            identity = float(np.mean(err_sums[arm].sum(axis=0) / counts.sum(axis=0)))
+            point, _ = macro_mae(t_machs, rec["errs"][arm])
+            assert abs(identity - point) <= 1e-12, (arm, rec["seed"], identity, point)
+
+        split_to_joint = np.searchsorted(u_joint, u_groups)
+        assert np.array_equal(u_joint[split_to_joint], u_groups)
+        W_split = W_joint[:, split_to_joint]
+
+        q3_m_mae_j = np.zeros((BOOTSTRAP_DRAWS, n_m), dtype=float)
+        q2_m_mae_j = np.zeros((BOOTSTRAP_DRAWS, n_m), dtype=float)
+        q1_m_mae_j = np.zeros((BOOTSTRAP_DRAWS, n_m), dtype=float)
+
+        for m in range(n_m):
+            cnt_m = np.einsum('bk,k->b', W_split, counts[:, m])
+            q3_m_mae_j[:, m] = np.einsum('bk,k->b', W_split, err_sums["Q3"][:, m]) / cnt_m
+            q2_m_mae_j[:, m] = np.einsum('bk,k->b', W_split, err_sums["Q2"][:, m]) / cnt_m
+            q1_m_mae_j[:, m] = np.einsum('bk,k->b', W_split, err_sums["Q1"][:, m]) / cnt_m
+
+        q3_boots_joint += q3_m_mae_j.mean(axis=1) / len(SEEDS)
+        q2_boots_joint += q2_m_mae_j.mean(axis=1) / len(SEEDS)
+        q1_boots_joint += q1_m_mae_j.mean(axis=1) / len(SEEDS)
+
+    diff_boots_joint = q3_boots_joint - q2_boots_joint
+    ratio_boots_joint = q3_boots_joint / q2_boots_joint
+
+    ci_diff_joint = [float(x) for x in np.percentile(diff_boots_joint, [2.5, 97.5])]
+    ci_ratio_joint = [float(x) for x in np.percentile(ratio_boots_joint, [2.5, 97.5])]
+    ci_q3_joint = [float(x) for x in np.percentile(q3_boots_joint, [2.5, 97.5])]
+    ci_q2_joint = [float(x) for x in np.percentile(q2_boots_joint, [2.5, 97.5])]
+    ci_q1_joint = [float(x) for x in np.percentile(q1_boots_joint, [2.5, 97.5])]
+
+    boot_per_split = {
+        "n_draws": BOOTSTRAP_DRAWS,
+        "seed": BOOTSTRAP_SEED,
+        "resample_unit": "partial-circuit groups",
+        "resample_scheme": "independent per split",
+        "difference_q3_minus_q2_95_ci": ci_diff,
+        "ratio_q3_over_q2_95_ci": ci_ratio,
+        "q3_macro_mae_95_ci": ci_q3,
+        "q2_macro_mae_95_ci": ci_q2,
+        "q1_macro_mae_95_ci": ci_q1,
+    }
+    boot_joint = {
+        "status": "post hoc, descriptive",
+        "n_draws": BOOTSTRAP_DRAWS,
+        "seed": BOOTSTRAP_SEED,
+        "resample_unit": "unique partial-circuit groups across splits",
+        "resample_scheme": "joint across splits with shared multiplicity",
+        "unique_test_groups": K_joint,
+        "difference_q3_minus_q2_95_ci": ci_diff_joint,
+        "ratio_q3_over_q2_95_ci": ci_ratio_joint,
+        "q3_macro_mae_95_ci": ci_q3_joint,
+        "q2_macro_mae_95_ci": ci_q2_joint,
+        "q1_macro_mae_95_ci": ci_q1_joint,
+    }
+
     return {
         "total_groups": n_groups,
         "arms": summary,
@@ -210,7 +300,9 @@ def run_grouped_matched(rows, group_ids, rng_seed=BOOTSTRAP_SEED):
             "q3_macro_mae_95_ci": ci_q3,
             "q2_macro_mae_95_ci": ci_q2,
             "q1_macro_mae_95_ci": ci_q1,
-        }
+        },
+        "bootstrap_per_split": boot_per_split,
+        "bootstrap_joint": boot_joint,
     }
 
 
@@ -329,15 +421,20 @@ def main():
                       ("Structure-Only (6 Descriptors Alone, 864 Groups)", res_struct)]:
         print()
         print(f"Results for {name}:")
-        print(f"{'Arm':<5}{'Features':>10}{'Macro MAE Mean':>16}{'Min':>12}{'Max':>12}{'95% Bootstrap CI':>24}")
+        print(f"{'Arm':<5}{'Features':>10}{'Macro MAE Mean':>16}{'Min':>12}{'Max':>12}{'Per-Split 95% CI':>28}{'Joint 95% CI':>28}")
         for arm in ("Q3", "Q2", "Q1"):
             a = res["arms"][arm]
             ci = res["bootstrap"][f"{arm.lower()}_macro_mae_95_ci"]
-            print(f"{arm:<5}{len(a['features']):>10}{a['ten_seed_mean']:>16.4f}{a['ten_seed_min']:>12.4f}{a['ten_seed_max']:>12.4f}{str(ci):>24}")
-        print(f"Ratio Q3/Q2 (descriptors-only / forward-added): {res['ratio_q3_over_q2']:.4f}  "
-              f"95% CI: [{res['bootstrap']['ratio_q3_over_q2_95_ci'][0]:.4f}, {res['bootstrap']['ratio_q3_over_q2_95_ci'][1]:.4f}]")
+            ci_j = res["bootstrap_joint"][f"{arm.lower()}_macro_mae_95_ci"]
+            ci_str = f"[{ci[0]:.4f}, {ci[1]:.4f}]"
+            ci_j_str = f"[{ci_j[0]:.4f}, {ci_j[1]:.4f}]"
+            print(f"{arm:<5}{len(a['features']):>10}{a['ten_seed_mean']:>16.4f}{a['ten_seed_min']:>12.4f}{a['ten_seed_max']:>12.4f}{ci_str:>28}{ci_j_str:>28}")
+        print(f"Ratio Q3/Q2: {res['ratio_q3_over_q2']:.4f}  "
+              f"Per-Split 95% CI: [{res['bootstrap']['ratio_q3_over_q2_95_ci'][0]:.4f}, {res['bootstrap']['ratio_q3_over_q2_95_ci'][1]:.4f}]  "
+              f"Joint 95% CI: [{res['bootstrap_joint']['ratio_q3_over_q2_95_ci'][0]:.4f}, {res['bootstrap_joint']['ratio_q3_over_q2_95_ci'][1]:.4f}]")
         print(f"Difference Q3 - Q2: {res['difference_q3_minus_q2']:.4f}  "
-              f"95% CI: [{res['bootstrap']['difference_q3_minus_q2_95_ci'][0]:.4f}, {res['bootstrap']['difference_q3_minus_q2_95_ci'][1]:.4f}]")
+              f"Per-Split 95% CI: [{res['bootstrap']['difference_q3_minus_q2_95_ci'][0]:.4f}, {res['bootstrap']['difference_q3_minus_q2_95_ci'][1]:.4f}]  "
+              f"Joint 95% CI: [{res['bootstrap_joint']['difference_q3_minus_q2_95_ci'][0]:.4f}, {res['bootstrap_joint']['difference_q3_minus_q2_95_ci'][1]:.4f}]")
         print(f"Difference Q2 - Q1: {res['difference_q2_minus_q1']:.4f}")
         q3 = res["arms"]["Q3"]["per_seed_macro_mae"]
         q2 = res["arms"]["Q2"]["per_seed_macro_mae"]
