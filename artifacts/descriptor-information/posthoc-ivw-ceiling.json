@@ -1,0 +1,5329 @@
+{
+ "schema": "qem-descriptor-information-posthoc-ivw-ceiling-v1",
+ "status": "post hoc, heuristic; paper results and analysis-a were known",
+ "analysis_script": "tools/ivw_ceiling.py",
+ "analysis_script_sha256": "0824696ea2226b3e608a54c29c27c34b62fbe38528720bec0a5e41e053b5fa00",
+ "assumption": "Heuristic inverse-variance weighting assumption: errors of the descriptor model and the calibrated quantum measurement are assumed independent and roughly unbiased, with MAE serving as the characteristic error scale sigma. The combined error scale is c_comb = (c_ref^-2 + c_r^-2)^(-1/2), giving ceiling(D/C) = 1 - macro(c_comb) / macro(c_ref).",
+ "reviewer_verification": {
+  "reviewer_spearman_original_reported": 0.97,
+  "reviewer_spearman_original_reproduced": true,
+  "reproduced_spearman_original_exact": 0.9736213634389926,
+  "reviewer_tfi_strength_range_reported": [
+   0.87,
+   1.0
+  ],
+  "reviewer_tfi_strength_range_reproduced": true,
+  "reproduced_tfi_strength_range_exact": [
+   0.8660577920441596,
+   1.003857414799493
+  ]
+ },
+ "fit_sets": {
+  "original": {
+   "summary": {
+    "n_cells": 48,
+    "spearman_correlation": 0.9736213634389926,
+    "spearman_pvalue": 3.62399472937569e-31,
+    "cells_exceeding_ceiling_by_more_than_0_02": [
+     {
+      "row": "shipped-s211-n640/tfi",
+      "rung": "R0",
+      "family": "tfi",
+      "dataset_seed": 211,
+      "observed_D_over_C": 0.16623304942665465,
+      "ceiling_D_over_C": 0.011186341404424871,
+      "diff": 0.15504670802222978,
+      "ratio": null
+     },
+     {
+      "row": "shipped-s307-n640/heisenberg",
+      "rung": "N1",
+      "family": "heisenberg",
+      "dataset_seed": 307,
+      "observed_D_over_C": 0.10849381177680925,
+      "ceiling_D_over_C": 0.029128491960511482,
+      "diff": 0.07936531981629777,
+      "ratio": null
+     }
+    ],
+    "n_cells_ceiling_over_0_05": 35,
+    "ratio_obs_over_ceiling_summary": {
+     "min": 0.252944814248823,
+     "max": 0.8821997208427768,
+     "mean": 0.7158655095722407
+    },
+    "tfi_n2_r5_ratios": {
+     "min": 0.6063024592917358,
+     "max": 0.8734145123913767,
+     "values": [
+      0.7737320617158499,
+      0.7986135534701144,
+      0.6849383770010588,
+      0.6923445181017958,
+      0.7457336015822076,
+      0.6797490803210974,
+      0.7838982098989726,
+      0.790023972541132,
+      0.6878990927360608,
+      0.6965024485195511,
+      0.8552588214272105,
+      0.6931314131214101,
+      0.8174027522576188,
+      0.761437336398972,
+      0.6063024592917358,
+      0.6749141249453358,
+      0.8734145123913767,
+      0.6637992680788204
+     ]
+    }
+   },
+   "cells": {
+    "shipped-s101-n640/tfi/R0": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "R0",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.0023609442733868594,
+     "mean_F": 0.002673830378871794,
+     "observed_D_over_C": -0.13252583257125716,
+     "macro_c_comb": 0.002350492370539821,
+     "ceiling_D_over_C_from_C": 0.004427001079548631,
+     "ceiling_D_over_C_from_ref": 2.2249871346469163e-06,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9820520776081995,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.1369528336508058,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.0023563831036098343,
+       "c_r": 0.017170961034112475,
+       "c_ref": 1.7862039589196765e-05,
+       "c_comb_C": 0.002334503635668983,
+       "c_comb_ref": 1.7862029924825858e-05
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.0023655054431638836,
+       "c_r": 0.020948442480065343,
+       "c_ref": 6.68862381548866e-05,
+       "c_comb_C": 0.002350566867496932,
+       "c_comb_ref": 6.688589721837042e-05
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0023563831036098343,
+       "c_r": 0.040947076260186954,
+       "c_ref": 1.786203958914264e-05,
+       "c_comb_C": 0.002352490995759658,
+       "c_comb_ref": 1.7862037889657818e-05
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.0023655054431638836,
+       "c_r": 0.07762925827903577,
+       "c_ref": 6.688623815488208e-05,
+       "c_comb_C": 0.002364407983233712,
+       "c_comb_ref": 6.688621332759868e-05
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/N1": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "N1",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.008065126417693904,
+     "mean_F": 0.00790933129144036,
+     "observed_D_over_C": 0.019317133815999324,
+     "macro_c_comb": 0.007696868259729335,
+     "ceiling_D_over_C_from_C": 0.045660556188760526,
+     "ceiling_D_over_C_from_ref": 0.05072829516460908,
+     "ceiling_D_over_C_from_ref_norm_C": -0.0176900247244407,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.026343422372761202,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.00779725790018983,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.00785305435423971,
+       "c_comb_C": 0.007099564840783163,
+       "c_comb_ref": 0.007141606337546886
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.00833299493519798,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.009439779007630964,
+       "c_comb_C": 0.007742889023799695,
+       "c_comb_ref": 0.008606340776606438
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.00779725790018983,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.00785305435423971,
+       "c_comb_C": 0.00765962227182297,
+       "c_comb_ref": 0.007712495945962022
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.00833299493519798,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.009439779007630962,
+       "c_comb_C": 0.008285396902511514,
+       "c_comb_ref": 0.009370751753599249
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/N2": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "N2",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.020103217376209803,
+     "mean_F": 0.017192185529168607,
+     "observed_D_over_C": 0.14480427647795902,
+     "macro_c_comb": 0.016340891900662607,
+     "ceiling_D_over_C_from_C": 0.18715041503752217,
+     "ceiling_D_over_C_from_ref": 0.19998657744395132,
+     "ceiling_D_over_C_from_ref_norm_C": 0.1551010454718984,
+     "observed_over_ceiling_C": 0.7737320617158499,
+     "diff_observed_minus_ceiling_C": -0.04234613855956315,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.018846996418089377,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.01976893830711431,
+       "c_comb_C": 0.012692961894937143,
+       "c_comb_ref": 0.012963605728638555
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.02135943833433022,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.02269331761240021,
+       "c_comb_C": 0.014955977442084779,
+       "c_comb_ref": 0.01539272917986413
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.018846996418089377,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.019768938307114313,
+       "c_comb_C": 0.01712051551072021,
+       "c_comb_ref": 0.017802714107850014
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.02135943833433022,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.02269331761240021,
+       "c_comb_C": 0.020594112754908304,
+       "c_comb_ref": 0.021781700358890602
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/N3": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "N3",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.06026093873881806,
+     "mean_F": 0.03589285947002924,
+     "observed_D_over_C": 0.40437603161816904,
+     "macro_c_comb": 0.029747958884036856,
+     "ceiling_D_over_C_from_C": 0.5063475693106948,
+     "ceiling_D_over_C_from_ref": 0.5214133868852426,
+     "ceiling_D_over_C_from_ref_norm_C": 0.49919847817693996,
+     "observed_over_ceiling_C": 0.7986135534701144,
+     "diff_observed_minus_ceiling_C": -0.10197153769252576,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.05609086905527418,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.05969705150271456,
+       "c_comb_C": 0.016418848676378082,
+       "c_comb_ref": 0.01650189188635668
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.06443100842236196,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.06641917908081789,
+       "c_comb_C": 0.019921922084083613,
+       "c_comb_ref": 0.019978319082337388
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.05609086905527418,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.05969705150271456,
+       "c_comb_C": 0.03307221250357986,
+       "c_comb_ref": 0.03376708085949945
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.06443100842236196,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.06641917908081789,
+       "c_comb_C": 0.04957885227210587,
+       "c_comb_ref": 0.05046778747935161
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/N4": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "N4",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.14771671387457816,
+     "mean_F": 0.07167613737143906,
+     "observed_D_over_C": 0.514773003735399,
+     "macro_c_comb": 0.03669858573861952,
+     "ceiling_D_over_C_from_C": 0.7515610469795639,
+     "ceiling_D_over_C_from_ref": 0.7561829695259766,
+     "ceiling_D_over_C_from_ref_norm_C": 0.7509281155818903,
+     "observed_over_ceiling_C": 0.6849383770010588,
+     "diff_observed_minus_ceiling_C": -0.23678804324416491,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.13625150623214072,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.13898829345946068,
+       "c_comb_C": 0.01703620899265174,
+       "c_comb_ref": 0.017041404173873936
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.15918192151701557,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.16281244796751515,
+       "c_comb_C": 0.020769365008603463,
+       "c_comb_ref": 0.020777165814436817
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.13625150623214072,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.13898829345946068,
+       "c_comb_C": 0.03921450775336801,
+       "c_comb_ref": 0.03927799363505985
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.15918192151701557,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.16281244796751515,
+       "c_comb_C": 0.06977426119985485,
+       "c_comb_ref": 0.07007175751579704
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/R3-TFI": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "R3-TFI",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.2078268425895616,
+     "mean_F": 0.090132858047533,
+     "observed_D_over_C": 0.5663079084277053,
+     "macro_c_comb": 0.03783346289947504,
+     "ceiling_D_over_C_from_C": 0.8179568027495246,
+     "ceiling_D_over_C_from_ref": 0.8142375226212885,
+     "ceiling_D_over_C_from_ref_norm_C": 0.818276498911617,
+     "observed_over_ceiling_C": 0.6923445181017958,
+     "diff_observed_minus_ceiling_C": -0.25164889432181936,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.1923670531263692,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.18967866265933114,
+       "c_comb_C": 0.017102961389587244,
+       "c_comb_ref": 0.017101032000602735
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.22328663205275393,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.2169375925548394,
+       "c_comb_C": 0.020856853272242324,
+       "c_comb_ref": 0.020851451521928147
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.1923670531263692,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.18967866265933114,
+       "c_comb_C": 0.04004981865476827,
+       "c_comb_ref": 0.04002506278520015
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.22328663205275393,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.2169375925548393,
+       "c_comb_C": 0.07332421828130233,
+       "c_comb_ref": 0.07309053951434652
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/R4": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "R4",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.03735552540591376,
+     "mean_F": 0.027340961993747866,
+     "observed_D_over_C": 0.26808787464090855,
+     "macro_c_comb": 0.02392638208862432,
+     "ceiling_D_over_C_from_C": 0.3594955009028855,
+     "ceiling_D_over_C_from_ref": 0.36183865026855944,
+     "ceiling_D_over_C_from_ref_norm_C": 0.3573875365692891,
+     "observed_over_ceiling_C": 0.7457336015822076,
+     "diff_observed_minus_ceiling_C": -0.09140762626197696,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.035669145800646083,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.036026111279050074,
+       "c_comb_C": 0.015471585374914007,
+       "c_comb_ref": 0.01550036475104731
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.03904190501118141,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.03920604188705719,
+       "c_comb_C": 0.018459107037056794,
+       "c_comb_ref": 0.01847637026832147
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.035669145800646083,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.036026111279050074,
+       "c_comb_C": 0.026895636526538872,
+       "c_comb_ref": 0.02704768519750691
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.03904190501118141,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.03920604188705719,
+       "c_comb_C": 0.0348791994159876,
+       "c_comb_ref": 0.03499608459849527
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/R5": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "R5",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.21144167267513542,
+     "mean_F": 0.09346338678010382,
+     "observed_D_over_C": 0.5579708313994307,
+     "macro_c_comb": 0.037880149297565766,
+     "ceiling_D_over_C_from_C": 0.8208482329036157,
+     "ceiling_D_over_C_from_ref": 0.8208371654932631,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8208485870715777,
+     "observed_over_ceiling_C": 0.6797490803210974,
+     "diff_observed_minus_ceiling_C": -0.26287740150418504,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.19501619016540622,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.19499113112581717,
+       "c_comb_C": 0.01710478568836962,
+       "c_comb_ref": 0.017104768776625427
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.2278671551848646,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.22786525553483408,
+       "c_comb_C": 0.020860475537657994,
+       "c_comb_ref": 0.020860474080165236
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.19501619016540622,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.19499113112581717,
+       "c_comb_C": 0.04007326069327964,
+       "c_comb_ref": 0.04007304322463723
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.2278671551848646,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.22786525553483408,
+       "c_comb_C": 0.0734820752709558,
+       "c_comb_ref": 0.07348201156537006
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/R0": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "R0",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.004000073044431321,
+     "mean_F": 0.004193110050267046,
+     "observed_D_over_C": -0.04825837020762887,
+     "macro_c_comb": 0.003973028554461016,
+     "ceiling_D_over_C_from_C": 0.006760999029243986,
+     "ceiling_D_over_C_from_ref": 3.6970324203911e-05,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9360995625681319,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.05501936923687285,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.00392543498167514,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.00010709014083981581,
+       "c_comb_C": 0.0038585298635873335,
+       "c_comb_ref": 0.00010708874687795106
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.004074711107187502,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.00040414159416019837,
+       "c_comb_C": 0.004041164041666691,
+       "c_comb_ref": 0.00040410845812612615
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.00392543498167514,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.00010709014084004688,
+       "c_comb_C": 0.003920964465164807,
+       "c_comb_ref": 0.0001070900499147668
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.004074711107187502,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.00040414159416025453,
+       "c_comb_C": 0.004071455847425233,
+       "c_comb_ref": 0.0004041384142754989
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/N1": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "N1",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.0067271423986577554,
+     "mean_F": 0.007399410881138801,
+     "observed_D_over_C": -0.09993373748341966,
+     "macro_c_comb": 0.006605726995933989,
+     "ceiling_D_over_C_from_C": 0.0180485851983736,
+     "ceiling_D_over_C_from_ref": 0.05656568176558052,
+     "ceiling_D_over_C_from_ref_norm_C": -0.7780153739593971,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.11798232268179326,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.006422997736767339,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.011927600997187386,
+       "c_comb_C": 0.006141836057706695,
+       "c_comb_ref": 0.010370028385624893
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.00703128706054817,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.013428615914683719,
+       "c_comb_C": 0.006863002260233999,
+       "c_comb_ref": 0.012356443494905452
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.006422997736767339,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.011927600997187378,
+       "c_comb_C": 0.006403469371646715,
+       "c_comb_ref": 0.01180392087046205
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.00703128706054817,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.013428615914683717,
+       "c_comb_C": 0.007014600294148547,
+       "c_comb_ref": 0.013313457679517941
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/N2": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "N2",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.01611969504628792,
+     "mean_F": 0.015108870794645901,
+     "observed_D_over_C": 0.06270740536588466,
+     "macro_c_comb": 0.014755193700332438,
+     "ceiling_D_over_C_from_C": 0.08464808683025948,
+     "ceiling_D_over_C_from_ref": 0.10738905580489255,
+     "ceiling_D_over_C_from_ref_norm_C": -0.05193417963774949,
+     "observed_over_ceiling_C": 0.7408012125735179,
+     "diff_observed_minus_ceiling_C": -0.02194068146437482,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.015414798834767046,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.017559030588491755,
+       "c_comb_C": 0.0124239909193013,
+       "c_comb_ref": 0.013467519658465685
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.016824591257808795,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.0204348082610152,
+       "c_comb_C": 0.014846457833610547,
+       "c_comb_ref": 0.01715274102944136
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.015414798834767046,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.017559030588491745,
+       "c_comb_C": 0.015150575605765139,
+       "c_comb_ref": 0.017171442295536042
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.016824591257808795,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.0204348082610152,
+       "c_comb_C": 0.01659975044265277,
+       "c_comb_ref": 0.02003572975466723
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/N3": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "N3",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.04879117683173707,
+     "mean_F": 0.034930683545133165,
+     "observed_D_over_C": 0.28407786379909766,
+     "macro_c_comb": 0.03304850729986199,
+     "ceiling_D_over_C_from_C": 0.3226540238241391,
+     "ceiling_D_over_C_from_ref": 0.30293023961806986,
+     "ceiling_D_over_C_from_ref_norm_C": 0.35053067861717924,
+     "observed_over_ceiling_C": 0.8804411004461324,
+     "diff_observed_minus_ceiling_C": -0.03857616002504144,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.04582108407372001,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.042363432463782866,
+       "c_comb_C": 0.019081863067944165,
+       "c_comb_ref": 0.018806805970056087
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.05176126958975411,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.04855536593313845,
+       "c_comb_C": 0.02694491684648041,
+       "c_comb_ref": 0.026460299831949807
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.04582108407372001,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.042363432463782866,
+       "c_comb_C": 0.04002057629049804,
+       "c_comb_ref": 0.03765474581437631
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.05176126958975411,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.04855536593313845,
+       "c_comb_C": 0.046146672994525344,
+       "c_comb_ref": 0.04383163840912768
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/N4": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "N4",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.09417058206571804,
+     "mean_F": 0.05966492441964868,
+     "observed_D_over_C": 0.36641652721217305,
+     "macro_c_comb": 0.04552444088568894,
+     "ceiling_D_over_C_from_C": 0.5165747106254565,
+     "ceiling_D_over_C_from_ref": 0.5060092911327185,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5229588405443648,
+     "observed_over_ceiling_C": 0.709319522762786,
+     "diff_observed_minus_ceiling_C": -0.1501581834132834,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.08751558550061386,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.08457951245764965,
+       "c_comb_C": 0.02040967491909019,
+       "c_comb_ref": 0.020370585124610423
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.1008255786308222,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.0972993886992202,
+       "c_comb_C": 0.030117152980671462,
+       "c_comb_ref": 0.030018489420449438
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.08751558550061386,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.08457951245764964,
+       "c_comb_C": 0.05990756826527449,
+       "c_comb_ref": 0.05894011756385272
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.1008255786308222,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.0972993886992202,
+       "c_comb_C": 0.07166336737771961,
+       "c_comb_ref": 0.07036378251205608
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/R3-Heis": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "R3-Heis",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.009805651564666559,
+     "mean_F": 0.009855500722675525,
+     "observed_D_over_C": -0.00508371704625849,
+     "macro_c_comb": 0.009462343540560317,
+     "ceiling_D_over_C_from_C": 0.03501124038950243,
+     "ceiling_D_over_C_from_ref": 0.0368874568401133,
+     "ceiling_D_over_C_from_ref_norm_C": 0.009527281999654025,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.04009495743576092,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.00871308533931062,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.008993945599858619,
+       "c_comb_C": 0.008047208766571229,
+       "c_comb_ref": 0.008266895478718866
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.010898217790022497,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.011174476929837807,
+       "c_comb_C": 0.010301252210886664,
+       "c_comb_ref": 0.01053360628353686
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.00871308533931062,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.008993945599734404,
+       "c_comb_C": 0.00866452184938655,
+       "c_comb_ref": 0.008940562052950447
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.010898217790022497,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.011174476929837807,
+       "c_comb_C": 0.010836391335396819,
+       "c_comb_ref": 0.011107857612872345
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/R4": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "R4",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.07521139720787604,
+     "mean_F": 0.049940871465308165,
+     "observed_D_over_C": 0.3359933026203849,
+     "macro_c_comb": 0.041486099857185654,
+     "ceiling_D_over_C_from_C": 0.4484067389078994,
+     "ceiling_D_over_C_from_ref": 0.45252801350519223,
+     "ceiling_D_over_C_from_ref_norm_C": 0.4450000889033918,
+     "observed_over_ceiling_C": 0.7493047571914309,
+     "diff_observed_minus_ceiling_C": -0.11241343628751449,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.06917116677010694,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.07015974042201607,
+       "c_comb_C": 0.020084207600667505,
+       "c_comb_ref": 0.020107939564863554
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.08125162764564513,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.08233141818895975,
+       "c_comb_C": 0.02941700939726463,
+       "c_comb_ref": 0.02946737828373727
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.06917116677010694,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.07015974042201606,
+       "c_comb_C": 0.052920307990306975,
+       "c_comb_ref": 0.05335908386495505
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.08125162764564513,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.08233141818895975,
+       "c_comb_C": 0.0635228744405035,
+       "c_comb_ref": 0.06403487334173567
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/R5": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "R5",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.09527417690339673,
+     "mean_F": 0.058971733760159295,
+     "observed_D_over_C": 0.381031296445062,
+     "macro_c_comb": 0.045731096832872964,
+     "ceiling_D_over_C_from_C": 0.5200053328275718,
+     "ceiling_D_over_C_from_ref": 0.5236945438198026,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5179198613015313,
+     "observed_over_ceiling_C": 0.7327449785431488,
+     "diff_observed_minus_ceiling_C": -0.13897403638250977,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.0877678105275577,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.0892112288859969,
+       "c_comb_C": 0.020412861079051027,
+       "c_comb_ref": 0.020430605102926467
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.10278054327923576,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.10364731522690374,
+       "c_comb_C": 0.03016790753067036,
+       "c_comb_ref": 0.03018957501445665
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0877678105275577,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.08921122888599688,
+       "c_comb_C": 0.05998828800749881,
+       "c_comb_ref": 0.06044316279542386
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.10278054327923576,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.10364731522690374,
+       "c_comb_C": 0.07235533071427168,
+       "c_comb_ref": 0.07265581075108074
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/R0": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "R0",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.0033843756361094076,
+     "mean_F": 0.0028217805537136664,
+     "observed_D_over_C": 0.16623304942665465,
+     "macro_c_comb": 0.00334651685480307,
+     "ceiling_D_over_C_from_C": 0.011186341404424871,
+     "ceiling_D_over_C_from_ref": 3.992767880434123e-06,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9848039137638704,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": 0.15504670802222978,
+     "exceeds_ceiling_by_more_than_0_02": true,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.0030296831134448464,
+       "c_r": 0.014350231807996858,
+       "c_ref": 2.2361652334861904e-05,
+       "c_comb_C": 0.002964337907170777,
+       "c_comb_ref": 2.2361625185285782e-05
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.003739068158773968,
+       "c_r": 0.018915950086488942,
+       "c_ref": 8.049728640054212e-05,
+       "c_comb_C": 0.0036680941187810187,
+       "c_comb_ref": 8.049655752813738e-05
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0030296831134448464,
+       "c_r": 0.03934439800385346,
+       "c_ref": 2.23616523348966e-05,
+       "c_comb_C": 0.0030207403934140236,
+       "c_comb_ref": 2.2361648723162555e-05
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.003739068158773968,
+       "c_r": 0.06498873238554712,
+       "c_ref": 8.049728640053058e-05,
+       "c_comb_C": 0.0037328949998464613,
+       "c_comb_ref": 8.049722465051188e-05
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/N1": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "N1",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.008153933972993277,
+     "mean_F": 0.008031364819060114,
+     "observed_D_over_C": 0.015031904150699077,
+     "macro_c_comb": 0.007669365217167381,
+     "ceiling_D_over_C_from_C": 0.059427603587524525,
+     "ceiling_D_over_C_from_ref": 0.061703382163924014,
+     "ceiling_D_over_C_from_ref_norm_C": 0.02044324526108332,
+     "observed_over_ceiling_C": 0.252944814248823,
+     "diff_observed_minus_ceiling_C": -0.04439569943682545,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.007977894207589886,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.007400232922395741,
+       "c_comb_C": 0.006972790521331394,
+       "c_comb_ref": 0.00657718342949886
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.008329973738396664,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.00962474819575232,
+       "c_comb_C": 0.0076235164362943785,
+       "c_comb_ref": 0.008578171967326503
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.007977894207589886,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.007400232922395741,
+       "c_comb_C": 0.007818774986955396,
+       "c_comb_ref": 0.007272706559701905
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.008329973738396664,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.009624748195752333,
+       "c_comb_C": 0.008262378924088355,
+       "c_comb_ref": 0.009520902447235512
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/N2": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "N2",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.020189042933422514,
+     "mean_F": 0.01670483377220875,
+     "observed_D_over_C": 0.17257921401740792,
+     "macro_c_comb": 0.01574432151779025,
+     "ceiling_D_over_C_from_C": 0.22015513218182958,
+     "ceiling_D_over_C_from_ref": 0.21578818586749493,
+     "ceiling_D_over_C_from_ref_norm_C": 0.22328197766701263,
+     "observed_over_ceiling_C": 0.7838982098989726,
+     "diff_observed_minus_ceiling_C": -0.047575918164421666,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.019273310870618725,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.018258605917295972,
+       "c_comb_C": 0.011510143551730405,
+       "c_comb_ref": 0.011282594219184813
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.021104774996226306,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.021733633978733256,
+       "c_comb_C": 0.014086086776615844,
+       "c_comb_ref": 0.014268507780463995
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.019273310870618725,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.018258605917295972,
+       "c_comb_C": 0.01730819245411121,
+       "c_comb_ref": 0.016562075416034754
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.021104774996226306,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.021733633978733242,
+       "c_comb_C": 0.02007286328870354,
+       "c_comb_ref": 0.02061159658449129
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/N3": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "N3",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.058700031821876844,
+     "mean_F": 0.0338797388553796,
+     "observed_D_over_C": 0.4228327003605982,
+     "macro_c_comb": 0.02728289281195271,
+     "ceiling_D_over_C_from_C": 0.535215025185307,
+     "ceiling_D_over_C_from_ref": 0.5582548023456524,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5246206420630655,
+     "observed_over_ceiling_C": 0.790023972541132,
+     "diff_observed_minus_ceiling_C": -0.11238232482470872,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.05426083521240431,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.059186367292621944,
+       "c_comb_C": 0.013873261585548097,
+       "c_comb_ref": 0.013946165225005762
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.06313922843134936,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.06715245240042703,
+       "c_comb_C": 0.01812023226591588,
+       "c_comb_ref": 0.018207383490138243
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.05426083521240431,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.059186367292621944,
+       "c_comb_C": 0.031852159056803636,
+       "c_comb_ref": 0.03276540746455036
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.06313922843134936,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.067152452400427,
+       "c_comb_C": 0.04528591833954322,
+       "c_comb_ref": 0.04670017757375138
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/N4": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "N4",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.14040094300834774,
+     "mean_F": 0.0662548707987158,
+     "observed_D_over_C": 0.5281023803752052,
+     "macro_c_comb": 0.03261468046986671,
+     "ceiling_D_over_C_from_C": 0.7677032662955294,
+     "ceiling_D_over_C_from_ref": 0.7648149693135661,
+     "ceiling_D_over_C_from_ref_norm_C": 0.767997011256528,
+     "observed_over_ceiling_C": 0.6878990927360608,
+     "diff_observed_minus_ceiling_C": -0.23960088592032425,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.1276281654238985,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.12556157282231578,
+       "c_comb_C": 0.0142603732339467,
+       "c_comb_ref": 0.014257419834625747
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.15317372059279705,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.15144107743366825,
+       "c_comb_C": 0.018773339127758294,
+       "c_comb_ref": 0.018770095087605874
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.1276281654238985,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.12556157282231578,
+       "c_comb_C": 0.03759840087913076,
+       "c_comb_ref": 0.03754437079778156
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.15317372059279705,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.15144107743366825,
+       "c_comb_C": 0.05982660863863107,
+       "c_comb_ref": 0.05972186788134109
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/R3-TFI": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "R3-TFI",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.208786480898423,
+     "mean_F": 0.08672766647825911,
+     "observed_D_over_C": 0.5846107175854307,
+     "macro_c_comb": 0.033541132257358386,
+     "ceiling_D_over_C_from_C": 0.8393519919822945,
+     "ceiling_D_over_C_from_ref": 0.840326180870026,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8392914772153822,
+     "observed_over_ceiling_C": 0.6965024485195511,
+     "diff_observed_minus_ceiling_C": -0.2547412743968638,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.19106007126544125,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.1916134144435254,
+       "c_comb_C": 0.014309925396601295,
+       "c_comb_ref": 0.01431015688215494
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.22651289053140472,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.22866546540554628,
+       "c_comb_C": 0.01885033490274539,
+       "c_comb_ref": 0.018851558172829602
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.19106007126544125,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.1916134144435254,
+       "c_comb_C": 0.038535809050668765,
+       "c_comb_ref": 0.038540330431807414
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.22651289053140472,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.22866546540554628,
+       "c_comb_C": 0.06246845967941808,
+       "c_comb_ref": 0.06251302220354553
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/R4": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "R4",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.039092989298812886,
+     "mean_F": 0.025455302441047507,
+     "observed_D_over_C": 0.3488524950988976,
+     "macro_c_comb": 0.023147305353679728,
+     "ceiling_D_over_C_from_C": 0.4078911393357523,
+     "ceiling_D_over_C_from_ref": 0.4089718983872507,
+     "ceiling_D_over_C_from_ref_norm_C": 0.4073654484181529,
+     "observed_over_ceiling_C": 0.8552588214272105,
+     "diff_observed_minus_ceiling_C": -0.059038644236854676,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.035729456894370716,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.03601418431673013,
+       "c_comb_C": 0.013316330818994564,
+       "c_comb_ref": 0.01333092063224598
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.04245652170325505,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.042384308478713474,
+       "c_comb_C": 0.01727860043393998,
+       "c_comb_ref": 0.017273722517321975
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.035729456894370716,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.03601418431673013,
+       "c_comb_C": 0.02645042817947673,
+       "c_comb_ref": 0.026565323788324696
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.04245652170325505,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.04238430847871347,
+       "c_comb_C": 0.035543861982307634,
+       "c_comb_ref": 0.03550145779449103
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/R5": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "R5",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.21342854541287623,
+     "mean_F": 0.08877052088229669,
+     "observed_D_over_C": 0.5840738139756767,
+     "macro_c_comb": 0.03358094051324917,
+     "ceiling_D_over_C_from_C": 0.842659563423032,
+     "ceiling_D_over_C_from_ref": 0.8430529373932247,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8426441688269806,
+     "observed_over_ceiling_C": 0.6931314131214101,
+     "diff_observed_minus_ceiling_C": -0.25858574944735535,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.1937560922493607,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.19452487163720095,
+       "c_comb_C": 0.01431103472103977,
+       "c_comb_ref": 0.014311342673692622
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.23310099857639174,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.23344396832300437,
+       "c_comb_C": 0.01885397348913808,
+       "c_comb_ref": 0.01885415457338701
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.1937560922493607,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.19452487163720095,
+       "c_comb_C": 0.03855748887661593,
+       "c_comb_ref": 0.038563512874625346
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.23310099857639174,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.23344396832300437,
+       "c_comb_C": 0.06260126496620291,
+       "c_comb_ref": 0.0626078945162617
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/R0": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "R0",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.003985326951777466,
+     "mean_F": 0.003965662956469744,
+     "observed_D_over_C": 0.004934098392843991,
+     "macro_c_comb": 0.003955553807049742,
+     "ceiling_D_over_C_from_C": 0.007470690632909283,
+     "ceiling_D_over_C_from_ref": 5.306133417326553e-05,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9266541612152366,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.0025365922400652913,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.004133455602757869,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.00011679736073654731,
+       "c_comb_C": 0.00405318026716237,
+       "c_comb_ref": 0.00011679549552584584
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.003837198300797065,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.0004678479575433672,
+       "c_comb_C": 0.0038075148891900217,
+       "c_comb_ref": 0.00046779353588922746
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.004133455602757869,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.00011679736073659728,
+       "c_comb_C": 0.004127419234020361,
+       "c_comb_ref": 0.00011679722425112967
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.003837198300797065,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.00046784795754327045,
+       "c_comb_C": 0.003834100837826214,
+       "c_comb_ref": 0.00046784233677236704
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/N1": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "N1",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.007377352429240104,
+     "mean_F": 0.007817223734676072,
+     "observed_D_over_C": -0.05962454819055943,
+     "macro_c_comb": 0.0072109708971583334,
+     "ceiling_D_over_C_from_C": 0.022553013927098964,
+     "ceiling_D_over_C_from_ref": 0.04488186267725147,
+     "ceiling_D_over_C_from_ref_norm_C": -0.38862740775611915,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.08217756211765839,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.007064453165941726,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.010342343811933833,
+       "c_comb_C": 0.006684689693320686,
+       "c_comb_ref": 0.009248838498044752
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.00769025169253848,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.011109230353822505,
+       "c_comb_C": 0.0074593408308872705,
+       "c_comb_ref": 0.010445143814126808
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.007064453165941726,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.010342343811933833,
+       "c_comb_C": 0.007034444297472587,
+       "c_comb_ref": 0.01024886233694084
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.00769025169253848,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.011109230353822505,
+       "c_comb_C": 0.007665408766952789,
+       "c_comb_ref": 0.011034730470563574
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/N2": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "N2",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.01678442152366676,
+     "mean_F": 0.015407261555785595,
+     "observed_D_over_C": 0.08204989167719066,
+     "macro_c_comb": 0.015215305621328983,
+     "ceiling_D_over_C_from_C": 0.09348644516138127,
+     "ceiling_D_over_C_from_ref": 0.1029207500912902,
+     "ceiling_D_over_C_from_ref_norm_C": 0.03985821437326842,
+     "observed_over_ceiling_C": 0.8776661850341168,
+     "diff_observed_minus_ceiling_C": -0.011436553484190606,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.015843596246158064,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.016586687062321546,
+       "c_comb_C": 0.012573773928907177,
+       "c_comb_ref": 0.01293566138457831
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.01772524680117546,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.01934196573861019,
+       "c_comb_C": 0.01534667155477792,
+       "c_comb_ref": 0.01636034118560126
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.015843596246158064,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.016586687062321546,
+       "c_comb_C": 0.01551352299984701,
+       "c_comb_ref": 0.01620908318064772
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.01772524680117546,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.01934196573861019,
+       "c_comb_C": 0.017427254001783823,
+       "c_comb_ref": 0.018956612058953333
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/N3": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "N3",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.044615292634951884,
+     "mean_F": 0.033474103566464915,
+     "observed_D_over_C": 0.24971682153125432,
+     "macro_c_comb": 0.03086789441287386,
+     "ceiling_D_over_C_from_C": 0.3081319747146123,
+     "ceiling_D_over_C_from_ref": 0.2977089473239696,
+     "ceiling_D_over_C_from_ref_norm_C": 0.32157627632481367,
+     "observed_over_ceiling_C": 0.8104216440456681,
+     "diff_observed_minus_ceiling_C": -0.058415153183357965,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.04138061469351278,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.038135515364670546,
+       "c_comb_C": 0.018488880064374914,
+       "c_comb_ref": 0.01816988937345215
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.04784997057639098,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.04806257258455739,
+       "c_comb_C": 0.025821375606610974,
+       "c_comb_ref": 0.025854627148515996
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.04138061469351278,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.03813551536467055,
+       "c_comb_C": 0.03638613870294716,
+       "c_comb_ref": 0.03412091628099223
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.04784997057639098,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.04806257258455739,
+       "c_comb_C": 0.04277518327756239,
+       "c_comb_ref": 0.04292685904608832
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/N4": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "N4",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.08567099897178385,
+     "mean_F": 0.05474267866818833,
+     "observed_D_over_C": 0.36101271929584833,
+     "macro_c_comb": 0.04258424431535071,
+     "ceiling_D_over_C_from_C": 0.5029327914178281,
+     "ceiling_D_over_C_from_ref": 0.4887466324685149,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5114805786688144,
+     "observed_over_ceiling_C": 0.7178150350429726,
+     "diff_observed_minus_ceiling_C": -0.14192007212197977,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.07983743865565171,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.07514011290924172,
+       "c_comb_C": 0.020006993983410264,
+       "c_comb_ref": 0.0199264838608486
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.09150455928791597,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.08858280609914218,
+       "c_comb_C": 0.029080289261829158,
+       "c_comb_ref": 0.02898231555789985
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.07983743865565171,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.07514011290924172,
+       "c_comb_C": 0.055198020310112145,
+       "c_comb_ref": 0.053571820460481125
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.09150455928791597,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.08858280609914218,
+       "c_comb_C": 0.06605167370605129,
+       "c_comb_ref": 0.06492716749101216
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/R3-Heis": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "R3-Heis",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.010399542132150132,
+     "mean_F": 0.009907322601036713,
+     "observed_D_over_C": 0.04733088484652816,
+     "macro_c_comb": 0.009978219772328125,
+     "ceiling_D_over_C_from_C": 0.04051354900707482,
+     "ceiling_D_over_C_from_ref": 0.05062512647440276,
+     "ceiling_D_over_C_from_ref_norm_C": -0.07901628717594344,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": 0.006817335839453334,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.008975614066573805,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.009848579230823343,
+       "c_comb_C": 0.008232692139696327,
+       "c_comb_ref": 0.008890653307582362
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.011823470197726452,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.013790713640055182,
+       "c_comb_C": 0.011032103527785999,
+       "c_comb_ref": 0.012577725423197225
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.008975614066573805,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.009848579230823343,
+       "c_comb_C": 0.00891430663183323,
+       "c_comb_ref": 0.009767755858333659
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.011823470197726452,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.013790713640055182,
+       "c_comb_C": 0.011733776789996946,
+       "c_comb_ref": 0.013648966769936467
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/R4": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "R4",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.06571265657485417,
+     "mean_F": 0.04756301524202296,
+     "observed_D_over_C": 0.276197041465775,
+     "macro_c_comb": 0.03800745540292849,
+     "ceiling_D_over_C_from_C": 0.42161133967192943,
+     "ceiling_D_over_C_from_ref": 0.41989808650164706,
+     "ceiling_D_over_C_from_ref_norm_C": 0.4231449683121693,
+     "observed_over_ceiling_C": 0.6550987022329466,
+     "diff_observed_minus_ceiling_C": -0.14541429820615442,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.06100922932961881,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.06062801612118176,
+       "c_comb_C": 0.019573898079103036,
+       "c_comb_ref": 0.01956120181377609
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.07041608382008956,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.07006169790571977,
+       "c_comb_C": 0.028118851244910235,
+       "c_comb_ref": 0.028096141336179336
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.06100922932961881,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.06062801612118176,
+       "c_comb_C": 0.04767380079920019,
+       "c_comb_ref": 0.047491240697706716
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.07041608382008956,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.07006169790571977,
+       "c_comb_C": 0.05666327148850051,
+       "c_comb_ref": 0.05647812251545406
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/R5": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "R5",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.08577022598950494,
+     "mean_F": 0.0558938965256351,
+     "observed_D_over_C": 0.348329844292652,
+     "macro_c_comb": 0.042612462471960794,
+     "ceiling_D_over_C_from_C": 0.5031788481334424,
+     "ceiling_D_over_C_from_ref": 0.5119530740003355,
+     "ceiling_D_over_C_from_ref_norm_C": 0.49789499509720936,
+     "observed_over_ceiling_C": 0.6922585191821803,
+     "diff_observed_minus_ceiling_C": -0.15484900384079037,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.07927338478071053,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.08186343157634365,
+       "c_comb_C": 0.019998028455963608,
+       "c_comb_ref": 0.020037774369280812
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.09226706719829933,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.09461820347447698,
+       "c_comb_C": 0.029104491302250766,
+       "c_comb_ref": 0.029175818361084675
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.07927338478071053,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.08186343157634365,
+       "c_comb_C": 0.055010574294653294,
+       "c_comb_ref": 0.05585445511173887
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.09226706719829933,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.09461820347447698,
+       "c_comb_C": 0.0663367558349755,
+       "c_comb_ref": 0.06719459112179096
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/R0": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "R0",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.0028303637977982704,
+     "mean_F": 0.0029377952652063577,
+     "observed_D_over_C": -0.037956769900624916,
+     "macro_c_comb": 0.002808716927616516,
+     "ceiling_D_over_C_from_C": 0.007648087570436335,
+     "ceiling_D_over_C_from_ref": 3.6577397596326833e-06,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9819001706962339,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.04560485747106125,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.002998968293066597,
+       "c_r": 0.01576050807553888,
+       "c_ref": 2.2469881588840606e-05,
+       "c_comb_C": 0.002946106382404076,
+       "c_comb_ref": 2.246985875225002e-05
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.0026617593025299435,
+       "c_r": 0.01943745020613042,
+       "c_ref": 7.998869639332198e-05,
+       "c_comb_C": 0.0026371476054637038,
+       "c_comb_ref": 7.99880191078535e-05
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.002998968293066597,
+       "c_r": 0.0425820496820417,
+       "c_ref": 2.2469881588879288e-05,
+       "c_comb_C": 0.002991558253025548,
+       "c_comb_ref": 2.2469878460501886e-05
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.0026617593025299435,
+       "c_r": 0.07435601201348838,
+       "c_ref": 7.998869639341774e-05,
+       "c_comb_C": 0.0026600554695727367,
+       "c_comb_ref": 7.998865011022539e-05
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/N1": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "N1",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.00805663644739047,
+     "mean_F": 0.007920888094369138,
+     "observed_D_over_C": 0.016849258857311523,
+     "macro_c_comb": 0.007635680930669063,
+     "ceiling_D_over_C_from_C": 0.05224953607752181,
+     "ceiling_D_over_C_from_ref": 0.0578797305831219,
+     "ceiling_D_over_C_from_ref_norm_C": -0.016947134618483295,
+     "observed_over_ceiling_C": 0.32247671696668356,
+     "diff_observed_minus_ceiling_C": -0.03540027722021029,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.008052605867583584,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.00799299069749487,
+       "c_comb_C": 0.0071708292799923965,
+       "c_comb_ref": 0.007128635064502766
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.008060667027197354,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.00940006115756756,
+       "c_comb_C": 0.007445810007476817,
+       "c_comb_ref": 0.00846243204632231
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.008052605867583584,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.007992990697494875,
+       "c_comb_C": 0.007912368249698829,
+       "c_comb_ref": 0.007855792140623027
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.008060667027197354,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.00940006115756756,
+       "c_comb_C": 0.00801371618550821,
+       "c_comb_ref": 0.009325834147898197
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/N2": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "N2",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.021874897718980997,
+     "mean_F": 0.017844287589478508,
+     "observed_D_over_C": 0.18425732459563018,
+     "macro_c_comb": 0.016943901195700176,
+     "ceiling_D_over_C_from_C": 0.22541803790936865,
+     "ceiling_D_over_C_from_ref": 0.2314788852502353,
+     "ceiling_D_over_C_from_ref_norm_C": 0.21104400492483344,
+     "observed_over_ceiling_C": 0.8174027522576188,
+     "diff_observed_minus_ceiling_C": -0.04116071331373847,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.021819026249520104,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.02217470704427806,
+       "c_comb_C": 0.012776071022577834,
+       "c_comb_ref": 0.01284634563725235
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.021930769188441897,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.022738389982771258,
+       "c_comb_C": 0.014546346884473241,
+       "c_comb_ref": 0.014774886812234683
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.021819026249520104,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.022174707044278062,
+       "c_comb_C": 0.019418268024546263,
+       "c_comb_ref": 0.019667711625065965
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.021930769188441897,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.02273838998277126,
+       "c_comb_C": 0.02103491885120336,
+       "c_comb_ref": 0.02174438271363157
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/N3": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "N3",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.06386707558599493,
+     "mean_F": 0.03777410057903921,
+     "observed_D_over_C": 0.4085512725852367,
+     "macro_c_comb": 0.02959902257672703,
+     "ceiling_D_over_C_from_C": 0.5365527182018393,
+     "ceiling_D_over_C_from_ref": 0.5367745522122171,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5353025305108512,
+     "observed_over_ceiling_C": 0.761437336398972,
+     "diff_observed_minus_ceiling_C": -0.12800144561660254,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.061453960860315536,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.060834032448938924,
+       "c_comb_C": 0.015266450448152757,
+       "c_comb_ref": 0.015256809825585624
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.06628019031167434,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.06730602786174075,
+       "c_comb_C": 0.018651934453572893,
+       "c_comb_ref": 0.018674315873197154
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.061453960860315536,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.060834032448938924,
+       "c_comb_C": 0.035000763661027584,
+       "c_comb_ref": 0.03488505199650483
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.06628019031167434,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.06730602786174075,
+       "c_comb_C": 0.049476941744154894,
+       "c_comb_ref": 0.04989929593864856
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/N4": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "N4",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.13846921052703068,
+     "mean_F": 0.07601814450301146,
+     "observed_D_over_C": 0.4510104866368693,
+     "macro_c_comb": 0.035466055802946816,
+     "ceiling_D_over_C_from_C": 0.7438704556199989,
+     "ceiling_D_over_C_from_ref": 0.749923668378603,
+     "ceiling_D_over_C_from_ref_norm_C": 0.742922234501078,
+     "observed_over_ceiling_C": 0.6063024592917358,
+     "diff_observed_minus_ceiling_C": -0.29285996898312955,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.12771049439405951,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.1304806055927375,
+       "c_comb_C": 0.0156418489391028,
+       "c_comb_ref": 0.015646779915934234
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.14922792666000184,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.15421131228601231,
+       "c_comb_C": 0.019274631603584235,
+       "c_comb_ref": 0.019284863061378332
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.12771049439405951,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.13048060559273747,
+       "c_comb_C": 0.04039575140604158,
+       "c_comb_ref": 0.04048091267305587
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.14922792666000184,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.15421131228601231,
+       "c_comb_C": 0.06655199126305864,
+       "c_comb_ref": 0.06697686528038704
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/R3-TFI": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "R3-TFI",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.20181969883106915,
+     "mean_F": 0.09041136130284066,
+     "observed_D_over_C": 0.5520191446796358,
+     "macro_c_comb": 0.036749309265208564,
+     "ceiling_D_over_C_from_C": 0.8179101966851653,
+     "ceiling_D_over_C_from_ref": 0.8178123119400174,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8179088713296492,
+     "observed_over_ceiling_C": 0.6749141249453358,
+     "diff_observed_minus_ceiling_C": -0.26589105200552954,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.18319165469797455,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.18280187955052496,
+       "c_comb_C": 0.01570250292735076,
+       "c_comb_ref": 0.01570225667447539
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.22044774296416375,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.22062358941925955,
+       "c_comb_C": 0.019362330606483284,
+       "c_comb_ref": 0.01936244961393233
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.18319165469797455,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.182801879550525,
+       "c_comb_C": 0.041476289999735155,
+       "c_comb_ref": 0.04147175253447631
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.22044774296416375,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.22062358941925955,
+       "c_comb_C": 0.07045611352726505,
+       "c_comb_ref": 0.07046184816935461
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/R4": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "R4",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.03966322155042895,
+     "mean_F": 0.0261076090379886,
+     "observed_D_over_C": 0.34176781367104436,
+     "macro_c_comb": 0.024142970489651878,
+     "ceiling_D_over_C_from_C": 0.39130081859448007,
+     "ceiling_D_over_C_from_ref": 0.3951226774641553,
+     "ceiling_D_over_C_from_ref_norm_C": 0.3889285717846074,
+     "observed_over_ceiling_C": 0.8734145123913767,
+     "diff_observed_minus_ceiling_C": -0.04953300492343571,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.03817928999822569,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.03898520659351844,
+       "c_comb_C": 0.014568067833933726,
+       "c_comb_ref": 0.01461165653076723
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.041147153102632214,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.041153560516593815,
+       "c_comb_C": 0.017575158137309355,
+       "c_comb_ref": 0.01757565734147426
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.03817928999822569,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.03898520659351844,
+       "c_comb_C": 0.028426376094631344,
+       "c_comb_ref": 0.02875436029404601
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.041147153102632214,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.041153560516593815,
+       "c_comb_C": 0.03600227989273308,
+       "c_comb_ref": 0.036006571595489124
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/R5": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "R5",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.20723174380488088,
+     "mean_F": 0.09411023522178644,
+     "observed_D_over_C": 0.5458695975149639,
+     "macro_c_comb": 0.03681650832188207,
+     "ceiling_D_over_C_from_C": 0.8223413669840723,
+     "ceiling_D_over_C_from_ref": 0.8220331992634012,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8223595624057465,
+     "observed_over_ceiling_C": 0.6637992680788204,
+     "diff_observed_minus_ceiling_C": -0.27647176946910845,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.18702976545412625,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.18659868992047993,
+       "c_comb_C": 0.01570484672490591,
+       "c_comb_ref": 0.015704590621610153
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.2274337221556355,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.22710473679228405,
+       "c_comb_C": 0.019366849834691773,
+       "c_comb_ref": 0.01936664625932744
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.18702976545412625,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.1865986899204799,
+       "c_comb_C": 0.04151954086780483,
+       "c_comb_ref": 0.04151480926732113
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.2274337221556355,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.2271047367922841,
+       "c_comb_C": 0.07067479586012576,
+       "c_comb_ref": 0.07066490446341837
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/R0": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "R0",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.003252402156228066,
+     "mean_F": 0.004248179890598861,
+     "observed_D_over_C": -0.30616685346366757,
+     "macro_c_comb": 0.003239541819014787,
+     "ceiling_D_over_C_from_C": 0.003954104257572255,
+     "ceiling_D_over_C_from_ref": 3.291047155806748e-05,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9182880662390123,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.3101209577212398,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.0030718236826794134,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.00012401731003134977,
+       "c_comb_C": 0.0030418092407435266,
+       "c_comb_ref": 0.0001240153056538886
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.003432980629776717,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.00040752032223055276,
+       "c_comb_C": 0.0034150751453002537,
+       "c_comb_ref": 0.00040749013802880376
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0030718236826794134,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.00012401731003129114,
+       "c_comb_C": 0.0030698978535069485,
+       "c_comb_ref": 0.00012401718318326215
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.003432980629776717,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.0004075203222302686,
+       "c_comb_C": 0.00343138503650842,
+       "c_comb_ref": 0.0004075176513492507
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/N1": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "N1",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.008909357924539934,
+     "mean_F": 0.007942747722822673,
+     "observed_D_over_C": 0.10849381177680925,
+     "macro_c_comb": 0.008649841763861653,
+     "ceiling_D_over_C_from_C": 0.029128491960511482,
+     "ceiling_D_over_C_from_ref": 0.048323105375692954,
+     "ceiling_D_over_C_from_ref_norm_C": -0.3184313490572048,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": 0.07936531981629777,
+     "exceeds_ceiling_by_more_than_0_02": true,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.008931266752315878,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.011030588914455287,
+       "c_comb_C": 0.008265269697081959,
+       "c_comb_ref": 0.009843548868535047
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.00888744909676399,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.013655051462096663,
+       "c_comb_C": 0.008589960936626532,
+       "c_comb_ref": 0.012643891135088218
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.008931266752315878,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.011030588914455287,
+       "c_comb_C": 0.008884262449333097,
+       "c_comb_ref": 0.01094240262773119
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.00888744909676399,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.013655051462096663,
+       "c_comb_C": 0.00885987397240502,
+       "c_comb_ref": 0.013555664519384284
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/N2": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "N2",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.017797731379702916,
+     "mean_F": 0.01690153323639883,
+     "observed_D_over_C": 0.0503546280244536,
+     "macro_c_comb": 0.016186339526027483,
+     "ceiling_D_over_C_from_C": 0.09053917149874036,
+     "ceiling_D_over_C_from_ref": 0.10578154519981386,
+     "ceiling_D_over_C_from_ref_norm_C": 0.006245640778617667,
+     "observed_over_ceiling_C": 0.556164002728412,
+     "diff_observed_minus_ceiling_C": -0.04018454347428676,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.01672134919263787,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.018379231146351035,
+       "c_comb_C": 0.013270720017934383,
+       "c_comb_ref": 0.014055154626847402
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.01887411356676797,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.021178380414647313,
+       "c_comb_C": 0.01644156275998444,
+       "c_comb_ref": 0.0178981996982721
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.01672134919263787,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.018379231146351035,
+       "c_comb_C": 0.016418838998193904,
+       "c_comb_ref": 0.0179797665117793
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.01887411356676797,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.021178380414647313,
+       "c_comb_C": 0.018614236327997205,
+       "c_comb_ref": 0.02081317173442505
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/N3": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "N3",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.05590661465324438,
+     "mean_F": 0.03894151641145367,
+     "observed_D_over_C": 0.30345422177706805,
+     "macro_c_comb": 0.0366761639503313,
+     "ceiling_D_over_C_from_C": 0.34397451575610827,
+     "ceiling_D_over_C_from_ref": 0.331744346247983,
+     "ceiling_D_over_C_from_ref_norm_C": 0.3606900458206267,
+     "observed_over_ceiling_C": 0.8821997208427768,
+     "diff_observed_minus_ceiling_C": -0.04052029397904022,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.052329011870524286,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.05028001323782655,
+       "c_comb_C": 0.020133736567765927,
+       "c_comb_ref": 0.020010934131121892
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.05948421743596447,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.05668999158476762,
+       "c_comb_C": 0.029176613503420195,
+       "c_comb_ref": 0.02882843571644989
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.052329011870524286,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.05028001323782655,
+       "c_comb_C": 0.04480245690666138,
+       "c_comb_ref": 0.043496271955210046
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.05948421743596447,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.05668999158476762,
+       "c_comb_C": 0.052591848823477685,
+       "c_comb_ref": 0.05063097920637633
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/N4": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "N4",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.10145964916700638,
+     "mean_F": 0.06413137093168111,
+     "observed_D_over_C": 0.36791254988356525,
+     "macro_c_comb": 0.04880853088184961,
+     "ceiling_D_over_C_from_C": 0.5189365301124889,
+     "ceiling_D_over_C_from_ref": 0.5084140659677829,
+     "ceiling_D_over_C_from_ref_norm_C": 0.525047762422599,
+     "observed_over_ceiling_C": 0.7089740816739449,
+     "diff_observed_minus_ceiling_C": -0.1510239802289236,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.09432367000249493,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.09007250650990901,
+       "c_comb_C": 0.021252031222101817,
+       "c_comb_ref": 0.021200102083610787
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.10859562833151779,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.10598065148191278,
+       "c_comb_C": 0.0319946521605034,
+       "c_comb_ref": 0.03192550660957538
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.09432367000249493,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.09007250650990901,
+       "c_comb_C": 0.06383519574352058,
+       "c_comb_ref": 0.062467925643105694
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.10859562833151779,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.10598065148191278,
+       "c_comb_C": 0.07815224440127265,
+       "c_comb_ref": 0.07716041524645921
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/R3-Heis": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "R3-Heis",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.011978551384457043,
+     "mean_F": 0.011716004729832433,
+     "observed_D_over_C": 0.021918063895879705,
+     "macro_c_comb": 0.01144126247138845,
+     "ceiling_D_over_C_from_C": 0.04485424788224057,
+     "ceiling_D_over_C_from_ref": 0.0642536807786861,
+     "ceiling_D_over_C_from_ref_norm_C": -0.15094968261520192,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.022936183986360867,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.009627847309236642,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.012005756513173618,
+       "c_comb_C": 0.008808016476202414,
+       "c_comb_ref": 0.010517870988414281
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.01432925545967744,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.017461011628865993,
+       "c_comb_C": 0.013173458742423712,
+       "c_comb_ref": 0.015482032723411943
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.009627847309236642,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.012005756513173618,
+       "c_comb_C": 0.009569039937201875,
+       "c_comb_ref": 0.01189230354826177
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.01432925545967744,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.01746101162886599,
+       "c_comb_C": 0.014214534729725798,
+       "c_comb_ref": 0.017254632396434884
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/R4": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "R4",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.07185455503269497,
+     "mean_F": 0.04958282557688139,
+     "observed_D_over_C": 0.30995570768867187,
+     "macro_c_comb": 0.04197986768687058,
+     "ceiling_D_over_C_from_C": 0.4157660893207248,
+     "ceiling_D_over_C_from_ref": 0.41666853795885783,
+     "ceiling_D_over_C_from_ref_norm_C": 0.41492574337772414,
+     "observed_over_ceiling_C": 0.7455050222952886,
+     "diff_observed_minus_ceiling_C": -0.10581038163205292,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.06607504798971603,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.06635617385915646,
+       "c_comb_C": 0.020713397295705944,
+       "c_comb_ref": 0.02072200819102922
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.07763406207567392,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.0777822897977664,
+       "c_comb_C": 0.030743602896345996,
+       "c_comb_ref": 0.030752785987964434
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.06607504798971603,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.06635617385915646,
+       "c_comb_C": 0.052555053793028994,
+       "c_comb_ref": 0.05269618193260757
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.07763406207567392,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.07778228979776641,
+       "c_comb_C": 0.0639074167624014,
+       "c_comb_ref": 0.06399002537111245
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/R5": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "R5",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.10143976537503197,
+     "mean_F": 0.06239402610470981,
+     "observed_D_over_C": 0.38491551243209743,
+     "macro_c_comb": 0.0488218162636964,
+     "ceiling_D_over_C_from_C": 0.518711265910388,
+     "ceiling_D_over_C_from_ref": 0.5218354980839984,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5168292044794272,
+     "observed_over_ceiling_C": 0.7420612154172781,
+     "diff_observed_minus_ceiling_C": -0.13379575347829054,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.09336114659679537,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.09434395326081249,
+       "c_comb_C": 0.02124086013311196,
+       "c_comb_ref": 0.02125226314521295
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.10951838415326857,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.11065968852890973,
+       "c_comb_C": 0.03201797860521977,
+       "c_comb_ref": 0.032046094123237
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.09336114659679537,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.09434395326081249,
+       "c_comb_C": 0.06353435357303641,
+       "c_comb_ref": 0.0638414818294403
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.10951838415326857,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.11065968852890973,
+       "c_comb_C": 0.07849407274341745,
+       "c_comb_ref": 0.0789110894368076
+      }
+     }
+    }
+   }
+  },
+  "strength-indicator": {
+   "summary": {
+    "n_cells": 48,
+    "spearman_correlation": 0.9686278766825879,
+    "spearman_pvalue": 1.852353807230997e-29,
+    "cells_exceeding_ceiling_by_more_than_0_02": [
+     {
+      "row": "shipped-s101-n640/heisenberg",
+      "rung": "R3-Heis",
+      "family": "heisenberg",
+      "dataset_seed": 101,
+      "observed_D_over_C": 0.09019794155955935,
+      "ceiling_D_over_C": 0.03375774249759911,
+      "diff": 0.05644019906196024,
+      "ratio": null
+     },
+     {
+      "row": "shipped-s211-n640/heisenberg",
+      "rung": "R0",
+      "family": "heisenberg",
+      "dataset_seed": 211,
+      "observed_D_over_C": 0.035913130898289576,
+      "ceiling_D_over_C": 0.0071165966975561545,
+      "diff": 0.02879653420073342,
+      "ratio": null
+     }
+    ],
+    "n_cells_ceiling_over_0_05": 35,
+    "ratio_obs_over_ceiling_summary": {
+     "min": -0.22630586531311933,
+     "max": 1.003857414799493,
+     "mean": 0.8126126103110595
+    },
+    "tfi_n2_r5_ratios": {
+     "min": 0.8660577920441596,
+     "max": 1.003857414799493,
+     "values": [
+      0.8962093985387811,
+      0.9285227830254684,
+      0.9613021376493693,
+      0.9992826402899406,
+      0.8843262748039443,
+      0.9913911326552609,
+      0.9478363537230704,
+      0.9730789125365858,
+      0.9743170172965726,
+      1.003857414799493,
+      0.9471698168194218,
+      0.9946279998970946,
+      0.8660577920441596,
+      0.919010346100045,
+      0.9485052654177187,
+      0.9944229714024111,
+      0.9486990655476737,
+      0.9918276158588566
+     ]
+    }
+   },
+   "cells": {
+    "shipped-s101-n640/tfi/R0": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "R0",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.0030222908483639485,
+     "mean_F": 0.003673598409504396,
+     "observed_D_over_C": -0.21550128489222625,
+     "macro_c_comb": 0.0030037151542262903,
+     "ceiling_D_over_C_from_C": 0.006146229820241933,
+     "ceiling_D_over_C_from_ref": 2.2249871346469163e-06,
+     "ceiling_D_over_C_from_ref_norm_C": 0.985979494788514,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.22164751471246819,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.002663133755386351,
+       "c_r": 0.017170961034112475,
+       "c_ref": 1.7862039589196765e-05,
+       "c_comb_C": 0.0026316700578230745,
+       "c_comb_ref": 1.7862029924825858e-05
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.003052525798938342,
+       "c_r": 0.020948442480065343,
+       "c_ref": 6.68862381548866e-05,
+       "c_comb_C": 0.0030206254910222566,
+       "c_comb_ref": 6.688589721837042e-05
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0029475839682946356,
+       "c_r": 0.040947076260186954,
+       "c_ref": 1.786203958914264e-05,
+       "c_comb_C": 0.0029399765215802525,
+       "c_comb_ref": 1.7862037889657818e-05
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.003425919870836466,
+       "c_r": 0.07762925827903577,
+       "c_ref": 6.688623815488208e-05,
+       "c_comb_C": 0.0034225885464795767,
+       "c_comb_ref": 6.688621332759868e-05
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/N1": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "N1",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.008302718023279,
+     "mean_F": 0.008211113124497472,
+     "observed_D_over_C": 0.011033121746961251,
+     "macro_c_comb": 0.00789050443143403,
+     "ceiling_D_over_C_from_C": 0.049648029800507976,
+     "ceiling_D_over_C_from_ref": 0.05072829516460908,
+     "ceiling_D_over_C_from_ref_norm_C": 0.011432318860428392,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.038614908053546726,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.00826139253968993,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.00785305435423971,
+       "c_comb_C": 0.007444563111026164,
+       "c_comb_ref": 0.007141606337546886
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.008579599975224343,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.009439779007630964,
+       "c_comb_C": 0.007939522695022017,
+       "c_comb_ref": 0.008606340776606438
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.007869879002252504,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.00785305435423971,
+       "c_comb_C": 0.007728431437991606,
+       "c_comb_ref": 0.007712495945962022
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.008500000575949228,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.009439779007630962,
+       "c_comb_C": 0.008449500481696336,
+       "c_comb_ref": 0.009370751753599249
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/N2": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "N2",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.02031938029309629,
+     "mean_F": 0.016823914713224447,
+     "observed_D_over_C": 0.1720261902406278,
+     "macro_c_comb": 0.016419102539291203,
+     "ceiling_D_over_C_from_C": 0.19194865677720718,
+     "ceiling_D_over_C_from_ref": 0.19998657744395132,
+     "ceiling_D_over_C_from_ref_norm_C": 0.1640893029802829,
+     "observed_over_ceiling_C": 0.8962093985387811,
+     "diff_observed_minus_ceiling_C": -0.019922466536579392,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.01922392605665313,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.01976893830711431,
+       "c_comb_C": 0.012806235210418685,
+       "c_comb_ref": 0.012963605728638555
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.02171592859236263,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.02269331761240021,
+       "c_comb_C": 0.015076812562721614,
+       "c_comb_ref": 0.01539272917986413
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.01910676137706282,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.019768938307114313,
+       "c_comb_C": 0.01731452870772338,
+       "c_comb_ref": 0.017802714107850014
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.02123090514630659,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.02269331761240021,
+       "c_comb_C": 0.020478833676301135,
+       "c_comb_ref": 0.021781700358890602
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/N3": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "N3",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.05961737717647192,
+     "mean_F": 0.03178458926306248,
+     "observed_D_over_C": 0.46685696740771226,
+     "macro_c_comb": 0.029642035243859353,
+     "ceiling_D_over_C_from_C": 0.5027953820223137,
+     "ceiling_D_over_C_from_ref": 0.5214133868852426,
+     "ceiling_D_over_C_from_ref_norm_C": 0.4937923931548539,
+     "observed_over_ceiling_C": 0.9285227830254684,
+     "diff_observed_minus_ceiling_C": -0.0359384146146014,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.05515403955237471,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.05969705150271456,
+       "c_comb_C": 0.016394802560426407,
+       "c_comb_ref": 0.01650189188635668
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.0641922918823608,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.06641917908081789,
+       "c_comb_C": 0.019914829927831296,
+       "c_comb_ref": 0.019978319082337388
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.05509737143621289,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.05969705150271456,
+       "c_comb_C": 0.032864987322328926,
+       "c_comb_ref": 0.03376708085949945
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.06402580583493928,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.06641917908081789,
+       "c_comb_C": 0.04939352116485078,
+       "c_comb_ref": 0.05046778747935161
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/N4": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "N4",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.14719860338925633,
+     "mean_F": 0.0409605769917175,
+     "observed_D_over_C": 0.7217325704959298,
+     "macro_c_comb": 0.03668389397924908,
+     "ceiling_D_over_C_from_C": 0.7507863992279797,
+     "ceiling_D_over_C_from_ref": 0.7561829695259766,
+     "ceiling_D_over_C_from_ref_norm_C": 0.7500514309398858,
+     "observed_over_ceiling_C": 0.9613021376493693,
+     "diff_observed_minus_ceiling_C": -0.02905382873204998,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.13590253573022415,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.13898829345946068,
+       "c_comb_C": 0.017035524248297462,
+       "c_comb_ref": 0.017041404173873936
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.15808093114426586,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.16281244796751515,
+       "c_comb_C": 0.020766894317503073,
+       "c_comb_ref": 0.020777165814436817
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.13629949685004167,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.13898829345946068,
+       "c_comb_C": 0.03921565132217829,
+       "c_comb_ref": 0.03927799363505985
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.15851144983249377,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.16281244796751515,
+       "c_comb_C": 0.0697175060290175,
+       "c_comb_ref": 0.07007175751579704
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/R3-TFI": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "R3-TFI",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.20835778386502368,
+     "mean_F": 0.03796151447680347,
+     "observed_D_over_C": 0.8178061132508718,
+     "macro_c_comb": 0.037839191308687514,
+     "ceiling_D_over_C_from_C": 0.8183931955563507,
+     "ceiling_D_over_C_from_ref": 0.8142375226212885,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8187395702001455,
+     "observed_over_ceiling_C": 0.9992826402899406,
+     "diff_observed_minus_ceiling_C": -0.000587082305478881,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.19296099589671636,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.18967866265933114,
+       "c_comb_C": 0.017103376892958832,
+       "c_comb_ref": 0.017101032000602735
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.22375736459261622,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.2169375925548394,
+       "c_comb_C": 0.02085723572048705,
+       "c_comb_ref": 0.020851451521928147
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.19294754352330204,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.18967866265933114,
+       "c_comb_C": 0.040055034528980946,
+       "c_comb_ref": 0.04002506278520015
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.22376523144746016,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.2169375925548393,
+       "c_comb_C": 0.07334111809232324,
+       "c_comb_ref": 0.07309053951434652
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/R4": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "R4",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.03732348402581237,
+     "mean_F": 0.02546829625282566,
+     "observed_D_over_C": 0.31763347078712784,
+     "macro_c_comb": 0.02391758610016834,
+     "ceiling_D_over_C_from_C": 0.3591813110580112,
+     "ceiling_D_over_C_from_ref": 0.36183865026855944,
+     "ceiling_D_over_C_from_ref_norm_C": 0.35683586807595047,
+     "observed_over_ceiling_C": 0.8843262748039443,
+     "diff_observed_minus_ceiling_C": -0.041547840270883374,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.03558909105262977,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.036026111279050074,
+       "c_comb_C": 0.015465034466663714,
+       "c_comb_ref": 0.01550036475104731
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.03905749472740129,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.03920604188705719,
+       "c_comb_C": 0.01846075396776282,
+       "c_comb_ref": 0.01847637026832147
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.03561581402962491,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.036026111279050074,
+       "c_comb_C": 0.0268727503297326,
+       "c_comb_ref": 0.02704768519750691
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.03903153629359349,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.03920604188705719,
+       "c_comb_C": 0.03487180563651422,
+       "c_comb_ref": 0.03499608459849527
+      }
+     }
+    },
+    "shipped-s101-n640/tfi/R5": {
+     "row": "shipped-s101-n640/tfi",
+     "rung": "R5",
+     "dataset_seed": 101,
+     "family": "tfi",
+     "mean_C": 0.21147609073317114,
+     "mean_F": 0.03937511503489736,
+     "observed_D_over_C": 0.8138081950617355,
+     "macro_c_comb": 0.03788065495664504,
+     "ceiling_D_over_C_from_C": 0.820874999035041,
+     "ceiling_D_over_C_from_ref": 0.8208371654932631,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8208777442387354,
+     "observed_over_ceiling_C": 0.9913911326552609,
+     "diff_observed_minus_ceiling_C": -0.007066803973305502,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.19501432821275455,
+       "c_r": 0.017170961034112475,
+       "c_ref": 0.19499113112581717,
+       "c_comb_C": 0.017104784432004957,
+       "c_comb_ref": 0.017104768776625427
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.2279196737390261,
+       "c_r": 0.020948442480065343,
+       "c_ref": 0.22786525553483408,
+       "c_comb_C": 0.02086051581783015,
+       "c_comb_ref": 0.020860474080165236
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.1950537584576387,
+       "c_r": 0.040947076260186954,
+       "c_ref": 0.19499113112581717,
+       "c_comb_C": 0.040073586569981105,
+       "c_comb_ref": 0.04007304322463723
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.22791660252326523,
+       "c_r": 0.07762925827903577,
+       "c_ref": 0.22786525553483408,
+       "c_comb_C": 0.07348373300676393,
+       "c_comb_ref": 0.07348201156537006
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/R0": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "R0",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.003934340185462441,
+     "mean_F": 0.004468322567905905,
+     "observed_D_over_C": -0.13572349041309426,
+     "macro_c_comb": 0.0039044558370389558,
+     "ceiling_D_over_C_from_C": 0.0075957713402388105,
+     "ceiling_D_over_C_from_ref": 3.6970324203911e-05,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9350319481159605,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.14331926175333307,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.003924535941138348,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.00010709014083981581,
+       "c_comb_C": 0.0038576760038238375,
+       "c_comb_ref": 0.00010708874687795106
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.00455910455559135,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.00040414159416019837,
+       "c_comb_C": 0.004512260118860842,
+       "c_comb_ref": 0.00040410845812612615
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0036365526819974806,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.00010709014084004688,
+       "c_comb_C": 0.003632997440204726,
+       "c_comb_ref": 0.0001070900499147668
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.0036171675631225864,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.00040414159416025453,
+       "c_comb_C": 0.003614889785266417,
+       "c_comb_ref": 0.0004041384142754989
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/N1": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "N1",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.007440330296331213,
+     "mean_F": 0.007975804184394924,
+     "observed_D_over_C": -0.07196910173836638,
+     "macro_c_comb": 0.007287697533254012,
+     "ceiling_D_over_C_from_C": 0.020514245604454473,
+     "ceiling_D_over_C_from_ref": 0.05656568176558052,
+     "ceiling_D_over_C_from_ref_norm_C": -0.6075848962680419,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.09248334734282085,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.007015993537160261,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.011927600997187386,
+       "c_comb_C": 0.006654064895572209,
+       "c_comb_ref": 0.010370028385624893
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.007391767265554039,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.013428615914683719,
+       "c_comb_C": 0.00719697918686702,
+       "c_comb_ref": 0.012356443494905452
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.007353087328404789,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.011927600997187378,
+       "c_comb_C": 0.0073238291180305285,
+       "c_comb_ref": 0.01180392087046205
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.00800047305420577,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.013428615914683717,
+       "c_comb_C": 0.007975916932546293,
+       "c_comb_ref": 0.013313457679517941
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/N2": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "N2",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.015977710133150986,
+     "mean_F": 0.015283317806166444,
+     "observed_D_over_C": 0.04346006537844257,
+     "macro_c_comb": 0.014673563989908952,
+     "ceiling_D_over_C_from_C": 0.0816228440980511,
+     "ceiling_D_over_C_from_ref": 0.10738905580489255,
+     "ceiling_D_over_C_from_ref_norm_C": -0.06128212636334096,
+     "observed_over_ceiling_C": 0.5324497799443901,
+     "diff_observed_minus_ceiling_C": -0.03816277871960853,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.01498273332779029,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.017559030588491755,
+       "c_comb_C": 0.012194421151707283,
+       "c_comb_ref": 0.013467519658465685
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.01671558231618501,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.0204348082610152,
+       "c_comb_C": 0.014771394046397539,
+       "c_comb_ref": 0.01715274102944136
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.01496268243660891,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.017559030588491745,
+       "c_comb_C": 0.014720675347860184,
+       "c_comb_ref": 0.017171442295536042
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.01724984245201974,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.0204348082610152,
+       "c_comb_C": 0.017007765413670807,
+       "c_comb_ref": 0.02003572975466723
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/N3": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "N3",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.04616835347174593,
+     "mean_F": 0.03451568813801996,
+     "observed_D_over_C": 0.2523950814242735,
+     "macro_c_comb": 0.03191230654254028,
+     "ceiling_D_over_C_from_C": 0.308783958213499,
+     "ceiling_D_over_C_from_ref": 0.30293023961806986,
+     "ceiling_D_over_C_from_ref_norm_C": 0.3136343377337444,
+     "observed_over_ceiling_C": 0.8173840470357687,
+     "diff_observed_minus_ceiling_C": -0.056388876789225495,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.04369493453299599,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.042363432463782866,
+       "c_comb_C": 0.01891902832240689,
+       "c_comb_ref": 0.018806805970056087
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.04906804360836308,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.04855536593313845,
+       "c_comb_C": 0.026542353347859846,
+       "c_comb_ref": 0.026460299831949807
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.04310809697357185,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.042363432463782866,
+       "c_comb_C": 0.038174785425990725,
+       "c_comb_ref": 0.03765474581437631
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.048802338772052783,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.04855536593313845,
+       "c_comb_C": 0.04401305907390367,
+       "c_comb_ref": 0.04383163840912768
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/N4": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "N4",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.09143441852519449,
+     "mean_F": 0.059058807002415246,
+     "observed_D_over_C": 0.3540856063284115,
+     "macro_c_comb": 0.045012489491678964,
+     "ceiling_D_over_C_from_C": 0.507707379587306,
+     "ceiling_D_over_C_from_ref": 0.5060092911327185,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5086834435014895,
+     "observed_over_ceiling_C": 0.6974206414258403,
+     "diff_observed_minus_ceiling_C": -0.15362177325889453,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.0847564526737575,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.08457951245764965,
+       "c_comb_C": 0.020373049796953042,
+       "c_comb_ref": 0.020370585124610423
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.09821777910897875,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.0972993886992202,
+       "c_comb_C": 0.030045116641827217,
+       "c_comb_ref": 0.030018489420449438
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.08470500480177792,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.08457951245764964,
+       "c_comb_C": 0.05898253628896983,
+       "c_comb_ref": 0.05894011756385272
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.09805843751626374,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.0972993886992202,
+       "c_comb_C": 0.07064925523896577,
+       "c_comb_ref": 0.07036378251205608
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/R3-Heis": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "R3-Heis",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.009950814220894014,
+     "mean_F": 0.009053271261327784,
+     "observed_D_over_C": 0.09019794155955935,
+     "macro_c_comb": 0.009614897196783627,
+     "ceiling_D_over_C_from_C": 0.03375774249759911,
+     "ceiling_D_over_C_from_ref": 0.0368874568401133,
+     "ceiling_D_over_C_from_ref_norm_C": 0.023976315764535183,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": 0.05644019906196024,
+     "exceeds_ceiling_by_more_than_0_02": true,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.008393200620153012,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.008993945599858619,
+       "c_comb_C": 0.00779316812793062,
+       "c_comb_ref": 0.008266895478718866
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.01104531667399684,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.011174476929837807,
+       "c_comb_C": 0.010425209800675503,
+       "c_comb_ref": 0.01053360628353686
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.00904133405359235,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.008993945599734404,
+       "c_comb_C": 0.008987107321602966,
+       "c_comb_ref": 0.008940562052950447
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.011323405535833851,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.011174476929837807,
+       "c_comb_C": 0.011254103536925417,
+       "c_comb_ref": 0.011107857612872345
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/R4": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "R4",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.07542834159623954,
+     "mean_F": 0.049765005521179254,
+     "observed_D_over_C": 0.3402346589088965,
+     "macro_c_comb": 0.04155570894410812,
+     "ceiling_D_over_C_from_C": 0.449070361820339,
+     "ceiling_D_over_C_from_ref": 0.45252801350519223,
+     "ceiling_D_over_C_from_ref_norm_C": 0.4465963604600325,
+     "observed_over_ceiling_C": 0.7576422045082887,
+     "diff_observed_minus_ceiling_C": -0.10883570291144251,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.06931192092289716,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.07015974042201607,
+       "c_comb_C": 0.02008764347622094,
+       "c_comb_ref": 0.020107939564863554
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.08139871314251491,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.08233141818895975,
+       "c_comb_C": 0.02942397318246044,
+       "c_comb_ref": 0.02946737828373727
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0694528951101655,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.07015974042201606,
+       "c_comb_C": 0.05304614902499316,
+       "c_comb_ref": 0.05335908386495505
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.08154983720938061,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.08233141818895975,
+       "c_comb_C": 0.06366507009275793,
+       "c_comb_ref": 0.06403487334173567
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg/R5": {
+     "row": "shipped-s101-n640/heisenberg",
+     "rung": "R5",
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "mean_C": 0.09530260176453413,
+     "mean_F": 0.05897865139450388,
+     "observed_D_over_C": 0.3811433234506703,
+     "macro_c_comb": 0.04574988327949136,
+     "ceiling_D_over_C_from_C": 0.5199513713956475,
+     "ceiling_D_over_C_from_ref": 0.5236945438198026,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5180636460539505,
+     "observed_over_ceiling_C": 0.7330364807532093,
+     "diff_observed_minus_ceiling_C": -0.1388080479449772,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.08782257822203401,
+       "c_r": 0.020988410540082443,
+       "c_ref": 0.0892112288859969,
+       "c_comb_C": 0.020413549487066446,
+       "c_comb_ref": 0.020430605102926467
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.10259390080527578,
+       "c_r": 0.03155791891451596,
+       "c_ref": 0.10364731522690374,
+       "c_comb_C": 0.03016317606853489,
+       "c_comb_ref": 0.03018957501445665
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0879824844671259,
+       "c_r": 0.08218009452249732,
+       "c_ref": 0.08921122888599688,
+       "c_comb_C": 0.06005669873930168,
+       "c_comb_ref": 0.06044316279542386
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.10281144356370084,
+       "c_r": 0.10187721736450336,
+       "c_ref": 0.10364731522690374,
+       "c_comb_C": 0.07236610882306242,
+       "c_comb_ref": 0.07265581075108074
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/R0": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "R0",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.002733242029295279,
+     "mean_F": 0.0031534811749512753,
+     "observed_D_over_C": -0.15375116478958425,
+     "macro_c_comb": 0.0027121808396994027,
+     "ceiling_D_over_C_from_C": 0.007705570663022021,
+     "ceiling_D_over_C_from_ref": 3.992767880434123e-06,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9811837870665868,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.16145673545260628,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.002568163027370978,
+       "c_r": 0.014350231807996858,
+       "c_ref": 2.2361652334861904e-05,
+       "c_comb_C": 0.002527998940444433,
+       "c_comb_ref": 2.2361625185285782e-05
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.0029784329181318345,
+       "c_r": 0.018915950086488942,
+       "c_ref": 8.049728640054212e-05,
+       "c_comb_C": 0.0029421842478820487,
+       "c_comb_ref": 8.049655752813738e-05
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.002486051562194029,
+       "c_r": 0.03934439800385346,
+       "c_ref": 2.23616523348966e-05,
+       "c_comb_C": 0.0024811034846691543,
+       "c_comb_ref": 2.2361648723162555e-05
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.0029003206094842756,
+       "c_r": 0.06498873238554712,
+       "c_ref": 8.049728640053058e-05,
+       "c_comb_C": 0.002897436685801976,
+       "c_comb_ref": 8.049722465051188e-05
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/N1": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "N1",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.00799501647112303,
+     "mean_F": 0.007807575606694092,
+     "observed_D_over_C": 0.02344471272897943,
+     "macro_c_comb": 0.007538681923171213,
+     "ceiling_D_over_C_from_C": 0.05707737433688054,
+     "ceiling_D_over_C_from_ref": 0.061703382163924014,
+     "ceiling_D_over_C_from_ref_norm_C": 0.000972527099902476,
+     "observed_over_ceiling_C": 0.4107531749902278,
+     "diff_observed_minus_ceiling_C": -0.03363266160790111,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.007612745964935333,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.007400232922395741,
+       "c_comb_C": 0.0067250342951389284,
+       "c_comb_ref": 0.00657718342949886
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.008461111842879874,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.00962474819575232,
+       "c_comb_C": 0.007723653178507124,
+       "c_comb_ref": 0.008578171967326503
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.007427562089836781,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.007400232922395741,
+       "c_comb_C": 0.007298642149845573,
+       "c_comb_ref": 0.007272706559701905
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.008478645986840125,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.009624748195752333,
+       "c_comb_C": 0.008407398069193233,
+       "c_comb_ref": 0.009520902447235512
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/N2": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "N2",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.02037575508124425,
+     "mean_F": 0.016066085055151343,
+     "observed_D_over_C": 0.21150970891183957,
+     "macro_c_comb": 0.015828904763502516,
+     "ceiling_D_over_C_from_C": 0.22315002804127138,
+     "ceiling_D_over_C_from_ref": 0.21578818586749493,
+     "ceiling_D_over_C_from_ref_norm_C": 0.23039939194802406,
+     "observed_over_ceiling_C": 0.9478363537230704,
+     "diff_observed_minus_ceiling_C": -0.011640319129431809,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.01946252051014401,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.018258605917295972,
+       "c_comb_C": 0.011550065567199945,
+       "c_comb_ref": 0.011282594219184813
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.021452823412709484,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.021733633978733256,
+       "c_comb_C": 0.014188163897937622,
+       "c_comb_ref": 0.014268507780463995
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.019149717102466518,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.018258605917295972,
+       "c_comb_C": 0.017218513532051515,
+       "c_comb_ref": 0.016562075416034754
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.021437959299656976,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.021733633978733242,
+       "c_comb_C": 0.020358876056820983,
+       "c_comb_ref": 0.02061159658449129
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/N3": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "N3",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.05872166252070016,
+     "mean_F": 0.028119561299135638,
+     "observed_D_over_C": 0.5211381951384104,
+     "macro_c_comb": 0.027272927143430395,
+     "ceiling_D_over_C_from_C": 0.5355559435358914,
+     "ceiling_D_over_C_from_ref": 0.5582548023456524,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5247957526998723,
+     "observed_over_ceiling_C": 0.9730789125365858,
+     "diff_observed_minus_ceiling_C": -0.014417748397481,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.05451376928251207,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.059186367292621944,
+       "c_comb_C": 0.01387746161549819,
+       "c_comb_ref": 0.013946165225005762
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.06298528835378309,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.06715245240042703,
+       "c_comb_C": 0.018116581328016128,
+       "c_comb_ref": 0.018207383490138243
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.054473383072412895,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.059186367292621944,
+       "c_comb_C": 0.03189498857855624,
+       "c_comb_ref": 0.03276540746455036
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.0629142093740926,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.067152452400427,
+       "c_comb_C": 0.045202677051651034,
+       "c_comb_ref": 0.04670017757375138
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/N4": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "N4",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.14006735545551072,
+     "mean_F": 0.03536529190933405,
+     "observed_D_over_C": 0.7475122465593558,
+     "macro_c_comb": 0.032605347005024654,
+     "ceiling_D_over_C_from_C": 0.7672166587354394,
+     "ceiling_D_over_C_from_ref": 0.7648149693135661,
+     "ceiling_D_over_C_from_ref_norm_C": 0.76744446773906,
+     "observed_over_ceiling_C": 0.9743170172965726,
+     "diff_observed_minus_ceiling_C": -0.019704412176083652,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.12721831698967492,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.12556157282231578,
+       "c_comb_C": 0.014259798792168238,
+       "c_comb_ref": 0.014257419834625747
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.15300341091835856,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.15144107743366825,
+       "c_comb_C": 0.018773025058808276,
+       "c_comb_ref": 0.018770095087605874
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.12737434303057976,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.12556157282231578,
+       "c_comb_C": 0.037591893849377354,
+       "c_comb_ref": 0.03754437079778156
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.15267335088342962,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.15144107743366825,
+       "c_comb_C": 0.05979667031974476,
+       "c_comb_ref": 0.05972186788134109
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/R3-TFI": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "R3-TFI",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.2085276185506107,
+     "mean_F": 0.03286534936039456,
+     "observed_D_over_C": 0.8423933021974352,
+     "macro_c_comb": 0.03354034784812525,
+     "ceiling_D_over_C_from_C": 0.8391563281581099,
+     "ceiling_D_over_C_from_ref": 0.840326180870026,
+     "ceiling_D_over_C_from_ref_norm_C": 0.839091976612965,
+     "observed_over_ceiling_C": 1.003857414799493,
+     "diff_observed_minus_ceiling_C": 0.0032369740393253243,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.190414073234154,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.1916134144435254,
+       "c_comb_C": 0.014309652606856585,
+       "c_comb_ref": 0.01431015688215494
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.22649856487395686,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.22866546540554628,
+       "c_comb_C": 0.018850326645524107,
+       "c_comb_ref": 0.018851558172829602
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.19066685830497315,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.1916134144435254,
+       "c_comb_C": 0.03853257312100053,
+       "c_comb_ref": 0.038540330431807414
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.22653097778935863,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.22866546540554628,
+       "c_comb_C": 0.06246883901911976,
+       "c_comb_ref": 0.06251302220354553
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/R4": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "R4",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.0393680021074027,
+     "mean_F": 0.024077146173876813,
+     "observed_D_over_C": 0.3884082278752625,
+     "macro_c_comb": 0.02322426984102592,
+     "ceiling_D_over_C_from_C": 0.4100724294398759,
+     "ceiling_D_over_C_from_ref": 0.4089718983872507,
+     "ceiling_D_over_C_from_ref_norm_C": 0.41150541193606893,
+     "observed_over_ceiling_C": 0.9471698168194218,
+     "diff_observed_minus_ceiling_C": -0.02166420156461335,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.03601549275775846,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.03601418431673013,
+       "c_comb_C": 0.013330986990264426,
+       "c_comb_ref": 0.01333092063224598
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.042706987055411164,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.042384308478713474,
+       "c_comb_C": 0.017295359186481927,
+       "c_comb_ref": 0.017273722517321975
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.036022823676623364,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.03601418431673013,
+       "c_comb_C": 0.026568790637240065,
+       "c_comb_ref": 0.026565323788324696
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.04272670493981778,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.04238430847871347,
+       "c_comb_C": 0.03570194255011727,
+       "c_comb_ref": 0.03550145779449103
+      }
+     }
+    },
+    "shipped-s211-n640/tfi/R5": {
+     "row": "shipped-s211-n640/tfi",
+     "rung": "R5",
+     "dataset_seed": 211,
+     "family": "tfi",
+     "mean_C": 0.21357737860942483,
+     "mean_F": 0.03454926906694572,
+     "observed_D_over_C": 0.838235353894258,
+     "macro_c_comb": 0.03358233567779449,
+     "ceiling_D_over_C_from_C": 0.8427626750714667,
+     "ceiling_D_over_C_from_ref": 0.8430529373932247,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8427538235643012,
+     "observed_over_ceiling_C": 0.9946279998970946,
+     "diff_observed_minus_ceiling_C": -0.004527321177208776,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.19392549980928273,
+       "c_r": 0.014350231807996858,
+       "c_ref": 0.19452487163720095,
+       "c_comb_C": 0.014311102894228564,
+       "c_comb_ref": 0.014311342673692622
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.23310863759206932,
+       "c_r": 0.018915950086488942,
+       "c_ref": 0.23344396832300437,
+       "c_comb_C": 0.01885397753110232,
+       "c_comb_ref": 0.01885415457338701
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.19398120223220566,
+       "c_r": 0.03934439800385346,
+       "c_ref": 0.19452487163720095,
+       "c_comb_C": 0.038559259916963275,
+       "c_comb_ref": 0.038563512874625346
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.23329417480414166,
+       "c_r": 0.06498873238554712,
+       "c_ref": 0.23344396832300437,
+       "c_comb_C": 0.06260500236888382,
+       "c_comb_ref": 0.0626078945162617
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/R0": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "R0",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.004039431897918047,
+     "mean_F": 0.00389436325141339,
+     "observed_D_over_C": 0.035913130898289576,
+     "macro_c_comb": 0.00401068489021332,
+     "ceiling_D_over_C_from_C": 0.0071165966975561545,
+     "ceiling_D_over_C_from_ref": 5.306133417326553e-05,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9276365698205483,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": 0.02879653420073342,
+     "exceeds_ceiling_by_more_than_0_02": true,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.0038003612835847697,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.00011679736073654731,
+       "c_comb_C": 0.003737690301222268,
+       "c_comb_ref": 0.00011679549552584584
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.004351267094563458,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.0004678479575433672,
+       "c_comb_C": 0.004308126688293838,
+       "c_comb_ref": 0.00046779353588922746
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.004110068610871385,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.00011679736073659728,
+       "c_comb_C": 0.00410413397776959,
+       "c_comb_ref": 0.00011679722425112967
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.0038960306026525763,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.00046784795754327045,
+       "c_comb_C": 0.0038927885935675843,
+       "c_comb_ref": 0.00046784233677236704
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/N1": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "N1",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.007638918753787628,
+     "mean_F": 0.008206790103957497,
+     "observed_D_over_C": -0.07433923156838146,
+     "macro_c_comb": 0.007452027814087728,
+     "ceiling_D_over_C_from_C": 0.024465627364767317,
+     "ceiling_D_over_C_from_ref": 0.04488186267725147,
+     "ceiling_D_over_C_from_ref_norm_C": -0.3410790335791285,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.09880485893314878,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.00729964244618448,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.010342343811933833,
+       "c_comb_C": 0.006882905733626913,
+       "c_comb_ref": 0.009248838498044752
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.008141426577735495,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.011109230353822505,
+       "c_comb_C": 0.007868909945005375,
+       "c_comb_ref": 0.010445143814126808
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.006963509455435971,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.010342343811933833,
+       "c_comb_C": 0.00693476349043914,
+       "c_comb_ref": 0.01024886233694084
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.008151096535794568,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.011109230353822505,
+       "c_comb_C": 0.008121532087279481,
+       "c_comb_ref": 0.011034730470563574
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/N2": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "N2",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.016659951406112233,
+     "mean_F": 0.015273410462830452,
+     "observed_D_over_C": 0.08322598964923039,
+     "macro_c_comb": 0.015189943658027203,
+     "ceiling_D_over_C_from_C": 0.08823601655558877,
+     "ceiling_D_over_C_from_ref": 0.1029207500912902,
+     "ceiling_D_over_C_from_ref_norm_C": 0.032684786431447566,
+     "observed_over_ceiling_C": 0.9432201599535939,
+     "diff_observed_minus_ceiling_C": -0.005010026906358378,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.015150802722027883,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.016586687062321546,
+       "c_comb_C": 0.012218973368538983,
+       "c_comb_ref": 0.01293566138457831
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.0174980689784842,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.01934196573861019,
+       "c_comb_C": 0.015198515539079834,
+       "c_comb_ref": 0.01636034118560126
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.015748266179995495,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.016586687062321546,
+       "c_comb_C": 0.015423994516458674,
+       "c_comb_ref": 0.01620908318064772
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.018242667743941336,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.01934196573861019,
+       "c_comb_C": 0.017918291208031314,
+       "c_comb_ref": 0.018956612058953333
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/N3": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "N3",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.04379560926815139,
+     "mean_F": 0.03384601027344243,
+     "observed_D_over_C": 0.227182568320711,
+     "macro_c_comb": 0.03054585322819027,
+     "ceiling_D_over_C_from_C": 0.30253617340577743,
+     "ceiling_D_over_C_from_ref": 0.2977089473239696,
+     "ceiling_D_over_C_from_ref_norm_C": 0.30887882442879,
+     "observed_over_ceiling_C": 0.7509269578021726,
+     "diff_observed_minus_ceiling_C": -0.07535360508506644,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.0402152319290166,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.038135515364670546,
+       "c_comb_C": 0.018381317626569454,
+       "c_comb_ref": 0.01816988937345215
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.04729857779025725,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.04806257258455739,
+       "c_comb_C": 0.025733656455775026,
+       "c_comb_ref": 0.025854627148515996
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.040532938331455035,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.03813551536467055,
+       "c_comb_C": 0.035805820544763375,
+       "c_comb_ref": 0.03412091628099223
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.04713568902187671,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.04806257258455739,
+       "c_comb_C": 0.04226261828565323,
+       "c_comb_ref": 0.04292685904608832
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/N4": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "N4",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.08168652366760569,
+     "mean_F": 0.0536825451074482,
+     "observed_D_over_C": 0.3428225036740423,
+     "macro_c_comb": 0.04183138188445662,
+     "ceiling_D_over_C_from_C": 0.4879035120324795,
+     "ceiling_D_over_C_from_ref": 0.4887466324685149,
+     "ceiling_D_over_C_from_ref_norm_C": 0.4876517574323266,
+     "observed_over_ceiling_C": 0.7026440581375049,
+     "diff_observed_minus_ceiling_C": -0.14508100835843718,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.07555788555779387,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.07514011290924172,
+       "c_comb_C": 0.0199342152748402,
+       "c_comb_ref": 0.0199264838608486
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.08747726607002757,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.08858280609914218,
+       "c_comb_C": 0.028942939742262613,
+       "c_comb_ref": 0.02898231555789985
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.07631108800003793,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.07514011290924172,
+       "c_comb_C": 0.053991346523605405,
+       "c_comb_ref": 0.053571820460481125
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.08739985504256338,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.08858280609914218,
+       "c_comb_C": 0.06445702599711826,
+       "c_comb_ref": 0.06492716749101216
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/R3-Heis": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "R3-Heis",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.01038124530496414,
+     "mean_F": 0.010127429993505896,
+     "observed_D_over_C": 0.024449408910208095,
+     "macro_c_comb": 0.010003955605355525,
+     "ceiling_D_over_C_from_C": 0.03634339508654161,
+     "ceiling_D_over_C_from_ref": 0.05062512647440276,
+     "ceiling_D_over_C_from_ref_norm_C": -0.08091804115221102,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.011893986176333513,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.00830954850220335,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.009848579230823343,
+       "c_comb_C": 0.0077096810940953725,
+       "c_comb_ref": 0.008890653307582362
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.011537738314481908,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.013790713640055182,
+       "c_comb_C": 0.01079890540917495,
+       "c_comb_ref": 0.012577725423197225
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.009671740473105725,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.009848579230823343,
+       "c_comb_C": 0.009595159670120354,
+       "c_comb_ref": 0.009767755858333659
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.012005953930065578,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.013790713640055182,
+       "c_comb_C": 0.011912076248031422,
+       "c_comb_ref": 0.013648966769936467
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/R4": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "R4",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.06570871733995196,
+     "mean_F": 0.04685320969723149,
+     "observed_D_over_C": 0.28695595357871984,
+     "macro_c_comb": 0.03800684656954686,
+     "ceiling_D_over_C_from_C": 0.42158593093647134,
+     "ceiling_D_over_C_from_ref": 0.41989808650164706,
+     "ceiling_D_over_C_from_ref_norm_C": 0.4231103858767431,
+     "observed_over_ceiling_C": 0.6806582775219819,
+     "diff_observed_minus_ceiling_C": -0.1346299773577515,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.06100688736210437,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.06062801612118176,
+       "c_comb_C": 0.019573820731180996,
+       "c_comb_ref": 0.01956120181377609
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.07040555647826517,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.07006169790571977,
+       "c_comb_C": 0.028118180777442443,
+       "c_comb_ref": 0.028096141336179336
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.061013387669129816,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.06062801612118176,
+       "c_comb_C": 0.04767578486180146,
+       "c_comb_ref": 0.047491240697706716
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.07040903785030851,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.07006169790571977,
+       "c_comb_C": 0.05665959990776253,
+       "c_comb_ref": 0.05647812251545406
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg/R5": {
+     "row": "shipped-s211-n640/heisenberg",
+     "rung": "R5",
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "mean_C": 0.08540573212194795,
+     "mean_F": 0.05566961366543327,
+     "observed_D_over_C": 0.34817473860016185,
+     "macro_c_comb": 0.04257573090567116,
+     "ceiling_D_over_C_from_C": 0.5014886021364618,
+     "ceiling_D_over_C_from_ref": 0.5119530740003355,
+     "ceiling_D_over_C_from_ref_norm_C": 0.4957521155666481,
+     "observed_over_ceiling_C": 0.6942824565042034,
+     "diff_observed_minus_ceiling_C": -0.1533138635363,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.07852837658813609,
+       "c_r": 0.02066642683945328,
+       "c_ref": 0.08186343157634365,
+       "c_comb_C": 0.019985908488566,
+       "c_comb_ref": 0.020037774369280812
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.09192086757912554,
+       "c_r": 0.030670322908800986,
+       "c_ref": 0.09461820347447698,
+       "c_comb_C": 0.029093570069989944,
+       "c_comb_ref": 0.029175818361084675
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.078931698633135,
+       "c_r": 0.07639957792361493,
+       "c_ref": 0.08186343157634365,
+       "c_comb_C": 0.05489601236006901,
+       "c_comb_ref": 0.05585445511173887
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.0922419856873952,
+       "c_r": 0.09544215868376295,
+       "c_ref": 0.09461820347447698,
+       "c_comb_C": 0.06632743270405969,
+       "c_comb_ref": 0.06719459112179096
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/R0": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "R0",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.0024336306371701604,
+     "mean_F": 0.002750375412220282,
+     "observed_D_over_C": -0.13015318356545438,
+     "macro_c_comb": 0.0024192023995820043,
+     "ceiling_D_over_C_from_C": 0.005928688342341615,
+     "ceiling_D_over_C_from_ref": 3.6577397596326833e-06,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9789495164856746,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": -0.136081871907796,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.002441434739510021,
+       "c_r": 0.01576050807553888,
+       "c_ref": 2.2469881588840606e-05,
+       "c_comb_C": 0.002412658541241446,
+       "c_comb_ref": 2.246985875225002e-05
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.002663829555103722,
+       "c_r": 0.01943745020613042,
+       "c_ref": 7.998869639332198e-05,
+       "c_comb_C": 0.0026391609169844296,
+       "c_comb_ref": 7.99880191078535e-05
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.002217399696443149,
+       "c_r": 0.0425820496820417,
+       "c_ref": 2.2469881588879288e-05,
+       "c_comb_C": 0.002214399382617079,
+       "c_comb_ref": 2.2469878460501886e-05
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.0024118585576237486,
+       "c_r": 0.07435601201348838,
+       "c_ref": 7.998869639341774e-05,
+       "c_comb_C": 0.0024105907574850627,
+       "c_comb_ref": 7.998865011022539e-05
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/N1": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "N1",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.00810239902734734,
+     "mean_F": 0.008196492114147058,
+     "observed_D_over_C": -0.011612990977380253,
+     "macro_c_comb": 0.007686620644098054,
+     "ceiling_D_over_C_from_C": 0.05131546617809657,
+     "ceiling_D_over_C_from_ref": 0.0578797305831219,
+     "ceiling_D_over_C_from_ref_norm_C": -0.011203388303001605,
+     "observed_over_ceiling_C": -0.22630586531311933,
+     "diff_observed_minus_ceiling_C": -0.06292845715547682,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.00806301544140662,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.00799299069749487,
+       "c_comb_C": 0.0071781770813615295,
+       "c_comb_ref": 0.007128635064502766
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.00789870027488394,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.00940006115756756,
+       "c_comb_C": 0.007317588224240274,
+       "c_comb_ref": 0.00846243204632231
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.008169667004445226,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.007992990697494875,
+       "c_comb_C": 0.008023335411306155,
+       "c_comb_ref": 0.007855792140623027
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.008278213388653574,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.00940006115756756,
+       "c_comb_C": 0.008227381859484259,
+       "c_comb_ref": 0.009325834147898197
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/N2": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "N2",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.021849928529185995,
+     "mean_F": 0.01759262643892109,
+     "observed_D_over_C": 0.19484283825359996,
+     "macro_c_comb": 0.016934203355446285,
+     "ceiling_D_over_C_from_C": 0.2249767163848404,
+     "ceiling_D_over_C_from_ref": 0.2314788852502353,
+     "ceiling_D_over_C_from_ref_norm_C": 0.21014241881874507,
+     "observed_over_ceiling_C": 0.8660577920441596,
+     "diff_observed_minus_ceiling_C": -0.030133878131240438,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.021946201075557996,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.02217470704427806,
+       "c_comb_C": 0.01280145711039947,
+       "c_comb_ref": 0.01284634563725235
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.02167032960324734,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.022738389982771258,
+       "c_comb_C": 0.014469584378126909,
+       "c_comb_ref": 0.014774886812234683
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.021913498398918922,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.022174707044278062,
+       "c_comb_C": 0.01948477118045965,
+       "c_comb_ref": 0.019667711625065965
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.02186968503901972,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.02273838998277126,
+       "c_comb_C": 0.02098100075279911,
+       "c_comb_ref": 0.02174438271363157
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/N3": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "N3",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.0634615049464881,
+     "mean_F": 0.032273506190074394,
+     "observed_D_over_C": 0.4914475126726349,
+     "macro_c_comb": 0.029525000435124835,
+     "ceiling_D_over_C_from_C": 0.5347573231989873,
+     "ceiling_D_over_C_from_ref": 0.5367745522122171,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5323327356716516,
+     "observed_over_ceiling_C": 0.919010346100045,
+     "diff_observed_minus_ceiling_C": -0.043309810526352355,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.061296375767082266,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.060834032448938924,
+       "c_comb_C": 0.015264025797238944,
+       "c_comb_ref": 0.015256809825585624
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.06575153882497989,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.06730602786174075,
+       "c_comb_C": 0.018640022201532016,
+       "c_comb_ref": 0.018674315873197154
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.06098170184496828,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.060834032448938924,
+       "c_comb_C": 0.03491283045976976,
+       "c_comb_ref": 0.03488505199650483
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.06581640334892193,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.06730602786174075,
+       "c_comb_C": 0.0492831232819586,
+       "c_comb_ref": 0.04989929593864856
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/N4": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "N4",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.1372278923094989,
+     "mean_F": 0.0406557562291154,
+     "observed_D_over_C": 0.703735475748459,
+     "macro_c_comb": 0.03541281589254992,
+     "ceiling_D_over_C_from_C": 0.7419415594267008,
+     "ceiling_D_over_C_from_ref": 0.749923668378603,
+     "ceiling_D_over_C_from_ref_norm_C": 0.7405967938908231,
+     "observed_over_ceiling_C": 0.9485052654177187,
+     "diff_observed_minus_ceiling_C": -0.03820608367824185,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.1269059685949207,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.1304806055927375,
+       "c_comb_C": 0.015640356896200632,
+       "c_comb_ref": 0.015646779915934234
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.14811568196091776,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.15421131228601231,
+       "c_comb_C": 0.019272208326851663,
+       "c_comb_ref": 0.019284863061378332
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.1265807321642225,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.13048060559273747,
+       "c_comb_C": 0.04035956684647235,
+       "c_comb_ref": 0.04048091267305587
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.14730918651793462,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.15421131228601231,
+       "c_comb_C": 0.06637913150067506,
+       "c_comb_ref": 0.06697686528038704
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/R3-TFI": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "R3-TFI",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.20190654151895213,
+     "mean_F": 0.03766966896888772,
+     "observed_D_over_C": 0.8134301707834868,
+     "macro_c_comb": 0.0367485782848114,
+     "ceiling_D_over_C_from_C": 0.8179921363203482,
+     "ceiling_D_over_C_from_ref": 0.8178123119400174,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8179871911450173,
+     "observed_over_ceiling_C": 0.9944229714024111,
+     "diff_observed_minus_ceiling_C": -0.00456196553686139,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.18327966110980168,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.18280187955052496,
+       "c_comb_C": 0.015702558312500708,
+       "c_comb_ref": 0.01570225667447539
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.22092495045670674,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.22062358941925955,
+       "c_comb_C": 0.01936265291042055,
+       "c_comb_ref": 0.01936244961393233
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.1830104115939099,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.182801879550525,
+       "c_comb_C": 0.04147418352652126,
+       "c_comb_ref": 0.04147175253447631
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.22041114291539005,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.22062358941925955,
+       "c_comb_C": 0.0704549183898031,
+       "c_comb_ref": 0.07046184816935461
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/R4": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "R4",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.039914093870014045,
+     "mean_F": 0.025034900600361253,
+     "observed_D_over_C": 0.3727804348536387,
+     "macro_c_comb": 0.024230307714850928,
+     "ceiling_D_over_C_from_C": 0.3929385496321076,
+     "ceiling_D_over_C_from_ref": 0.3951226774641553,
+     "ceiling_D_over_C_from_ref_norm_C": 0.3927693430953083,
+     "observed_over_ceiling_C": 0.9486990655476737,
+     "diff_observed_minus_ceiling_C": -0.020158114778468905,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.03834600328434023,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.03898520659351844,
+       "c_comb_C": 0.014577277987634906,
+       "c_comb_ref": 0.01461165653076723
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.0414379352613337,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.041153560516593815,
+       "c_comb_C": 0.01759762246191524,
+       "c_comb_ref": 0.01757565734147426
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.038362328526623524,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.03898520659351844,
+       "c_comb_C": 0.028501682541926532,
+       "c_comb_ref": 0.02875436029404601
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.041510108407758727,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.041153560516593815,
+       "c_comb_C": 0.03624464786792703,
+       "c_comb_ref": 0.036006571595489124
+      }
+     }
+    },
+    "shipped-s307-n640/tfi/R5": {
+     "row": "shipped-s307-n640/tfi",
+     "rung": "R5",
+     "dataset_seed": 307,
+     "family": "tfi",
+     "mean_C": 0.20723489621892907,
+     "mean_F": 0.03820841605182891,
+     "observed_D_over_C": 0.8156274992824354,
+     "macro_c_comb": 0.036815684791009225,
+     "ceiling_D_over_C_from_C": 0.8223480433907422,
+     "ceiling_D_over_C_from_ref": 0.8220331992634012,
+     "ceiling_D_over_C_from_ref_norm_C": 0.8223622646350583,
+     "observed_over_ceiling_C": 0.9918276158588566,
+     "diff_observed_minus_ceiling_C": -0.006720544108306803,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.1871303270555066,
+       "c_r": 0.01576050807553888,
+       "c_ref": 0.18659868992047993,
+       "c_comb_C": 0.015704906216199403,
+       "c_comb_ref": 0.015704590621610153
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.22745374597520987,
+       "c_r": 0.01943745020613042,
+       "c_ref": 0.22710473679228405,
+       "c_comb_C": 0.01936686219707966,
+       "c_comb_ref": 0.01936664625932744
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.18703624528362134,
+       "c_r": 0.0425820496820417,
+       "c_ref": 0.1865986899204799,
+       "c_comb_C": 0.0415196117549621,
+       "c_comb_ref": 0.04151480926732113
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.22731926656137852,
+       "c_r": 0.07435601201348838,
+       "c_ref": 0.2271047367922841,
+       "c_comb_C": 0.07067135899579574,
+       "c_comb_ref": 0.07066490446341837
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/R0": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "R0",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.0042253090537318705,
+     "mean_F": 0.004123389262392458,
+     "observed_D_over_C": 0.024121263094209318,
+     "macro_c_comb": 0.004195473161183112,
+     "ceiling_D_over_C_from_C": 0.007061233194861072,
+     "ceiling_D_over_C_from_ref": 3.291047155806748e-05,
+     "ceiling_D_over_C_from_ref_norm_C": 0.9371028092444321,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": 0.017060029899348246,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.004322290599430569,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.00012401731003134977,
+       "c_comb_C": 0.0042398539602842645,
+       "c_comb_ref": 0.0001240153056538886
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.004030616244944491,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.00040752032223055276,
+       "c_comb_C": 0.004001722426255314,
+       "c_comb_ref": 0.00040749013802880376
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.004066352325220507,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.00012401731003129114,
+       "c_comb_C": 0.0040618881949676935,
+       "c_comb_ref": 0.00012401718318326215
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.004481977045331914,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.0004075203222302686,
+       "c_comb_C": 0.0044784280632251755,
+       "c_comb_ref": 0.0004075176513492507
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/N1": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "N1",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.00845460369739806,
+     "mean_F": 0.008129303118828075,
+     "observed_D_over_C": 0.038476147459176054,
+     "macro_c_comb": 0.008226072394011035,
+     "ceiling_D_over_C_from_C": 0.027030398060805094,
+     "ceiling_D_over_C_from_ref": 0.048323105375692954,
+     "ceiling_D_over_C_from_ref_norm_C": -0.38934682311598845,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": 0.01144574939837096,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.008527726334144984,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.011030588914455287,
+       "c_comb_C": 0.00794234164322269,
+       "c_comb_ref": 0.009843548868535047
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.008580449397169936,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.013655051462096663,
+       "c_comb_C": 0.008311831251759818,
+       "c_comb_ref": 0.012643891135088218
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.008082883387575684,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.011030588914455287,
+       "c_comb_C": 0.008047992081009666,
+       "c_comb_ref": 0.01094240262773119
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.008627355670701628,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.013655051462096663,
+       "c_comb_C": 0.008602124600051964,
+       "c_comb_ref": 0.013555664519384284
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/N2": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "N2",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.01743550423592803,
+     "mean_F": 0.01634661643379664,
+     "observed_D_over_C": 0.06245232643674286,
+     "macro_c_comb": 0.015905697451693276,
+     "ceiling_D_over_C_from_C": 0.08774089716788325,
+     "ceiling_D_over_C_from_ref": 0.10578154519981386,
+     "ceiling_D_over_C_from_ref_norm_C": -0.014399864982715727,
+     "observed_over_ceiling_C": 0.7117812611061716,
+     "diff_observed_minus_ceiling_C": -0.025288570731140388,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.016284499097038684,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.018379231146351035,
+       "c_comb_C": 0.013049154686367755,
+       "c_comb_ref": 0.014055154626847402
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.018646566036507946,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.021178380414647313,
+       "c_comb_C": 0.01629048758278696,
+       "c_comb_ref": 0.0178981996982721
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.016451368161891047,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.018379231146351035,
+       "c_comb_C": 0.016163026398311214,
+       "c_comb_ref": 0.0179797665117793
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.018359583648274443,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.021178380414647313,
+       "c_comb_C": 0.018120121139307183,
+       "c_comb_ref": 0.02081317173442505
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/N3": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "N3",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.05359049527314604,
+     "mean_F": 0.03858502248862107,
+     "observed_D_over_C": 0.2800025024595016,
+     "macro_c_comb": 0.03574923820919834,
+     "ceiling_D_over_C_from_C": 0.3329183089839418,
+     "ceiling_D_over_C_from_ref": 0.331744346247983,
+     "ceiling_D_over_C_from_ref_norm_C": 0.3330598071520433,
+     "observed_over_ceiling_C": 0.8410546818949732,
+     "diff_observed_minus_ceiling_C": -0.05291580652444022,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.05059075939919937,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.05028001323782655,
+       "c_comb_C": 0.020030371723327882,
+       "c_comb_ref": 0.020010934131121892
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.056832818486022105,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.05668999158476762,
+       "c_comb_C": 0.028847165738780732,
+       "c_comb_ref": 0.02882843571644989
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.05004786335637851,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.05028001323782655,
+       "c_comb_C": 0.04334571704308322,
+       "c_comb_ref": 0.043496271955210046
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.05689053985098421,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.05668999158476762,
+       "c_comb_C": 0.05077369833160153,
+       "c_comb_ref": 0.05063097920637633
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/N4": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "N4",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.09913883411617845,
+     "mean_F": 0.06226395728905335,
+     "observed_D_over_C": 0.3719518910613003,
+     "macro_c_comb": 0.0483804680095487,
+     "ceiling_D_over_C_from_C": 0.5119927681129197,
+     "ceiling_D_over_C_from_ref": 0.5084140659677829,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5139292505778632,
+     "observed_over_ceiling_C": 0.7264787985819099,
+     "diff_observed_minus_ceiling_C": -0.14004087705161944,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.09234055471454557,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.09007250650990901,
+       "c_comb_C": 0.021228651629646714,
+       "c_comb_ref": 0.021200102083610787
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.10586743447222793,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.10598065148191278,
+       "c_comb_C": 0.03192240720387683,
+       "c_comb_ref": 0.03192550660957538
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0924856185365828,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.09007250650990901,
+       "c_comb_C": 0.06325632964281114,
+       "c_comb_ref": 0.062467925643105694
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.1058617287413576,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.10598065148191278,
+       "c_comb_C": 0.07711448356186011,
+       "c_comb_ref": 0.07716041524645921
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/R3-Heis": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "R3-Heis",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.012117326862771859,
+     "mean_F": 0.011390211009661838,
+     "observed_D_over_C": 0.060006291927631544,
+     "macro_c_comb": 0.011554950238070521,
+     "ceiling_D_over_C_from_C": 0.04641094781631516,
+     "ceiling_D_over_C_from_ref": 0.0642536807786861,
+     "ceiling_D_over_C_from_ref_norm_C": -0.13776826112430074,
+     "observed_over_ceiling_C": null,
+     "diff_observed_minus_ceiling_C": 0.013595344111316382,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.010112968750340345,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.012005756513173618,
+       "c_comb_C": 0.009174873440915108,
+       "c_comb_ref": 0.010517870988414281
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.014236326873885808,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.017461011628865993,
+       "c_comb_C": 0.013101143285470025,
+       "c_comb_ref": 0.015482032723411943
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.009857282031310886,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.012005756513173618,
+       "c_comb_C": 0.009794197297231504,
+       "c_comb_ref": 0.01189230354826177
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.014262729795550396,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.01746101162886599,
+       "c_comb_C": 0.014149586928665447,
+       "c_comb_ref": 0.017254632396434884
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/R4": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "R4",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.07192359302463609,
+     "mean_F": 0.049395407298403485,
+     "observed_D_over_C": 0.31322386408749064,
+     "macro_c_comb": 0.042015517145578114,
+     "ceiling_D_over_C_from_C": 0.41583122618489765,
+     "ceiling_D_over_C_from_ref": 0.41666853795885783,
+     "ceiling_D_over_C_from_ref_norm_C": 0.41548734423934697,
+     "observed_over_ceiling_C": 0.7532475782571868,
+     "diff_observed_minus_ceiling_C": -0.102607362097407,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.06612874034783606,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.06635617385915646,
+       "c_comb_C": 0.020715049549946834,
+       "c_comb_ref": 0.02072200819102922
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.07758572278892101,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.0777822897977664,
+       "c_comb_C": 0.030740598552062535,
+       "c_comb_ref": 0.030752785987964434
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.06620259647315799,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.06635617385915646,
+       "c_comb_C": 0.052619166531847415,
+       "c_comb_ref": 0.05269618193260757
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.0777773124886293,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.07778228979776641,
+       "c_comb_C": 0.06398725394845567,
+       "c_comb_ref": 0.06399002537111245
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg/R5": {
+     "row": "shipped-s307-n640/heisenberg",
+     "rung": "R5",
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "mean_C": 0.10152972385509748,
+     "mean_F": 0.06232338008564359,
+     "observed_D_over_C": 0.3861563124648003,
+     "macro_c_comb": 0.04885580312692728,
+     "ceiling_D_over_C_from_C": 0.5188029547223635,
+     "ceiling_D_over_C_from_ref": 0.5218354980839984,
+     "ceiling_D_over_C_from_ref_norm_C": 0.5172573087697442,
+     "observed_over_ceiling_C": 0.74432172937691,
+     "diff_observed_minus_ceiling_C": -0.13264664225756317,
+     "exceeds_ceiling_by_more_than_0_02": false,
+     "rule_cells": {
+      "L1/z_mid": {
+       "severity": "L1",
+       "observable": "z_mid",
+       "c_C": 0.09319209129009344,
+       "c_r": 0.021812901751679225,
+       "c_ref": 0.09434395326081249,
+       "c_comb_C": 0.021238864107028667,
+       "c_comb_ref": 0.02125226314521295
+      },
+      "L1/zz_mid": {
+       "severity": "L1",
+       "observable": "zz_mid",
+       "c_C": 0.10968069009819399,
+       "c_r": 0.03348073123927993,
+       "c_ref": 0.11065968852890973,
+       "c_comb_C": 0.03202202597436096,
+       "c_comb_ref": 0.032046094123237
+      },
+      "L3/z_mid": {
+       "severity": "L3",
+       "observable": "z_mid",
+       "c_C": 0.0933755766781196,
+       "c_r": 0.08670941737211871,
+       "c_ref": 0.09434395326081249,
+       "c_comb_C": 0.0635389007519052,
+       "c_comb_ref": 0.0638414818294403
+      },
+      "L3/zz_mid": {
+       "severity": "L3",
+       "observable": "zz_mid",
+       "c_C": 0.10987053735398289,
+       "c_r": 0.11255881263473455,
+       "c_ref": 0.11065968852890973,
+       "c_comb_C": 0.07862342167441429,
+       "c_comb_ref": 0.0789110894368076
+      }
+     }
+    }
+   }
+  }
+ }
+}

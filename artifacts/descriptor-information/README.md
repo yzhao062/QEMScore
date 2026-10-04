@@ -133,3 +133,28 @@ On the release assets, point `--fits` (or `--strength-fits`) at `descriptor-info
 4. *TFI turns "measurement adds" no later than N2*: held. N1 is not distinguished on all three seeds and N2 to R5 add on all three.
 5. *Heisenberg changes little*: held for D/C from N2 to R5 outside R3-Heis (paired differences at most 0.032 in size). Three cells near the decision boundary changed label: R3-Heis seed 101 (not distinguished to adds, D/C 0.090), N1 seed 307 (adds to not distinguished), and N2 seed 307 (not distinguished to adds). The R3-Heis rung statement turns "mixed", the N1 statement "not distinguished", and N2 stays "mixed".
 6. *No expectation for Part B or the near-Clifford datasets*: every label is unchanged. On Part B the paired D/C differences range from about -0.081 to 0.061; on the near-Clifford datasets their absolute values are below 0.012.
+
+## Post Hoc Analyses of Learner Adequacy, References, and Raw Contrasts (2026-10-03)
+
+A fifth review panel asked whether the learners that define D are adequate, how strong a descriptor-only reference can be, and how the strength-aware fits compare with the raw estimate. The four analyses below answer these questions from the released fits and caches without refitting any learned arm. All four are post hoc: the original and strength-indicator results were known.
+
+- `posthoc-learner-adequacy.json` and `strength-indicator/posthoc-learner-adequacy.json` (`tools/learner_adequacy.py`): per-seed spread of C, F, and D in every cell, and the seed-ensemble estimand D_ens, which averages each arm's test predictions over the 20 learner seeds before scoring. Intervals reuse script A's two-stage bootstrap. A pooled Part A R0 estimate resamples learner seeds once per dataset seed for both family rows, because the two families of a dataset share one fitted network. In the original fits, ensembling lowers the R0 test errors of C 2.5 to 4.8 times and of F 2.3 to 5.4 times, and it flips the point sign of D on three of six R0 rows (seed 101 Heisenberg, seed 211 TFI, seed 307 TFI). Pooled R0 D/C is -0.052 [-0.222, 0.094]; pooled D_ens/C is 0.007 [-0.472, 0.289]. Mean C, F, and D match `analysis-a.json` to 1e-12 in every cell.
+- `posthoc-strongest-reference.json` (`tools/strongest_reference.py`): at every Part A rung, the strongest descriptor-only reference that never reads r, and the stacking increment of r over it with a one-stage circuit bootstrap. Per cell, a histogram gradient-boosted regressor is selected from an eight-point grid by validation error; at R0 the degree-five coupling polynomial of `tools/refit_polynomial_diagnostic.py` is also fitted. At R0 the polynomial is strongest, with test error 1.5 to 8.2 percent of mean C, and stacking r on it changes the error by less than 3e-6. From N1 to R5 the boosted reference is close to C (0.93 to 1.88 times C's error).
+- `posthoc-ivw-ceiling.json` (`tools/ivw_ceiling.py`, heuristic): per cell, c_comb = (c_C^-2 + c_r^-2)^-1/2 from C's per-cell test error c_C and the calibration error c_r of `posthoc-measurement-floor.json`, and the ceiling D/C* = 1 - macro(c_comb)/macro(c_C). The assumption is independent, roughly unbiased errors with MAE as the error scale. Over the 48 Part A cells, the Spearman correlation between the ceiling and the observed D/C is 0.974 for the original fits and 0.969 for the strength fits. For the strength fits, transverse-field Ising reaches 0.87 to 1.00 of the ceiling from N2 to R5.
+- `strength-indicator/posthoc-arm-minus-raw.json` (`tools/descriptor_ladder_posthoc.py --fits ... --cache ...`): F - R and C - R on Part B for the strength-indicator fits. At B-none, F - R is -0.0024, -0.0037, and -0.0006 for dataset seeds 101, 211, and 307; only seed 211's interval lies below zero. The positional form of the script still reproduces `posthoc-arm-minus-raw.json`.
+
+```bash
+ASSET=descriptor-information-v1; STRENGTH=descriptor-information-strength-v1
+python tools/learner_adequacy.py --fits $ASSET/fits --cache $ASSET/cache \
+    --analysis-a artifacts/descriptor-information/analysis-a.json \
+    --out artifacts/descriptor-information/posthoc-learner-adequacy.json
+python tools/learner_adequacy.py --fits $STRENGTH/fits --cache $ASSET/cache \
+    --analysis-a artifacts/descriptor-information/strength-indicator/analysis-a.json \
+    --out artifacts/descriptor-information/strength-indicator/posthoc-learner-adequacy.json
+python tools/strongest_reference.py --partA-ladder runs/partA --workers 8
+python tools/ivw_ceiling.py
+python tools/descriptor_ladder_posthoc.py --fits $STRENGTH/fits --cache $ASSET/cache \
+    --out artifacts/descriptor-information/strength-indicator/posthoc-arm-minus-raw.json
+```
+
+`tools/strongest_reference.py` reads the full Part A caches, rung descriptors, and encoder cache of the prepared run directory (`runs/partA` above), since the reference is fitted on training rows; the other three read only the release assets.
