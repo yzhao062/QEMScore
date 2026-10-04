@@ -1073,6 +1073,11 @@ def _statements(spec: dict, rows_out: dict) -> dict:
                 cell = row["rungs"].get(rung)
                 labels[row["dataset_seed"]] = (cell["classification"].get("label")
                                                if cell else None)
+            if labels and all(label is None for label in labels.values()):
+                # No row of this family has fits at this rung (a reduced rung
+                # selection, as in the shot sweep): omit the statement, as
+                # analysis B does. A rung fitted in some rows stays "incomplete".
+                continue
             statements[name][rung] = rung_statement(labels)
     return statements
 

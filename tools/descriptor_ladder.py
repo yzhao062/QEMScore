@@ -193,7 +193,8 @@ def _cache_path(out: Path, key: str) -> Path:
 
 
 def prepare_primary(data_dirs, archive: Path, out: Path,
-                    label_tolerance: float | None) -> dict:
+                    label_tolerance: float | None,
+                    sweep: bool = False) -> dict:
     """Verify each regenerated dataset against the archive and cache its rows."""
     from tools.learner_seed_replication import prepare_dataset
 
@@ -203,7 +204,8 @@ def prepare_primary(data_dirs, archive: Path, out: Path,
     for data_dir in data_dirs:
         started = time.perf_counter()
         check = prepare_dataset(Path(data_dir).resolve(), archive, cache_dir,
-                                label_tolerance=label_tolerance)
+                                label_tolerance=label_tolerance,
+                                sweep=sweep)
         check["load_and_verify_seconds"] = time.perf_counter() - started
         checks[check["setting"]] = check
         print(f"verified {check['setting']} in {check['load_and_verify_seconds']:.1f}s "
@@ -984,7 +986,8 @@ def _write_dataset_index(out: Path, checks: dict, nc_checks: dict) -> None:
 def cmd_prepare(args) -> int:
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
-    checks = prepare_primary(args.datasets, args.archive, out, args.label_tolerance)
+    sweep = bool(getattr(args, "sweep", False))
+    checks = prepare_primary(args.datasets, args.archive, out, args.label_tolerance, sweep=sweep)
     nc_checks = prepare_nc(args.nc_datasets or [], out, args.nc_results)
     write_json(out / "dataset_checks.json", {"primary": checks, "near_clifford": nc_checks})
     _write_dataset_index(out, checks, nc_checks)
@@ -1004,6 +1007,9 @@ def cmd_prepare(args) -> int:
         diagnostics["coupling_noise"][key] = {
             "n_circuits": len(table["circuits"]), "z_mean": float(z.mean()),
             "z_sd": float(z.std(ddof=1))}
+        if sweep:
+            # The sweep rungs (R0, N1, N2, R5) never read the R4 encoding.
+            continue
         meta = prepare_encoding(key, data, Path(check["data_dir"]), out, args.workers)
         diagnostics["encoder"][key] = {k: meta[k] for k in (
             "n_circuits", "upstream_commit", "upstream_mlp_sha256",
@@ -1016,11 +1022,18 @@ def cmd_prepare(args) -> int:
 
 
 def _selected(args) -> tuple[list[str], list[str], list[int]]:
-    rungs = list(args.rungs) if args.rungs else list(DEFAULT_RUNGS)
+    sweep = bool(getattr(args, "sweep", False))
+    if sweep:
+        default_rungs = ["R0", "N1", "N2", "R5"]
+        default_arms = ["A", "C", "F", "P"]
+    else:
+        default_rungs = DEFAULT_RUNGS
+        default_arms = ARMS
+    rungs = list(args.rungs) if args.rungs else list(default_rungs)
     unknown = sorted(set(rungs) - set(RUNGS) - set(NC_RUNGS))
     if unknown:
         raise SystemExit(f"unknown rungs {unknown}; choose from {[*RUNGS, *NC_RUNGS]}")
-    arms = list(args.arms) if args.arms else list(ARMS)
+    arms = list(args.arms) if args.arms else list(default_arms)
     if set(arms) - set(ARMS):
         raise SystemExit(f"unknown arms; choose from {ARMS}")
     return rungs, arms, common._parse_seeds(args.seeds)
@@ -1063,7 +1076,8 @@ def cmd_run(args) -> int:
     nc_rungs = [rung for rung in rungs if rung in NC_RUNGS]
     if nc_rungs and not nc:
         raise SystemExit(f"{nc_rungs} need --nc-datasets")
-    strength_indicator = bool(getattr(args, "strength_indicator", False))
+    sweep = bool(getattr(args, "sweep", False))
+    strength_indicator = bool(getattr(args, "strength_indicator", False) or sweep)
     jobs = build_jobs(out, primary, nc, rungs, arms, seeds,
                       strength_indicator=strength_indicator)
     aliases = []
@@ -1133,6 +1147,8 @@ def main(argv=None) -> int:
         p.add_argument("--label-tolerance", type=float, default=1e-11,
                        help="as in the Appendix M.4 run (s211 differs by 1e-12 in "
                             "two validation labels)")
+        p.add_argument("--sweep", action="store_true",
+                       help="accept sweep datasets without requiring 2048-shot archive hashes")
         if nc:
             p.add_argument("--nc-datasets", nargs="*", type=Path, default=[])
             p.add_argument("--nc-results", type=Path, default=None,

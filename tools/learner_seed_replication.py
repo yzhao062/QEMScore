@@ -149,11 +149,23 @@ def _describe_deviation(key, manifest, archive, record, regenerated_test,
 
 
 def prepare_dataset(data_dir: Path, archive: Path, cache_dir: Path,
-                    label_tolerance: float | None = None) -> dict:
+                    label_tolerance: float | None = None,
+                    sweep: bool = False) -> dict:
     """Load one dataset, verify it against the archived record, cache its rows."""
-    from qemscore.validation import validate_split_artifact
+    from qemscore.validation import item_stream_hash, validate_split_artifact
 
-    rows, manifest = validate_split_artifact(data_dir)
+    if sweep:
+        rows = [
+            json.loads(line)
+            for line in (data_dir / "items.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        manifest = json.loads((data_dir / "manifest.json").read_text(encoding="utf-8"))
+        actual_items_hash = item_stream_hash(rows)
+        if manifest.get("items_hash") != actual_items_hash:
+            raise ValueError(f"{data_dir}: items_hash mismatch in sweep dataset")
+    else:
+        rows, manifest = validate_split_artifact(data_dir)
     seed = int(manifest["master_seed"])
     regime = "shipped"
     # The rehearsal-free frozen size of the primary rows.
@@ -174,9 +186,9 @@ def prepare_dataset(data_dir: Path, archive: Path, cache_dir: Path,
         "archived_dataset_hash": str(record["dataset_hash"]),
         "dataset_hash_matches_archive": str(manifest["dataset_hash"])
         == str(record["dataset_hash"]),
-        "split_spec_hash_matches_archive": str(manifest["split_spec_hash"])
+        "split_spec_hash_matches_archive": str(manifest.get("split_spec_hash"))
         == str(record["split_spec_hash"]),
-        "validate_split_artifact": "passed",
+        "validate_split_artifact": "passed" if not sweep else "sweep_passed",
         "structure_counts": structure["counts"],
     }
     regenerated_test = [
@@ -193,7 +205,28 @@ def prepare_dataset(data_dir: Path, archive: Path, cache_dir: Path,
         "test_items_identical_to_archive",
         "validation_items_identical_to_archive"))
     checks["exact_match"] = exact
-    if not exact:
+    if sweep:
+        checks["sweep"] = True
+        arch_test_cids = [it["circuit_id"] for it in record["test_items"]]
+        regen_test_cids = [it["circuit_id"] for it in roles["test"]]
+        if arch_test_cids != regen_test_cids:
+            raise SystemExit(f"{key}: sweep test circuit IDs differ from archive")
+        arch_val_cids = [it["circuit_id"] for it in record["validation_items"]]
+        regen_val_cids = [it["circuit_id"] for it in roles["validation"]]
+        if arch_val_cids != regen_val_cids:
+            raise SystemExit(f"{key}: sweep validation circuit IDs differ from archive")
+        tol = 1e-11 if label_tolerance is None else label_tolerance
+        for role, archived in (("test", record["test_items"]),
+                               ("validation", record["validation_items"])):
+            if len(roles[role]) != len(archived):
+                raise SystemExit(f"{key}: sweep {role} rows {len(roles[role])} "
+                                 f"differ from the archive's {len(archived)}")
+            max_diff = max(abs(float(r["ideal_expectation"]) - float(a["ideal_expectation"]))
+                           for r, a in zip(roles[role], archived))
+            checks[f"sweep_{role}_label_max_abs_diff"] = max_diff
+            if max_diff > tol:
+                raise SystemExit(f"{key}: {role} ideal expectation diff {max_diff} > {tol}")
+    elif not exact:
         checks["deviation"] = _describe_deviation(
             key, manifest, archive, record, regenerated_test, regenerated_validation)
         deviation = checks["deviation"]
