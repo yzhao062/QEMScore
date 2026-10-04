@@ -113,13 +113,26 @@ KEPT = (
 )
 assert all(name in FEATURES for name in KEPT)
 
+STRENGTH_FEATURE_NAME = "noise_strength_L3"
+
+
+def severity_indicator(item: Mapping[str, object]) -> float:
+    """Return 0.0 for severity 'L1', 1.0 for 'L3'; raise on any other value."""
+    sev = item.get("severity")
+    if sev == "L1":
+        return 0.0
+    if sev == "L3":
+        return 1.0
+    raise ValueError(f"Unknown or missing severity: {sev!r}; expected 'L1' or 'L3'")
+
+
 __all__ = [
     "CANDIDATES", "FEATURES", "FROZEN_GATE_CRITERION", "GATE_CRITERIA",
     "GATE_TOLERANCE", "KEPT", "LEARNER_SEEDS", "LIAO_ARMS", "NOISY", "REPO_ROOT",
-    "RULE_FILE", "RULE_SEED", "_parse_seeds", "blas_fpe_probe",
+    "RULE_FILE", "RULE_SEED", "STRENGTH_FEATURE_NAME", "_parse_seeds", "blas_fpe_probe",
     "check_gate_amendment", "drive", "gate_decision", "load_cache", "print_plan",
-    "require_gate", "rule_path", "run_affine_fit", "run_liao_fit", "sha256_file",
-    "write_cache", "write_json",
+    "require_gate", "rule_path", "run_affine_fit", "run_liao_fit", "severity_indicator",
+    "sha256_file", "write_cache", "write_json",
 ]
 
 
@@ -386,6 +399,7 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
         "learner_seed": k,
         "shuffle_seed": shuffle_seed,
         "purpose": job.get("purpose", "rung_fit"),
+        **({"strength_indicator": True} if job.get("strength_indicator") else {}),
         "dropped_features": list(drop),
         "feature_builder": getattr(builder, "name", None),
         "n_features": len(names),
@@ -527,6 +541,7 @@ def run_affine_fit(job: Mapping[str, object], data: Mapping[str, object],
         "method": "feat-only (affine ridge over the rung's columns without the "
                   "noisy estimate)",
         "purpose": job.get("purpose", "rung_fit"),
+        **({"strength_indicator": True} if job.get("strength_indicator") else {}),
         "feature_builder": getattr(builder, "name", None),
         "n_features": len(names) - (1 if NOISY in names else 0),
         "feature_names": [name for name in names if name != NOISY],

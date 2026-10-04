@@ -705,7 +705,8 @@ def arms_at(store: FitStore, spec: dict, key: str, rung: str) -> dict:
 
 
 def analyze_cell(est: RowEstimator, store: FitStore, spec: dict, key: str,
-                 rung: str) -> dict:
+                 rung: str, *, orig_est: RowEstimator | None = None,
+                 orig_store: FitStore | None = None) -> dict:
     arms = arms_at(store, spec, key, rung)
     entry: dict = {"rung": rung}
     entry["fits_present"] = {
@@ -741,6 +742,10 @@ def analyze_cell(est: RowEstimator, store: FitStore, spec: dict, key: str,
         entry["contrast_vs_reference"] = {"status": "is_reference", "reference": reference}
     else:
         entry["contrast_vs_reference"] = _contrast(est, store, spec, key, rung, arms)
+
+    if orig_est is not None and orig_store is not None:
+        entry["comparison_vs_original"] = _compare_original(
+            est, orig_est, store, orig_store, spec, key, rung, arms)
 
     mlp, mlp_parts = est.difference(arms["C"], arms["F"], name="test__mlp")
     learner_fixed = {"candidate": "mlp", "D": mlp}
@@ -863,6 +868,37 @@ def _contrast(est: RowEstimator, store: FitStore, spec: dict, key: str, rung: st
     return out
 
 
+def _compare_original(est: RowEstimator, orig_est: RowEstimator, store: FitStore,
+                      orig_store: FitStore, spec: dict, key: str, rung: str,
+                      arms: dict) -> dict:
+    orig_arms = arms_at(orig_store, spec, key, rung)
+    seeds = sorted(set(arms["C"]) & set(arms["F"]) & set(orig_arms["C"]) & set(orig_arms["F"]))
+    if not (orig_arms["C"] and orig_arms["F"]):
+        return {"status": "not_available", "reason": "original C and F fits not both present"}
+    if not seeds:
+        return {"status": "not_estimable", "reason": "no learner seed shared by both fits"}
+    here, here_parts = est.difference(arms["C"], arms["F"], seeds=seeds)
+    there, there_parts = orig_est.difference(orig_arms["C"], orig_arms["F"], seeds=seeds)
+    if here_parts is None or there_parts is None:
+        return {"status": "not_available", "reason": "predictions missing"}
+    n = len(seeds)
+    delta_d = here_parts["draws"] - there_parts["draws"]
+    out = {"status": "estimated", "n_seeds": n, "learner_seeds": seeds,
+           "delta_D": interval_entry(delta_d, here_parts["point"] - there_parts["point"],
+                                     n)}
+    if (np.any(here_parts["first_mean_draws"] <= 0.0)
+            or np.any(there_parts["first_mean_draws"] <= 0.0)):
+        out["delta_D_over_C"] = {"status": "undefined",
+                                 "reason": "mean C not positive in every draw"}
+    else:
+        ratio_draws = (here_parts["draws"] / here_parts["first_mean_draws"]
+                       - there_parts["draws"] / there_parts["first_mean_draws"])
+        ratio_point = (here_parts["point"] / here_parts["first_point"]
+                       - there_parts["point"] / there_parts["first_point"])
+        out["delta_D_over_C"] = interval_entry(ratio_draws, ratio_point, n)
+    return out
+
+
 # --------------------------------------------------------------------------
 # Driver
 # --------------------------------------------------------------------------
@@ -899,9 +935,11 @@ def inventory(store: FitStore, part: str, spec: dict, keys_by_seed: dict[int, st
 
 
 def analyze(fit_dirs: list[Path], cache_dirs: list[Path], *, draws: int, seed: int,
-            use_orig: bool = False, verbose: bool = True) -> dict:
+            use_orig: bool = False, verbose: bool = True,
+            original_fit_dirs: list[Path] | None = None) -> dict:
     started = time.perf_counter()
     store = FitStore(fit_dirs, use_orig)
+    orig_store = FitStore(original_fit_dirs, use_orig) if original_fit_dirs else None
     caches, shadowed = discover_caches(cache_dirs)
     rule = _REPO / RULE_FILE
     result: dict = {
@@ -930,6 +968,9 @@ def analyze(fit_dirs: list[Path], cache_dirs: list[Path], *, draws: int, seed: i
         "skipped": [],
         "parts": {},
     }
+    if original_fit_dirs:
+        result["inputs"]["original_fits"] = [str(Path(d).resolve()) for d in original_fit_dirs]
+        result["inputs"]["n_original_fit_files"] = orig_store.n_files
     nominal = 1 if use_orig else len(LEARNER_SEEDS)
     point_check_max, point_checks = 0.0, 0
     fit_keys = store.keys()
@@ -981,6 +1022,7 @@ def analyze(fit_dirs: list[Path], cache_dirs: list[Path], *, draws: int, seed: i
                     result["skipped"].append({"row": label, "reason": str(exc)})
                     continue
                 est = RowEstimator(row, store, draws, seed, nominal)
+                orig_est = RowEstimator(row, orig_store, draws, seed, nominal) if orig_store else None
                 row_out = {"key": key, "dataset_seed": dataset_seed, "family": family,
                            "families_in_row": row.families,
                            "n_test_items": row.n_items, "n_test_circuits": row.n_circuits,
@@ -997,7 +1039,8 @@ def analyze(fit_dirs: list[Path], cache_dirs: list[Path], *, draws: int, seed: i
                     if rung not in present:
                         row_out["rungs_absent"].append(rung)
                         continue
-                    row_out["rungs"][rung] = analyze_cell(est, store, spec, key, rung)
+                    row_out["rungs"][rung] = analyze_cell(
+                        est, store, spec, key, rung, orig_est=orig_est, orig_store=orig_store)
                     if verbose:
                         _print_cell(label, rung, row_out["rungs"][rung])
                 point_check_max = max(point_check_max, est.point_check_max)
@@ -1045,10 +1088,14 @@ def _print_cell(label: str, rung: str, cell: dict) -> None:
     d = cell["D"]
     interval = (f"[{d['interval']['lower']:+.6f}, {d['interval']['upper']:+.6f}]"
                 if d.get("status") == "estimated" else "")
+    comp = cell.get("comparison_vs_original")
+    comp_str = ""
+    if comp and comp.get("status") == "estimated":
+        comp_str = f" [vs orig: dD={_fmt(comp['delta_D'])} d(D/C)={_fmt(comp['delta_D_over_C'])}]"
     print(f"{label:34s} {rung:10s} n={d.get('n_seeds', '-')!s:>3} "
           f"C={_fmt(cell['means']['C'])} F={_fmt(cell['means']['F'])} "
           f"D={_fmt(d)} {interval} D/C={_fmt(cell['D_over_C'])} "
-          f"-> {cell['classification'].get('label')}", flush=True)
+          f"-> {cell['classification'].get('label')}{comp_str}", flush=True)
 
 
 # --------------------------------------------------------------------------
@@ -1490,6 +1537,12 @@ def main(argv=None) -> int:
                         help="smoke test only: analyze the original-seed (orig) fits as "
                              "a one-seed sample instead of k01..k20")
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--original-fits", action="append", type=Path, default=[],
+                        help="optional: directories of original fits to perform paired comparison (descriptive)")
+    parser.add_argument("--follow-up-rule", type=Path, default=None,
+                        help="optional: a later frozen rule that governs these fits "
+                             "(for example docs/frozen-rules/2026-10-03-strength-indicator.md); "
+                             "its path and SHA-256 are recorded beside the estimator rule")
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args(argv)
     if args.self_test:
@@ -1500,7 +1553,12 @@ def main(argv=None) -> int:
         print(f"NOTE: bootstrap seed {args.bootstrap_seed} differs from the rule's "
               f"{RULE_SEED}", flush=True)
     result = analyze(args.fits, args.cache, draws=args.draws, seed=args.bootstrap_seed,
-                     use_orig=args.use_orig_fits, verbose=not args.quiet)
+                     use_orig=args.use_orig_fits, verbose=not args.quiet,
+                     original_fit_dirs=args.original_fits)
+    if args.follow_up_rule is not None:
+        path = args.follow_up_rule
+        found = path if path.is_absolute() or path.exists() else _REPO / path
+        result["follow_up_rule"] = {"path": str(path), "sha256": sha256_file(found)}
     _write_json(args.out, result)
     for part, value in result["parts"].items():
         if value.get("status") != "analyzed":

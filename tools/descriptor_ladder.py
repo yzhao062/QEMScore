@@ -144,7 +144,9 @@ from tools.descriptor_common import (  # noqa: E402
     KEPT,
     LEARNER_SEEDS,
     RULE_SEED,
+    STRENGTH_FEATURE_NAME,
     load_cache,
+    severity_indicator,
     write_cache,
     write_json,
 )
@@ -424,10 +426,12 @@ class RungBuilder:
     def __init__(self, rung: str, *, z_by_item: dict | None = None,
                  encoding_by_circuit: dict | None = None,
                  circuit_by_item: dict | None = None,
-                 encoder_names: list[str] | None = None) -> None:
+                 encoder_names: list[str] | None = None,
+                 strength_indicator: bool = False) -> None:
         if rung not in RUNGS and rung != NC_RUNG:
             raise ValueError(f"unknown rung {rung!r}")
         self.rung = rung
+        self.strength_indicator = bool(strength_indicator)
         self.name = f"descriptor-ladder:{rung}"
         self._z = z_by_item
         self._encoding = encoding_by_circuit
@@ -454,6 +458,8 @@ class RungBuilder:
                     names.append(n)
         else:  # R5 and NC-none
             names = list(KEPT)
+        if self.strength_indicator:
+            names.append(STRENGTH_FEATURE_NAME)
         self.names = tuple(names)
         self._drop_index = {
             "R3-TFI": FEATURES.index("h"), "R3-Heis": FEATURES.index("jz")}.get(rung)
@@ -462,8 +468,8 @@ class RungBuilder:
         base = build_features(item)
         rung = self.rung
         if rung == "R0":
-            return base
-        if rung in NOISE_LEVELS:
+            res = base
+        elif rung in NOISE_LEVELS:
             family = str(item["family"])
             values = list(base)
             if family in COUPLINGS:
@@ -471,44 +477,56 @@ class RungBuilder:
                 for coupling, draw in zip(COUPLINGS[family], z, strict=True):
                     index = FEATURES.index(coupling)
                     values[index] = values[index] + self.s * draw
-            return values
-        if self._drop_index is not None:
-            return base[:self._drop_index] + base[self._drop_index + 1:]
-        values = dict(zip(FEATURES, base))
-        if rung == "R4":
+            res = values
+        elif self._drop_index is not None:
+            res = base[:self._drop_index] + base[self._drop_index + 1:]
+        elif rung == "R4":
             encoded = self._encoding[self._circuit[str(item["item_id"])]]
+            values = dict(zip(FEATURES, base))
             row: list[float] = []
             for n in FEATURES:
                 if n == SPIN_BLOCK[0]:
                     row.extend(float(v) for v in encoded)
                 if n not in SPIN_BLOCK:
                     row.append(values[n])
-            return row
-        return [values[n] for n in KEPT]
+            res = row
+        else:
+            values = dict(zip(FEATURES, base))
+            res = [values[n] for n in KEPT]
+        if self.strength_indicator:
+            return [*res, severity_indicator(item)]
+        return res
 
 
-_BUILDERS: dict[tuple[str, str], tuple] = {}
+_BUILDERS: dict[tuple, tuple] = {}
 
 
-def builder_for(out: Path, key: str, rung: str, data: dict):
+def builder_for(out: Path, key: str, rung: str, data: dict, *,
+                strength_indicator: bool = False):
     """The rung's (builder, names), built once per process."""
-    cache_key = (str(out), key, rung)
+    cache_key = (str(out), key, rung, strength_indicator)
     if cache_key in _BUILDERS:
         return _BUILDERS[cache_key]
     if rung == "R0":
-        built = (build_features, tuple(FEATURES))
+        if not strength_indicator:
+            built = (build_features, tuple(FEATURES))
+        else:
+            builder = RungBuilder("R0", strength_indicator=True)
+            built = (builder, builder.names)
     elif rung in NOISE_LEVELS:
         table = coupling_noise_table(data)
-        builder = RungBuilder(rung, z_by_item=table["z_by_item"])
+        builder = RungBuilder(rung, z_by_item=table["z_by_item"],
+                              strength_indicator=strength_indicator)
         built = (builder, builder.names)
     elif rung == "R4":
         vectors, names = _load_encoding(out, key)
         circuit_by_item = {str(r["item_id"]): str(r["circuit_id"]) for r in _all_rows(data)}
         builder = RungBuilder(rung, encoding_by_circuit=vectors,
-                              circuit_by_item=circuit_by_item, encoder_names=names)
+                              circuit_by_item=circuit_by_item, encoder_names=names,
+                              strength_indicator=strength_indicator)
         built = (builder, builder.names)
     else:
-        builder = RungBuilder(rung)
+        builder = RungBuilder(rung, strength_indicator=strength_indicator)
         built = (builder, builder.names)
     _BUILDERS[cache_key] = built
     return built
@@ -523,7 +541,9 @@ def run_job(job: dict) -> dict:
     """Worker entry point: one fit."""
     out = Path(job["out"])
     data = load_cache(job["cache"])
-    builder, names = builder_for(out, job["key"], job["rung_builder"], data)
+    strength = bool(job.get("strength_indicator", False))
+    builder, names = builder_for(out, job["key"], job["rung_builder"], data,
+                                 strength_indicator=strength)
     if job["kind"] == "affine":
         return common.run_affine_fit(job, data, builder, names)
     return common.run_liao_fit(job, data, builder, names)
@@ -531,7 +551,8 @@ def run_job(job: dict) -> dict:
 
 def _job(out: Path, fit_dir: Path, key: str, rung: str, arm: str, *,
          learner_seed: int | None = None, shuffle_seed: int | None = None,
-         purpose: str = "rung_fit", stem: str | None = None) -> dict:
+         purpose: str = "rung_fit", stem: str | None = None,
+         strength_indicator: bool = False) -> dict:
     fit_arm = {"M": "F"}.get(arm, arm)
     builder_rung = {NC_RUNG: "R5", NC_REEXPORT_RUNG: "R0"}.get(rung, rung)
     if stem is None:
@@ -539,7 +560,7 @@ def _job(out: Path, fit_dir: Path, key: str, rung: str, arm: str, *,
         stem = f"{key}__{rung}{seed_part}__{arm}"
     if fit_arm == "P" and shuffle_seed is None:
         shuffle_seed = learner_seed
-    return {
+    job_dict = {
         "part": PART, "kind": "affine" if arm == "A" else "liao",
         "key": key, "rung": rung, "rung_builder": builder_rung, "arm": arm,
         "fit_arm": fit_arm, "learner_seed": learner_seed,
@@ -547,6 +568,9 @@ def _job(out: Path, fit_dir: Path, key: str, rung: str, arm: str, *,
         "purpose": purpose, "stem": stem,
         "cache": str(_cache_path(out, key)), "out": str(out), "fit_dir": str(fit_dir),
     }
+    if strength_indicator:
+        job_dict["strength_indicator"] = True
+    return job_dict
 
 
 def _dataset_seed(key: str, pattern: re.Pattern) -> int:
@@ -554,54 +578,90 @@ def _dataset_seed(key: str, pattern: re.Pattern) -> int:
 
 
 def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
-               rungs: list[str], arms: list[str], seeds: list[int]) -> list[dict]:
+               rungs: list[str], arms: list[str], seeds: list[int],
+               strength_indicator: bool = False) -> list[dict]:
     """Every planned fit; the re-export rungs come first so a mismatch shows early."""
     fit_dir = out / "fits"
     jobs = []
     liao_arms = [arm for arm in ("F", "C", "P") if arm in arms]
-    if "R0" in rungs:
-        # Appendix M.4 re-export: seeds 1-20, then M.4's original-seed P
-        # (archived shuffle seed). M.4's original-seed F and C are the gate fits.
-        for k in seeds:
-            for key in primary_keys:
-                for arm in liao_arms:
-                    jobs.append(_job(out, fit_dir, key, "R0", arm, learner_seed=k,
-                                     purpose="r0_reexport_appendix_m4"))
-        if "P" in arms:
-            for key in primary_keys:
-                jobs.append(_job(
-                    out, fit_dir, key, "R0", "P",
-                    learner_seed=_dataset_seed(key, PRIMARY_KEY),
-                    shuffle_seed=TRAINING_SHUFFLE_SEED,
-                    purpose="r0_reexport_appendix_m4_original_seed_archived_shuffle",
-                    stem=f"{key}__R0__orig__P"))
-    if NC_REEXPORT_RUNG in rungs:
-        # Appendix N re-export: seeds 1-20 plus its anchor (learner seed = dataset seed).
-        for key in nc_keys:
-            anchor = _dataset_seed(key, NC_KEY)
-            for k in [*seeds, *([anchor] if anchor not in seeds else [])]:
-                for arm in liao_arms:
+    if not strength_indicator:
+        if "R0" in rungs:
+            # Appendix M.4 re-export: seeds 1-20, then M.4's original-seed P
+            # (archived shuffle seed). M.4's original-seed F and C are the gate fits.
+            for k in seeds:
+                for key in primary_keys:
+                    for arm in liao_arms:
+                        jobs.append(_job(out, fit_dir, key, "R0", arm, learner_seed=k,
+                                         purpose="r0_reexport_appendix_m4"))
+            if "P" in arms:
+                for key in primary_keys:
                     jobs.append(_job(
-                        out, fit_dir, key, NC_REEXPORT_RUNG, arm, learner_seed=k,
-                        purpose=("nc_reexport_appendix_n_anchor" if k == anchor
-                                 and anchor not in seeds else "nc_reexport_appendix_n")))
-    spin_rungs = [r for r in rungs if r in RUNGS and r not in REEXPORT_RUNGS]
-    if "A" in arms:
-        for rung in spin_rungs:
-            for key in primary_keys:
-                jobs.append(_job(out, fit_dir, key, rung, "A"))
-    for k in seeds:
-        for rung in spin_rungs:
-            for key in primary_keys:
-                for arm in liao_arms:
-                    jobs.append(_job(out, fit_dir, key, rung, arm, learner_seed=k))
-        if NC_RUNG in rungs:
+                        out, fit_dir, key, "R0", "P",
+                        learner_seed=_dataset_seed(key, PRIMARY_KEY),
+                        shuffle_seed=TRAINING_SHUFFLE_SEED,
+                        purpose="r0_reexport_appendix_m4_original_seed_archived_shuffle",
+                        stem=f"{key}__R0__orig__P"))
+        if NC_REEXPORT_RUNG in rungs:
+            # Appendix N re-export: seeds 1-20 plus its anchor (learner seed = dataset seed).
             for key in nc_keys:
-                for arm in ("M", "C"):
-                    if arm in arms:
-                        jobs.append(_job(out, fit_dir, key, NC_RUNG, arm,
+                anchor = _dataset_seed(key, NC_KEY)
+                for k in [*seeds, *([anchor] if anchor not in seeds else [])]:
+                    for arm in liao_arms:
+                        jobs.append(_job(
+                            out, fit_dir, key, NC_REEXPORT_RUNG, arm, learner_seed=k,
+                            purpose=("nc_reexport_appendix_n_anchor" if k == anchor
+                                     and anchor not in seeds else "nc_reexport_appendix_n")))
+        spin_rungs = [r for r in rungs if r in RUNGS and r not in REEXPORT_RUNGS]
+        if "A" in arms:
+            for rung in spin_rungs:
+                for key in primary_keys:
+                    jobs.append(_job(out, fit_dir, key, rung, "A"))
+        for k in seeds:
+            for rung in spin_rungs:
+                for key in primary_keys:
+                    for arm in liao_arms:
+                        jobs.append(_job(out, fit_dir, key, rung, arm, learner_seed=k))
+            if NC_RUNG in rungs:
+                for key in nc_keys:
+                    for arm in ("M", "C"):
+                        if arm in arms:
+                            jobs.append(_job(out, fit_dir, key, NC_RUNG, arm,
+                                             learner_seed=k,
+                                             purpose="near_clifford_no_descriptors"))
+    else:
+        part_a_rungs = [r for r in rungs if r in RUNGS]
+        if "A" in arms:
+            for rung in part_a_rungs:
+                for key in primary_keys:
+                    jobs.append(_job(out, fit_dir, key, rung, "A",
+                                     strength_indicator=True))
+        for k in seeds:
+            for rung in part_a_rungs:
+                for key in primary_keys:
+                    for arm in liao_arms:
+                        jobs.append(_job(out, fit_dir, key, rung, arm,
                                          learner_seed=k,
-                                         purpose="near_clifford_no_descriptors"))
+                                         strength_indicator=True))
+        if NC_REEXPORT_RUNG in rungs:
+            if "A" in arms:
+                for key in nc_keys:
+                    jobs.append(_job(out, fit_dir, key, NC_REEXPORT_RUNG, "A",
+                                     strength_indicator=True))
+            for k in seeds:
+                for key in nc_keys:
+                    for arm in liao_arms:
+                        jobs.append(_job(out, fit_dir, key, NC_REEXPORT_RUNG, arm,
+                                         learner_seed=k,
+                                         strength_indicator=True))
+        if NC_RUNG in rungs:
+            for k in seeds:
+                for key in nc_keys:
+                    for arm in ("M", "C"):
+                        if arm in arms:
+                            jobs.append(_job(out, fit_dir, key, NC_RUNG, arm,
+                                             learner_seed=k,
+                                             purpose="near_clifford_no_descriptors",
+                                             strength_indicator=True))
     return jobs
 
 
@@ -1003,31 +1063,34 @@ def cmd_run(args) -> int:
     nc_rungs = [rung for rung in rungs if rung in NC_RUNGS]
     if nc_rungs and not nc:
         raise SystemExit(f"{nc_rungs} need --nc-datasets")
-    jobs = build_jobs(out, primary, nc, rungs, arms, seeds)
+    strength_indicator = bool(getattr(args, "strength_indicator", False))
+    jobs = build_jobs(out, primary, nc, rungs, arms, seeds,
+                      strength_indicator=strength_indicator)
     aliases = []
     if "R5" in rungs:
         aliases.append("M (Part A) = F at R5, the same fits")
-    if "R0" in rungs:
+    if "R0" in rungs and not strength_indicator:
         aliases.append("R0 original-seed F and C = the gate fits in gate/fits "
                        "(re-exports of Appendix M.4's __orig__ F and C)")
     if args.dry_run:
         common.print_plan(jobs, out / "fits", aliases)
         return 0
     common.require_gate(args.gate_file or out / "gate" / "gate_r0.json")
-    # A re-export has to be checkable against what it re-exports.
-    if "R0" in rungs and args.seedrep_fits is None:
-        raise SystemExit("R0 re-exports Appendix M.4: pass --seedrep-fits so each fit "
-                         "is checked against M.4")
-    if NC_REEXPORT_RUNG in rungs and args.nc_results is None:
-        raise SystemExit("NC-R0 re-exports Appendix N: pass --nc-results so each fit "
-                         "is checked against Appendix N")
+    if not strength_indicator:
+        # A re-export has to be checkable against what it re-exports.
+        if "R0" in rungs and args.seedrep_fits is None:
+            raise SystemExit("R0 re-exports Appendix M.4: pass --seedrep-fits so each fit "
+                             "is checked against M.4")
+        if NC_REEXPORT_RUNG in rungs and args.nc_results is None:
+            raise SystemExit("NC-R0 re-exports Appendix N: pass --nc-results so each fit "
+                             "is checked against Appendix N")
     index_path = out / "datasets.json"
     needed = set(primary) | (set(nc) if nc_rungs else set())
     index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {}
     encoder_ready = all(_encoder_paths(out, key)[0].exists() for key in primary)
     if not needed <= set(index) or ("R4" in rungs and not encoder_ready):
         cmd_prepare(args)
-    reexporting = [rung for rung in rungs if rung in REEXPORT_RUNGS]
+    reexporting = [rung for rung in rungs if rung in REEXPORT_RUNGS] if not strength_indicator else []
     if reexporting:
         order = reexport_preconditions(
             out, primary if "R0" in rungs else [],
@@ -1037,9 +1100,13 @@ def cmd_run(args) -> int:
         if not order["all_match"]:
             raise SystemExit(f"cached row order differs from the re-export reference: "
                              f"{json.dumps(order)}")
-    common.write_json(out / "run_config.json", {
+    run_cfg = {
         "rungs": rungs, "arms": arms, "seeds": seeds, "workers": args.workers,
-        "n_jobs": len(jobs), "started_unix": time.time()})
+        "n_jobs": len(jobs), "started_unix": time.time(),
+    }
+    if strength_indicator:
+        run_cfg["strength_indicator"] = True
+    common.write_json(out / "run_config.json", run_cfg)
     info = common.drive(jobs, run_job, out, args.workers, limit=args.limit_jobs)
     write_json(out / f"run_{int(time.time())}.json", info)
     if info["crashes"]:
@@ -1093,6 +1160,8 @@ def main(argv=None) -> int:
     run.add_argument("--arms", nargs="+", default=None)
     run.add_argument("--seeds", default="1-20")
     run.add_argument("--dry-run", action="store_true")
+    run.add_argument("--strength-indicator", action="store_true",
+                     help="append noise_strength_L3 feature to every arm and rung")
     run.add_argument("--gate-file", type=Path, default=None)
     run.add_argument("--limit-jobs", type=int, default=None)
     run.add_argument("--seedrep-fits", type=Path, default=None, help=seedrep_help)

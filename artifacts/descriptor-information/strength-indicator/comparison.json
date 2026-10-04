@@ -1,0 +1,3267 @@
+{
+ "schema": "descriptor-information-strength-comparison-v1",
+ "frozen_rule": "docs/frozen-rules/2026-10-03-strength-indicator.md",
+ "rule_file_sha256": "eba027eb370ffea12c8bf542027f785704004b9ca7fa114aae6579c5798a0005",
+ "bootstrap": {
+  "seed": 20261002,
+  "draws": 10000,
+  "rng_scheme": "paired draws using fresh numpy default_rng(seed) per row and quantity; learner seeds then whole test circuits"
+ },
+ "inputs": {
+  "strength_fits": [
+   "runs-strength/partA/fits",
+   "runs-strength/partB/fits"
+  ],
+  "original_fits": [
+   "runs/partA/fits",
+   "runs/partA/gate/fits",
+   "runs/partB/fits"
+  ],
+  "cache": [
+   "runs-strength/partA/cache",
+   "runs-strength/partB/cache"
+  ],
+  "n_strength_fit_files": 2502,
+  "n_original_fit_files": 2517
+ },
+ "parts": {
+  "A": {
+   "title": "Part A: spin chains, same circuits",
+   "rows": {
+    "shipped-s101-n640/tfi": {
+     "dataset_seed": 101,
+     "family": "tfi",
+     "rungs": {
+      "R0": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0003384214556555121,
+        "interval": {
+         "lower": -0.001220308936240876,
+         "upper": 0.0004975803011550907
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00043863010373643857,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.08297545232096909,
+        "interval": {
+         "lower": -0.4328333056468504,
+         "upper": 0.3348833003713004
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.19616849529698052,
+        "n_seeds": 20
+       }
+      },
+      "N1": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -6.419022747201772e-05,
+        "interval": {
+         "lower": -0.0007853892483757241,
+         "upper": 0.0005862329330918269
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00035018086579768226,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.008284012069038072,
+        "interval": {
+         "lower": -0.0965378763877075,
+         "upper": 0.07055762910239168
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.04265560881293924,
+        "n_seeds": 20
+       }
+      },
+      "N2": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0005844337328306513,
+        "interval": {
+         "lower": -0.0001766105165629547,
+         "upper": 0.0014116381741090935
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00040783715773087467,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.027221913762668776,
+        "interval": {
+         "lower": -0.006856261633422475,
+         "upper": 0.06435894941432826
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.018283420465866052,
+        "n_seeds": 20
+       }
+      },
+      "N3": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0034647086446206003,
+        "interval": {
+         "lower": 0.000981323574241447,
+         "upper": 0.006233624764445481
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0013353228355657346,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.062480935789543224,
+        "interval": {
+         "lower": 0.026274959186521243,
+         "upper": 0.10076644322004699
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.018992952634182502,
+        "n_seeds": 20
+       }
+      },
+      "N4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.030197449894399764,
+        "interval": {
+         "lower": 0.022986661312572577,
+         "upper": 0.03788740631656606
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.003775351599698665,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.20695956676053073,
+        "interval": {
+         "lower": 0.1690765072413185,
+         "upper": 0.24451890162222034
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.019305027772358048,
+        "n_seeds": 20
+       }
+      },
+      "R3-TFI": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.05270228484619165,
+        "interval": {
+         "lower": 0.04430046180625021,
+         "upper": 0.061620130628777234
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.004437722401379285,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.25149820482316654,
+        "interval": {
+         "lower": 0.2212925524077424,
+         "upper": 0.2826337623566523
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.015779053907609055,
+        "n_seeds": 20
+       }
+      },
+      "R4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.001840624360820822,
+        "interval": {
+         "lower": 0.0008833331150874035,
+         "upper": 0.0028536442520831146
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0005020467577590618,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.049545596146219284,
+        "interval": {
+         "lower": 0.025049790775149596,
+         "upper": 0.0747986798449549
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.012746059024321767,
+        "n_seeds": 20
+       }
+      },
+      "R5": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.054122689803242224,
+        "interval": {
+         "lower": 0.045117750312599146,
+         "upper": 0.06386400455905139
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00479990323581052,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.2558373636623048,
+        "interval": {
+         "lower": 0.22429903563680711,
+         "upper": 0.2869358549902443
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.015903251563696548,
+        "n_seeds": 20
+       }
+      }
+     }
+    },
+    "shipped-s101-n640/heisenberg": {
+     "dataset_seed": 101,
+     "family": "heisenberg",
+     "rungs": {
+      "R0": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0003409453766077393,
+        "interval": {
+         "lower": -0.0016137416274747403,
+         "upper": 0.0008139482945943282
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0006197549681681373,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.08746512020546539,
+        "interval": {
+         "lower": -0.4250518132881501,
+         "upper": 0.2263809035772394
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.16451221008411376,
+        "n_seeds": 20
+       }
+      },
+      "N1": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.00013679459441733543,
+        "interval": {
+         "lower": -0.0010265347397644372,
+         "upper": 0.0014513630736594056
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0006390862826841706,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.027964635745053285,
+        "interval": {
+         "lower": -0.1465317058035062,
+         "upper": 0.22070414642475206
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.09472795632019318,
+        "n_seeds": 20
+       }
+      },
+      "N2": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0003164319246574736,
+        "interval": {
+         "lower": -0.0011431316936121934,
+         "upper": 0.0005149180366501776
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00042395410910181606,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.019247339987442096,
+        "interval": {
+         "lower": -0.06870087321353287,
+         "upper": 0.03205538616875204
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.02569891991421994,
+        "n_seeds": 20
+       }
+      },
+      "N3": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.002207827952877937,
+        "interval": {
+         "lower": -0.0039355053654652585,
+         "upper": -0.0006301305685681461
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": true,
+        "draw_sd": 0.0008291927620812032,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.03168278237482414,
+        "interval": {
+         "lower": -0.06148449055706351,
+         "upper": -0.0047201245609202695
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": true,
+        "draw_sd": 0.014353647796904491,
+        "n_seeds": 20
+       }
+      },
+      "N4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0021300461232901177,
+        "interval": {
+         "lower": -0.0060975987685254205,
+         "upper": 0.0013171423020718167
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0018921347371893306,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.012330920883761531,
+        "interval": {
+         "lower": -0.042359314201094254,
+         "upper": 0.014723549262179133
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.014370449611577784,
+        "n_seeds": 20
+       }
+      },
+      "R3-Heis": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.000947392117575197,
+        "interval": {
+         "lower": -0.00022744330624601807,
+         "upper": 0.002246303827283346
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0006385019646605297,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.09528165860581783,
+        "interval": {
+         "lower": -0.02032942820704567,
+         "upper": 0.22514700031879467
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.06327110583946693,
+        "n_seeds": 20
+       }
+      },
+      "R4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.00039281033249242286,
+        "interval": {
+         "lower": -0.0005683416143078815,
+         "upper": 0.001544536978235562
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0005419972379984428,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.004241356288511577,
+        "interval": {
+         "lower": -0.007097387393848004,
+         "upper": 0.017119825234724276
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.006229933596635284,
+        "n_seeds": 20
+       }
+      },
+      "R5": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 2.1507226792817635e-05,
+        "interval": {
+         "lower": -0.0009427845094147807,
+         "upper": 0.0008916991545608815
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0004666029093590069,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.00011202700560830614,
+        "interval": {
+         "lower": -0.010242548248728943,
+         "upper": 0.008898443339356103
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.004878276903008588,
+        "n_seeds": 20
+       }
+      }
+     }
+    },
+    "shipped-s211-n640/tfi": {
+     "dataset_seed": 211,
+     "family": "tfi",
+     "rungs": {
+      "R0": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.000982834228051737,
+        "interval": {
+         "lower": -0.002764942821957736,
+         "upper": 0.0004985523906610493
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0008370293813764412,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.3199842142162389,
+        "interval": {
+         "lower": -0.7237361921648415,
+         "upper": 0.20297345430385128
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.23756233396930077,
+        "n_seeds": 20
+       }
+      },
+      "N1": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 6.487171049577445e-05,
+        "interval": {
+         "lower": -0.0006494637183655069,
+         "upper": 0.0007057304238366996
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00034338226424198104,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.008412808578280351,
+        "interval": {
+         "lower": -0.08168545932804434,
+         "upper": 0.0857165800506511
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.04257207893871624,
+        "n_seeds": 20
+       }
+      },
+      "N2": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0008254608648791462,
+        "interval": {
+         "lower": 9.74634354173977e-05,
+         "upper": 0.001537491377176034
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00036276372726204285,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.03893049489443165,
+        "interval": {
+         "lower": 0.006034209333245251,
+         "upper": 0.07128030544086172
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.016435199654191105,
+        "n_seeds": 20
+       }
+      },
+      "N3": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.005781808255067286,
+        "interval": {
+         "lower": 0.0032760625137793742,
+         "upper": 0.00865574494696428
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0013860511117458623,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.0983054947778122,
+        "interval": {
+         "lower": 0.060327257628321376,
+         "upper": 0.13805212833849165
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.019887146648421235,
+        "n_seeds": 20
+       }
+      },
+      "N4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0305559913365447,
+        "interval": {
+         "lower": 0.022844703636460628,
+         "upper": 0.038412595601370614
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.003977248365251398,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.2194098661841506,
+        "interval": {
+         "lower": 0.18068503135440184,
+         "upper": 0.255813145346184
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.019236606811077278,
+        "n_seeds": 20
+       }
+      },
+      "R3-TFI": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.05360345477005221,
+        "interval": {
+         "lower": 0.04480171808500013,
+         "upper": 0.06284053793479219
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.004596471892938219,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.25778258461200454,
+        "interval": {
+         "lower": 0.22333542638435636,
+         "upper": 0.29280793534473126
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.01766476865461602,
+        "n_seeds": 20
+       }
+      },
+      "R4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0016531690757605032,
+        "interval": {
+         "lower": 0.0007769715528645369,
+         "upper": 0.0026789076032497053
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00048652341599901257,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.03955573277636493,
+        "interval": {
+         "lower": 0.02003866154217123,
+         "upper": 0.0606418660961573
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.010340572172793144,
+        "n_seeds": 20
+       }
+      },
+      "R5": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.05437008501189959,
+        "interval": {
+         "lower": 0.0453466169594509,
+         "upper": 0.06372566286361749
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00470595277967777,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.25416153991858126,
+        "interval": {
+         "lower": 0.22185949086031323,
+         "upper": 0.2863812280216353
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.016572709321439803,
+        "n_seeds": 20
+       }
+      }
+     }
+    },
+    "shipped-s211-n640/heisenberg": {
+     "dataset_seed": 211,
+     "family": "heisenberg",
+     "rungs": {
+      "R0": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.00012540465119693407,
+        "interval": {
+         "lower": -0.001068202387235101,
+         "upper": 0.0013906498064979315
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0006338694993151471,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.030979032505445585,
+        "interval": {
+         "lower": -0.24959214020568504,
+         "upper": 0.3704670476796903
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.15936979868908813,
+        "n_seeds": 20
+       }
+      },
+      "N1": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.00012800004473390313,
+        "interval": {
+         "lower": -0.0015417438135976352,
+         "upper": 0.001253867215117351
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0007135013069807881,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.01471468337782203,
+        "interval": {
+         "lower": -0.2086800810987092,
+         "upper": 0.17844505165333724
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0987109454858824,
+        "n_seeds": 20
+       }
+      },
+      "N2": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 9.380975400612949e-06,
+        "interval": {
+         "lower": -0.0009137662929229097,
+         "upper": 0.0009362356459843111
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00047245385569325796,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.0011760979720397274,
+        "interval": {
+         "lower": -0.050273947505448564,
+         "upper": 0.05384310828075769
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.026462192815993983,
+        "n_seeds": 20
+       }
+      },
+      "N3": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0011915900737779987,
+        "interval": {
+         "lower": -0.0030558143283761882,
+         "upper": 0.0006541281372244711
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0009339050710700068,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.022534253210543337,
+        "interval": {
+         "lower": -0.056850097421700094,
+         "upper": 0.011729942913834657
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.017333973626072478,
+        "n_seeds": 20
+       }
+      },
+      "N4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0029243417434380164,
+        "interval": {
+         "lower": -0.006159340249093382,
+         "upper": -9.011888192868541e-06
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": true,
+        "draw_sd": 0.0015460193091658206,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.018190215621806005,
+        "interval": {
+         "lower": -0.04718707823933079,
+         "upper": 0.008438936928662457
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.013926942387208941,
+        "n_seeds": 20
+       }
+      },
+      "R3-Heis": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.00023840421965516965,
+        "interval": {
+         "lower": -0.0012171505080710169,
+         "upper": 0.0008013301729778641
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.000515876868895633,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.02288147593632006,
+        "interval": {
+         "lower": -0.11482981469303093,
+         "upper": 0.07878873680264206
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.04919099160890304,
+        "n_seeds": 20
+       }
+      },
+      "R4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0007058663098892491,
+        "interval": {
+         "lower": -0.0003287634548773749,
+         "upper": 0.0018029914453985185
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.000543546179717438,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.01075891211294483,
+        "interval": {
+         "lower": -0.00512799945819498,
+         "upper": 0.027086232298558704
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.008175789728538576,
+        "n_seeds": 20
+       }
+      },
+      "R5": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.00014021100735515934,
+        "interval": {
+         "lower": -0.0017296923928545116,
+         "upper": 0.0013886619150981366
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0007803848908210208,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.00015510569249016504,
+        "interval": {
+         "lower": -0.01703344487551502,
+         "upper": 0.01676466400229239
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.008507865849236941,
+        "n_seeds": 20
+       }
+      }
+     }
+    },
+    "shipped-s307-n640/tfi": {
+     "dataset_seed": 307,
+     "family": "tfi",
+     "rungs": {
+      "R0": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.00020931330764203373,
+        "interval": {
+         "lower": -0.0012920070855790742,
+         "upper": 0.000881923930058722
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.000560445293835845,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.09219641366482947,
+        "interval": {
+         "lower": -0.49693006520390043,
+         "upper": 0.3703627953918812
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.22394441108619448,
+        "n_seeds": 20
+       }
+      },
+      "N1": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.00022984143982105192,
+        "interval": {
+         "lower": -0.0007402131069248346,
+         "upper": 0.0002466644671434234
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0002497486371245643,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.028462249834691776,
+        "interval": {
+         "lower": -0.09174567548512921,
+         "upper": 0.030370734521810085
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.03105609665322032,
+        "n_seeds": 20
+       }
+      },
+      "N2": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0002266919607624143,
+        "interval": {
+         "lower": -0.00039266608499499673,
+         "upper": 0.0008253640879459455
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00031122518124262165,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.01058551365796978,
+        "interval": {
+         "lower": -0.015739391629300662,
+         "upper": 0.03530009315138481
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.012967467131609478,
+        "n_seeds": 20
+       }
+      },
+      "N3": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.005095023749457962,
+        "interval": {
+         "lower": 0.0021128983334991252,
+         "upper": 0.008375404514683726
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.001593578422437708,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.08289624008739821,
+        "interval": {
+         "lower": 0.03936310744265663,
+         "upper": 0.12631072246132574
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.022263471744426163,
+        "n_seeds": 20
+       }
+      },
+      "N4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.03412107005636428,
+        "interval": {
+         "lower": 0.025722424289472894,
+         "upper": 0.042802751338334825
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.004366089338202272,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.25272498911158964,
+        "interval": {
+         "lower": 0.20719560797873288,
+         "upper": 0.2969624205254521
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.022935584154927205,
+        "n_seeds": 20
+       }
+      },
+      "R3-TFI": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.05282853502183592,
+        "interval": {
+         "lower": 0.042428169279788985,
+         "upper": 0.06330087587487855
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00532615036109394,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.26141102610385103,
+        "interval": {
+         "lower": 0.22086810940211246,
+         "upper": 0.3010115150118745
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.02055766639154181,
+        "n_seeds": 20
+       }
+      },
+      "R4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0013235807572124381,
+        "interval": {
+         "lower": 0.0005569812430739424,
+         "upper": 0.0020731789901376613
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0003834340150156257,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.031012621182594347,
+        "interval": {
+         "lower": 0.012748720496175306,
+         "upper": 0.049408503563625326
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.009307445294731953,
+        "n_seeds": 20
+       }
+      },
+      "R5": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0559049715840057,
+        "interval": {
+         "lower": 0.044841890718279674,
+         "upper": 0.06719852662547028
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.005685133383204464,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.2697579017674715,
+        "interval": {
+         "lower": 0.23068627961099047,
+         "upper": 0.3062490678611428
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.01943371576557639,
+        "n_seeds": 20
+       }
+      }
+     }
+    },
+    "shipped-s307-n640/heisenberg": {
+     "dataset_seed": 307,
+     "family": "heisenberg",
+     "rungs": {
+      "R0": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0010976975257102057,
+        "interval": {
+         "lower": -4.857827211767336e-05,
+         "upper": 0.0023875711172628624
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0006279964905498714,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.3302881165578769,
+        "interval": {
+         "lower": -0.014333746739154616,
+         "upper": 0.7806035400190912
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.20418436300597653,
+        "n_seeds": 20
+       }
+      },
+      "N1": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0006413096231472767,
+        "interval": {
+         "lower": -0.0018105313779054996,
+         "upper": 0.000583356554144692
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0006123784258997708,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.0700176643176332,
+        "interval": {
+         "lower": -0.19466379210120321,
+         "upper": 0.06566095912367222
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.06710751948869642,
+        "n_seeds": 20
+       }
+      },
+      "N2": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0001926896588273048,
+        "interval": {
+         "lower": -0.000784057177598729,
+         "upper": 0.0010850936933717063
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0004790365861838312,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.012097698412289262,
+        "interval": {
+         "lower": -0.04039009603626868,
+         "upper": 0.06336297852360381
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.026202568828761683,
+        "n_seeds": 20
+       }
+      },
+      "N3": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0019596254572657196,
+        "interval": {
+         "lower": -0.003965712212400442,
+         "upper": -7.976177995712343e-05
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": true,
+        "draw_sd": 0.0009852307694639068,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.023451719317566455,
+        "interval": {
+         "lower": -0.05319548337364166,
+         "upper": 0.00419185874019523
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.014598361640550866,
+        "n_seeds": 20
+       }
+      },
+      "N4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.00045340140820013947,
+        "interval": {
+         "lower": -0.004405274618917212,
+         "upper": 0.003019255118591935
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0018739334914996029,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.004039341177735023,
+        "interval": {
+         "lower": -0.023690043654620168,
+         "upper": 0.0298379980543501
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.013507185530119075,
+        "n_seeds": 20
+       }
+      },
+      "R3-Heis": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0004645691984854121,
+        "interval": {
+         "lower": -0.00062326597901873,
+         "upper": 0.001490882661083594
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0005381190342127939,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.03808822803175184,
+        "interval": {
+         "lower": -0.050772760982286745,
+         "upper": 0.12571267747832357
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.04456404179668995,
+        "n_seeds": 20
+       }
+      },
+      "R4": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0002564562704190157,
+        "interval": {
+         "lower": -0.0006538602180144428,
+         "upper": 0.001265370893590316
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0004838760201543853,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.003268156398818778,
+        "interval": {
+         "lower": -0.00936616385949023,
+         "upper": 0.01703400621872166
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.006628588450100647,
+        "n_seeds": 20
+       }
+      },
+      "R5": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0001606044991317515,
+        "interval": {
+         "lower": -0.0006236273195966564,
+         "upper": 0.0010019106502735784
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00041321150775051934,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.0012408000327028823,
+        "interval": {
+         "lower": -0.006196322243986833,
+         "upper": 0.008969449102486423
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0038836187451366647,
+        "n_seeds": 20
+       }
+      }
+     }
+    }
+   }
+  },
+  "B": {
+   "title": "Part B: QAOA-MaxCut, random graphs",
+   "rows": {
+    "qaoa-s101-n640": {
+     "dataset_seed": 101,
+     "family": null,
+     "rungs": {
+      "B-partial": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.005692384258354437,
+        "interval": {
+         "lower": -0.011967225923058784,
+         "upper": 0.0013879717116143631
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.003418184291767002,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.08070794496161504,
+        "interval": {
+         "lower": -0.20332351513156938,
+         "upper": 0.020854493924078354
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.057506072990905835,
+        "n_seeds": 20
+       }
+      },
+      "B-complete": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.00044080817357294334,
+        "interval": {
+         "lower": -0.001646666761490842,
+         "upper": 0.0007641847852458038
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0006154226233575376,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.006841471649753482,
+        "interval": {
+         "lower": -0.025594254360477627,
+         "upper": 0.012133866885707051
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.009604864069100036,
+        "n_seeds": 20
+       }
+      },
+      "B-none": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0030537007821769373,
+        "interval": {
+         "lower": -0.0010300475081424267,
+         "upper": 0.007257630592747379
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0020894407951005216,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.04197526476337704,
+        "interval": {
+         "lower": -0.004387370264934671,
+         "upper": 0.08868752617165661
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.023614871632107057,
+        "n_seeds": 20
+       }
+      }
+     }
+    },
+    "qaoa-s211-n640": {
+     "dataset_seed": 211,
+     "family": null,
+     "rungs": {
+      "B-partial": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0008807285249423681,
+        "interval": {
+         "lower": -0.003824099390063683,
+         "upper": 0.006196801471806563
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0025416277072260783,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.014088451846060557,
+        "interval": {
+         "lower": -0.047383587398595,
+         "upper": 0.06619823114717244
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.028696770469480264,
+        "n_seeds": 20
+       }
+      },
+      "B-complete": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 1.7966051056817964e-06,
+        "interval": {
+         "lower": -0.001330188183276643,
+         "upper": 0.0013413419152468878
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0006753157510032582,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -9.672841751602601e-05,
+        "interval": {
+         "lower": -0.01573532747387282,
+         "upper": 0.015880255488619127
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.008011864490835513,
+        "n_seeds": 20
+       }
+      },
+      "B-none": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.003961400772426009,
+        "interval": {
+         "lower": -0.001546869331440927,
+         "upper": 0.008689940570902301
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.00261075540646124,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.06121944799327189,
+        "interval": {
+         "lower": 0.024574614600284903,
+         "upper": 0.09877520836378603
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.01895053016681147,
+        "n_seeds": 20
+       }
+      }
+     }
+    },
+    "qaoa-s307-n640": {
+     "dataset_seed": 307,
+     "family": null,
+     "rungs": {
+      "B-partial": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.000106507657078838,
+        "interval": {
+         "lower": -0.001627873506374065,
+         "upper": 0.0018219955756960103
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0008742790645988166,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.002003427943993552,
+        "interval": {
+         "lower": -0.017369227514837497,
+         "upper": 0.020201154483263907
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.009617837911089602,
+        "n_seeds": 20
+       }
+      },
+      "B-complete": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.0005264285831014862,
+        "interval": {
+         "lower": -0.0006226098156231325,
+         "upper": 0.0016816901061296903
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0005833663176541509,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.00666862881940327,
+        "interval": {
+         "lower": -0.008065185065898707,
+         "upper": 0.021927438930495872
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.007543162129628686,
+        "n_seeds": 20
+       }
+      },
+      "B-none": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.005427210640132789,
+        "interval": {
+         "lower": 0.0021955557056694518,
+         "upper": 0.009034390886736661
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0017468095905082209,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.05874557332702429,
+        "interval": {
+         "lower": 0.024372293067590735,
+         "upper": 0.09304054372117251
+        },
+        "excludes_zero_above": true,
+        "excludes_zero_below": false,
+        "draw_sd": 0.01744142496406453,
+        "n_seeds": 20
+       }
+      }
+     }
+    }
+   }
+  },
+  "NC": {
+   "title": "Near-Clifford datasets of Appendix N (arm M)",
+   "rows": {
+    "nc-s101-n640": {
+     "dataset_seed": 101,
+     "family": null,
+     "rungs": {
+      "NC-R0": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0030970158552531962,
+        "interval": {
+         "lower": -0.00490693299110024,
+         "upper": -0.001468376786923198
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": true,
+        "draw_sd": 0.0008612686658692248,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.010712003561347938,
+        "interval": {
+         "lower": -0.01913495406292275,
+         "upper": -0.0023442693090963054
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": true,
+        "draw_sd": 0.00418969737745856,
+        "n_seeds": 20
+       }
+      },
+      "NC-none": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.00121543531910287,
+        "interval": {
+         "lower": -0.0021601274950312577,
+         "upper": -0.0002354010319136964
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": true,
+        "draw_sd": 0.0004954037472995259,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.00025791796077179185,
+        "interval": {
+         "lower": -0.004332653783872841,
+         "upper": 0.0056957465427459825
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.002524736365553577,
+        "n_seeds": 20
+       }
+      }
+     }
+    },
+    "nc-s211-n640": {
+     "dataset_seed": 211,
+     "family": null,
+     "rungs": {
+      "NC-R0": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0006135283942633046,
+        "interval": {
+         "lower": -0.002201920669139873,
+         "upper": 0.001162810570199763
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0008583225515196223,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.011401527069820783,
+        "interval": {
+         "lower": -0.026266802653101877,
+         "upper": 0.003457279529024306
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0074204974663970025,
+        "n_seeds": 20
+       }
+      },
+      "NC-none": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": -0.0005257537677066798,
+        "interval": {
+         "lower": -0.0015158847520485976,
+         "upper": 0.0004708857033705506
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0005032952661249711,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": -0.0016061953254875583,
+        "interval": {
+         "lower": -0.01119800190729987,
+         "upper": 0.007739521214254446
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.004802925509344586,
+        "n_seeds": 20
+       }
+      }
+     }
+    },
+    "nc-s307-n640": {
+     "dataset_seed": 307,
+     "family": null,
+     "rungs": {
+      "NC-R0": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 4.387295948461711e-05,
+        "interval": {
+         "lower": -0.0022908192004540235,
+         "upper": 0.0029497604434627054
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0013407566858521125,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.008530805026921495,
+        "interval": {
+         "lower": -0.00883230330496306,
+         "upper": 0.025618748840169358
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.008631520507566623,
+        "n_seeds": 20
+       }
+      },
+      "NC-none": {
+       "status": "estimated",
+       "n_seeds": 20,
+       "learner_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+       ],
+       "delta_D": {
+        "status": "estimated",
+        "point": 0.00048561294767610064,
+        "interval": {
+         "lower": -0.0009844764978138832,
+         "upper": 0.002221512400732854
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.0007971383189568798,
+        "n_seeds": 20
+       },
+       "delta_D_over_C": {
+        "status": "estimated",
+        "point": 0.007278977672409703,
+        "interval": {
+         "lower": -0.0007924151108256366,
+         "upper": 0.01646408291243848
+        },
+        "excludes_zero_above": false,
+        "excludes_zero_below": false,
+        "draw_sd": 0.004389190606263561,
+        "n_seeds": 20
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "seconds": 4.7326526250108145
+}

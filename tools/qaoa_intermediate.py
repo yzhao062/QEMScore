@@ -81,7 +81,9 @@ from tools.descriptor_common import (  # noqa: E402
     FEATURES,
     KEPT,
     NOISY,
+    STRENGTH_FEATURE_NAME,
     load_cache,
+    severity_indicator,
     write_cache,
     write_json,
 )
@@ -367,10 +369,12 @@ def cmd_diagnostics(args) -> int:
 class QAOABuilder:
     """Feature builder for one Part B rung."""
 
-    def __init__(self, rung: str, n_qubits: int) -> None:
+    def __init__(self, rung: str, n_qubits: int, *,
+                 strength_indicator: bool = False) -> None:
         if rung not in RUNGS:
             raise ValueError(f"unknown rung {rung!r}")
         self.rung = rung
+        self.strength_indicator = bool(strength_indicator)
         self.name = f"qaoa-intermediate:{rung}"
         self.pairs = tuple(combinations(range(n_qubits), 2))
         self._pair_index = {pair: i for i, pair in enumerate(self.pairs)}
@@ -380,6 +384,8 @@ class QAOABuilder:
             names = [*FEATURES, *(f"edge_{i}_{j}" for i, j in self.pairs)]
         else:
             names = list(KEPT)
+        if self.strength_indicator:
+            names.append(STRENGTH_FEATURE_NAME)
         self.names = tuple(names)
 
     def edge_indicators(self, item: dict) -> list[float]:
@@ -392,23 +398,27 @@ class QAOABuilder:
     def __call__(self, item: dict) -> list[float]:
         base = build_features(item)
         if self.rung == "B-partial":
-            return base
-        if self.rung == "B-complete":
-            return [*base, *self.edge_indicators(item)]
-        values = dict(zip(FEATURES, base))
-        return [values[n] for n in KEPT]
+            res = base
+        elif self.rung == "B-complete":
+            res = [*base, *self.edge_indicators(item)]
+        else:
+            values = dict(zip(FEATURES, base))
+            res = [values[n] for n in KEPT]
+        if self.strength_indicator:
+            return [*res, severity_indicator(item)]
+        return res
 
 
-_BUILDERS: dict[tuple[str, int], tuple] = {}
+_BUILDERS: dict[tuple, tuple] = {}
 
 
-def builder_for(rung: str, n_qubits: int):
-    key = (rung, n_qubits)
+def builder_for(rung: str, n_qubits: int, *, strength_indicator: bool = False):
+    key = (rung, n_qubits, strength_indicator)
     if key not in _BUILDERS:
-        if rung == "B-partial":
+        if rung == "B-partial" and not strength_indicator:
             _BUILDERS[key] = (build_features, tuple(FEATURES))
         else:
-            builder = QAOABuilder(rung, n_qubits)
+            builder = QAOABuilder(rung, n_qubits, strength_indicator=strength_indicator)
             _BUILDERS[key] = (builder, builder.names)
     return _BUILDERS[key]
 
@@ -418,13 +428,17 @@ def builder_for(rung: str, n_qubits: int):
 # --------------------------------------------------------------------------
 
 
-def run_gbt_fit(job: dict, data: dict) -> dict:
+def run_gbt_fit(job: dict, data: dict, *, builder=None, names=None) -> dict:
     """Reference: HistGradientBoostingRegressor on B-complete without the noisy estimate."""
     from sklearn.ensemble import HistGradientBoostingRegressor
 
     started = time.perf_counter()
-    builder = QAOABuilder("B-complete", int(data["n_qubits"]))
-    columns = [i for i, name in enumerate(builder.names) if name != NOISY]
+    strength = bool(job.get("strength_indicator", False))
+    if builder is None:
+        builder = QAOABuilder("B-complete", int(data["n_qubits"]),
+                              strength_indicator=strength)
+        names = builder.names
+    columns = [i for i, name in enumerate(names) if name != NOISY]
 
     def matrix(rows):
         return np.asarray([builder(dict(r)) for r in rows], dtype=float)[:, columns]
@@ -460,7 +474,7 @@ def run_gbt_fit(job: dict, data: dict) -> dict:
         "part": PART, "key": job["key"], "dataset_seed": int(data["seed"]),
         "dataset_hash": dataset_hash, "rung": job["rung"], "arm": "GBT",
         "method": "HistGradientBoostingRegressor reference (not an arm)",
-        "feature_names": [builder.names[i] for i in columns],
+        "feature_names": [names[i] for i in columns],
         "n_features": len(columns), "grid": list(GBT_GRID),
         "fixed": {"loss": "squared_error", "early_stopping": False, "random_state": 0},
         "selection": "lowest source-validation macro MAE; ties to the earlier grid point",
@@ -475,6 +489,8 @@ def run_gbt_fit(job: dict, data: dict) -> dict:
                             if predictions else None),
         "seconds": time.perf_counter() - started,
     }
+    if job.get("strength_indicator"):
+        result["strength_indicator"] = True
     common._write_fit(job, result, predictions)
     return {"stem": job["stem"], "seconds": result["seconds"], "flagged": None,
             "flagged_secondary": None, "error": error, "selected": "gbt"}
@@ -487,18 +503,21 @@ def run_gbt_fit(job: dict, data: dict) -> dict:
 
 def run_job(job: dict) -> dict:
     data = load_cache(job["cache"])
+    strength = bool(job.get("strength_indicator", False))
+    builder, names = builder_for(job["rung"], int(data["n_qubits"]),
+                                 strength_indicator=strength)
     if job["kind"] == "gbt":
-        return run_gbt_fit(job, data)
-    builder, names = builder_for(job["rung"], int(data["n_qubits"]))
+        return run_gbt_fit(job, data, builder=builder, names=names)
     if job["kind"] == "affine":
         return common.run_affine_fit(job, data, builder, names)
     return common.run_liao_fit(job, data, builder, names)
 
 
-def _job(out: Path, key: str, rung: str, arm: str, *, learner_seed=None) -> dict:
+def _job(out: Path, key: str, rung: str, arm: str, *, learner_seed=None,
+         strength_indicator: bool = False) -> dict:
     kind = {"A": "affine", "GBT": "gbt"}.get(arm, "liao")
     seed_part = "" if learner_seed is None else f"__k{learner_seed:02d}"
-    return {
+    job_dict = {
         "part": PART, "kind": kind, "key": key, "rung": rung, "arm": arm,
         "fit_arm": arm, "learner_seed": learner_seed,
         "shuffle_seed": learner_seed if arm == "P" else None,
@@ -506,23 +525,29 @@ def _job(out: Path, key: str, rung: str, arm: str, *, learner_seed=None) -> dict
         "stem": f"{key}__{rung}{seed_part}__{arm}",
         "cache": str(out / "cache" / f"{key}.pkl"), "fit_dir": str(out / "fits"),
     }
+    if strength_indicator:
+        job_dict["strength_indicator"] = True
+    return job_dict
 
 
 def build_jobs(out: Path, keys: list[str], rungs: list[str], arms: list[str],
-               seeds: list[int]) -> list[dict]:
+               seeds: list[int], strength_indicator: bool = False) -> list[dict]:
     jobs = []
     for rung in rungs:
         for key in keys:
             if "A" in arms:
-                jobs.append(_job(out, key, rung, "A"))
+                jobs.append(_job(out, key, rung, "A",
+                                 strength_indicator=strength_indicator))
             if "GBT" in arms and rung == "B-complete":
-                jobs.append(_job(out, key, rung, "GBT"))
+                jobs.append(_job(out, key, rung, "GBT",
+                                 strength_indicator=strength_indicator))
     for k in seeds:
         for rung in rungs:
             for key in keys:
                 for arm in ("F", "C", "P"):
                     if arm in arms:
-                        jobs.append(_job(out, key, rung, arm, learner_seed=k))
+                        jobs.append(_job(out, key, rung, arm, learner_seed=k,
+                                         strength_indicator=strength_indicator))
     return jobs
 
 
@@ -579,7 +604,8 @@ def cmd_run(args) -> int:
         keys = [Path(d["data_dir"]).name for d in datasets]
     else:
         keys = [dataset_name(seed, N_QUBITS) for seed in DATASET_SEEDS]
-    jobs = build_jobs(out, keys, rungs, arms, seeds)
+    strength_indicator = bool(getattr(args, "strength_indicator", False))
+    jobs = build_jobs(out, keys, rungs, arms, seeds, strength_indicator=strength_indicator)
     aliases = ["M (Part B) = F at B-none, the same fits"] if "B-none" in rungs else []
     if args.dry_run:
         common.print_plan(jobs, out / "fits", aliases)
@@ -587,8 +613,13 @@ def cmd_run(args) -> int:
     common.require_gate(args.gate_file)
     out.mkdir(parents=True, exist_ok=True)
     prepare_caches(root, out)
-    write_json(out / "run_config.json", {"rungs": rungs, "arms": arms, "seeds": seeds,
-                                         "workers": args.workers, "n_jobs": len(jobs)})
+    run_cfg = {
+        "rungs": rungs, "arms": arms, "seeds": seeds,
+        "workers": args.workers, "n_jobs": len(jobs),
+    }
+    if strength_indicator:
+        run_cfg["strength_indicator"] = True
+    write_json(out / "run_config.json", run_cfg)
     info = common.drive(jobs, run_job, out, args.workers, limit=args.limit_jobs)
     write_json(out / f"run_{int(time.time())}.json", info)
     return 0 if not info["crashes"] else 3
@@ -611,6 +642,8 @@ def main(argv=None) -> int:
     run.add_argument("--arms", nargs="+", default=None)
     run.add_argument("--seeds", default="1-20")
     run.add_argument("--dry-run", action="store_true")
+    run.add_argument("--strength-indicator", action="store_true", default=False,
+                     help="append noise_strength_L3 feature to every arm and rung")
     run.add_argument("--limit-jobs", type=int, default=None)
     args = parser.parse_args(argv)
     if args.command == "generate":

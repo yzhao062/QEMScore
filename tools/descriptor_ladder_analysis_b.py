@@ -27,6 +27,7 @@ Implements:
 from __future__ import annotations
 
 import argparse
+import hashlib
 from collections import Counter, defaultdict
 import json
 import os
@@ -1206,6 +1207,12 @@ def main() -> None:
         action="store_true",
         help="Run self-test on fabricated synthetic data with known D.",
     )
+    parser.add_argument(
+        "--follow-up-rule",
+        type=Path,
+        default=None,
+        help="Optional later frozen rule governing these fits; its path and SHA-256 are recorded.",
+    )
 
     args = parser.parse_args()
 
@@ -1230,6 +1237,14 @@ def main() -> None:
         n_draws=args.draws,
         bootstrap_seed=args.bootstrap_seed,
     )
+    if args.follow_up_rule is not None:
+        rule_path = args.follow_up_rule
+        if not rule_path.is_absolute() and not rule_path.exists():
+            rule_path = Path(__file__).resolve().parents[1] / rule_path
+        result["follow_up_rule"] = {
+            "path": str(args.follow_up_rule),
+            "sha256": hashlib.sha256(rule_path.read_bytes()).hexdigest(),
+        }
     write_analysis_json(args.out, result)
 
     print(f"\nProcessing summary:")
