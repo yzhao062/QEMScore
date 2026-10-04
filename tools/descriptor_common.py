@@ -58,8 +58,18 @@ if not Path(qemscore.__file__).resolve().is_relative_to(REPO_ROOT):
         f"qemscore resolves to {qemscore.__file__}, outside {REPO_ROOT}; "
         f"run with PYTHONPATH={REPO_ROOT}")
 
+from sklearn.ensemble import HistGradientBoostingRegressor  # noqa: E402
+from sklearn.linear_model import Ridge  # noqa: E402
+from sklearn.preprocessing import PolynomialFeatures  # noqa: E402
+
 from qemscore.baselines.controls import shuffle_noisy_items  # noqa: E402
-from qemscore.baselines.liao import LiaoMitigator  # noqa: E402
+from qemscore.baselines.liao import (  # noqa: E402
+    LiaoMitigator,
+    LiaoValidationScore,
+    _group_cost,
+    _validation_score,
+    select_one_standard_error,
+)
 from qemscore.baselines.ridge import RidgeMitigator  # noqa: E402
 from qemscore.campaign.analysis import _family_mae  # noqa: E402
 from qemscore.datasets.schema import FEATURES  # noqa: E402
@@ -95,6 +105,23 @@ NOISY = "noisy_expectation"
 CANDIDATES = ("random_forest", "mlp")
 LIAO_ARMS = ("F", "C", "P")
 
+# Strong learner definitions per frozen rule 2026-10-03-strong-learners.md
+STRONG_LEARNERS_RULE = "docs/frozen-rules/2026-10-03-strong-learners.md"
+# Where the caches of the 2026-10-03 run are recorded (inputs.caches_used).
+STRENGTH_RECORD = "artifacts/descriptor-information/strength-indicator/analysis-a.json"
+HGBR_GRID = (
+    (200, 0.05, 15),
+    (200, 0.05, 31),
+    (200, 0.1, 15),
+    (200, 0.1, 31),
+    (500, 0.05, 15),
+    (500, 0.05, 31),
+    (500, 0.1, 15),
+    (500, 0.1, 31),
+)
+RIDGE_ALPHAS = (1e-6, 1e-4, 1e-2, 1.0, 1e2, 1e4)
+POLY5_RUNGS = frozenset({"R0", "N1", "N2", "N3", "N4", "R3-TFI", "R3-Heis"})
+
 # Columns kept at every rung and by every arm (the arm decides whether it reads
 # the noisy estimate): noisy estimate, log2 shots, qubit count, family
 # indicators, two-qubit gate count, compiled depth, observable locality.
@@ -126,13 +153,38 @@ def severity_indicator(item: Mapping[str, object]) -> float:
     raise ValueError(f"Unknown or missing severity: {sev!r}; expected 'L1' or 'L3'")
 
 
+def _cell_key(item: Mapping[str, object], part: str) -> str:
+    """Per-cell key: 8 cells in Part A (family/severity/observable), 2 in Part B (severity/observable)."""
+    if part == "A":
+        return f"{item['family']}/{item['severity']}/{item['observable']}"
+    return f"{item['severity']}/{item['observable']}"
+
+
+def _poly5_coupling_columns(rung: str, family: str, names: Sequence[str]) -> list[int]:
+    """Coupling columns carried by the rung's feature vector for this family."""
+    if rung == "R0":
+        cols = ["j", "h"] if family == "tfi" else ["jx", "jy", "jz"]
+    elif rung in ("N1", "N2", "N3", "N4"):
+        s = {"N1": 0.01, "N2": 0.03, "N3": 0.10, "N4": 0.30}[rung]
+        cols = [f"j+{s:g}z", f"h+{s:g}z"] if family == "tfi" else [f"jx+{s:g}z", f"jy+{s:g}z", f"jz+{s:g}z"]
+    elif rung == "R3-TFI":
+        cols = ["j"] if family == "tfi" else ["jx", "jy", "jz"]
+    elif rung == "R3-Heis":
+        cols = ["j", "h"] if family == "tfi" else ["jx", "jy"]
+    else:
+        return []
+    return [names.index(col) for col in cols]
+
+
 __all__ = [
     "CANDIDATES", "FEATURES", "FROZEN_GATE_CRITERION", "GATE_CRITERIA",
-    "GATE_TOLERANCE", "KEPT", "LEARNER_SEEDS", "LIAO_ARMS", "NOISY", "REPO_ROOT",
-    "RULE_FILE", "RULE_SEED", "STRENGTH_FEATURE_NAME", "_parse_seeds", "blas_fpe_probe",
-    "check_gate_amendment", "drive", "gate_decision", "load_cache", "print_plan",
-    "require_gate", "rule_path", "run_affine_fit", "run_liao_fit", "severity_indicator",
-    "sha256_file", "write_cache", "write_json",
+    "GATE_TOLERANCE", "HGBR_GRID", "KEPT", "LEARNER_SEEDS", "LIAO_ARMS", "NOISY",
+    "POLY5_RUNGS", "REPO_ROOT", "RIDGE_ALPHAS", "RULE_FILE", "RULE_SEED",
+    "STRENGTH_FEATURE_NAME", "STRENGTH_RECORD", "STRONG_LEARNERS_RULE", "check_caches_recorded",
+    "strong_learners_rule_sha256",
+    "_parse_seeds", "blas_fpe_probe", "check_gate_amendment", "drive", "gate_decision",
+    "load_cache", "print_plan", "require_gate", "rule_path", "run_affine_fit",
+    "run_liao_fit", "severity_indicator", "sha256_file", "write_cache", "write_json",
 ]
 
 
@@ -147,6 +199,52 @@ def sha256_file(path: Path) -> str:
         for block in iter(lambda: handle.read(1 << 20), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+_RULE_SHA256_CACHE: dict[str, str] = {}
+
+
+def strong_learners_rule_sha256() -> str:
+    """SHA-256 of the strong-learners rule file, read once per process.
+
+    Computed from the file so that a wording edit before commit cannot
+    desynchronize the recorded hash from the file.
+    """
+    path = REPO_ROOT / STRONG_LEARNERS_RULE
+    key = str(path)
+    if key not in _RULE_SHA256_CACHE:
+        _RULE_SHA256_CACHE[key] = sha256_file(path)
+    return _RULE_SHA256_CACHE[key]
+
+
+def check_caches_recorded(cache_dir: Path, keys: Sequence[str], *,
+                          record_path: Path | None = None) -> dict:
+    """Compare each primary cache's SHA-256 with ``inputs.caches_used`` of the record.
+
+    Exits nonzero, naming every mismatch, before any fit; returns the digests
+    for ``run_config.json``.
+    """
+    record_path = Path(record_path) if record_path else REPO_ROOT / STRENGTH_RECORD
+    recorded = json.loads(record_path.read_text(encoding="utf-8"))["inputs"]["caches_used"]
+    digests: dict[str, dict] = {}
+    problems: list[str] = []
+    for key in keys:
+        path = Path(cache_dir) / f"{key}.pkl"
+        if key not in recorded:
+            problems.append(f"{key}: no digest recorded in {record_path}")
+            continue
+        if not path.exists():
+            problems.append(f"{key}: {path} is missing")
+            continue
+        actual = sha256_file(path)
+        want = str(recorded[key]["sha256"])
+        digests[key] = {"path": str(path), "sha256": actual, "recorded_sha256": want}
+        if actual != want:
+            problems.append(f"{key}: cache SHA-256 {actual} != recorded {want} ({path})")
+    if problems:
+        raise SystemExit("cache SHA-256 check failed before any fit:\n  "
+                         + "\n  ".join(problems))
+    return digests
 
 
 def write_json(path: Path, value: object) -> None:
@@ -292,6 +390,219 @@ def _family_mae_or_none(rows, values, dataset_hash):
     return _family_mae(rows, array, artifact_id=dataset_hash)
 
 
+def _fit_strong_learners(
+    job: Mapping[str, object],
+    data: Mapping[str, object],
+    builder: Callable[[dict], Sequence[float]],
+    names: Sequence[str],
+    train: list[dict],
+    validation: list[dict],
+    candidate_predictions: dict[str, np.ndarray],
+    timing: dict[str, float],
+) -> tuple[
+    dict[str, np.ndarray],
+    list[dict],
+    dict[str, list[dict]],
+    dict[str, list[int | float]],
+    dict[str, float] | None,
+    tuple[str, ...],
+]:
+    part = str(job["part"])
+    rung = str(job["rung"])
+    fit_arm = str(job["fit_arm"])
+    k = int(job["learner_seed"])
+    test = list(data["test"])
+
+    def cell_fn(item: Mapping[str, object]) -> str:
+        return _cell_key(item, part)
+
+    train_cells = {cell_fn(it) for it in train}
+    val_cells = {cell_fn(it) for it in validation}
+    test_cells = {cell_fn(it) for it in test}
+    expected_count = 8 if part == "A" else 2
+    all_cells = sorted(train_cells & val_cells & test_cells)
+    if len(all_cells) != expected_count:
+        raise ValueError(
+            f"Expected {expected_count} rule cells for Part {part}, but found {len(all_cells)}: {all_cells}"
+        )
+
+    has_poly5 = (part == "A" and rung in POLY5_RUNGS)
+    candidate_names = (
+        ("random_forest", "mlp", "hgbr", "poly5_ridge")
+        if has_poly5
+        else ("random_forest", "mlp", "hgbr")
+    )
+
+    X_train_full = np.asarray([builder(dict(it)) for it in train], dtype=float)
+    X_val_full = np.asarray([builder(dict(it)) for it in validation], dtype=float)
+    X_test_full = np.asarray([builder(dict(it)) for it in test], dtype=float)
+
+    if fit_arm == "C":
+        drop_col = names.index(NOISY)
+        hgbr_X_train = np.delete(X_train_full, drop_col, axis=1)
+        hgbr_X_val = np.delete(X_val_full, drop_col, axis=1)
+        hgbr_X_test = np.delete(X_test_full, drop_col, axis=1)
+    else:
+        hgbr_X_train = X_train_full
+        hgbr_X_val = X_val_full
+        hgbr_X_test = X_test_full
+
+    y_train = np.asarray([float(it["ideal_expectation"]) for it in train], dtype=float)
+    y_val = np.asarray([float(it["ideal_expectation"]) for it in validation], dtype=float)
+
+    cell_indices_train = {cell: [i for i, it in enumerate(train) if cell_fn(it) == cell] for cell in all_cells}
+    cell_indices_val = {cell: [i for i, it in enumerate(validation) if cell_fn(it) == cell] for cell in all_cells}
+    cell_indices_test = {cell: [i for i, it in enumerate(test) if cell_fn(it) == cell] for cell in all_cells}
+
+    # 1. HGBR candidate
+    val_pred_hgbr = np.empty(len(validation), dtype=float)
+    test_pred_hgbr = np.empty(len(test), dtype=float)
+    hgbr_grid_point: dict[str, list[int | float]] = {}
+    with warnings.catch_warnings(record=True) as caught_hgbr:
+        warnings.simplefilter("always")
+        t0 = time.perf_counter()
+        for cell in all_cells:
+            tr_idx = cell_indices_train[cell]
+            v_idx = cell_indices_val[cell]
+            te_idx = cell_indices_test[cell]
+
+            X_tr_c = hgbr_X_train[tr_idx]
+            y_tr_c = y_train[tr_idx]
+            X_v_c = hgbr_X_val[v_idx]
+            y_v_c = y_val[v_idx]
+            X_te_c = hgbr_X_test[te_idx]
+
+            best_mae = None
+            best_point = None
+            best_model = None
+            for point in HGBR_GRID:
+                mi, lr, mln = point
+                model = HistGradientBoostingRegressor(
+                    max_iter=mi,
+                    learning_rate=lr,
+                    max_leaf_nodes=mln,
+                    random_state=k,
+                    early_stopping=False,
+                )
+                model.fit(X_tr_c, y_tr_c)
+                pred_v = model.predict(X_v_c)
+                mae = float(np.mean(np.abs(pred_v - y_v_c)))
+                if best_mae is None or mae < best_mae:
+                    best_mae = mae
+                    best_point = point
+                    best_model = model
+            hgbr_grid_point[cell] = list(best_point)
+            val_pred_hgbr[v_idx] = best_model.predict(X_v_c)
+            test_pred_hgbr[te_idx] = best_model.predict(X_te_c)
+        timing["candidate_hgbr_seconds"] = time.perf_counter() - t0
+    hgbr_warnings = _warning_rows(caught_hgbr, "candidate_hgbr")
+    candidate_predictions["validation__hgbr"] = val_pred_hgbr
+    candidate_predictions["test__hgbr"] = test_pred_hgbr
+
+    # 2. poly5_ridge candidate (if applicable)
+    poly5_ridge_alpha: dict[str, float] | None = None
+    poly5_warnings: list[dict] = []
+    if has_poly5:
+        poly5_ridge_alpha = {}
+        val_pred_poly = np.empty(len(validation), dtype=float)
+        test_pred_poly = np.empty(len(test), dtype=float)
+        with warnings.catch_warnings(record=True) as caught_poly:
+            warnings.simplefilter("always")
+            t0 = time.perf_counter()
+            for cell in all_cells:
+                tr_idx = cell_indices_train[cell]
+                v_idx = cell_indices_val[cell]
+                te_idx = cell_indices_test[cell]
+
+                family = train[tr_idx[0]]["family"]
+                col_indices = _poly5_coupling_columns(rung, family, names)
+
+                C_tr = X_train_full[tr_idx][:, col_indices]
+                C_v = X_val_full[v_idx][:, col_indices]
+                C_te = X_test_full[te_idx][:, col_indices]
+
+                mean_c = np.mean(C_tr, axis=0)
+                std_c = np.std(C_tr, axis=0, ddof=0)
+                std_c = np.where(std_c == 0.0, 1.0, std_c)
+                Z_tr = (C_tr - mean_c) / std_c
+                Z_v = (C_v - mean_c) / std_c
+                Z_te = (C_te - mean_c) / std_c
+
+                poly = PolynomialFeatures(5, include_bias=False)
+                X_poly_tr = poly.fit_transform(Z_tr)
+                X_poly_v = poly.transform(Z_v)
+                X_poly_te = poly.transform(Z_te)
+
+                if fit_arm in ("F", "P"):
+                    r_idx = names.index(NOISY)
+                    r_tr = X_train_full[tr_idx, r_idx]
+                    r_v = X_val_full[v_idx, r_idx]
+                    r_te = X_test_full[te_idx, r_idx]
+
+                    mean_r = float(np.mean(r_tr))
+                    std_r = float(np.std(r_tr, ddof=0))
+                    if std_r == 0.0:
+                        std_r = 1.0
+                    r_tr_std = ((r_tr - mean_r) / std_r).reshape(-1, 1)
+                    r_v_std = ((r_v - mean_r) / std_r).reshape(-1, 1)
+                    r_te_std = ((r_te - mean_r) / std_r).reshape(-1, 1)
+
+                    X_design_tr = np.hstack([X_poly_tr, r_tr_std, r_tr_std * Z_tr])
+                    X_design_v = np.hstack([X_poly_v, r_v_std, r_v_std * Z_v])
+                    X_design_te = np.hstack([X_poly_te, r_te_std, r_te_std * Z_te])
+                else:
+                    X_design_tr = X_poly_tr
+                    X_design_v = X_poly_v
+                    X_design_te = X_poly_te
+
+                y_tr_c = y_train[tr_idx]
+                y_v_c = y_val[v_idx]
+
+                best_mae = None
+                best_alpha = None
+                best_model = None
+                for alpha in RIDGE_ALPHAS:
+                    ridge = Ridge(alpha=alpha, fit_intercept=True)
+                    ridge.fit(X_design_tr, y_tr_c)
+                    pred_v = ridge.predict(X_design_v)
+                    mae = float(np.mean(np.abs(pred_v - y_v_c)))
+                    if best_mae is None or mae < best_mae:
+                        best_mae = mae
+                        best_alpha = alpha
+                        best_model = ridge
+                poly5_ridge_alpha[cell] = float(best_alpha)
+                val_pred_poly[v_idx] = best_model.predict(X_design_v)
+                test_pred_poly[te_idx] = best_model.predict(X_design_te)
+            timing["candidate_poly5_ridge_seconds"] = time.perf_counter() - t0
+        poly5_warnings = _warning_rows(caught_poly, "candidate_poly5_ridge")
+        candidate_predictions["validation__poly5_ridge"] = val_pred_poly
+        candidate_predictions["test__poly5_ridge"] = test_pred_poly
+
+    per_candidate_warnings = {
+        "hgbr": hgbr_warnings,
+        "poly5_ridge": poly5_warnings,
+    }
+    extra_warnings = hgbr_warnings + poly5_warnings
+    return (
+        candidate_predictions,
+        extra_warnings,
+        per_candidate_warnings,
+        hgbr_grid_point,
+        poly5_ridge_alpha,
+        candidate_names,
+    )
+
+
+def _score_rows(scores) -> list[dict]:
+    return [
+        {"name": s.name, "validation_mae": s.validation_mae,
+         "standard_error": s.standard_error,
+         "total_excess_absolute_loss": s.total_excess_absolute_loss,
+         "circuit_evaluations": s.circuit_evaluations,
+         "simplicity_rank": s.simplicity_rank}
+        for s in scores]
+
+
 def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
                  builder: Callable[[dict], Sequence[float]],
                  names: Sequence[str]) -> dict:
@@ -366,6 +677,46 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
     candidate_predictions: dict[str, np.ndarray] = {}
     candidate_warnings: list[dict] = []
     selected_matches_candidate = None
+    cand_names: Sequence[str] = CANDIDATES
+    hgbr_grid_point: dict[str, list[int | float]] | None = None
+    poly5_ridge_alpha: dict[str, float] | None = None
+    # Whenever a model was fitted its own selection is recorded, even if the
+    # prediction step then failed (as the option-off code does).
+    selected_model_name: str | None = (
+        None if model is None else model.selected_model_name_)
+    one_standard_error_threshold: float | None = (
+        None if model is None else model.one_standard_error_threshold_)
+    eligible_models: list[str] | None = (
+        None if model is None else list(model.eligible_models_))
+    val_scores = None if model is None else model.validation_scores_
+    warnings_agg = fit_warnings + predict_warnings
+    option_off: dict | None = None
+    dataset_hash = str(data["dataset_hash"])
+
+    def _snapshot() -> dict:
+        """The values the option-off code writes, as of this moment."""
+        return {
+            "selected_model": selected_model_name,
+            "eligible_models": None if eligible_models is None else list(eligible_models),
+            "one_standard_error_threshold": one_standard_error_threshold,
+            "validation_scores": None if val_scores is None else _score_rows(val_scores),
+            "flagged": flagged,
+            "flagged_secondary": flagged_secondary,
+            "finite": dict(finite),
+            "n_runtime_warnings": int(sum(row["count"] for row in runtime_warnings)),
+            "n_runtime_warnings_not_matmul_fpe": int(
+                sum(row["count"] for row in other_runtime)),
+            "warnings_aggregated": [dict(row) for row in warnings_agg],
+            "test_family_mae": (
+                _family_mae_or_none(data["test"], predictions["test"], dataset_hash)
+                if "test" in predictions else None),
+            "validation_family_mae": (
+                _family_mae_or_none(data["validation"], predictions["validation"],
+                                    dataset_hash)
+                if "validation" in predictions else None),
+            "selected_equals_candidate_predictions": selected_matches_candidate,
+        }
+
     if model is not None and error is None:
         with warnings.catch_warnings(record=True) as caught_candidates:
             warnings.simplefilter("always")
@@ -378,12 +729,79 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
                         dtype=float)
             timing["candidate_predict_seconds"] = time.perf_counter() - t0
         candidate_warnings = _warning_rows(caught_candidates, "candidate_prediction")
-        selected = model.selected_model_name_
+
+        # LiaoMitigator's own selection: what the option-off code records.
+        liao_selected = selected_model_name
         selected_matches_candidate = bool(all(
-            np.array_equal(predictions[role], candidate_predictions[f"{role}__{selected}"])
+            np.array_equal(predictions[role],
+                           candidate_predictions[f"{role}__{liao_selected}"])
             for role in ("validation", "test")))
 
-    dataset_hash = str(data["dataset_hash"])
+        if job.get("strong_learners"):
+            # The option-off state, recorded before the strong selection changes
+            # anything: tools/strong_learner_derive.py rebuilds the baseline from it.
+            option_off = _snapshot()
+            # A failure here propagates: ``drive`` records the job as a crash.
+            (
+                candidate_predictions,
+                extra_warnings,
+                per_cand_warnings,
+                hgbr_grid_point,
+                poly5_ridge_alpha,
+                cand_names,
+            ) = _fit_strong_learners(
+                job, data, builder, names, train, validation,
+                candidate_predictions, timing
+            )
+            candidate_warnings.extend(extra_warnings)
+            shared_cost = _group_cost([*train, *validation])
+            ranks = {"random_forest": 0, "mlp": 1, "hgbr": 2, "poly5_ridge": 3}
+            val_scores = [
+                _validation_score(
+                    name, validation, candidate_predictions[f"validation__{name}"],
+                    circuit_evaluations=shared_cost, simplicity_rank=ranks[name])
+                for name in cand_names
+            ]
+            (
+                selected_model_name,
+                one_standard_error_threshold,
+                eligible_tuple,
+            ) = select_one_standard_error(val_scores)
+            eligible_models = list(eligible_tuple)
+
+            for role in ("validation", "test"):
+                predictions[role] = candidate_predictions[f"{role}__{selected_model_name}"]
+
+            if selected_model_name != liao_selected:
+                # The selected predictions differ from LiaoMitigator's: recompute
+                # the finite checks and both flags. A selected new candidate's
+                # fitting and prediction warnings also enter both flags.
+                sel_warnings = per_cand_warnings.get(selected_model_name, [])
+                runtime_warnings = runtime_warnings + [
+                    row for row in sel_warnings if row["is_runtime_warning"]]
+                other_runtime = [row for row in runtime_warnings
+                                 if row["message"] not in SPURIOUS_MATMUL_MESSAGES]
+                finite = dict(finite)
+                finite["selected_predictions"] = bool(
+                    len(predictions) == 2
+                    and all(np.all(np.isfinite(value)) for value in predictions.values()))
+                flagged = bool(error is not None or runtime_warnings
+                               or not all(finite.values()))
+                flagged_secondary = bool(error is not None or other_runtime
+                                         or not all(finite.values()))
+                warnings_agg = fit_warnings + predict_warnings + sel_warnings
+
+            # The selected candidate's stored predictions are the fit's predictions
+            # (the same arrays; non-finite values compare equal here and are caught
+            # by the finite checks and the flags).
+            selected_matches_candidate = bool(all(
+                np.array_equal(predictions[role],
+                               candidate_predictions[f"{role}__{selected_model_name}"],
+                               equal_nan=True)
+                for role in ("validation", "test")))
+
+    if job.get("strong_learners") and option_off is None:
+        option_off = _snapshot()
     result = {
         "schema": "descriptor-information-fit-v1",
         "frozen_rule": RULE_FILE,
@@ -400,6 +818,14 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
         "shuffle_seed": shuffle_seed,
         "purpose": job.get("purpose", "rung_fit"),
         **({"strength_indicator": True} if job.get("strength_indicator") else {}),
+        **({"strong_learners": True} if job.get("strong_learners") else {}),
+        **({"candidates": list(cand_names)} if job.get("strong_learners") else {}),
+        **({"hgbr_grid_point": hgbr_grid_point} if job.get("strong_learners") else {}),
+        **({"poly5_ridge_alpha": poly5_ridge_alpha} if job.get("strong_learners") else {}),
+        **({"follow_up_rule": {"path": STRONG_LEARNERS_RULE,
+                               "sha256": strong_learners_rule_sha256()}}
+           if job.get("strong_learners") else {}),
+        **({"option_off": option_off} if option_off is not None else {}),
         "dropped_features": list(drop),
         "feature_builder": getattr(builder, "name", None),
         "n_features": len(names),
@@ -412,20 +838,13 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
         "n_runtime_warnings": int(sum(row["count"] for row in runtime_warnings)),
         "n_runtime_warnings_not_matmul_fpe": int(
             sum(row["count"] for row in other_runtime)),
-        "warnings_aggregated": fit_warnings + predict_warnings,
+        "warnings_aggregated": warnings_agg,
         "candidate_prediction_warnings": candidate_warnings,
-        "selected_model": None if model is None else model.selected_model_name_,
+        "selected_model": selected_model_name,
         "selected_equals_candidate_predictions": selected_matches_candidate,
-        "eligible_models": None if model is None else list(model.eligible_models_),
-        "one_standard_error_threshold": (
-            None if model is None else model.one_standard_error_threshold_),
-        "validation_scores": None if model is None else [
-            {"name": s.name, "validation_mae": s.validation_mae,
-             "standard_error": s.standard_error,
-             "total_excess_absolute_loss": s.total_excess_absolute_loss,
-             "circuit_evaluations": s.circuit_evaluations,
-             "simplicity_rank": s.simplicity_rank}
-            for s in model.validation_scores_],
+        "eligible_models": eligible_models,
+        "one_standard_error_threshold": one_standard_error_threshold,
+        "validation_scores": None if val_scores is None else _score_rows(val_scores),
         "mlp_n_iter": None if model is None else int(
             model.candidate_models_["mlp"].n_iter_),
         "mlp_final_train_loss": None if model is None or error is not None else float(
@@ -441,12 +860,12 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
             name: _family_mae_or_none(data["test"],
                                       candidate_predictions[f"test__{name}"],
                                       dataset_hash)
-            for name in CANDIDATES if f"test__{name}" in candidate_predictions},
+            for name in cand_names if f"test__{name}" in candidate_predictions},
         "candidate_validation_family_mae": {
             name: _family_mae_or_none(data["validation"],
                                       candidate_predictions[f"validation__{name}"],
                                       dataset_hash)
-            for name in CANDIDATES if f"validation__{name}" in candidate_predictions},
+            for name in cand_names if f"validation__{name}" in candidate_predictions},
         "n_rows": {"train": len(train), "validation": len(validation),
                    "test": len(data["test"])},
         "timing": timing,
@@ -542,6 +961,10 @@ def run_affine_fit(job: Mapping[str, object], data: Mapping[str, object],
                   "noisy estimate)",
         "purpose": job.get("purpose", "rung_fit"),
         **({"strength_indicator": True} if job.get("strength_indicator") else {}),
+        **({"strong_learners": True} if job.get("strong_learners") else {}),
+        **({"follow_up_rule": {"path": STRONG_LEARNERS_RULE,
+                               "sha256": strong_learners_rule_sha256()}}
+           if job.get("strong_learners") else {}),
         "feature_builder": getattr(builder, "name", None),
         "n_features": len(names) - (1 if NOISY in names else 0),
         "feature_names": [name for name in names if name != NOISY],

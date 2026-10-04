@@ -554,7 +554,8 @@ def run_job(job: dict) -> dict:
 def _job(out: Path, fit_dir: Path, key: str, rung: str, arm: str, *,
          learner_seed: int | None = None, shuffle_seed: int | None = None,
          purpose: str = "rung_fit", stem: str | None = None,
-         strength_indicator: bool = False) -> dict:
+         strength_indicator: bool = False,
+         strong_learners: bool = False) -> dict:
     fit_arm = {"M": "F"}.get(arm, arm)
     builder_rung = {NC_RUNG: "R5", NC_REEXPORT_RUNG: "R0"}.get(rung, rung)
     if stem is None:
@@ -572,6 +573,8 @@ def _job(out: Path, fit_dir: Path, key: str, rung: str, arm: str, *,
     }
     if strength_indicator:
         job_dict["strength_indicator"] = True
+    if strong_learners:
+        job_dict["strong_learners"] = True
     return job_dict
 
 
@@ -581,7 +584,8 @@ def _dataset_seed(key: str, pattern: re.Pattern) -> int:
 
 def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                rungs: list[str], arms: list[str], seeds: list[int],
-               strength_indicator: bool = False) -> list[dict]:
+               strength_indicator: bool = False,
+               strong_learners: bool = False) -> list[dict]:
     """Every planned fit; the re-export rungs come first so a mismatch shows early."""
     fit_dir = out / "fits"
     jobs = []
@@ -594,7 +598,8 @@ def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                 for key in primary_keys:
                     for arm in liao_arms:
                         jobs.append(_job(out, fit_dir, key, "R0", arm, learner_seed=k,
-                                         purpose="r0_reexport_appendix_m4"))
+                                         purpose="r0_reexport_appendix_m4",
+                                         strong_learners=strong_learners))
             if "P" in arms:
                 for key in primary_keys:
                     jobs.append(_job(
@@ -602,7 +607,8 @@ def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                         learner_seed=_dataset_seed(key, PRIMARY_KEY),
                         shuffle_seed=TRAINING_SHUFFLE_SEED,
                         purpose="r0_reexport_appendix_m4_original_seed_archived_shuffle",
-                        stem=f"{key}__R0__orig__P"))
+                        stem=f"{key}__R0__orig__P",
+                        strong_learners=strong_learners))
         if NC_REEXPORT_RUNG in rungs:
             # Appendix N re-export: seeds 1-20 plus its anchor (learner seed = dataset seed).
             for key in nc_keys:
@@ -612,49 +618,57 @@ def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                         jobs.append(_job(
                             out, fit_dir, key, NC_REEXPORT_RUNG, arm, learner_seed=k,
                             purpose=("nc_reexport_appendix_n_anchor" if k == anchor
-                                     and anchor not in seeds else "nc_reexport_appendix_n")))
+                                     and anchor not in seeds else "nc_reexport_appendix_n"),
+                            strong_learners=strong_learners))
         spin_rungs = [r for r in rungs if r in RUNGS and r not in REEXPORT_RUNGS]
         if "A" in arms:
             for rung in spin_rungs:
                 for key in primary_keys:
-                    jobs.append(_job(out, fit_dir, key, rung, "A"))
+                    jobs.append(_job(out, fit_dir, key, rung, "A",
+                                     strong_learners=strong_learners))
         for k in seeds:
             for rung in spin_rungs:
                 for key in primary_keys:
                     for arm in liao_arms:
-                        jobs.append(_job(out, fit_dir, key, rung, arm, learner_seed=k))
+                        jobs.append(_job(out, fit_dir, key, rung, arm, learner_seed=k,
+                                         strong_learners=strong_learners))
             if NC_RUNG in rungs:
                 for key in nc_keys:
                     for arm in ("M", "C"):
                         if arm in arms:
                             jobs.append(_job(out, fit_dir, key, NC_RUNG, arm,
                                              learner_seed=k,
-                                             purpose="near_clifford_no_descriptors"))
+                                             purpose="near_clifford_no_descriptors",
+                                             strong_learners=strong_learners))
     else:
         part_a_rungs = [r for r in rungs if r in RUNGS]
         if "A" in arms:
             for rung in part_a_rungs:
                 for key in primary_keys:
                     jobs.append(_job(out, fit_dir, key, rung, "A",
-                                     strength_indicator=True))
+                                     strength_indicator=True,
+                                     strong_learners=strong_learners))
         for k in seeds:
             for rung in part_a_rungs:
                 for key in primary_keys:
                     for arm in liao_arms:
                         jobs.append(_job(out, fit_dir, key, rung, arm,
                                          learner_seed=k,
-                                         strength_indicator=True))
+                                         strength_indicator=True,
+                                         strong_learners=strong_learners))
         if NC_REEXPORT_RUNG in rungs:
             if "A" in arms:
                 for key in nc_keys:
                     jobs.append(_job(out, fit_dir, key, NC_REEXPORT_RUNG, "A",
-                                     strength_indicator=True))
+                                     strength_indicator=True,
+                                     strong_learners=strong_learners))
             for k in seeds:
                 for key in nc_keys:
                     for arm in liao_arms:
                         jobs.append(_job(out, fit_dir, key, NC_REEXPORT_RUNG, arm,
                                          learner_seed=k,
-                                         strength_indicator=True))
+                                         strength_indicator=True,
+                                         strong_learners=strong_learners))
         if NC_RUNG in rungs:
             for k in seeds:
                 for key in nc_keys:
@@ -663,7 +677,8 @@ def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                             jobs.append(_job(out, fit_dir, key, NC_RUNG, arm,
                                              learner_seed=k,
                                              purpose="near_clifford_no_descriptors",
-                                             strength_indicator=True))
+                                             strength_indicator=True,
+                                             strong_learners=strong_learners))
     return jobs
 
 
@@ -1078,8 +1093,23 @@ def cmd_run(args) -> int:
         raise SystemExit(f"{nc_rungs} need --nc-datasets")
     sweep = bool(getattr(args, "sweep", False))
     strength_indicator = bool(getattr(args, "strength_indicator", False) or sweep)
+    strong_learners = bool(getattr(args, "strong_learners", False))
+    if strong_learners:
+        fit_dir = out / "fits"
+        if fit_dir.exists():
+            for json_path in fit_dir.glob("*.json"):
+                try:
+                    fit_meta = json.loads(json_path.read_text(encoding="utf-8"))
+                except Exception:
+                    continue
+                if not fit_meta.get("strong_learners"):
+                    raise SystemExit(
+                        f"Refusal: {json_path.name} does not have strong_learners: true; "
+                        "run --strong-learners refuses to start in a fits directory holding non-strong fits."
+                    )
     jobs = build_jobs(out, primary, nc, rungs, arms, seeds,
-                      strength_indicator=strength_indicator)
+                      strength_indicator=strength_indicator,
+                      strong_learners=strong_learners)
     aliases = []
     if "R5" in rungs:
         aliases.append("M (Part A) = F at R5, the same fits")
@@ -1114,12 +1144,17 @@ def cmd_run(args) -> int:
         if not order["all_match"]:
             raise SystemExit(f"cached row order differs from the re-export reference: "
                              f"{json.dumps(order)}")
+    cache_digests = (common.check_caches_recorded(out / "cache", primary)
+                     if strong_learners else None)
     run_cfg = {
         "rungs": rungs, "arms": arms, "seeds": seeds, "workers": args.workers,
         "n_jobs": len(jobs), "started_unix": time.time(),
     }
     if strength_indicator:
         run_cfg["strength_indicator"] = True
+    if strong_learners:
+        run_cfg["strong_learners"] = True
+        run_cfg["cache_sha256"] = cache_digests
     common.write_json(out / "run_config.json", run_cfg)
     info = common.drive(jobs, run_job, out, args.workers, limit=args.limit_jobs)
     write_json(out / f"run_{int(time.time())}.json", info)
@@ -1178,6 +1213,8 @@ def main(argv=None) -> int:
     run.add_argument("--dry-run", action="store_true")
     run.add_argument("--strength-indicator", action="store_true",
                      help="append noise_strength_L3 feature to every arm and rung")
+    run.add_argument("--strong-learners", action="store_true",
+                     help="enable strong learner candidates (hgbr, poly5_ridge)")
     run.add_argument("--gate-file", type=Path, default=None)
     run.add_argument("--limit-jobs", type=int, default=None)
     run.add_argument("--seedrep-fits", type=Path, default=None, help=seedrep_help)

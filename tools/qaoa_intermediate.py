@@ -491,6 +491,12 @@ def run_gbt_fit(job: dict, data: dict, *, builder=None, names=None) -> dict:
     }
     if job.get("strength_indicator"):
         result["strength_indicator"] = True
+    if job.get("strong_learners"):
+        result["strong_learners"] = True
+        result["follow_up_rule"] = {
+            "path": common.STRONG_LEARNERS_RULE,
+            "sha256": common.strong_learners_rule_sha256(),
+        }
     common._write_fit(job, result, predictions)
     return {"stem": job["stem"], "seconds": result["seconds"], "flagged": None,
             "flagged_secondary": None, "error": error, "selected": "gbt"}
@@ -514,7 +520,7 @@ def run_job(job: dict) -> dict:
 
 
 def _job(out: Path, key: str, rung: str, arm: str, *, learner_seed=None,
-         strength_indicator: bool = False) -> dict:
+         strength_indicator: bool = False, strong_learners: bool = False) -> dict:
     kind = {"A": "affine", "GBT": "gbt"}.get(arm, "liao")
     seed_part = "" if learner_seed is None else f"__k{learner_seed:02d}"
     job_dict = {
@@ -527,27 +533,33 @@ def _job(out: Path, key: str, rung: str, arm: str, *, learner_seed=None,
     }
     if strength_indicator:
         job_dict["strength_indicator"] = True
+    if strong_learners:
+        job_dict["strong_learners"] = True
     return job_dict
 
 
 def build_jobs(out: Path, keys: list[str], rungs: list[str], arms: list[str],
-               seeds: list[int], strength_indicator: bool = False) -> list[dict]:
+               seeds: list[int], strength_indicator: bool = False,
+               strong_learners: bool = False) -> list[dict]:
     jobs = []
     for rung in rungs:
         for key in keys:
             if "A" in arms:
                 jobs.append(_job(out, key, rung, "A",
-                                 strength_indicator=strength_indicator))
+                                 strength_indicator=strength_indicator,
+                                 strong_learners=strong_learners))
             if "GBT" in arms and rung == "B-complete":
                 jobs.append(_job(out, key, rung, "GBT",
-                                 strength_indicator=strength_indicator))
+                                 strength_indicator=strength_indicator,
+                                 strong_learners=strong_learners))
     for k in seeds:
         for rung in rungs:
             for key in keys:
                 for arm in ("F", "C", "P"):
                     if arm in arms:
                         jobs.append(_job(out, key, rung, arm, learner_seed=k,
-                                         strength_indicator=strength_indicator))
+                                         strength_indicator=strength_indicator,
+                                         strong_learners=strong_learners))
     return jobs
 
 
@@ -605,7 +617,23 @@ def cmd_run(args) -> int:
     else:
         keys = [dataset_name(seed, N_QUBITS) for seed in DATASET_SEEDS]
     strength_indicator = bool(getattr(args, "strength_indicator", False))
-    jobs = build_jobs(out, keys, rungs, arms, seeds, strength_indicator=strength_indicator)
+    strong_learners = bool(getattr(args, "strong_learners", False))
+    if strong_learners:
+        fit_dir = out / "fits"
+        if fit_dir.exists():
+            for json_path in fit_dir.glob("*.json"):
+                try:
+                    fit_meta = json.loads(json_path.read_text(encoding="utf-8"))
+                except Exception:
+                    continue
+                if not fit_meta.get("strong_learners"):
+                    raise SystemExit(
+                        f"Refusal: {json_path.name} does not have strong_learners: true; "
+                        "run --strong-learners refuses to start in a fits directory holding non-strong fits."
+                    )
+    jobs = build_jobs(out, keys, rungs, arms, seeds,
+                      strength_indicator=strength_indicator,
+                      strong_learners=strong_learners)
     aliases = ["M (Part B) = F at B-none, the same fits"] if "B-none" in rungs else []
     if args.dry_run:
         common.print_plan(jobs, out / "fits", aliases)
@@ -613,12 +641,17 @@ def cmd_run(args) -> int:
     common.require_gate(args.gate_file)
     out.mkdir(parents=True, exist_ok=True)
     prepare_caches(root, out)
+    cache_digests = (common.check_caches_recorded(out / "cache", keys)
+                     if strong_learners else None)
     run_cfg = {
         "rungs": rungs, "arms": arms, "seeds": seeds,
         "workers": args.workers, "n_jobs": len(jobs),
     }
     if strength_indicator:
         run_cfg["strength_indicator"] = True
+    if strong_learners:
+        run_cfg["strong_learners"] = True
+        run_cfg["cache_sha256"] = cache_digests
     write_json(out / "run_config.json", run_cfg)
     info = common.drive(jobs, run_job, out, args.workers, limit=args.limit_jobs)
     write_json(out / f"run_{int(time.time())}.json", info)
@@ -644,6 +677,8 @@ def main(argv=None) -> int:
     run.add_argument("--dry-run", action="store_true")
     run.add_argument("--strength-indicator", action="store_true", default=False,
                      help="append noise_strength_L3 feature to every arm and rung")
+    run.add_argument("--strong-learners", action="store_true", default=False,
+                     help="enable hgbr strong learner candidate")
     run.add_argument("--limit-jobs", type=int, default=None)
     args = parser.parse_args(argv)
     if args.command == "generate":
