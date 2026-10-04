@@ -186,9 +186,17 @@ def compute_stacking(
     fits_dir: Path,
     datasets: dict[int, dict[str, list[dict]]],
     row_summary: dict[str, dict],
+    rungs_per_family: dict[str, tuple[str, ...]] | None = None,
 ) -> dict[str, dict]:
-    """Compute stacking increment per row and rung across learner seeds 1..20."""
+    """Compute stacking increment per row and rung across learner seeds 1..20.
+
+    ``rungs_per_family`` defaults to the full Part A ladder. Each entry also
+    carries the relative increment (macro recal - macro stack) / macro recal,
+    a ratio of seed means whose interval is formed inside each draw.
+    """
     stacking_results = {}
+    if rungs_per_family is None:
+        rungs_per_family = RUNGS_PER_FAMILY
 
     for seed in SEEDS:
         val_items = datasets[seed]["val"]
@@ -246,7 +254,7 @@ def compute_stacking(
                 20, n_circ, BOOTSTRAP_DRAWS, RULE_SEED
             )
 
-            for rung in RUNGS_PER_FAMILY[fam]:
+            for rung in rungs_per_family[fam]:
                 key_rung = f"{row_key}/{rung}"
 
                 c_test_seeds = np.empty((20, len(row_test_items)), dtype=float)
@@ -374,6 +382,9 @@ def compute_stacking(
 
                 mean_incr = math.fsum(incr_seeds) / len(incr_seeds)
                 ci_lo, ci_hi = np.percentile(incr_draws, dla.PERCENTILES)
+                rec_draws_mean = (rec_draws * seed_counts).sum(axis=1) / 20.0
+                rel_lo, rel_hi = np.percentile(incr_draws / rec_draws_mean, dla.PERCENTILES)
+                mean_rec = math.fsum(macro_rec_seeds) / 20.0
 
                 entry = {
                     "row": row_key,
@@ -400,6 +411,10 @@ def compute_stacking(
                         "upper": float(ci_hi),
                     },
                     "excludes_zero_above": bool(ci_lo > 0.0),
+                    "relative_increment": {
+                        "point": mean_incr / mean_rec,
+                        "interval": {"lower": float(rel_lo), "upper": float(rel_hi)},
+                    },
                     "L1_floor_mae": floors["L1_floor_mae"],
                     "L3_floor_mae": floors["L3_floor_mae"],
                     "macro_floor_mae": floors["macro_floor_mae"],

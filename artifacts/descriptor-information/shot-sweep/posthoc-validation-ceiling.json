@@ -1,0 +1,1970 @@
+{
+ "schema": "posthoc-shot-sweep-validation-ceiling-v1",
+ "status": "post hoc, descriptive; decides nothing",
+ "script": "tools/shot_sweep_validation_ceiling.py",
+ "script_sha256": "c749fddbfd01947d2f41c77dbde4fdd52a53f883b8c5c7bad88620d9a4e9fc47",
+ "inputs": {
+  "predictions": "artifacts/descriptor-information/shot-sweep/predictions.json",
+  "predictions_sha256": "63a2496e386eb7292dcf8586ef200d26f87313ed408c8066c8b7f5e01adff80b",
+  "c_fits": "assets/shot-sweep-v1/runs/shots-2048/fits",
+  "cache": "assets/shot-sweep-v1/runs/shots-2048/cache",
+  "analysis_a": {
+   "256": "artifacts/descriptor-information/shot-sweep/levels/256/analysis-a.json",
+   "1024": "artifacts/descriptor-information/shot-sweep/levels/1024/analysis-a.json",
+   "2048": "artifacts/descriptor-information/shot-sweep/levels/2048/analysis-a.json",
+   "8192": "artifacts/descriptor-information/shot-sweep/levels/8192/analysis-a.json",
+   "32768": "artifacts/descriptor-information/shot-sweep/levels/32768/analysis-a.json",
+   "131072": "artifacts/descriptor-information/shot-sweep/levels/131072/analysis-a.json",
+   "exact": "artifacts/descriptor-information/shot-sweep/levels/exact/analysis-a.json"
+  }
+ },
+ "frozen_ceiling_reproduced_max_abs_diff": 0.0,
+ "mean_ratio_validation_to_test_c_C": {
+  "R0": 0.9969150207648915,
+  "N1": 0.9936158527757183,
+  "N2": 0.9931564911353871,
+  "R5": 0.9757544263798327
+ },
+ "frozen": {
+  "summary": {
+   "h1_a_n1_pass": 6,
+   "h1_a_n2_pass": 6,
+   "h1_qualifying_cells": 48,
+   "h1_b_median_ratio": 0.8756750579652819,
+   "h1_c_exceeding": 0,
+   "h1_holds": true,
+   "h2_label_changing": [
+    23,
+    27
+   ],
+   "h2_all_predicted": [
+    78,
+    83
+   ],
+   "h2_abstentions": 25,
+   "h2_holds": true,
+   "series_monotone_in_shots": {
+    "shipped-s101-n640/tfi/N1": true,
+    "shipped-s101-n640/heisenberg/N1": true,
+    "shipped-s211-n640/tfi/N1": true,
+    "shipped-s211-n640/heisenberg/N1": true,
+    "shipped-s307-n640/tfi/N1": true,
+    "shipped-s307-n640/heisenberg/N1": true,
+    "shipped-s101-n640/tfi/N2": true,
+    "shipped-s101-n640/heisenberg/N2": true,
+    "shipped-s211-n640/tfi/N2": true,
+    "shipped-s211-n640/heisenberg/N2": true,
+    "shipped-s307-n640/tfi/N2": true,
+    "shipped-s307-n640/heisenberg/N2": true
+   }
+  },
+  "persistence": {
+   "all_eligible": {
+    "n_cells": 108,
+    "matches": 79
+   },
+   "predicted": {
+    "n_cells": 83,
+    "matches": 59
+   },
+   "label_changing": {
+    "n_cells": 27,
+    "matches": 4
+   }
+  }
+ },
+ "variants": {
+  "validation_only": {
+   "summary": {
+    "h1_a_n1_pass": 6,
+    "h1_a_n2_pass": 6,
+    "h1_qualifying_cells": 48,
+    "h1_b_median_ratio": 0.8414765313893959,
+    "h1_c_exceeding": 0,
+    "h1_holds": true,
+    "h2_label_changing": [
+     23,
+     26
+    ],
+    "h2_all_predicted": [
+     77,
+     81
+    ],
+    "h2_abstentions": 27,
+    "h2_holds": true,
+    "series_monotone_in_shots": {
+     "shipped-s101-n640/tfi/N1": true,
+     "shipped-s101-n640/heisenberg/N1": true,
+     "shipped-s211-n640/tfi/N1": true,
+     "shipped-s211-n640/heisenberg/N1": true,
+     "shipped-s307-n640/tfi/N1": true,
+     "shipped-s307-n640/heisenberg/N1": true,
+     "shipped-s101-n640/tfi/N2": true,
+     "shipped-s101-n640/heisenberg/N2": true,
+     "shipped-s211-n640/tfi/N2": true,
+     "shipped-s211-n640/heisenberg/N2": true,
+     "shipped-s307-n640/tfi/N2": true,
+     "shipped-s307-n640/heisenberg/N2": true
+    }
+   },
+   "persistence": {
+    "all_eligible": {
+     "n_cells": 108,
+     "matches": 79
+    },
+    "predicted": {
+     "n_cells": 81,
+     "matches": 57
+    },
+    "label_changing": {
+     "n_cells": 26,
+     "matches": 3
+    }
+   },
+   "cells": {
+    "1024/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.01134560724216771,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.04868939353707058,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.003605162065189127,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.3266176140660014,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.02762104691340672,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.12248610835259743,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.00373526288719761,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.7454413988333449,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.011682155650955761,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.04520605697806768,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "1024/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.002949190897335474,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.3176333022083757,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.023516702384127286,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.11627244885137855,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.0029873154277894054,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.7324313897321539,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.012784821727173434,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.04381718797089362,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "1024/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.0033425037532370805,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.29867178017368756,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.021762126551794214,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.12019009199425434,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.002719984988879598,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.7364330591388242,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.19532449603327018,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.3256452899403113,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.11921304002419297,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.6281942242783836,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.4449325902464002,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.6901485625852191,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.18247198398068565,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.9662581855954315,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.196543208807485,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.3194068433996502,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.09861108760896153,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.6212735297806746,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.44173298722086085,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.6979450251765267,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.1727572246348471,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.9664369084123446,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.21991490236000744,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.33081130656742364,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.12761065775129776,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.630446390163307,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.4490814284079814,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.7248384395530549,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.17255692411436518,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.970060403001273,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.01954767525416179,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.07814437691656917,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.0063942300489654436,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.3739439679196248,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.04773677242329988,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.18316183781452455,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.006722023582234171,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.8032420146944376,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.022836207555371524,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.08149360761736957,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.005950222873823741,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.37922826390926523,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.046208728870396176,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.1896129446580106,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.00621918498785845,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.8048288739621479,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.03000455653991496,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.08995275263865388,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.008288794125697607,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.37399943417769743,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.04284176263625339,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.19959051884790469,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.005582854176018226,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.8172812704154955,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.0031189499138284393,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.014976644752727641,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.0009869585539395986,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.214567725114717,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.006610272677861184,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.035229907402732796,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "256/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.0008459949471080197,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.5428362346678403,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.003067527275298465,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.013022755140559283,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "256/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.0007597839310558019,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.19294751672519284,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.006061086217918787,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.03589341159038906,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "256/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.0007423449934911286,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.5336040069945843,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.00348198805478217,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.012986793627995263,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "256/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.0008841400851793413,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.1753796078998674,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.006498286817518517,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.043099968618063755,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "256/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.0007869005089243819,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.5632194544444045,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.1299957405092309,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.26533982817528523,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "32768/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.06005562235628148,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.5447465527595621,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.276593760412037,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "32768/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.5335622419992474,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.07087405950514325,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.9421100127462393,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.14182621198387102,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.2678845977390528,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.05480739997349249,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.5501096378917136,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.28505956716834524,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "32768/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.5461320387559663,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.07438730845309005,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.941920290353014,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.15397522360772353,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.26724653769467166,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.06766060734165014,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.5388167308768843,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.2918636574095176,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "32768/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.5796486279767337,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.07522872917960122,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.948397213093326,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.06164001069021907,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.17794333096782788,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "8192/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.02246015397343437,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.4668771176414547,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.1376261166322168,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.3615688281861993,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.024120831770734874,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.898349676233562,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.07309625379600748,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.18502779118730783,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.021926438549338734,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.4676584388210696,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.13736235606059266,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.36779237458515057,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.02334155957374162,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.8937732979579012,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.0763387746909896,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.18004704887852307,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.02405791211240982,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.4486739642232631,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.1309182074052898,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "8192/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.3867073840523916,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.021311020470996755,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.9047879211160459,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.2541495544992429,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.3907636636174624,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.1911558962575005,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.7761905529812432,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.6909540709857774,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.8373580487414829,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.4936087613818332,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.982671037576351,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.25928007130790676,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.384279026658518,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.17498346139407606,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.7678542574837093,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.6903300439845963,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.8409764501173658,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.4776842255166449,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.98272977413989,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.27647523373588645,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.3919435598319835,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.198076611193855,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.7568094385510465,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.7015021401992574,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.8582402377991832,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.4801808651605316,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.9847969353517905,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    }
+   }
+  },
+  "test_c_C_cross_fitted_c_m": {
+   "summary": {
+    "h1_a_n1_pass": 6,
+    "h1_a_n2_pass": 6,
+    "h1_qualifying_cells": 48,
+    "h1_b_median_ratio": 0.8651160246173891,
+    "h1_c_exceeding": 0,
+    "h1_holds": true,
+    "h2_label_changing": [
+     22,
+     25
+    ],
+    "h2_all_predicted": [
+     76,
+     80
+    ],
+    "h2_abstentions": 28,
+    "h2_holds": true,
+    "series_monotone_in_shots": {
+     "shipped-s101-n640/tfi/N1": true,
+     "shipped-s101-n640/heisenberg/N1": true,
+     "shipped-s211-n640/tfi/N1": true,
+     "shipped-s211-n640/heisenberg/N1": true,
+     "shipped-s307-n640/tfi/N1": true,
+     "shipped-s307-n640/heisenberg/N1": true,
+     "shipped-s101-n640/tfi/N2": true,
+     "shipped-s101-n640/heisenberg/N2": true,
+     "shipped-s211-n640/tfi/N2": true,
+     "shipped-s211-n640/heisenberg/N2": true,
+     "shipped-s307-n640/tfi/N2": true,
+     "shipped-s307-n640/heisenberg/N2": true
+    }
+   },
+   "persistence": {
+    "all_eligible": {
+     "n_cells": 108,
+     "matches": 79
+    },
+    "predicted": {
+     "n_cells": 80,
+     "matches": 57
+    },
+    "label_changing": {
+     "n_cells": 25,
+     "matches": 3
+    }
+   },
+   "cells": {
+    "1024/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.010046248569852034,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.042571421327145864,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.0037338737134016142,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.32161153234890205,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.031443422884327665,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.1363222008277194,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.0037311775338376707,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.7653449870595779,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.010252359365542807,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.039230713141158,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "1024/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.002886147497532021,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.2926804259927359,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.025303843458691522,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.12429594172528258,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.0031772491308829087,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.7521956530448547,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.013076520871688202,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.04472114298439245,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "1024/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.003330205869764624,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.3215723028642854,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.025306881153901006,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.1370462892978016,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.0027362720300565524,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "1024/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.7429257681588025,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.1860533051081621,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.3117848714823993,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.12144984468122455,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.6246959098144095,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.46448661053294027,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.7090328593528279,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.18188377233150776,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.9691886738169889,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.18598764283606894,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.30437141018052627,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.09716989651676378,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.5995934954957141,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.4527769697091716,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.7086281836216907,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.17995072457937,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.9692497488149904,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.22201698638419143,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.3329090664439458,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.12773065910124037,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.6555405429499482,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.4690719608074111,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "131072/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.742620502113539,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.1739120785839552,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "131072/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.9708973128809242,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.01736544554473285,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.06916920982203845,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.006634495868597545,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.3696781131598468,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.053958705891435366,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.2005539721175308,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.006717324409938552,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.8192997494276228,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.020183356962512833,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.07191457274160895,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.005832261016877505,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.35766884348372363,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.04955283274260747,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.20029557312207924,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.00660263962633012,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.8201735863613882,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.030677610949478518,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.09151992791476249,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.008271804449838771,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.39453272319470056,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.049345052279439305,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.22262162407655672,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.0056140614710781245,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "2048/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.822094178890166,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.002753669245140644,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.012894669401281145,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.0010265414351291469,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.20864903286247694,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.007582456265712634,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.040310141405924704,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "256/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.0008455558236146743,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.5708509124170327,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.002683126200130892,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.011121839380814347,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "256/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.0007434067840625946,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.16622045462601143,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.006549135239943271,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.03903753042682723,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "256/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.0007914391599853632,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.559628483969316,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.0035605630603645633,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.013283293792729634,
+     "predicted_label": "not_distinguished",
+     "label_changing": true
+    },
+    "256/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.0008798428518507206,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.20064801271100463,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.0075819701241252035,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.05060748308305163,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.0007923894035930523,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "256/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.5717424004383771,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.12088114141022754,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.25105146464591777,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "32768/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.06160054161332451,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.5420454414975775,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.29539782047964014,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "32768/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.5563655611578504,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.07072435542760802,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.9471218841717862,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.1313957825830928,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.25307153958191275,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.053799034516993305,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.5289332820066512,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.2954024561912516,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "32768/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.5586868119003123,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.07851504852148294,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.9467699953081142,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.1561113236737255,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.26934569363202787,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.06774599147818083,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.5612468449652874,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.3120338399942493,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "32768/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.6037810077440463,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.07581420697690378,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "32768/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.949835249179964,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.05569447003116379,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.16370235708234115,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "8192/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.023214624709710807,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.46368244974861883,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.15152154808608065,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.3840204356963586,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.024106123264043933,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.9070547611201739,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.06583604728468961,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.1702886014749342,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.021480832542170036,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.44865243601598226,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.14504015480598265,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.38052380799384167,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.024774032566072357,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.9025151551033551,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.07768295020089055,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.18214423080539077,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.02399591654145017,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.4669610326600092,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.14616438265376508,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "8192/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.4141288572260201,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.021425735232954657,
+     "predicted_label": "not_distinguished",
+     "label_changing": false
+    },
+    "8192/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.9074124907351971,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s101-n640/heisenberg/N1": {
+     "D_over_C_star": 0.24552906398182595,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s101-n640/heisenberg/N2": {
+     "D_over_C_star": 0.37490333290779543,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s101-n640/heisenberg/R0": {
+     "D_over_C_star": 0.19366697555575496,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s101-n640/heisenberg/R5": {
+     "D_over_C_star": 0.7706489770079277,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s101-n640/tfi/N1": {
+     "D_over_C_star": 0.7036701476202417,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s101-n640/tfi/N2": {
+     "D_over_C_star": 0.8477284848633327,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s101-n640/tfi/R0": {
+     "D_over_C_star": 0.4927001867700531,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s101-n640/tfi/R5": {
+     "D_over_C_star": 0.9841762487430654,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/heisenberg/N1": {
+     "D_over_C_star": 0.2499507420243665,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s211-n640/heisenberg/N2": {
+     "D_over_C_star": 0.3673598000463152,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/heisenberg/R0": {
+     "D_over_C_star": 0.1736553097290714,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/heisenberg/R5": {
+     "D_over_C_star": 0.740138276190448,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/tfi/N1": {
+     "D_over_C_star": 0.6982637064253101,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s211-n640/tfi/N2": {
+     "D_over_C_star": 0.8469557243125296,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/tfi/R0": {
+     "D_over_C_star": 0.48482807650060245,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s211-n640/tfi/R5": {
+     "D_over_C_star": 0.9841776965989928,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/heisenberg/N1": {
+     "D_over_C_star": 0.278345344815602,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s307-n640/heisenberg/N2": {
+     "D_over_C_star": 0.39428177454508184,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/heisenberg/R0": {
+     "D_over_C_star": 0.1981264517076884,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/heisenberg/R5": {
+     "D_over_C_star": 0.7822397742347204,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/tfi/N1": {
+     "D_over_C_star": 0.7103614315574203,
+     "predicted_label": "measurement_adds",
+     "label_changing": true
+    },
+    "exact/shipped-s307-n640/tfi/N2": {
+     "D_over_C_star": 0.867066387769249,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/tfi/R0": {
+     "D_over_C_star": 0.48152508343489453,
+     "predicted_label": null,
+     "label_changing": false
+    },
+    "exact/shipped-s307-n640/tfi/R5": {
+     "D_over_C_star": 0.9852219369385634,
+     "predicted_label": "measurement_adds",
+     "label_changing": false
+    }
+   }
+  }
+ },
+ "shot_rank_spearman_observed": {
+  "shipped-s101-n640/tfi/N1": 1.0,
+  "shipped-s101-n640/heisenberg/N1": 0.9285714285714288,
+  "shipped-s211-n640/tfi/N1": 1.0,
+  "shipped-s211-n640/heisenberg/N1": 0.8928571428571429,
+  "shipped-s307-n640/tfi/N1": 1.0,
+  "shipped-s307-n640/heisenberg/N1": 0.8214285714285715,
+  "shipped-s101-n640/tfi/N2": 1.0,
+  "shipped-s101-n640/heisenberg/N2": 1.0,
+  "shipped-s211-n640/tfi/N2": 1.0,
+  "shipped-s211-n640/heisenberg/N2": 1.0,
+  "shipped-s307-n640/tfi/N2": 1.0,
+  "shipped-s307-n640/heisenberg/N2": 1.0
+ },
+ "c_C_validation": {
+  "shipped-s101-n640/tfi/R0/L1/z_mid": 0.002649907135034877,
+  "shipped-s101-n640/tfi/R0/L1/zz_mid": 0.0030671250644082305,
+  "shipped-s101-n640/tfi/R0/L3/z_mid": 0.0029002839312589858,
+  "shipped-s101-n640/tfi/R0/L3/zz_mid": 0.0034022582024347595,
+  "shipped-s101-n640/heisenberg/R0/L1/z_mid": 0.003899055756308608,
+  "shipped-s101-n640/heisenberg/R0/L1/zz_mid": 0.004454518781349252,
+  "shipped-s101-n640/heisenberg/R0/L3/z_mid": 0.0036735461633020244,
+  "shipped-s101-n640/heisenberg/R0/L3/zz_mid": 0.0036926221171368506,
+  "shipped-s101-n640/tfi/N1/L1/z_mid": 0.007703620276623024,
+  "shipped-s101-n640/tfi/N1/L1/zz_mid": 0.008006166304419273,
+  "shipped-s101-n640/tfi/N1/L3/z_mid": 0.007357225442297973,
+  "shipped-s101-n640/tfi/N1/L3/zz_mid": 0.007946370438705145,
+  "shipped-s101-n640/heisenberg/N1/L1/z_mid": 0.007465123246883243,
+  "shipped-s101-n640/heisenberg/N1/L1/zz_mid": 0.007846989680702396,
+  "shipped-s101-n640/heisenberg/N1/L3/z_mid": 0.007743309404610406,
+  "shipped-s101-n640/heisenberg/N1/L3/zz_mid": 0.008470575783440282,
+  "shipped-s101-n640/tfi/N2/L1/z_mid": 0.017892819922840662,
+  "shipped-s101-n640/tfi/N2/L1/zz_mid": 0.020082361042191927,
+  "shipped-s101-n640/tfi/N2/L3/z_mid": 0.01769887682266494,
+  "shipped-s101-n640/tfi/N2/L3/zz_mid": 0.01956001362885578,
+  "shipped-s101-n640/heisenberg/N2/L1/z_mid": 0.016218235936467793,
+  "shipped-s101-n640/heisenberg/N2/L1/zz_mid": 0.01798568114416738,
+  "shipped-s101-n640/heisenberg/N2/L3/z_mid": 0.016111731036328764,
+  "shipped-s101-n640/heisenberg/N2/L3/zz_mid": 0.018498868197821438,
+  "shipped-s101-n640/tfi/R5/L1/z_mid": 0.17450432893071313,
+  "shipped-s101-n640/tfi/R5/L1/zz_mid": 0.21160679329493942,
+  "shipped-s101-n640/tfi/R5/L3/z_mid": 0.17453069361342727,
+  "shipped-s101-n640/tfi/R5/L3/zz_mid": 0.2116192158139476,
+  "shipped-s101-n640/heisenberg/R5/L1/z_mid": 0.08954548779447329,
+  "shipped-s101-n640/heisenberg/R5/L1/zz_mid": 0.1069055487806457,
+  "shipped-s101-n640/heisenberg/R5/L3/z_mid": 0.08967776553332582,
+  "shipped-s101-n640/heisenberg/R5/L3/zz_mid": 0.10708444025013483,
+  "shipped-s211-n640/tfi/R0/L1/z_mid": 0.00251452225084041,
+  "shipped-s211-n640/tfi/R0/L1/zz_mid": 0.0028535519786827934,
+  "shipped-s211-n640/tfi/R0/L3/z_mid": 0.0023903269901078515,
+  "shipped-s211-n640/tfi/R0/L3/zz_mid": 0.0028108866914678793,
+  "shipped-s211-n640/heisenberg/R0/L1/z_mid": 0.003854935096236331,
+  "shipped-s211-n640/heisenberg/R0/L1/zz_mid": 0.0043863763575259715,
+  "shipped-s211-n640/heisenberg/R0/L3/z_mid": 0.0042346415100244054,
+  "shipped-s211-n640/heisenberg/R0/L3/zz_mid": 0.00392202774518046,
+  "shipped-s211-n640/tfi/N1/L1/z_mid": 0.007340337745017409,
+  "shipped-s211-n640/tfi/N1/L1/zz_mid": 0.00812934050506319,
+  "shipped-s211-n640/tfi/N1/L3/z_mid": 0.007385774323336111,
+  "shipped-s211-n640/tfi/N1/L3/zz_mid": 0.008217337079877929,
+  "shipped-s211-n640/heisenberg/N1/L1/z_mid": 0.00784976871934731,
+  "shipped-s211-n640/heisenberg/N1/L1/zz_mid": 0.008627534798960817,
+  "shipped-s211-n640/heisenberg/N1/L3/z_mid": 0.0075194543612014065,
+  "shipped-s211-n640/heisenberg/N1/L3/zz_mid": 0.008705891373436397,
+  "shipped-s211-n640/tfi/N2/L1/z_mid": 0.018742360047117095,
+  "shipped-s211-n640/tfi/N2/L1/zz_mid": 0.02029312479876987,
+  "shipped-s211-n640/tfi/N2/L3/z_mid": 0.01868600947663127,
+  "shipped-s211-n640/tfi/N2/L3/zz_mid": 0.02043327009123422,
+  "shipped-s211-n640/heisenberg/N2/L1/z_mid": 0.01649855266442954,
+  "shipped-s211-n640/heisenberg/N2/L1/zz_mid": 0.01883056449640241,
+  "shipped-s211-n640/heisenberg/N2/L3/z_mid": 0.017168415930876573,
+  "shipped-s211-n640/heisenberg/N2/L3/zz_mid": 0.019570162226080295,
+  "shipped-s211-n640/tfi/R5/L1/z_mid": 0.17611412280724822,
+  "shipped-s211-n640/tfi/R5/L1/zz_mid": 0.21521192197083092,
+  "shipped-s211-n640/tfi/R5/L3/z_mid": 0.17609255025559772,
+  "shipped-s211-n640/tfi/R5/L3/zz_mid": 0.21511667369678614,
+  "shipped-s211-n640/heisenberg/R5/L1/z_mid": 0.08993273973327276,
+  "shipped-s211-n640/heisenberg/R5/L1/zz_mid": 0.10626286131293201,
+  "shipped-s211-n640/heisenberg/R5/L3/z_mid": 0.09019714843593321,
+  "shipped-s211-n640/heisenberg/R5/L3/zz_mid": 0.10648174285439635,
+  "shipped-s307-n640/tfi/R0/L1/z_mid": 0.00244994105742351,
+  "shipped-s307-n640/tfi/R0/L1/zz_mid": 0.0026469478059535094,
+  "shipped-s307-n640/tfi/R0/L3/z_mid": 0.00226967300067318,
+  "shipped-s307-n640/tfi/R0/L3/zz_mid": 0.002448939703635506,
+  "shipped-s307-n640/heisenberg/R0/L1/z_mid": 0.004299042239385161,
+  "shipped-s307-n640/heisenberg/R0/L1/zz_mid": 0.004097615076379735,
+  "shipped-s307-n640/heisenberg/R0/L3/z_mid": 0.004008479627783513,
+  "shipped-s307-n640/heisenberg/R0/L3/zz_mid": 0.004424319437979061,
+  "shipped-s307-n640/tfi/N1/L1/z_mid": 0.007279838982127531,
+  "shipped-s307-n640/tfi/N1/L1/zz_mid": 0.00762252318253087,
+  "shipped-s307-n640/tfi/N1/L3/z_mid": 0.007259191305825671,
+  "shipped-s307-n640/tfi/N1/L3/zz_mid": 0.007954638419292432,
+  "shipped-s307-n640/heisenberg/N1/L1/z_mid": 0.008396819167939464,
+  "shipped-s307-n640/heisenberg/N1/L1/zz_mid": 0.008634463140931175,
+  "shipped-s307-n640/heisenberg/N1/L3/z_mid": 0.00813601746774573,
+  "shipped-s307-n640/heisenberg/N1/L3/zz_mid": 0.00852002065271516,
+  "shipped-s307-n640/tfi/N2/L1/z_mid": 0.019290879945366036,
+  "shipped-s307-n640/tfi/N2/L1/zz_mid": 0.02106276865019889,
+  "shipped-s307-n640/tfi/N2/L3/z_mid": 0.01922635750911927,
+  "shipped-s307-n640/tfi/N2/L3/zz_mid": 0.021208002108146586,
+  "shipped-s307-n640/heisenberg/N2/L1/z_mid": 0.016053014998770314,
+  "shipped-s307-n640/heisenberg/N2/L1/zz_mid": 0.018534734656116738,
+  "shipped-s307-n640/heisenberg/N2/L3/z_mid": 0.016271817621687452,
+  "shipped-s307-n640/heisenberg/N2/L3/zz_mid": 0.018214252592094242,
+  "shipped-s307-n640/tfi/R5/L1/z_mid": 0.18100240340201432,
+  "shipped-s307-n640/tfi/R5/L1/zz_mid": 0.22183853848808638,
+  "shipped-s307-n640/tfi/R5/L3/z_mid": 0.18108504747551335,
+  "shipped-s307-n640/tfi/R5/L3/zz_mid": 0.2217984085603506,
+  "shipped-s307-n640/heisenberg/R5/L1/z_mid": 0.08112450626093579,
+  "shipped-s307-n640/heisenberg/R5/L1/zz_mid": 0.09658854251440692,
+  "shipped-s307-n640/heisenberg/R5/L3/z_mid": 0.08132785507382298,
+  "shipped-s307-n640/heisenberg/R5/L3/zz_mid": 0.09677005437594804
+ }
+}
