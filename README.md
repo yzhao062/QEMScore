@@ -135,7 +135,7 @@ Use a new output directory for each split-v2 generation. The console script has 
 
 ## Campaign Archive
 
-QEMScore has one GitHub release, tag `campaign-archive-v1` (2026-09-08). It ships the frozen controlled campaign reported in the paper as a release asset rather than as package data.
+QEMScore has two GitHub releases. Tag `campaign-archive-v1` (2026-09-08) ships the frozen controlled campaign reported in the paper as a release asset rather than as package data. Tag `descriptor-information-v1` (2026-10-04, at `431d101`) ships the fits of the descriptor-information experiment and its three follow-ups; see [Descriptor-Information Fits](#descriptor-information-fits) below.
 
 ```bash
 curl -L -O https://github.com/yzhao062/QEMScore/releases/download/campaign-archive-v1/campaign-archive-v1.tar.gz
@@ -152,6 +152,23 @@ cd campaign-archive-v1 && sha256sum -c SHA256SUMS.txt
 | Tree fingerprint | `c3b79a0766c1d48117995826a2ee48a1f0b2a1955931f314a9d298dbc9611821`, the SHA-256 of `SHA256SUMS.txt` itself |
 
 The archive holds the campaign report, tables, audit, and frozen manifest, plus per-setting rosters with every method's test predictions, per-cell metrics, and circuit-evaluation ledger. Per-setting records with role assignments, selected configurations, and untouched-test predictions are included, as are the fit bindings and each setting's dataset manifest. The generated item streams and their sidecars, 771 MB, are excluded, because the deterministic generators in this repository reproduce them from the recorded seed and dependency lock. `report.json` carries the twelve dataset hashes a regeneration must match. [`campaign-archive/MANIFEST.md`](campaign-archive/MANIFEST.md) lists every component, and [`campaign-archive/SHA256SUMS.txt`](campaign-archive/SHA256SUMS.txt) is a copy of the checksum file that travels in git.
+
+### Descriptor-Information Fits
+
+Release `descriptor-information-v1` contains fit records for the original descriptor-information experiment and its three follow-ups, in four assets. The original rule was frozen before new-rung and new-dataset fits; it reused earlier R0 fits. Each follow-up rule was committed before its new fits; see [`docs/frozen-rules/`](docs/frozen-rules/). Reproducing `posthoc-strongest-reference.json` requires additional fitting from the prepared Part A data. [`artifacts/descriptor-information/README.md`](artifacts/descriptor-information/README.md) gives the commands and required inputs. `artifacts/descriptor-information/posthoc-stacking-pins.json` records each asset's SHA-256 and those of the fit files the post hoc stacking reads.
+
+| Asset | Bytes | SHA-256 | Holds |
+|---|---:|---|---|
+| `descriptor-information-v1.tar.xz` | 89,990,540 | `9cf19a499122cdff92560333cb2a91b2fcdd098ad8fe0cb95e166f7d186dfa57` | Original experiment: every fit with per-candidate predictions, and the slim cached test items |
+| `descriptor-information-strength-v1.tar.xz` | 99,746,872 | `d9bc11b4eed70d90f7b3c605c1b1eb3c9656d15fbc83b2c20fe7511a7bdae170` | Strength-indicator rerun: fits only (reads the first asset's caches) |
+| `descriptor-information-strong-learners-v1.tar.xz` | 236,818,824 | `80fcccc657fafcfe68d55a899cf5008977c2e6e7e0994cffadb4e71a32d04643` | Strong-learner rerun: Part A and Part B fits, derived baseline fits, run log |
+| `descriptor-information-shot-sweep-v1.tar.xz` | 409,030,636 | `d39969f21e77e4ab33a1daaa7b8daedf4b93cb9753c569d575af0ec631971b16` | Shot-count sweep: seven level datasets, each level's fits and caches, check reports, run log |
+
+```bash
+curl -L -O https://github.com/yzhao062/QEMScore/releases/download/descriptor-information-v1/descriptor-information-v1.tar.xz
+sha256sum descriptor-information-v1.tar.xz
+tar -xJf descriptor-information-v1.tar.xz
+```
 
 ## What the Campaign Found
 
