@@ -16,6 +16,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+from collections.abc import Sequence
 import hashlib
 import json
 import math
@@ -57,11 +58,28 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def load_datasets(data_dir: Path) -> dict[int, dict[str, list[dict]]]:
+def load_datasets(
+    data_dir: Path,
+    dataset_seeds: Sequence[int] = SEEDS,
+) -> dict[int, dict[str, list[dict]]]:
     """Load regenerated dataset items split into validation and test."""
     datasets = {}
-    for seed in SEEDS:
-        p = data_dir / f"regen-shipped-s{seed}-n640" / "items.jsonl"
+    for seed in dataset_seeds:
+        candidates = [
+            data_dir / f"regen-shipped-s{seed}-n640" / "items.jsonl",
+            data_dir / f"shipped-s{seed}-n640" / "items.jsonl",
+        ]
+        p = None
+        for cand in candidates:
+            if cand.exists():
+                p = cand
+                break
+        if p is None:
+            matches = list(data_dir.glob(f"*s{seed}*/items.jsonl"))
+            if matches:
+                p = sorted(matches)[0]
+        if p is None or not p.exists():
+            raise FileNotFoundError(f"Dataset items.jsonl for seed {seed} not found in {data_dir}")
         val_items: list[dict] = []
         test_items: list[dict] = []
         with open(p, "r", encoding="utf-8") as f:
@@ -78,6 +96,7 @@ def load_datasets(data_dir: Path) -> dict[int, dict[str, list[dict]]]:
 
 def compute_floors(
     datasets: dict[int, dict[str, list[dict]]],
+    dataset_seeds: Sequence[int] = SEEDS,
 ) -> tuple[dict[str, dict], dict[str, dict]]:
     """Compute per-cell information floors and row-level severity summaries.
 
@@ -91,7 +110,7 @@ def compute_floors(
     cell_floors = {}
     row_floors = {}
 
-    for seed in SEEDS:
+    for seed in dataset_seeds:
         v_items = datasets[seed]["val"]
         t_items = datasets[seed]["test"]
 
@@ -187,6 +206,7 @@ def compute_stacking(
     datasets: dict[int, dict[str, list[dict]]],
     row_summary: dict[str, dict],
     rungs_per_family: dict[str, tuple[str, ...]] | None = None,
+    dataset_seeds: Sequence[int] = SEEDS,
 ) -> dict[str, dict]:
     """Compute stacking increment per row and rung across learner seeds 1..20.
 
@@ -198,7 +218,7 @@ def compute_stacking(
     if rungs_per_family is None:
         rungs_per_family = RUNGS_PER_FAMILY
 
-    for seed in SEEDS:
+    for seed in dataset_seeds:
         val_items = datasets[seed]["val"]
         test_items = datasets[seed]["test"]
 
@@ -532,17 +552,25 @@ def main() -> None:
         default=None,
         help="Optional path for a Markdown summary of the tables.",
     )
+    parser.add_argument(
+        "--dataset-seeds",
+        type=int,
+        nargs="+",
+        default=list(SEEDS),
+        help="Dataset seeds (default: %(default)s)",
+    )
     args = parser.parse_args()
 
+    dataset_seeds = tuple(args.dataset_seeds)
     t0 = time.perf_counter()
     print("Loading regenerated datasets...")
-    datasets = load_datasets(args.data_dir)
+    datasets = load_datasets(args.data_dir, dataset_seeds=dataset_seeds)
 
     print("Computing per-cell measurement information floors...")
-    cell_floors, row_summary = compute_floors(datasets)
+    cell_floors, row_summary = compute_floors(datasets, dataset_seeds=dataset_seeds)
 
     print("Computing stacking increment across all rungs and learner seeds...")
-    stacking_results = compute_stacking(args.fits_dir, datasets, row_summary)
+    stacking_results = compute_stacking(args.fits_dir, datasets, row_summary, dataset_seeds=dataset_seeds)
 
     # Build output JSON
     payload = {

@@ -279,3 +279,19 @@ python tools/joint_bootstrap.py \
     --set shot-sweep 256=$S/runs/shots-256/fits@$S/runs/shots-256/cache@$A/shot-sweep/levels/256/analysis-a.json ... \
     --out $A/posthoc-joint-bootstrap.json
 ```
+
+## Round-8 Follow-Ups (Rules of 2026-10-04)
+
+Each earlier follow-up was frozen before fitting but designed with earlier results in view. The seventh review panel asked whether they hold on new circuits, and asked six further questions of the released datasets. Three rules answer, each committed with its code before any dataset or fit it governs.
+
+- `docs/frozen-rules/2026-10-04-fresh-confirmation.md`: three new dataset seeds (401, 503, 607), generated after the rule, with the seven shot levels of the sweep and both candidate sets. Eight predictions (P1 to P8) are locked in the rule and scored once by `tools/fresh_confirmation.py score`. The shot-rule predictions (P6, P7) come from `tools/fresh_confirmation.py predict`, which reads validation rows only and is written before any fit of F or P. Run on the earlier seeds with their released analyses, the same script reproduces the released validation-only ceilings (largest difference 1.6e-14 over 168 cells) and every earlier value the rule quotes.
+- `docs/frozen-rules/2026-10-04-crossed-follow-ups.md`, on the released datasets: (B) the stronger candidates at the six other shot levels, (C) an MLP with validation early stopping and a step size that halves on plateaus, (D) learner seeds 21 to 40 of C and F for an A/A calibration of the decision interval, (E) a stack with a measurement-free prediction of the label, (G) training sizes 40 to 320, and (H) an equal-spend accounting.
+- `docs/frozen-rules/2026-10-04-mlqem-own-data.md`: the control applied to ML-QEM's own simulated Trotter-Ising data, encoding, and models (code and commands in `reanalysis/mlqem/`).
+
+New options and tools:
+- `tools/fresh_panel.py` (`generate`, `verify`, `record-caches`), `tools/descriptor_ladder.py prepare --fresh` and `prepare --sweep --fresh --fresh-source`, and `--dataset-seeds` on the analysis, post hoc, prediction, hypothesis, stacking, joint-band, and learner-adequacy scripts (default 101, 211, 307; default outputs unchanged).
+- `tools/descriptor_ladder.py run --neural-es` (part C; the defaults of `qemscore.baselines.liao` are unchanged, checked against an oracle written before the change), `--train-size N` (part G; the first N training circuits in the generator's prefix order), and `--cache-record PATH` (any run checks its caches against a record before the first fit).
+- `tools/aa_calibration.py` (part D), `tools/measurement_free_stack.py` (part E), `tools/equal_spend.py` (part H), and `tools/stacking_increment_all.py --unpinned` for fit sets not yet in a release (every other input check applies; run on a released set, it reproduces the pinned record exactly).
+- Scripts: `round8/scripts/mac_fresh.sh` (generation and preparation of the fresh panel on macOS) and `round8/scripts/round8_stage.sh` (every DeltaAI stage).
+
+Results are added here when the runs finish.

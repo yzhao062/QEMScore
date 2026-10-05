@@ -36,6 +36,7 @@ from pathlib import Path
 import pickle
 import sys
 from typing import Any
+from collections.abc import Sequence
 import warnings
 from zoneinfo import ZoneInfo
 
@@ -130,10 +131,11 @@ def load_c_fit_predictions(fits_dir: Path, seed: int, rung: str) -> np.ndarray:
 def compute_c_C_for_fits(
     fits_dir: Path,
     cache_by_seed: dict[int, dict],
+    dataset_seeds: Sequence[int] = SEEDS,
 ) -> dict[str, float]:
     """Compute c_C for each row, rung, and rule cell from C fits."""
     c_C_dict = {}
-    for seed in SEEDS:
+    for seed in dataset_seeds:
         key = f"shipped-s{seed}-n640"
         test_items = cache_by_seed[seed]["test"]
         for rung in RUNGS:
@@ -190,6 +192,7 @@ def run_predict(
     run_log_path: Path,
     command_str: str,
     require_all_levels: bool = True,
+    dataset_seeds: Sequence[int] = SEEDS,
 ) -> dict:
     repo_root = _REPO
     if require_all_levels and set(level_dirs) != set(CANONICAL_LEVELS):
@@ -213,7 +216,7 @@ def run_predict(
     for lvl_name, p in level_dirs.items():
         cache_dir = p / "cache" if (p / "cache").is_dir() else p
         level_caches[lvl_name] = {}
-        for seed in SEEDS:
+        for seed in dataset_seeds:
             cf = find_cache_file(cache_dir, seed)
             level_caches[lvl_name][seed] = load_cache(cf)
 
@@ -227,8 +230,8 @@ def run_predict(
         cache_2048 = next(iter(level_caches.values()))
 
     # 3. Compute c_C from sweep fits and reference fits
-    c_C_sweep = compute_c_C_for_fits(c_fits_dir, cache_2048)
-    c_C_ref = compute_c_C_for_fits(reference_c_fits_dir, cache_2048)
+    c_C_sweep = compute_c_C_for_fits(c_fits_dir, cache_2048, dataset_seeds=dataset_seeds)
+    c_C_ref = compute_c_C_for_fits(reference_c_fits_dir, cache_2048, dataset_seeds=dataset_seeds)
 
     # 4. Compute per-level and rule-cell quantities: c_m, c_r, cross-fitted c_m
     rule_cells_out: dict[str, dict[str, Any]] = {}
@@ -236,7 +239,7 @@ def run_predict(
 
     for lvl_name, seed_cache in level_dirs.items():
         caches = level_caches[lvl_name]
-        for seed in SEEDS:
+        for seed in dataset_seeds:
             key = f"shipped-s{seed}-n640"
             v_items = caches[seed]["validation"]
             t_items = caches[seed]["test"]
@@ -353,7 +356,7 @@ def run_predict(
     thresholds_computed: dict[str, dict[str, float]] = {}
 
     for lvl_name in level_dirs.keys():
-        for seed in SEEDS:
+        for seed in dataset_seeds:
             key = f"shipped-s{seed}-n640"
             for fam in FAMILIES:
                 row_key = f"{key}/{fam}"
@@ -393,16 +396,21 @@ def run_predict(
                     D_over_C_star_cr = 1.0 - (macro_c_comb_cr / macro_c_C) if macro_c_C > 0 else 0.0
 
                     # Reference analysis interval & threshold
-                    ref_rung = ref_rows[row_key]["rungs"][rung]
-                    ci = ref_rung["D_over_C"]["interval"]
-                    h = (ci["upper"] - ci["lower"]) / 2.0
-                    raw_thresh = max(0.10, 2.0 * h)
-                    adds_thresh = round(raw_thresh, 3)
+                    if row_key in ref_rows:
+                        ref_rung = ref_rows[row_key]["rungs"][rung]
+                        ci = ref_rung["D_over_C"]["interval"]
+                        h = (ci["upper"] - ci["lower"]) / 2.0
+                        raw_thresh = max(0.10, 2.0 * h)
+                        adds_thresh = round(raw_thresh, 3)
+                        ref_label = ref_rung["classification"]["label"]
+                        ref_baseline = "not_distinguished" if ref_label == "measurement_hurts" else ref_label
+                    else:
+                        h = float("nan")
+                        adds_thresh = 0.10
+                        ref_label = None
+                        ref_baseline = None
 
                     thresholds_computed.setdefault(row_key, {})[rung] = adds_thresh
-
-                    ref_label = ref_rung["classification"]["label"]
-                    ref_baseline = "not_distinguished" if ref_label == "measurement_hurts" else ref_label
 
                     # Label prediction
                     if D_over_C_star >= adds_thresh:
@@ -558,6 +566,13 @@ def main() -> None:
         required=True,
         help="Run log file to append output SHA-256 and timestamps",
     )
+    parser.add_argument(
+        "--dataset-seeds",
+        type=int,
+        nargs="+",
+        default=list(SEEDS),
+        help="Dataset seeds (default: %(default)s)",
+    )
 
     args = parser.parse_args()
 
@@ -577,6 +592,7 @@ def main() -> None:
         out_path=args.out,
         run_log_path=args.run_log,
         command_str=" ".join(sys.argv),
+        dataset_seeds=tuple(args.dataset_seeds),
     )
 
 

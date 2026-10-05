@@ -182,7 +182,8 @@ __all__ = [
     "POLY5_RUNGS", "REPO_ROOT", "RIDGE_ALPHAS", "RULE_FILE", "RULE_SEED",
     "STRENGTH_FEATURE_NAME", "STRENGTH_RECORD", "STRONG_LEARNERS_RULE", "check_caches_recorded",
     "strong_learners_rule_sha256",
-    "_parse_seeds", "blas_fpe_probe", "check_gate_amendment", "drive", "gate_decision",
+    "_circuit_ids_sha256", "_parse_seeds", "blas_fpe_probe", "check_gate_amendment",
+    "drive", "filter_train_rows", "gate_decision",
     "load_cache", "print_plan", "require_gate", "rule_path", "run_affine_fit",
     "run_liao_fit", "severity_indicator", "sha256_file", "write_cache", "write_json",
 ]
@@ -282,6 +283,18 @@ def _versions() -> dict:
 
 def _names_sha256(names: Sequence[str]) -> str:
     return hashlib.sha256(json.dumps(list(names)).encode("utf-8")).hexdigest()
+
+
+def _circuit_ids_sha256(circuit_ids: Sequence[str]) -> str:
+    """SHA-256 of the sorted unique training circuit identifiers."""
+    return hashlib.sha256(json.dumps(sorted(set(circuit_ids))).encode("utf-8")).hexdigest()
+
+
+def filter_train_rows(train: Sequence[dict], train_size: int | None) -> list[dict]:
+    """Return the first train_size circuits per family in the generator's prefix order."""
+    if train_size is None:
+        return list(train)
+    return [row for row in train if int(row["instance"]) < train_size]
 
 
 def rule_path() -> Path:
@@ -615,7 +628,8 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
     shuffle_seed = (int(job["shuffle_seed"]) if job.get("shuffle_seed") is not None
                     else None)
     drop = (NOISY,) if fit_arm == "C" else ()
-    train = list(data["train"])
+    train_size = job.get("train_size")
+    train = filter_train_rows(data["train"], train_size)
     validation = list(data["validation"])
     if fit_arm == "P":
         if shuffle_seed is None:
@@ -629,10 +643,24 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
         warnings.simplefilter("always")
         t0 = time.perf_counter()
         try:
-            model = LiaoMitigator(
-                random_state=k, drop_features=drop,
-                feature_builder=builder, feature_names=tuple(names),
-            ).fit(train, validation)
+            neural_es = bool(job.get("neural_es"))
+            liao_kwargs = {
+                "random_state": k,
+                "drop_features": drop,
+                "feature_builder": builder,
+                "feature_names": tuple(names),
+            }
+            if neural_es:
+                liao_kwargs.update({
+                    "stopping_rule": "validation_patience",
+                    "epochs": 2000,
+                    "patience": 50,
+                    "min_delta": 0.0,
+                    "lr_plateau_factor": 0.5,
+                    "lr_plateau_patience": 10,
+                    "lr_min": 1e-5,
+                })
+            model = LiaoMitigator(**liao_kwargs).fit(train, validation)
         except Exception as exc:  # recorded, never swallowed silently
             error = f"fit: {type(exc).__name__}: {exc}"
         timing["fit_seconds"] = time.perf_counter() - t0
@@ -817,6 +845,12 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
         "learner_seed": k,
         "shuffle_seed": shuffle_seed,
         "purpose": job.get("purpose", "rung_fit"),
+        **({"train_size": int(train_size),
+            "n_train_rows": len(train),
+            "training_rows": len(train),
+            "training_circuit_ids_sha256": _circuit_ids_sha256([str(r["circuit_id"]) for r in train]),
+            "training_circuit_identifiers_sha256": _circuit_ids_sha256([str(r["circuit_id"]) for r in train])}
+           if train_size is not None else {}),
         **({"strength_indicator": True} if job.get("strength_indicator") else {}),
         **({"strong_learners": True} if job.get("strong_learners") else {}),
         **({"candidates": list(cand_names)} if job.get("strong_learners") else {}),
@@ -826,6 +860,21 @@ def run_liao_fit(job: Mapping[str, object], data: Mapping[str, object],
                                "sha256": strong_learners_rule_sha256()}}
            if job.get("strong_learners") else {}),
         **({"option_off": option_off} if option_off is not None else {}),
+        **({"neural_es": True} if job.get("neural_es") else {}),
+        **({
+            "schedule_parameters": {
+                "stopping_rule": "validation_patience",
+                "epochs": 2000,
+                "patience": 50,
+                "min_delta": 0.0,
+                "lr_plateau_factor": 0.5,
+                "lr_plateau_patience": 10,
+                "lr_min": 1e-5,
+            },
+            "epochs_run": None if model is None or error is not None else int(model.candidate_models_["mlp"].n_iter_),
+            "best_epoch": None if model is None or error is not None else int(model.candidate_models_["mlp"].best_epoch_),
+            "final_learning_rate": None if model is None or error is not None else float(model.candidate_models_["mlp"].final_learning_rate_),
+        } if job.get("neural_es") else {}),
         "dropped_features": list(drop),
         "feature_builder": getattr(builder, "name", None),
         "n_features": len(names),
@@ -932,6 +981,8 @@ def run_affine_fit(job: Mapping[str, object], data: Mapping[str, object],
     error = None
     predictions: dict[str, np.ndarray] = {}
     selection = None
+    train_size = job.get("train_size")
+    train = filter_train_rows(data["train"], train_size)
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         try:
@@ -939,7 +990,7 @@ def run_affine_fit(job: Mapping[str, object], data: Mapping[str, object],
                 lambda: _BuilderFeatureOnlyRidge(builder, names),
                 source_measurements=False, test_measurements=False,
                 legacy_reports_alpha=False)
-            method.fit(list(data["train"]), manifest={}, split_v2=True)
+            method.fit(train, manifest={}, split_v2=True)
             method.select(list(data["validation"]))
             for role in ("validation", "test"):
                 output = method.predict(list(data["prediction_rows"][role]), manifest={})
@@ -960,8 +1011,15 @@ def run_affine_fit(job: Mapping[str, object], data: Mapping[str, object],
         "method": "feat-only (affine ridge over the rung's columns without the "
                   "noisy estimate)",
         "purpose": job.get("purpose", "rung_fit"),
+        **({"train_size": int(train_size),
+            "n_train_rows": len(train),
+            "training_rows": len(train),
+            "training_circuit_ids_sha256": _circuit_ids_sha256([str(r["circuit_id"]) for r in train]),
+            "training_circuit_identifiers_sha256": _circuit_ids_sha256([str(r["circuit_id"]) for r in train])}
+           if train_size is not None else {}),
         **({"strength_indicator": True} if job.get("strength_indicator") else {}),
         **({"strong_learners": True} if job.get("strong_learners") else {}),
+        **({"neural_es": True} if job.get("neural_es") else {}),
         **({"follow_up_rule": {"path": STRONG_LEARNERS_RULE,
                                "sha256": strong_learners_rule_sha256()}}
            if job.get("strong_learners") else {}),
@@ -1002,9 +1060,17 @@ def print_plan(jobs: Sequence[Mapping[str, object]], fit_dir: Path | None,
     for job in jobs:
         exists = fit_dir is not None and (fit_dir / f"{job['stem']}.json").exists()
         done += exists
+        flags = []
+        if job.get("strength_indicator"):
+            flags.append("strength_indicator")
+        if job.get("strong_learners"):
+            flags.append("strong_learners")
+        if job.get("neural_es"):
+            flags.append("neural_es")
+        flags_str = f" flags={','.join(flags)}" if flags else ""
         print(f"{'done' if exists else 'plan'} {job['stem']}  "
               f"[{job['part']} rung={job['rung']} arm={job['arm']} "
-              f"seed={job.get('learner_seed', '-')}]")
+              f"seed={job.get('learner_seed', '-')}{flags_str}]")
     by_rung_arm = Counter((str(job["rung"]), str(job["arm"])) for job in jobs)
     by_kind = Counter(str(job["kind"]) for job in jobs)
     print("\ncounts by rung and arm:")

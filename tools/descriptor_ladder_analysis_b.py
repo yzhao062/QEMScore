@@ -372,17 +372,18 @@ def classify_cell(d_ci_95: list[float] | None) -> str:
         return "Not distinguished"
 
 
-def determine_rung_statement(seed_results: Mapping[int, dict[str, Any]]) -> str:
+def determine_rung_statement(seed_results: Mapping[int, dict[str, Any]],
+                             dataset_seeds: Sequence[int] = DATASET_SEEDS) -> str:
     """Determine rung-level statement per family / part.
 
     Rule:
     - If a dataset seed's cell is absent or not estimable, say 'incomplete'
       rather than 'mixed'.
-    - A statement is made only when all three dataset seeds share one label;
+    - A statement is made only when all dataset seeds share one label;
       otherwise the rung reads 'mixed'.
     """
     labels = []
-    for d_seed in DATASET_SEEDS:
+    for d_seed in dataset_seeds:
         if d_seed not in seed_results:
             return "incomplete"
         cell = seed_results[d_seed]
@@ -390,7 +391,7 @@ def determine_rung_statement(seed_results: Mapping[int, dict[str, Any]]) -> str:
             return "incomplete"
         labels.append(cell["classification_label"])
 
-    if len(labels) == 3:
+    if len(labels) == len(dataset_seeds):
         if len(set(labels)) == 1:
             return labels[0]
         return "mixed"
@@ -402,6 +403,7 @@ def run_analysis(
     cache_dirs: Sequence[Path | str],
     n_draws: int = DEFAULT_DRAWS,
     bootstrap_seed: int = RULE_SEED,
+    dataset_seeds: Sequence[int] = DATASET_SEEDS,
 ) -> dict[str, Any]:
     """Run full analysis pipeline over fit files and cache items."""
     loader = DataLoader(fits_dirs, cache_dirs)
@@ -808,7 +810,7 @@ def run_analysis(
 
     for (part, rung, fam), seed_dict in grouped_cells.items():
         is_part_b = part.upper() == "B"
-        statement = determine_rung_statement(seed_dict)
+        statement = determine_rung_statement(seed_dict, dataset_seeds=dataset_seeds)
 
         valid_docs = [
             c["largest_non_excluded_d_over_c"]
@@ -1213,6 +1215,13 @@ def main() -> None:
         default=None,
         help="Optional later frozen rule governing these fits; its path and SHA-256 are recorded.",
     )
+    parser.add_argument(
+        "--dataset-seeds",
+        nargs="+",
+        type=int,
+        default=list(DATASET_SEEDS),
+        help=f"dataset seeds to evaluate (default: {' '.join(str(s) for s in DATASET_SEEDS)})",
+    )
 
     args = parser.parse_args()
 
@@ -1236,6 +1245,7 @@ def main() -> None:
         args.cache,
         n_draws=args.draws,
         bootstrap_seed=args.bootstrap_seed,
+        dataset_seeds=args.dataset_seeds,
     )
     if args.follow_up_rule is not None:
         rule_path = args.follow_up_rule

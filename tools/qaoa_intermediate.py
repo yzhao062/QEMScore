@@ -520,7 +520,8 @@ def run_job(job: dict) -> dict:
 
 
 def _job(out: Path, key: str, rung: str, arm: str, *, learner_seed=None,
-         strength_indicator: bool = False, strong_learners: bool = False) -> dict:
+         strength_indicator: bool = False, strong_learners: bool = False,
+         neural_es: bool = False) -> dict:
     kind = {"A": "affine", "GBT": "gbt"}.get(arm, "liao")
     seed_part = "" if learner_seed is None else f"__k{learner_seed:02d}"
     job_dict = {
@@ -535,23 +536,28 @@ def _job(out: Path, key: str, rung: str, arm: str, *, learner_seed=None,
         job_dict["strength_indicator"] = True
     if strong_learners:
         job_dict["strong_learners"] = True
+    if neural_es:
+        job_dict["neural_es"] = True
     return job_dict
 
 
 def build_jobs(out: Path, keys: list[str], rungs: list[str], arms: list[str],
                seeds: list[int], strength_indicator: bool = False,
-               strong_learners: bool = False) -> list[dict]:
+               strong_learners: bool = False,
+               neural_es: bool = False) -> list[dict]:
     jobs = []
     for rung in rungs:
         for key in keys:
             if "A" in arms:
                 jobs.append(_job(out, key, rung, "A",
                                  strength_indicator=strength_indicator,
-                                 strong_learners=strong_learners))
+                                 strong_learners=strong_learners,
+                                 neural_es=neural_es))
             if "GBT" in arms and rung == "B-complete":
                 jobs.append(_job(out, key, rung, "GBT",
                                  strength_indicator=strength_indicator,
-                                 strong_learners=strong_learners))
+                                 strong_learners=strong_learners,
+                                 neural_es=neural_es))
     for k in seeds:
         for rung in rungs:
             for key in keys:
@@ -559,7 +565,8 @@ def build_jobs(out: Path, keys: list[str], rungs: list[str], arms: list[str],
                     if arm in arms:
                         jobs.append(_job(out, key, rung, arm, learner_seed=k,
                                          strength_indicator=strength_indicator,
-                                         strong_learners=strong_learners))
+                                         strong_learners=strong_learners,
+                                         neural_es=neural_es))
     return jobs
 
 
@@ -618,22 +625,38 @@ def cmd_run(args) -> int:
         keys = [dataset_name(seed, N_QUBITS) for seed in DATASET_SEEDS]
     strength_indicator = bool(getattr(args, "strength_indicator", False))
     strong_learners = bool(getattr(args, "strong_learners", False))
-    if strong_learners:
-        fit_dir = out / "fits"
-        if fit_dir.exists():
-            for json_path in fit_dir.glob("*.json"):
-                try:
-                    fit_meta = json.loads(json_path.read_text(encoding="utf-8"))
-                except Exception:
-                    continue
-                if not fit_meta.get("strong_learners"):
-                    raise SystemExit(
-                        f"Refusal: {json_path.name} does not have strong_learners: true; "
-                        "run --strong-learners refuses to start in a fits directory holding non-strong fits."
-                    )
+    neural_es = bool(getattr(args, "neural_es", False))
+    if neural_es and strong_learners:
+        raise SystemExit(
+            "Refusal: --neural-es cannot be used with --strong-learners; "
+            "--neural-es is incompatible with --strong-learners."
+        )
+    fit_dir = out / "fits"
+    if fit_dir.exists():
+        for json_path in fit_dir.glob("*.json"):
+            try:
+                fit_meta = json.loads(json_path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if strong_learners and not fit_meta.get("strong_learners"):
+                raise SystemExit(
+                    f"Refusal: {json_path.name} does not have strong_learners: true; "
+                    "run --strong-learners refuses to start in a fits directory holding non-strong fits."
+                )
+            if neural_es and not fit_meta.get("neural_es"):
+                raise SystemExit(
+                    f"Refusal: {json_path.name} does not have neural_es: true; "
+                    "run --neural-es refuses to start in a fits directory holding non-neural-es fits."
+                )
+            if not neural_es and fit_meta.get("neural_es"):
+                raise SystemExit(
+                    f"Refusal: {json_path.name} has neural_es: true; "
+                    "run without --neural-es refuses to start in a fits directory holding neural-es fits."
+                )
     jobs = build_jobs(out, keys, rungs, arms, seeds,
                       strength_indicator=strength_indicator,
-                      strong_learners=strong_learners)
+                      strong_learners=strong_learners,
+                      neural_es=neural_es)
     aliases = ["M (Part B) = F at B-none, the same fits"] if "B-none" in rungs else []
     if args.dry_run:
         common.print_plan(jobs, out / "fits", aliases)
@@ -652,6 +675,8 @@ def cmd_run(args) -> int:
     if strong_learners:
         run_cfg["strong_learners"] = True
         run_cfg["cache_sha256"] = cache_digests
+    if neural_es:
+        run_cfg["neural_es"] = True
     write_json(out / "run_config.json", run_cfg)
     info = common.drive(jobs, run_job, out, args.workers, limit=args.limit_jobs)
     write_json(out / f"run_{int(time.time())}.json", info)
@@ -679,6 +704,8 @@ def main(argv=None) -> int:
                      help="append noise_strength_L3 feature to every arm and rung")
     run.add_argument("--strong-learners", action="store_true", default=False,
                      help="enable hgbr strong learner candidate")
+    run.add_argument("--neural-es", action="store_true", default=False,
+                     help="enable well-trained MLP with early stopping and lr plateau schedule")
     run.add_argument("--limit-jobs", type=int, default=None)
     args = parser.parse_args(argv)
     if args.command == "generate":

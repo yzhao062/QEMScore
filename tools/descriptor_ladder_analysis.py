@@ -305,9 +305,10 @@ def classify(d_entry: dict, mean_c: float | None) -> dict:
     return out
 
 
-def rung_statement(labels: dict[int, str | None]) -> dict:
+def rung_statement(labels: dict[int, str | None],
+                   dataset_seeds: tuple[int, ...] = DATASET_SEEDS) -> dict:
     present = {seed: label for seed, label in labels.items() if label is not None}
-    missing = [seed for seed in DATASET_SEEDS if seed not in present]
+    missing = [seed for seed in dataset_seeds if seed not in present]
     if missing:
         statement = "incomplete"
     elif len(set(present.values())) == 1:
@@ -315,7 +316,7 @@ def rung_statement(labels: dict[int, str | None]) -> dict:
     else:
         statement = "mixed"
     return {"statement": statement,
-            "labels": {str(seed): present.get(seed) for seed in DATASET_SEEDS},
+            "labels": {str(seed): present.get(seed) for seed in dataset_seeds},
             "missing_dataset_seeds": missing}
 
 
@@ -905,10 +906,10 @@ def _compare_original(est: RowEstimator, orig_est: RowEstimator, store: FitStore
 
 
 def inventory(store: FitStore, part: str, spec: dict, keys_by_seed: dict[int, str],
-              use_orig: bool) -> dict:
+              use_orig: bool, dataset_seeds: tuple[int, ...] = DATASET_SEEDS) -> dict:
     expected_seeds = None if use_orig else set(LEARNER_SEEDS)
     absent, incomplete, anchors = [], [], []
-    for dataset_seed in DATASET_SEEDS:
+    for dataset_seed in dataset_seeds:
         key = keys_by_seed.get(dataset_seed)
         if key is None:
             absent.append({"dataset_seed": dataset_seed, "what": "no fits for this dataset"})
@@ -936,8 +937,10 @@ def inventory(store: FitStore, part: str, spec: dict, keys_by_seed: dict[int, st
 
 def analyze(fit_dirs: list[Path], cache_dirs: list[Path], *, draws: int, seed: int,
             use_orig: bool = False, verbose: bool = True,
-            original_fit_dirs: list[Path] | None = None) -> dict:
+            original_fit_dirs: list[Path] | None = None,
+            dataset_seeds: Sequence[int] | None = None) -> dict:
     started = time.perf_counter()
+    ds = tuple(dataset_seeds) if dataset_seeds is not None else DATASET_SEEDS
     store = FitStore(fit_dirs, use_orig)
     orig_store = FitStore(original_fit_dirs, use_orig) if original_fit_dirs else None
     caches, shadowed = discover_caches(cache_dirs)
@@ -995,7 +998,7 @@ def analyze(fit_dirs: list[Path], cache_dirs: list[Path], *, draws: int, seed: i
                                  f"{keys_by_seed[dataset_seed]} and {key}")
             keys_by_seed[dataset_seed] = key
         part_out["status"] = "analyzed"
-        part_out["inventory"] = inventory(store, part, spec, keys_by_seed, use_orig)
+        part_out["inventory"] = inventory(store, part, spec, keys_by_seed, use_orig, dataset_seeds=ds)
         rows_out: dict = {}
         for dataset_seed, key in sorted(keys_by_seed.items()):
             if key not in caches:
@@ -1047,7 +1050,7 @@ def analyze(fit_dirs: list[Path], cache_dirs: list[Path], *, draws: int, seed: i
                 point_checks += est.point_checks
                 rows_out[label] = row_out
         part_out["rows"] = rows_out
-        part_out["rung_statements"] = _statements(spec, rows_out)
+        part_out["rung_statements"] = _statements(spec, rows_out, dataset_seeds=ds)
         result["parts"][part] = part_out
     result["point_check_against_fit_records"] = {
         "n_checked": point_checks, "max_abs_diff": point_check_max,
@@ -1056,7 +1059,7 @@ def analyze(fit_dirs: list[Path], cache_dirs: list[Path], *, draws: int, seed: i
     return result
 
 
-def _statements(spec: dict, rows_out: dict) -> dict:
+def _statements(spec: dict, rows_out: dict, dataset_seeds: tuple[int, ...] = DATASET_SEEDS) -> dict:
     groups = spec["families"] or (None,)
     statements: dict = {}
     for family in groups:
@@ -1078,7 +1081,7 @@ def _statements(spec: dict, rows_out: dict) -> dict:
                 # selection, as in the shot sweep): omit the statement, as
                 # analysis B does. A rung fitted in some rows stays "incomplete".
                 continue
-            statements[name][rung] = rung_statement(labels)
+            statements[name][rung] = rung_statement(labels, dataset_seeds=dataset_seeds)
     return statements
 
 
@@ -1548,6 +1551,8 @@ def main(argv=None) -> int:
                         help="optional: a later frozen rule that governs these fits "
                              "(for example docs/frozen-rules/2026-10-03-strength-indicator.md); "
                              "its path and SHA-256 are recorded beside the estimator rule")
+    parser.add_argument("--dataset-seeds", nargs="+", type=int, default=list(DATASET_SEEDS),
+                        help=f"dataset seeds to evaluate (default: {' '.join(str(s) for s in DATASET_SEEDS)})")
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args(argv)
     if args.self_test:
@@ -1559,7 +1564,8 @@ def main(argv=None) -> int:
               f"{RULE_SEED}", flush=True)
     result = analyze(args.fits, args.cache, draws=args.draws, seed=args.bootstrap_seed,
                      use_orig=args.use_orig_fits, verbose=not args.quiet,
-                     original_fit_dirs=args.original_fits)
+                     original_fit_dirs=args.original_fits,
+                     dataset_seeds=args.dataset_seeds)
     if args.follow_up_rule is not None:
         path = args.follow_up_rule
         found = path if path.is_absolute() or path.exists() else _REPO / path

@@ -357,6 +357,7 @@ def analyze_learner_adequacy(
     seed: int = RULE_SEED,
     analysis_a_path: Path | None = None,
     verbose: bool = True,
+    dataset_seeds: tuple[int, ...] = DATASET_SEEDS,
 ) -> dict:
     started = time.perf_counter()
     store = dla.FitStore(fit_dirs, False)
@@ -569,7 +570,7 @@ def analyze_learner_adequacy(
     # Pooled Part A R0
     if len(r0_rows_for_pooling) == 6:
         sc_by_ds, cc_by_row = generate_pooled_draws(
-            DATASET_SEEDS, r0_circuits_for_pooling, n_seeds=20, draws=draws, seed=seed
+            tuple(dataset_seeds), r0_circuits_for_pooling, n_seeds=20, draws=draws, seed=seed
         )
         pooled_r0 = compute_pooled_r0(r0_rows_for_pooling, sc_by_ds, cc_by_row, n_seeds=20)
         result["pooled_R0"] = pooled_r0
@@ -619,6 +620,8 @@ def main(argv=None) -> int:
                         help="RNG seed for bootstrap draws (default: 20261002)")
     parser.add_argument("--quiet", action="store_true",
                         help="suppress verbose per-cell table")
+    parser.add_argument("--dataset-seeds", type=int, nargs="+", default=list(DATASET_SEEDS),
+                        help="dataset seeds of the pooled Part A R0 estimate (default: %(default)s)")
     args = parser.parse_args(argv)
 
     if not args.fits or not args.cache or args.out is None:
@@ -638,6 +641,7 @@ def main(argv=None) -> int:
         seed=args.bootstrap_seed,
         analysis_a_path=analysis_a_path,
         verbose=not args.quiet,
+        dataset_seeds=tuple(args.dataset_seeds),
     )
 
     dla._write_json(args.out, result)

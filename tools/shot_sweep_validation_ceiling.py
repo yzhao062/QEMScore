@@ -33,6 +33,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+from collections.abc import Sequence
 import copy
 import hashlib
 import json
@@ -83,13 +84,38 @@ def cell_indices(items: list[dict], family: str, severity: str, observable: str)
                        and str(r["observable"]) == observable], dtype=int)
 
 
-def validation_c_C(c_fits: Path, cache_dir: Path) -> dict[str, float]:
+def validation_c_C(c_fits: Path, cache_dir: Path, dataset_seeds: Sequence[int] = SEEDS) -> dict[str, float]:
     """c_C^val per row/rung/cell: mean over learner seeds of C's validation MAE."""
     out: dict[str, float] = {}
-    for seed in SEEDS:
+    for seed in dataset_seeds:
         key = f"shipped-s{seed}-n640"
-        with open(cache_dir / f"{key}.pkl", "rb") as handle:
-            validation = pickle.load(handle)["validation"]
+        candidates = [
+            cache_dir / f"{key}.pkl",
+            cache_dir / f"{key}.json.gz",
+            cache_dir / f"{key}.json",
+        ]
+        cache_path = None
+        for cand in candidates:
+            if cand.exists():
+                cache_path = cand
+                break
+        if cache_path is None:
+            matches = sorted(cache_dir.glob(f"*s{seed}*.pkl")) + sorted(cache_dir.glob(f"*s{seed}*.json*"))
+            matches = [m for m in matches if not m.name.endswith(".order.json")]
+            if matches:
+                cache_path = matches[0]
+        if cache_path is None or not cache_path.exists():
+            raise FileNotFoundError(f"Cache file for seed {seed} not found in {cache_dir}")
+        if cache_path.name.endswith(".pkl"):
+            with open(cache_path, "rb") as handle:
+                validation = pickle.load(handle)["validation"]
+        elif cache_path.name.endswith(".json.gz"):
+            import gzip
+            with gzip.open(cache_path, "rt", encoding="utf-8") as handle:
+                validation = json.load(handle)["validation"]
+        else:
+            with open(cache_path, "r", encoding="utf-8") as handle:
+                validation = json.load(handle)["validation"]
         y_val = np.asarray([float(r["ideal_expectation"]) for r in validation])
         index = {(fam, s, o): cell_indices(validation, fam, s, o)
                  for fam in FAMILIES for s, o in CELLS_DEF}
@@ -168,10 +194,10 @@ def h2_cell_view(evaluation: dict, predictions: dict) -> dict:
     return out
 
 
-def shot_rank_spearman(obs_by_level: dict) -> dict:
+def shot_rank_spearman(obs_by_level: dict, dataset_seeds: Sequence[int] = SEEDS) -> dict:
     out = {}
     for rung in ("N1", "N2"):
-        for seed in SEEDS:
+        for seed in dataset_seeds:
             for fam in FAMILIES:
                 row = f"shipped-s{seed}-n640/{fam}"
                 observed = [obs_by_level[lvl][row][rung]["observed_D_over_C"] for lvl in LEVELS]
@@ -210,13 +236,16 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--cache", type=Path, required=True)
     parser.add_argument("--analysis-a", nargs="+", required=True, metavar="LEVEL=PATH")
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--dataset-seeds", type=int, nargs="+", default=list(SEEDS),
+                        help="Dataset seeds (default: %(default)s)")
     args = parser.parse_args(argv)
 
+    dataset_seeds = tuple(args.dataset_seeds)
     predictions = json.loads(args.predictions.read_text(encoding="utf-8"))
     analysis_paths = hyp.parse_level_args(args.analysis_a)
-    obs_by_level = {lvl: hyp.extract_analysis_a(p) for lvl, p in analysis_paths.items()}
+    obs_by_level = {lvl: hyp.extract_analysis_a(p, dataset_seeds=dataset_seeds) for lvl, p in analysis_paths.items()}
 
-    c_C_val = validation_c_C(args.c_fits, args.cache)
+    c_C_val = validation_c_C(args.c_fits, args.cache, dataset_seeds=dataset_seeds)
     c_C_test = {k: v["c_C"] for k, v in predictions["c_C_by_rung_cell"].items()}
     rule_cells = predictions["rule_cells"]
 
@@ -234,12 +263,12 @@ def main(argv: list[str] | None = None) -> None:
     if worst > 1e-12:
         raise SystemExit(f"the frozen ceiling is not reproduced (largest difference {worst})")
 
-    frozen = hyp.evaluate_pipeline(predictions, obs_by_level)
+    frozen = hyp.evaluate_pipeline(predictions, obs_by_level, dataset_seeds=dataset_seeds)
     variants = {}
     for name, values in (("validation_only", val_ceiling),
                          ("test_c_C_cross_fitted_c_m", mixed_ceiling)):
         alt = swap_ceiling(predictions, values)
-        evaluation = hyp.evaluate_pipeline(alt, obs_by_level)
+        evaluation = hyp.evaluate_pipeline(alt, obs_by_level, dataset_seeds=dataset_seeds)
         variants[name] = {
             "summary": summarize(evaluation),
             "persistence": persistence(h2_cell_view(evaluation, alt)),
@@ -271,7 +300,7 @@ def main(argv: list[str] | None = None) -> None:
         "frozen": {"summary": summarize(frozen),
                    "persistence": persistence(h2_cell_view(frozen, predictions))},
         "variants": variants,
-        "shot_rank_spearman_observed": shot_rank_spearman(obs_by_level),
+        "shot_rank_spearman_observed": shot_rank_spearman(obs_by_level, dataset_seeds=dataset_seeds),
         "c_C_validation": c_C_val,
     }
     out = args.out

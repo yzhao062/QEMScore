@@ -337,6 +337,10 @@ class LiaoMLPDeclarations:
         }
 
 
+DEFAULT_LR_PLATEAU_PATIENCE = 10
+DEFAULT_LR_MIN = 1e-5
+
+
 class LiaoMLPMitigator:
     """Two-hidden-layer dense ReLU network trained by deterministic Adam.
 
@@ -357,6 +361,9 @@ class LiaoMLPMitigator:
         weight_decay: float = DEFAULT_MLP_WEIGHT_DECAY,
         patience: int = 20,
         min_delta: float = 0.0,
+        lr_plateau_factor: float | None = None,
+        lr_plateau_patience: int = DEFAULT_LR_PLATEAU_PATIENCE,
+        lr_min: float = DEFAULT_LR_MIN,
         drop_features: Sequence[str] = (),
         feature_builder: FeatureBuilder | None = None,
         feature_names: Sequence[str] | None = None,
@@ -373,6 +380,30 @@ class LiaoMLPMitigator:
             raise ValueError("patience must be a positive integer")
         if not np.isfinite(min_delta) or min_delta < 0.0:
             raise ValueError("min_delta must be finite and nonnegative")
+        if lr_plateau_factor is not None:
+            if stopping_rule != "validation_patience":
+                raise ValueError(
+                    'lr_plateau schedule requires stopping_rule="validation_patience"'
+                )
+            if (
+                isinstance(lr_plateau_factor, bool)
+                or not np.isfinite(lr_plateau_factor)
+                or lr_plateau_factor <= 0.0
+                or lr_plateau_factor >= 1.0
+            ):
+                raise ValueError("lr_plateau_factor must be in (0, 1)")
+        if (
+            isinstance(lr_plateau_patience, bool)
+            or not isinstance(lr_plateau_patience, int)
+            or lr_plateau_patience <= 0
+        ):
+            raise ValueError("lr_plateau_patience must be a positive integer")
+        if (
+            isinstance(lr_min, bool)
+            or not np.isfinite(lr_min)
+            or lr_min <= 0.0
+        ):
+            raise ValueError("lr_min must be positive and finite")
 
         self.random_state = random_state
         self.feature_builder, self.feature_names = _feature_spec(
@@ -388,12 +419,20 @@ class LiaoMLPMitigator:
         self.weight_decay = float(weight_decay)
         self.patience = patience
         self.min_delta = float(min_delta)
+        self.lr_plateau_factor = None if lr_plateau_factor is None else float(lr_plateau_factor)
+        self.lr_plateau_patience = int(lr_plateau_patience)
+        self.lr_min = float(lr_min)
 
         self.feature_mean_: np.ndarray | None = None
         self.feature_scale_: np.ndarray | None = None
         self.loss_curve_: list[float] = []
         self.validation_loss_curve_: list[float] = []
         self.n_iter_: int = 0
+        self.learning_rates_: list[float] = []
+        self.learning_rate_per_epoch_: list[float] = []
+        self.learning_rate_changes_: list[tuple[int, float]] = []
+        self.best_epoch_: int = 0
+        self.final_learning_rate_: float = MLP_LEARNING_RATE
         self._parameters: dict[str, np.ndarray] | None = None
 
     def _features(self, items: Sequence[Item], label: str) -> np.ndarray:
@@ -427,6 +466,12 @@ class LiaoMLPMitigator:
             "min_delta": self.min_delta,
             "n_iter": self.n_iter_,
         }
+        if self.lr_plateau_factor is not None:
+            config["lr_plateau_factor"] = self.lr_plateau_factor
+            config["lr_plateau_patience"] = self.lr_plateau_patience
+            config["lr_min"] = self.lr_min
+            config["best_epoch"] = self.best_epoch_
+            config["final_learning_rate"] = self.final_learning_rate_
         return _with_builder(config, self.feature_builder, self.feature_names)
 
     def _initialize(self, n_features: int, rng: np.random.Generator) -> None:
@@ -533,10 +578,19 @@ class LiaoMLPMitigator:
         self.loss_curve_ = []
         self.validation_loss_curve_ = []
         self.n_iter_ = 0
+        self.learning_rates_ = []
+        self.learning_rate_per_epoch_ = []
+        self.learning_rate_changes_ = []
+        self.best_epoch_ = 0
+        self.final_learning_rate_ = MLP_LEARNING_RATE
+
+        current_lr = MLP_LEARNING_RATE
         adam_step = 0
         best_validation_loss = np.inf
         best_parameters: dict[str, np.ndarray] | None = None
+        best_epoch = 0
         stale_epochs = 0
+        plateau_stale_epochs = 0
 
         for epoch in range(self.epochs):
             order = rng.permutation(len(x))
@@ -560,7 +614,7 @@ class LiaoMLPMitigator:
                     corrected_second = second_moment[name] / (
                         1.0 - _ADAM_BETA_2**adam_step
                     )
-                    self.parameters_[name] -= MLP_LEARNING_RATE * corrected_first / (
+                    self.parameters_[name] -= current_lr * corrected_first / (
                         np.sqrt(corrected_second) + _ADAM_EPSILON
                     )
 
@@ -569,6 +623,8 @@ class LiaoMLPMitigator:
                 raise RuntimeError("MLP training produced a nonfinite loss")
             self.loss_curve_.append(train_loss)
             self.n_iter_ = epoch + 1
+            self.learning_rates_.append(current_lr)
+            self.learning_rate_per_epoch_.append(current_lr)
 
             if validation_x is not None and validation_y is not None:
                 validation_loss = self._mse(validation_x, validation_y)
@@ -578,14 +634,31 @@ class LiaoMLPMitigator:
                     best_parameters = {
                         name: value.copy() for name, value in self.parameters_.items()
                     }
+                    best_epoch = epoch + 1
                     stale_epochs = 0
+                    plateau_stale_epochs = 0
                 else:
                     stale_epochs += 1
+                    plateau_stale_epochs += 1
+                    if (
+                        self.lr_plateau_factor is not None
+                        and plateau_stale_epochs >= self.lr_plateau_patience
+                    ):
+                        new_lr = max(self.lr_min, current_lr * self.lr_plateau_factor)
+                        if new_lr != current_lr:
+                            self.learning_rate_changes_.append((epoch + 1, new_lr))
+                            current_lr = new_lr
+                        plateau_stale_epochs = 0
+
                     if stale_epochs >= self.patience:
                         break
 
+        self.final_learning_rate_ = current_lr
         if best_parameters is not None:
             self._parameters = best_parameters
+            self.best_epoch_ = best_epoch
+        else:
+            self.best_epoch_ = self.n_iter_
         return self
 
     def predict(self, items: Sequence[Item]) -> np.ndarray:
@@ -699,10 +772,17 @@ class LiaoMitigator:
         weight_decay: float = DEFAULT_MLP_WEIGHT_DECAY,
         patience: int = 20,
         min_delta: float = 0.0,
+        lr_plateau_factor: float | None = None,
+        lr_plateau_patience: int = DEFAULT_LR_PLATEAU_PATIENCE,
+        lr_min: float = DEFAULT_LR_MIN,
         drop_features: Sequence[str] = (),
         feature_builder: FeatureBuilder | None = None,
         feature_names: Sequence[str] | None = None,
     ) -> None:
+        if lr_plateau_factor is not None and stopping_rule != "validation_patience":
+            raise ValueError(
+                'lr_plateau schedule requires stopping_rule="validation_patience"'
+            )
         self.random_state = random_state
         self.feature_builder, self.feature_names = _feature_spec(
             feature_builder, feature_names)
@@ -711,6 +791,9 @@ class LiaoMitigator:
             self.drop_features,
             None if self.feature_builder is None else self.feature_names,
         )
+        self.lr_plateau_factor = None if lr_plateau_factor is None else float(lr_plateau_factor)
+        self.lr_plateau_patience = int(lr_plateau_patience)
+        self.lr_min = float(lr_min)
         # Both candidates read the same columns, so the hook cannot give the
         # forest and the network different inputs.
         self._feature_arguments: dict[str, object] = (
@@ -728,6 +811,9 @@ class LiaoMitigator:
             "weight_decay": weight_decay,
             "patience": patience,
             "min_delta": min_delta,
+            "lr_plateau_factor": self.lr_plateau_factor,
+            "lr_plateau_patience": self.lr_plateau_patience,
+            "lr_min": self.lr_min,
             "drop_features": self.drop_features,
             **self._feature_arguments,
         }
@@ -817,6 +903,8 @@ class LiaoMitigator:
 
 
 __all__ = [
+    "DEFAULT_LR_MIN",
+    "DEFAULT_LR_PLATEAU_PATIENCE",
     "DEFAULT_MLP_DROPOUT",
     "DEFAULT_MLP_EPOCHS",
     "DEFAULT_MLP_STOPPING_RULE",

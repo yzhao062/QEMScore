@@ -127,7 +127,9 @@ from concurrent.futures import ProcessPoolExecutor
 import functools
 import gzip
 import json
+import os
 from pathlib import Path
+import pickle
 import re
 import sys
 import time
@@ -192,10 +194,129 @@ def _cache_path(out: Path, key: str) -> Path:
     return out / "cache" / f"{key}.pkl"
 
 
-def prepare_primary(data_dirs, archive: Path, out: Path,
+def prepare_fresh_dataset(data_dir: Path, cache_dir: Path,
+                          label_tolerance: float | None = None,
+                          sweep: bool = False,
+                          fresh_source: Path | None = None) -> dict:
+    """Verify one fresh dataset with validate_split_artifact and structural assertions."""
+    from qemscore.campaign.analysis import _assert_setting
+    from qemscore.campaign.design import FAMILIES, setting_key
+    from qemscore.validation import item_stream_hash, validate_split_artifact
+
+    data_dir = Path(data_dir).resolve()
+    roles_tuple = ("train", "validation", "test")
+
+    if sweep:
+        if fresh_source is None:
+            raise SystemExit("--sweep with --fresh requires --fresh-source DIR")
+        fresh_source = Path(fresh_source).resolve()
+
+        rows = [
+            json.loads(line)
+            for line in (data_dir / "items.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        manifest = json.loads((data_dir / "manifest.json").read_text(encoding="utf-8"))
+        actual_items_hash = item_stream_hash(rows)
+        if manifest.get("items_hash") != actual_items_hash:
+            raise ValueError(f"{data_dir}: items_hash mismatch in sweep dataset")
+    else:
+        rows, manifest = validate_split_artifact(data_dir)
+
+    seed = int(manifest["master_seed"])
+    regime = "shipped"
+
+    key_match = PRIMARY_KEY.search(data_dir.name)
+    if key_match is None:
+        raise SystemExit(f"{data_dir}: directory name does not name a shipped-s<seed>-n<size> key")
+    key = key_match.group(1)
+    size = int(key_match.group(3))
+    if int(key_match.group(2)) != seed:
+        raise SystemExit(f"{data_dir}: directory names seed {key_match.group(2)}, manifest {seed}")
+
+    roles = {role: [row for row in rows if row["split"] == role] for role in roles_tuple}
+
+    expected = {
+        role: count // len(FAMILIES)
+        for role, count in manifest["split_spec"]["role_counts"].items()
+    }
+    structure = _assert_setting(regime, seed, size, rows, expected=expected)
+
+    checks = {
+        "setting": key,
+        "data_dir": str(data_dir),
+        "items_jsonl_sha256": common.sha256_file(data_dir / "items.jsonl"),
+        "manifest_dataset_hash": str(manifest["dataset_hash"]),
+        "validate_split_artifact": "passed" if not sweep else "sweep_passed",
+        "structure_counts": structure["counts"],
+        "n_items": {role: len(roles[role]) for role in roles_tuple},
+        "exact_match": True,
+        "fresh": True,
+    }
+
+    if sweep:
+        checks["sweep"] = True
+        # The 2,048-shot source tree holds regen-<key> for this dataset seed.
+        src_dataset = fresh_source / f"regen-{key}"
+        if not (src_dataset / "items.jsonl").exists():
+            raise SystemExit(f"{key}: {src_dataset} is not a fresh 2,048-shot source dataset")
+        src_rows = [
+            json.loads(line)
+            for line in (src_dataset / "items.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        src_roles = {role: [row for row in src_rows if row["split"] == role] for role in roles_tuple}
+
+        arch_test_cids = [it["circuit_id"] for it in src_roles["test"]]
+        regen_test_cids = [it["circuit_id"] for it in roles["test"]]
+        if arch_test_cids != regen_test_cids:
+            raise SystemExit(f"{key}: sweep test circuit IDs differ from fresh source {src_dataset}")
+
+        arch_val_cids = [it["circuit_id"] for it in src_roles["validation"]]
+        regen_val_cids = [it["circuit_id"] for it in roles["validation"]]
+        if arch_val_cids != regen_val_cids:
+            raise SystemExit(f"{key}: sweep validation circuit IDs differ from fresh source {src_dataset}")
+
+        tol = 1e-11 if label_tolerance is None else label_tolerance
+        for role in ("test", "validation"):
+            if len(roles[role]) != len(src_roles[role]):
+                raise SystemExit(f"{key}: sweep {role} rows {len(roles[role])} differ from fresh source {len(src_roles[role])}")
+            max_diff = max(abs(float(r["ideal_expectation"]) - float(s["ideal_expectation"]))
+                           for r, s in zip(roles[role], src_roles[role]))
+            checks[f"sweep_{role}_label_max_abs_diff"] = max_diff
+            if max_diff > tol:
+                raise SystemExit(f"{key}: {role} ideal expectation diff {max_diff} > {tol}")
+
+    payload = {
+        "key": key,
+        "seed": seed,
+        "train": roles["train"],
+        "validation": roles["validation"],
+        "test": roles["test"],
+        "prediction_rows": {
+            role: _prediction_items(roles[role]) for role in ("validation", "test")
+        },
+        "dataset_hash": str(manifest["dataset_hash"]),
+    }
+    cache_path = cache_dir / f"{key}.pkl"
+    tmp = cache_path.with_suffix(".pkl.tmp")
+    with open(tmp, "wb") as handle:
+        pickle.dump(payload, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    os.replace(tmp, cache_path)
+    order = {
+        "test_item_ids": [str(row["item_id"]) for row in roles["test"]],
+        "validation_item_ids": [str(row["item_id"]) for row in roles["validation"]],
+    }
+    (cache_dir / f"{key}.order.json").write_text(json.dumps(order), encoding="utf-8")
+    return checks
+
+
+def prepare_primary(data_dirs, archive: Path | None, out: Path,
                     label_tolerance: float | None,
-                    sweep: bool = False) -> dict:
-    """Verify each regenerated dataset against the archive and cache its rows."""
+                    sweep: bool = False,
+                    fresh: bool = False,
+                    fresh_source: Path | None = None) -> dict:
+    """Verify each regenerated dataset and cache its rows."""
     from tools.learner_seed_replication import prepare_dataset
 
     cache_dir = out / "cache"
@@ -203,9 +324,17 @@ def prepare_primary(data_dirs, archive: Path, out: Path,
     checks = {}
     for data_dir in data_dirs:
         started = time.perf_counter()
-        check = prepare_dataset(Path(data_dir).resolve(), archive, cache_dir,
-                                label_tolerance=label_tolerance,
-                                sweep=sweep)
+        if fresh:
+            check = prepare_fresh_dataset(Path(data_dir).resolve(), cache_dir,
+                                          label_tolerance=label_tolerance,
+                                          sweep=sweep,
+                                          fresh_source=fresh_source)
+        else:
+            if archive is None:
+                raise SystemExit("--archive is required when not in --fresh mode")
+            check = prepare_dataset(Path(data_dir).resolve(), archive, cache_dir,
+                                    label_tolerance=label_tolerance,
+                                    sweep=sweep)
         check["load_and_verify_seconds"] = time.perf_counter() - started
         checks[check["setting"]] = check
         print(f"verified {check['setting']} in {check['load_and_verify_seconds']:.1f}s "
@@ -555,7 +684,9 @@ def _job(out: Path, fit_dir: Path, key: str, rung: str, arm: str, *,
          learner_seed: int | None = None, shuffle_seed: int | None = None,
          purpose: str = "rung_fit", stem: str | None = None,
          strength_indicator: bool = False,
-         strong_learners: bool = False) -> dict:
+         strong_learners: bool = False,
+         train_size: int | None = None,
+         neural_es: bool = False) -> dict:
     fit_arm = {"M": "F"}.get(arm, arm)
     builder_rung = {NC_RUNG: "R5", NC_REEXPORT_RUNG: "R0"}.get(rung, rung)
     if stem is None:
@@ -575,6 +706,10 @@ def _job(out: Path, fit_dir: Path, key: str, rung: str, arm: str, *,
         job_dict["strength_indicator"] = True
     if strong_learners:
         job_dict["strong_learners"] = True
+    if train_size is not None:
+        job_dict["train_size"] = int(train_size)
+    if neural_es:
+        job_dict["neural_es"] = True
     return job_dict
 
 
@@ -585,12 +720,15 @@ def _dataset_seed(key: str, pattern: re.Pattern) -> int:
 def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                rungs: list[str], arms: list[str], seeds: list[int],
                strength_indicator: bool = False,
-               strong_learners: bool = False) -> list[dict]:
+               strong_learners: bool = False,
+               train_size: int | None = None,
+               neural_es: bool = False,
+               fresh: bool = False) -> list[dict]:
     """Every planned fit; the re-export rungs come first so a mismatch shows early."""
     fit_dir = out / "fits"
     jobs = []
     liao_arms = [arm for arm in ("F", "C", "P") if arm in arms]
-    if not strength_indicator:
+    if not strength_indicator and train_size is None and not fresh:
         if "R0" in rungs:
             # Appendix M.4 re-export: seeds 1-20, then M.4's original-seed P
             # (archived shuffle seed). M.4's original-seed F and C are the gate fits.
@@ -599,7 +737,8 @@ def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                     for arm in liao_arms:
                         jobs.append(_job(out, fit_dir, key, "R0", arm, learner_seed=k,
                                          purpose="r0_reexport_appendix_m4",
-                                         strong_learners=strong_learners))
+                                         strong_learners=strong_learners,
+                                         neural_es=neural_es))
             if "P" in arms:
                 for key in primary_keys:
                     jobs.append(_job(
@@ -608,7 +747,8 @@ def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                         shuffle_seed=TRAINING_SHUFFLE_SEED,
                         purpose="r0_reexport_appendix_m4_original_seed_archived_shuffle",
                         stem=f"{key}__R0__orig__P",
-                        strong_learners=strong_learners))
+                        strong_learners=strong_learners,
+                        neural_es=neural_es))
         if NC_REEXPORT_RUNG in rungs:
             # Appendix N re-export: seeds 1-20 plus its anchor (learner seed = dataset seed).
             for key in nc_keys:
@@ -619,19 +759,22 @@ def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                             out, fit_dir, key, NC_REEXPORT_RUNG, arm, learner_seed=k,
                             purpose=("nc_reexport_appendix_n_anchor" if k == anchor
                                      and anchor not in seeds else "nc_reexport_appendix_n"),
-                            strong_learners=strong_learners))
+                            strong_learners=strong_learners,
+                            neural_es=neural_es))
         spin_rungs = [r for r in rungs if r in RUNGS and r not in REEXPORT_RUNGS]
         if "A" in arms:
             for rung in spin_rungs:
                 for key in primary_keys:
                     jobs.append(_job(out, fit_dir, key, rung, "A",
-                                     strong_learners=strong_learners))
+                                     strong_learners=strong_learners,
+                                     neural_es=neural_es))
         for k in seeds:
             for rung in spin_rungs:
                 for key in primary_keys:
                     for arm in liao_arms:
                         jobs.append(_job(out, fit_dir, key, rung, arm, learner_seed=k,
-                                         strong_learners=strong_learners))
+                                         strong_learners=strong_learners,
+                                         neural_es=neural_es))
             if NC_RUNG in rungs:
                 for key in nc_keys:
                     for arm in ("M", "C"):
@@ -639,36 +782,45 @@ def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                             jobs.append(_job(out, fit_dir, key, NC_RUNG, arm,
                                              learner_seed=k,
                                              purpose="near_clifford_no_descriptors",
-                                             strong_learners=strong_learners))
+                                             strong_learners=strong_learners,
+                                             neural_es=neural_es))
     else:
         part_a_rungs = [r for r in rungs if r in RUNGS]
         if "A" in arms:
             for rung in part_a_rungs:
                 for key in primary_keys:
                     jobs.append(_job(out, fit_dir, key, rung, "A",
-                                     strength_indicator=True,
-                                     strong_learners=strong_learners))
+                                     strength_indicator=strength_indicator,
+                                     strong_learners=strong_learners,
+                                     train_size=train_size,
+                                     neural_es=neural_es))
         for k in seeds:
             for rung in part_a_rungs:
                 for key in primary_keys:
                     for arm in liao_arms:
                         jobs.append(_job(out, fit_dir, key, rung, arm,
                                          learner_seed=k,
-                                         strength_indicator=True,
-                                         strong_learners=strong_learners))
+                                         strength_indicator=strength_indicator,
+                                         strong_learners=strong_learners,
+                                         train_size=train_size,
+                                         neural_es=neural_es))
         if NC_REEXPORT_RUNG in rungs:
             if "A" in arms:
                 for key in nc_keys:
                     jobs.append(_job(out, fit_dir, key, NC_REEXPORT_RUNG, "A",
-                                     strength_indicator=True,
-                                     strong_learners=strong_learners))
+                                     strength_indicator=strength_indicator,
+                                     strong_learners=strong_learners,
+                                     train_size=train_size,
+                                     neural_es=neural_es))
             for k in seeds:
                 for key in nc_keys:
                     for arm in liao_arms:
                         jobs.append(_job(out, fit_dir, key, NC_REEXPORT_RUNG, arm,
                                          learner_seed=k,
-                                         strength_indicator=True,
-                                         strong_learners=strong_learners))
+                                         strength_indicator=strength_indicator,
+                                         strong_learners=strong_learners,
+                                         train_size=train_size,
+                                         neural_es=neural_es))
         if NC_RUNG in rungs:
             for k in seeds:
                 for key in nc_keys:
@@ -677,8 +829,10 @@ def build_jobs(out: Path, primary_keys: list[str], nc_keys: list[str],
                             jobs.append(_job(out, fit_dir, key, NC_RUNG, arm,
                                              learner_seed=k,
                                              purpose="near_clifford_no_descriptors",
-                                             strength_indicator=True,
-                                             strong_learners=strong_learners))
+                                             strength_indicator=strength_indicator,
+                                             strong_learners=strong_learners,
+                                             train_size=train_size,
+                                             neural_es=neural_es))
     return jobs
 
 
@@ -986,11 +1140,15 @@ def cmd_gate(args) -> int:
     return 0 if report["passed"] else 2
 
 
-def _write_dataset_index(out: Path, checks: dict, nc_checks: dict) -> None:
+def _write_dataset_index(out: Path, checks: dict, nc_checks: dict, fresh: bool = False) -> None:
     index = {key: {"kind": "primary", "data_dir": check["data_dir"],
                    "dataset_hash": check["manifest_dataset_hash"],
                    "cache": str(_cache_path(out, key))}
              for key, check in checks.items()}
+    if fresh:
+        for val in index.values():
+            val["fresh"] = True
+        index["_fresh"] = True
     index.update({key: {"kind": "near_clifford", "data_dir": check["data_dir"],
                         "dataset_hash": check["dataset_hash"],
                         "cache": str(_cache_path(out, key))}
@@ -1002,10 +1160,15 @@ def cmd_prepare(args) -> int:
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
     sweep = bool(getattr(args, "sweep", False))
-    checks = prepare_primary(args.datasets, args.archive, out, args.label_tolerance, sweep=sweep)
+    fresh = bool(getattr(args, "fresh", False))
+    fresh_source = getattr(args, "fresh_source", None)
+    if not fresh and args.archive is None:
+        raise SystemExit("--archive is required when --fresh is not specified")
+    checks = prepare_primary(args.datasets, args.archive, out, args.label_tolerance,
+                             sweep=sweep, fresh=fresh, fresh_source=fresh_source)
     nc_checks = prepare_nc(args.nc_datasets or [], out, args.nc_results)
     write_json(out / "dataset_checks.json", {"primary": checks, "near_clifford": nc_checks})
-    _write_dataset_index(out, checks, nc_checks)
+    _write_dataset_index(out, checks, nc_checks, fresh=fresh)
     diagnostics = {"schema": "descriptor-information-partA-diagnostics-v1",
                    "frozen_rule": common.RULE_FILE, "r4": {}, "encoder": {},
                    "coupling_noise": {}}
@@ -1083,8 +1246,72 @@ def cmd_check_reexport(args) -> int:
     return 0
 
 
+def _check_train_size_bounds(train_size: int, primary_keys: list[str], nc_keys: list[str],
+                             nc_rungs: list[str], out: Path,
+                             datasets: list[Path], nc_datasets: list[Path] | None) -> None:
+    dataset_paths = {k: Path(d) for k, d in zip(primary_keys, datasets)}
+    for key in primary_keys:
+        cache_p = _cache_path(out, key)
+        if cache_p.exists():
+            data = load_cache(cache_p)
+            families = {r.get("family") for r in data["train"]}
+            for fam in families:
+                n_circuits = len({r["circuit_id"] for r in data["train"] if r.get("family") == fam})
+                if train_size > n_circuits:
+                    raise SystemExit(
+                        f"Refusal: --train-size {train_size} exceeds dataset {key} family {fam} "
+                        f"training circuit count ({n_circuits})"
+                    )
+        elif key in dataset_paths and (dataset_paths[key] / "manifest.json").exists():
+            manifest = json.loads((dataset_paths[key] / "manifest.json").read_text(encoding="utf-8"))
+            rc = manifest.get("split_spec", {}).get("role_counts", {})
+            fams = manifest.get("split_spec", {}).get("fixed_axes", {}).get("circuit_family", [])
+            total_train = rc.get("train", 0)
+            n_fams = len(fams) if fams else 1
+            per_fam = total_train // n_fams if total_train else 0
+            if per_fam and train_size > per_fam:
+                raise SystemExit(
+                    f"Refusal: --train-size {train_size} exceeds dataset {key} "
+                    f"training circuit count ({per_fam})"
+                )
+
+    if nc_rungs and nc_datasets:
+        nc_dataset_paths = {k: Path(d) for k, d in zip(nc_keys, nc_datasets)}
+        for key in nc_keys:
+            cache_p = _cache_path(out, key)
+            if cache_p.exists():
+                data = load_cache(cache_p)
+                n_circuits = len({r["circuit_id"] for r in data["train"]})
+                if train_size > n_circuits:
+                    raise SystemExit(
+                        f"Refusal: --train-size {train_size} exceeds dataset {key} "
+                        f"training circuit count ({n_circuits})"
+                    )
+            elif key in nc_dataset_paths and (nc_dataset_paths[key] / "manifest.json").exists():
+                manifest = json.loads((nc_dataset_paths[key] / "manifest.json").read_text(encoding="utf-8"))
+                rc = manifest.get("split_spec", {}).get("role_counts", {})
+                train_c = rc.get("train", 0)
+                if train_c and train_size > train_c:
+                    raise SystemExit(
+                        f"Refusal: --train-size {train_size} exceeds dataset {key} "
+                        f"training circuit count ({train_c})"
+                    )
+
+
 def cmd_run(args) -> int:
     out = args.out.resolve()
+    fresh = bool(getattr(args, "fresh", False))
+    index_path = out / "datasets.json"
+    if not fresh and index_path.exists():
+        try:
+            index_data = json.loads(index_path.read_text(encoding="utf-8"))
+            if index_data.get("_fresh") or any(
+                isinstance(v, dict) and v.get("fresh") for v in index_data.values()
+            ):
+                fresh = True
+                args.fresh = True
+        except Exception:
+            pass
     rungs, arms, seeds = _selected(args)
     primary = [key for key, _ in _primary_keys(args)]
     nc = [key for key, _ in _nc_keys(args)]
@@ -1094,33 +1321,63 @@ def cmd_run(args) -> int:
     sweep = bool(getattr(args, "sweep", False))
     strength_indicator = bool(getattr(args, "strength_indicator", False) or sweep)
     strong_learners = bool(getattr(args, "strong_learners", False))
-    if strong_learners:
-        fit_dir = out / "fits"
-        if fit_dir.exists():
-            for json_path in fit_dir.glob("*.json"):
-                try:
-                    fit_meta = json.loads(json_path.read_text(encoding="utf-8"))
-                except Exception:
-                    continue
-                if not fit_meta.get("strong_learners"):
-                    raise SystemExit(
-                        f"Refusal: {json_path.name} does not have strong_learners: true; "
-                        "run --strong-learners refuses to start in a fits directory holding non-strong fits."
-                    )
+    train_size = getattr(args, "train_size", None)
+    if train_size is not None:
+        if train_size <= 0:
+            raise SystemExit(f"Refusal: --train-size must be a positive integer, got {train_size}")
+    neural_es = bool(getattr(args, "neural_es", False))
+    if neural_es and strong_learners:
+        raise SystemExit(
+            "Refusal: --neural-es cannot be used with --strong-learners; "
+            "--neural-es is incompatible with --strong-learners."
+        )
+    fit_dir = out / "fits"
+    if fit_dir.exists():
+        for json_path in fit_dir.glob("*.json"):
+            try:
+                fit_meta = json.loads(json_path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if strong_learners and not fit_meta.get("strong_learners"):
+                raise SystemExit(
+                    f"Refusal: {json_path.name} does not have strong_learners: true; "
+                    "run --strong-learners refuses to start in a fits directory holding non-strong fits."
+                )
+            if neural_es and not fit_meta.get("neural_es"):
+                raise SystemExit(
+                    f"Refusal: {json_path.name} does not have neural_es: true; "
+                    "run --neural-es refuses to start in a fits directory holding non-neural-es fits."
+                )
+            if not neural_es and fit_meta.get("neural_es"):
+                raise SystemExit(
+                    f"Refusal: {json_path.name} has neural_es: true; "
+                    "run without --neural-es refuses to start in a fits directory holding neural-es fits."
+                )
+            existing_size = fit_meta.get("train_size")
+            if existing_size != train_size:
+                raise SystemExit(
+                    f"Refusal: {json_path.name} has train_size {existing_size!r} != {train_size!r}; "
+                    "refuse to mix training sizes in one fits directory."
+                )
+    if train_size is not None:
+        _check_train_size_bounds(train_size, primary, nc, nc_rungs, out, args.datasets, args.nc_datasets)
     jobs = build_jobs(out, primary, nc, rungs, arms, seeds,
                       strength_indicator=strength_indicator,
-                      strong_learners=strong_learners)
+                      strong_learners=strong_learners,
+                      train_size=train_size,
+                      neural_es=neural_es,
+                      fresh=fresh)
     aliases = []
     if "R5" in rungs:
         aliases.append("M (Part A) = F at R5, the same fits")
-    if "R0" in rungs and not strength_indicator:
+    if "R0" in rungs and not strength_indicator and train_size is None and not fresh:
         aliases.append("R0 original-seed F and C = the gate fits in gate/fits "
                        "(re-exports of Appendix M.4's __orig__ F and C)")
     if args.dry_run:
         common.print_plan(jobs, out / "fits", aliases)
         return 0
     common.require_gate(args.gate_file or out / "gate" / "gate_r0.json")
-    if not strength_indicator:
+    if not strength_indicator and train_size is None and not fresh:
         # A re-export has to be checkable against what it re-exports.
         if "R0" in rungs and args.seedrep_fits is None:
             raise SystemExit("R0 re-exports Appendix M.4: pass --seedrep-fits so each fit "
@@ -1133,8 +1390,10 @@ def cmd_run(args) -> int:
     index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {}
     encoder_ready = all(_encoder_paths(out, key)[0].exists() for key in primary)
     if not needed <= set(index) or ("R4" in rungs and not encoder_ready):
+        if not fresh and args.archive is None:
+            raise SystemExit("--archive is required when --fresh is not specified")
         cmd_prepare(args)
-    reexporting = [rung for rung in rungs if rung in REEXPORT_RUNGS] if not strength_indicator else []
+    reexporting = [rung for rung in rungs if rung in REEXPORT_RUNGS] if (not strength_indicator and train_size is None and not fresh) else []
     if reexporting:
         order = reexport_preconditions(
             out, primary if "R0" in rungs else [],
@@ -1144,8 +1403,12 @@ def cmd_run(args) -> int:
         if not order["all_match"]:
             raise SystemExit(f"cached row order differs from the re-export reference: "
                              f"{json.dumps(order)}")
-    cache_digests = (common.check_caches_recorded(out / "cache", primary)
-                     if strong_learners else None)
+    # A strong run checks its caches against the strength-indicator record by
+    # default; any run that names --cache-record checks against that record.
+    cache_record = getattr(args, "cache_record", None)
+    cache_digests = (common.check_caches_recorded(out / "cache", primary,
+                                                  record_path=cache_record)
+                     if strong_learners or cache_record is not None else None)
     run_cfg = {
         "rungs": rungs, "arms": arms, "seeds": seeds, "workers": args.workers,
         "n_jobs": len(jobs), "started_unix": time.time(),
@@ -1154,7 +1417,15 @@ def cmd_run(args) -> int:
         run_cfg["strength_indicator"] = True
     if strong_learners:
         run_cfg["strong_learners"] = True
+    if cache_digests is not None:
         run_cfg["cache_sha256"] = cache_digests
+    if cache_record is not None:
+        run_cfg["cache_record"] = {"path": str(cache_record),
+                                   "sha256": common.sha256_file(Path(cache_record))}
+    if train_size is not None:
+        run_cfg["train_size"] = train_size
+    if neural_es:
+        run_cfg["neural_es"] = True
     common.write_json(out / "run_config.json", run_cfg)
     info = common.drive(jobs, run_job, out, args.workers, limit=args.limit_jobs)
     write_json(out / f"run_{int(time.time())}.json", info)
@@ -1175,8 +1446,12 @@ def main(argv=None) -> int:
 
     def common_arguments(p, *, nc: bool):
         p.add_argument("--datasets", nargs="+", required=True, type=Path,
-                       help="the three regenerated primary datasets")
-        p.add_argument("--archive", required=True, type=Path)
+                       help="the regenerated primary datasets")
+        p.add_argument("--archive", required=False, default=None, type=Path)
+        p.add_argument("--fresh", action="store_true",
+                       help="accept fresh datasets without requiring campaign archive records")
+        p.add_argument("--fresh-source", type=Path, default=None,
+                       help="2048-shot source dataset directory for fresh sweep preparation")
         p.add_argument("--out", required=True, type=Path)
         p.add_argument("--workers", type=int, default=4)
         p.add_argument("--label-tolerance", type=float, default=1e-11,
@@ -1215,7 +1490,14 @@ def main(argv=None) -> int:
                      help="append noise_strength_L3 feature to every arm and rung")
     run.add_argument("--strong-learners", action="store_true",
                      help="enable strong learner candidates (hgbr, poly5_ridge)")
+    run.add_argument("--train-size", type=int, default=None,
+                     help="use only the first N training circuits per family")
+    run.add_argument("--neural-es", action="store_true",
+                     help="enable well-trained MLP with early stopping and lr plateau schedule")
     run.add_argument("--gate-file", type=Path, default=None)
+    run.add_argument("--cache-record", type=Path, default=None,
+                     help="a JSON whose inputs.caches_used gives each primary cache's "
+                          "SHA-256; the run exits before any fit on a difference")
     run.add_argument("--limit-jobs", type=int, default=None)
     run.add_argument("--seedrep-fits", type=Path, default=None, help=seedrep_help)
     check = sub.add_parser("check-reexport",

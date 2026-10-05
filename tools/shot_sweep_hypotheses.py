@@ -31,7 +31,8 @@ import math
 import os
 from pathlib import Path
 import sys
-from typing import Any, Sequence
+from typing import Any
+from collections.abc import Sequence
 
 import numpy as np
 from scipy.stats import spearmanr
@@ -90,15 +91,20 @@ def parse_level_args(entries: list[str]) -> dict[str, Path]:
     return out
 
 
-def extract_analysis_a(path: Path) -> dict[str, dict[str, dict[str, Any]]]:
+def extract_analysis_a(
+    path: Path,
+    dataset_seeds: Sequence[int] = SEEDS,
+) -> dict[str, dict[str, dict[str, Any]]]:
     """Extract observed values from analysis A: out[row][rung] = {...}."""
     data = json.loads(path.read_text(encoding="utf-8"))
     rows = data["parts"]["A"]["rows"]
     out: dict[str, dict[str, dict[str, Any]]] = {}
-    for seed in SEEDS:
+    for seed in dataset_seeds:
         for fam in FAMILIES:
             row_key = f"shipped-s{seed}-n640/{fam}"
             out[row_key] = {}
+            if row_key not in rows:
+                continue
             row_data = rows[row_key]
             for rung in RUNGS:
                 if rung not in row_data["rungs"]:
@@ -113,7 +119,10 @@ def extract_analysis_a(path: Path) -> dict[str, dict[str, dict[str, Any]]]:
     return out
 
 
-def extract_analysis_b(path: Path) -> dict[str, dict[str, dict[str, Any]]]:
+def extract_analysis_b(
+    path: Path,
+    dataset_seeds: Sequence[int] = SEEDS,
+) -> dict[str, dict[str, dict[str, Any]]]:
     """Extract observed values from analysis B: out[row][rung] = {...}."""
     data = json.loads(path.read_text(encoding="utf-8"))
     out: dict[str, dict[str, dict[str, Any]]] = {}
@@ -126,7 +135,7 @@ def extract_analysis_b(path: Path) -> dict[str, dict[str, dict[str, Any]]]:
         if str(cell.get("part", "")).upper() == "A":
             cells_map[(int(cell["dataset_seed"]), str(cell["family"]), str(cell["rung"]))] = cell
 
-    for seed in SEEDS:
+    for seed in dataset_seeds:
         for fam in FAMILIES:
             row_key = f"shipped-s{seed}-n640/{fam}"
             b_row_key = f"s{seed}__{fam}"
@@ -150,17 +159,21 @@ def extract_analysis_b(path: Path) -> dict[str, dict[str, dict[str, Any]]]:
     return out
 
 
-def expected_classification_cells() -> set[str]:
+def expected_classification_cells(dataset_seeds: Sequence[int] = SEEDS) -> set[str]:
     return {
         f"{level}/shipped-s{seed}-n640/{family}/{rung}"
         for level in CANONICAL_LEVELS
-        for seed in SEEDS
+        for seed in dataset_seeds
         for family in FAMILIES
         for rung in RUNGS
     }
 
 
-def check_inventory(predictions: dict, obs_by_level: dict) -> None:
+def check_inventory(
+    predictions: dict,
+    obs_by_level: dict,
+    dataset_seeds: Sequence[int] = SEEDS,
+) -> None:
     """The frozen sweep needs every level and every classification cell.
 
     A missing record is an input error, distinct from the rule's not-testable
@@ -170,7 +183,7 @@ def check_inventory(predictions: dict, obs_by_level: dict) -> None:
     if set(obs_by_level) != set(CANONICAL_LEVELS):
         raise ValueError(
             f"the frozen sweep requires all seven analysis levels; got {sorted(obs_by_level)}")
-    expected = expected_classification_cells()
+    expected = expected_classification_cells(dataset_seeds=dataset_seeds)
     actual = set(predictions.get("classification_cells", {}))
     if actual != expected:
         raise ValueError(
@@ -179,7 +192,7 @@ def check_inventory(predictions: dict, obs_by_level: dict) -> None:
     missing_obs = [
         f"{level}/shipped-s{seed}-n640/{family}/{rung}"
         for level in CANONICAL_LEVELS
-        for seed in SEEDS
+        for seed in dataset_seeds
         for family in FAMILIES
         for rung in RUNGS
         if rung not in obs_by_level[level].get(f"shipped-s{seed}-n640/{family}", {})
@@ -192,15 +205,16 @@ def evaluate_pipeline(
     predictions: dict,
     obs_by_level: dict[str, dict[str, dict[str, dict[str, Any]]]],
     prefit_failed: bool = False,
+    dataset_seeds: Sequence[int] = SEEDS,
 ) -> dict:
-    check_inventory(predictions, obs_by_level)
+    check_inventory(predictions, obs_by_level, dataset_seeds=dataset_seeds)
     available_levels = list(CANONICAL_LEVELS)
 
     # --- H1 (a): 12 series of 3 dataset seeds x 2 families x 2 rungs (N1, N2) ---
     series_results: dict[str, dict[str, Any]] = {}
     for rung in ("N1", "N2", "R0", "R5"):
         series_results[rung] = {}
-        for seed in SEEDS:
+        for seed in dataset_seeds:
             for fam in FAMILIES:
                 row_key = f"shipped-s{seed}-n640/{fam}"
                 x_vals = []
@@ -231,7 +245,7 @@ def evaluate_pipeline(
     for lvl in available_levels:
         if str(lvl) == "2048":
             continue
-        for seed in SEEDS:
+        for seed in dataset_seeds:
             for fam in FAMILIES:
                 row_key = f"shipped-s{seed}-n640/{fam}"
                 for rung in ("N1", "N2"):
@@ -285,7 +299,7 @@ def evaluate_pipeline(
 
     for lvl in available_levels:
         is_2048 = (str(lvl) == "2048")
-        for seed in SEEDS:
+        for seed in dataset_seeds:
             for fam in FAMILIES:
                 row_key = f"shipped-s{seed}-n640/{fam}"
                 for rung in RUNGS:
@@ -590,6 +604,13 @@ def main() -> None:
         required=True,
         help="Output path for hypotheses results JSON",
     )
+    parser.add_argument(
+        "--dataset-seeds",
+        type=int,
+        nargs="+",
+        default=list(SEEDS),
+        help="Dataset seeds (default: %(default)s)",
+    )
 
     args = parser.parse_args()
 
@@ -618,16 +639,17 @@ def main() -> None:
         )
         sys.exit(1)
 
+    dataset_seeds = tuple(args.dataset_seeds)
     obs_a: dict[str, dict[str, dict[str, dict[str, Any]]]] = {}
     for lvl, p in levels_a.items():
-        obs_a[lvl] = extract_analysis_a(p)
+        obs_a[lvl] = extract_analysis_a(p, dataset_seeds=dataset_seeds)
 
     obs_b: dict[str, dict[str, dict[str, dict[str, Any]]]] = {}
     for lvl, p in levels_b.items():
-        obs_b[lvl] = extract_analysis_b(p)
+        obs_b[lvl] = extract_analysis_b(p, dataset_seeds=dataset_seeds)
 
-    results_a = evaluate_pipeline(predictions, obs_a, prefit_failed=args.prefit_failed)
-    results_b = evaluate_pipeline(predictions, obs_b, prefit_failed=args.prefit_failed)
+    results_a = evaluate_pipeline(predictions, obs_a, prefit_failed=args.prefit_failed, dataset_seeds=dataset_seeds)
+    results_b = evaluate_pipeline(predictions, obs_b, prefit_failed=args.prefit_failed, dataset_seeds=dataset_seeds)
 
     # Compare results to 1e-12
     diffs = compare_ab_results(results_a, results_b, path="results")

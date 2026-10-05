@@ -31,11 +31,14 @@ sys.path.insert(0, str(repo))
 import descriptor_ladder_analysis as dla  # noqa: E402
 
 
-def _rows(part: str, spec: dict, caches: dict, store) -> list[tuple[str, str, object, list[str]]]:
+def _rows(part: str, spec: dict, caches: dict, store,
+          dataset_seeds: Sequence[int] = dla.DATASET_SEEDS) -> list[tuple[str, str, object, list[str]]]:
     """(key, label, Row, rungs with fits) for every row of the part, in a fixed order."""
     rows = []
-    for seed in dla.DATASET_SEEDS:
+    for seed in dataset_seeds:
         key = f"qaoa-s{seed}-n640" if part == "B" else f"shipped-s{seed}-n640"
+        if key not in caches:
+            continue
         data = dla.load_cache(caches[key])
         present = store.rungs_for(key) if part == "A" else set(spec["rungs"])
         for family in (spec["families"] or (None,)):
@@ -49,11 +52,13 @@ def _rows(part: str, spec: dict, caches: dict, store) -> list[tuple[str, str, ob
 
 def compute_posthoc(fit_dirs: list[Path], cache_dirs: list[Path],
                     out_path: Path | None = None,
-                    *, verbose: bool = True, part: str = "B") -> dict:
+                    *, verbose: bool = True, part: str = "B",
+                    dataset_seeds: Sequence[int] | None = None) -> dict:
     store = dla.FitStore([Path(d) for d in fit_dirs], False)
     caches, _ = dla.discover_caches([Path(d) for d in cache_dirs])
     if part not in ("A", "B"):
         raise ValueError(f"part must be A or B, got {part}")
+    ds = tuple(dataset_seeds) if dataset_seeds is not None else dla.DATASET_SEEDS
     spec = dla.PARTS[part]
     out = {"schema": "descriptor-information-posthoc-arm-minus-raw-v1",
            "status": "post hoc; the frozen rule states no reading for these contrasts",
@@ -62,7 +67,7 @@ def compute_posthoc(fit_dirs: list[Path], cache_dirs: list[Path],
            "cells": {}}
     if part == "A":
         out["part"] = "A"
-    for key, label, row, rungs in _rows(part, spec, caches, store):
+    for key, label, row, rungs in _rows(part, spec, caches, store, dataset_seeds=ds):
         est = dla.RowEstimator(row, store, dla.DEFAULT_DRAWS, dla.RULE_SEED, 20)
         cells = row.all_cells
         r_point = dla.point_macro(est.raw_errors()[0], row.members, cells)
@@ -107,6 +112,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--quiet", action="store_true", help="Suppress printed lines")
     parser.add_argument("--part", choices=("A", "B"), default="B",
                         help="Part B (default) or Part A rows")
+    parser.add_argument("--dataset-seeds", nargs="+", type=int, default=list(dla.DATASET_SEEDS),
+                        help=f"dataset seeds (default: {' '.join(str(s) for s in dla.DATASET_SEEDS)})")
     args = parser.parse_args(argv)
 
     if args.fits:
@@ -134,7 +141,8 @@ def main(argv: list[str] | None = None) -> int:
         fit_dirs = [runs / ("fits" if args.flat else "partB/fits")]
         cache_dirs = [runs / ("cache" if args.flat else "partB/cache")]
 
-    compute_posthoc(fit_dirs, cache_dirs, out_path, verbose=not args.quiet, part=args.part)
+    compute_posthoc(fit_dirs, cache_dirs, out_path, verbose=not args.quiet, part=args.part,
+                    dataset_seeds=args.dataset_seeds)
     return 0
 
 

@@ -49,6 +49,7 @@ any edited or reordered fit file is refused.
 from __future__ import annotations
 
 import argparse
+from collections.abc import Sequence
 import hashlib
 import json
 import os
@@ -87,26 +88,26 @@ def display(path: Path) -> str:
         return str(path)
 
 
-def rungs_with_fits(fits_dir: Path) -> dict[str, tuple[str, ...]]:
+def rungs_with_fits(fits_dir: Path, dataset_seeds: Sequence[int] = mf.SEEDS) -> dict[str, tuple[str, ...]]:
     """The Part A rungs of each family whose first C fit exists for every dataset seed."""
     out = {}
     for fam, rungs in mf.RUNGS_PER_FAMILY.items():
         out[fam] = tuple(
             rung for rung in rungs
             if all((fits_dir / f"shipped-s{seed}-n640__{rung}__k01__C.json").exists()
-                   for seed in mf.SEEDS))
+                   for seed in dataset_seeds))
     if not any(out.values()):
         raise SystemExit(f"{fits_dir}: no Part A C fits found")
     return out
 
 
-def fits_digest(fits_dir: Path, rungs: dict[str, tuple[str, ...]]) -> str:
+def fits_digest(fits_dir: Path, rungs: dict[str, tuple[str, ...]], dataset_seeds: Sequence[int] = mf.SEEDS) -> str:
     """SHA-256 over the C and F fit files the stacking reads, in a fixed order."""
     digest = hashlib.sha256()
     names = sorted({
         f"shipped-s{seed}-n640__{rung}__k{k:02d}__{arm}.{ext}"
         for fam_rungs in rungs.values() for rung in fam_rungs
-        for seed in mf.SEEDS for k in range(1, 21)
+        for seed in dataset_seeds for k in range(1, 21)
         for arm in ("C", "F") for ext in ("json", "npz")})
     for name in names:
         digest.update(name.encode())
@@ -127,7 +128,8 @@ def analysis_cell(analysis: dict, row: str, rung: str) -> dict:
 
 
 def verify_inputs(fits_dir: Path, data_dir: Path, cache_dir: Path, analysis: dict,
-                  rungs: dict[str, tuple[str, ...]]) -> dict[str, str]:
+                  rungs: dict[str, tuple[str, ...]],
+                  dataset_seeds: Sequence[int] = mf.SEEDS) -> dict[str, str]:
     """Bind the data, the cache, the fits, and analysis A per dataset seed.
 
     For each dataset seed, the data's manifest must hash its own items, and its
@@ -145,7 +147,7 @@ def verify_inputs(fits_dir: Path, data_dir: Path, cache_dir: Path, analysis: dic
 
     caches_used = analysis["inputs"]["caches_used"]
     verified = {}
-    for seed in mf.SEEDS:
+    for seed in dataset_seeds:
         key = f"shipped-s{seed}-n640"
         item_dir = data_dir / f"regen-{key}"
         manifest = json.loads((item_dir / "manifest.json").read_text(encoding="utf-8"))
@@ -264,19 +266,30 @@ def verify_pins(name: str, fits_dir: Path, rungs: dict[str, tuple[str, ...]],
 
 
 def run_set(name: str, fits_dir: Path, data_dir: Path, cache_dir: Path,
-            analysis_path: Path, pins: dict) -> dict:
-    rungs = rungs_with_fits(fits_dir)
-    pinned_digest = verify_pins(name, fits_dir, rungs, analysis_path, pins)
+            analysis_path: Path, pins: dict | None,
+            dataset_seeds: Sequence[int] = mf.SEEDS) -> dict:
+    """One fit set. ``pins`` is None only for fits not yet in a release (``--unpinned``)."""
+    rungs = rungs_with_fits(fits_dir, dataset_seeds=dataset_seeds)
+    if pins is None:
+        pinned_digest = fits_digest(fits_dir, rungs, dataset_seeds=dataset_seeds)
+    else:
+        pinned_digest = verify_pins(name, fits_dir, rungs, analysis_path, pins)
     analysis = json.loads(analysis_path.read_text(encoding="utf-8"))
-    dataset_hashes = verify_inputs(fits_dir, data_dir, cache_dir, analysis, rungs)
-    datasets = mf.load_datasets(data_dir)
-    _, row_summary = mf.compute_floors(datasets)
-    stacking = mf.compute_stacking(fits_dir, datasets, row_summary, rungs_per_family=rungs)
+    dataset_hashes = verify_inputs(fits_dir, data_dir, cache_dir, analysis, rungs, dataset_seeds=dataset_seeds)
+    datasets = mf.load_datasets(data_dir, dataset_seeds=dataset_seeds)
+    _, row_summary = mf.compute_floors(datasets, dataset_seeds=dataset_seeds)
+    stacking = mf.compute_stacking(fits_dir, datasets, row_summary, rungs_per_family=rungs, dataset_seeds=dataset_seeds)
     analysis_max_abs_diff = verify_against_analysis(stacking, analysis)
     cells = {}
     for key, entry in sorted(stacking.items()):
         row, rung = key.rsplit("/", 1)
         cells[key] = {**entry, "analysis_a": analysis_cell(analysis, row, rung)}
+    data_items_sha256 = {}
+    for seed in dataset_seeds:
+        p = data_dir / f"regen-shipped-s{seed}-n640" / "items.jsonl"
+        if not p.exists():
+            p = data_dir / f"shipped-s{seed}-n640" / "items.jsonl"
+        data_items_sha256[str(seed)] = sha256_file(p) if p.exists() else None
     return {
         "fits_dir": display(fits_dir),
         "data_dir": display(data_dir),
@@ -284,10 +297,8 @@ def run_set(name: str, fits_dir: Path, data_dir: Path, cache_dir: Path,
         "dataset_hash_verified": dataset_hashes,
         "mean_C_and_F_match_analysis_a_max_abs_diff": analysis_max_abs_diff,
         "fits_digest": pinned_digest,
-        "fits_match_pins": True,
-        "data_items_sha256": {
-            str(seed): sha256_file(data_dir / f"regen-shipped-s{seed}-n640" / "items.jsonl")
-            for seed in mf.SEEDS},
+        "fits_match_pins": None if pins is None else True,
+        "data_items_sha256": data_items_sha256,
         "analysis_a": display(analysis_path),
         "analysis_a_sha256": sha256_file(analysis_path),
         "rungs": {fam: list(r) for fam, r in rungs.items()},
@@ -300,30 +311,43 @@ def main(argv: list[str] | None = None) -> None:
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--set", nargs=5, action="append", required=True,
                         metavar=("NAME", "FITS", "DATA", "CACHE", "ANALYSIS_A"))
-    parser.add_argument("--pins", type=Path, required=True,
-                        help="fit-file pins written by tools/stacking_pins.py")
+    pinning = parser.add_mutually_exclusive_group(required=True)
+    pinning.add_argument("--pins", type=Path,
+                         help="fit-file pins written by tools/stacking_pins.py")
+    pinning.add_argument("--unpinned", action="store_true",
+                         help="fits not yet in a release: every other check runs, and the "
+                              "output records the fits digest without pins")
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--follow-up-rule", type=Path, default=None,
+                        help="the frozen rule that names this run; without it the output is post hoc")
+    parser.add_argument("--dataset-seeds", type=int, nargs="+", default=list(mf.SEEDS),
+                        help="Dataset seeds (default: %(default)s)")
     args = parser.parse_args(argv)
 
-    pins = json.loads(args.pins.read_text(encoding="utf-8"))
+    pins = None if args.unpinned else json.loads(args.pins.read_text(encoding="utf-8"))
     names = [s[0] for s in args.set]
     if len(set(names)) != len(names):
         raise SystemExit("--set names must be unique")
+    dataset_seeds = tuple(args.dataset_seeds)
     payload = {
         "schema": SCHEMA,
-        "status": "post hoc, descriptive",
+        "status": ("post hoc, descriptive" if args.follow_up_rule is None
+                   else f"follows {args.follow_up_rule.as_posix()}"),
+        "follow_up_rule": (None if args.follow_up_rule is None else
+                           {"path": args.follow_up_rule.as_posix(),
+                            "sha256": sha256_file(args.follow_up_rule)}),
         "script": "tools/stacking_increment_all.py",
         "script_sha256": sha256_file(Path(__file__).resolve()),
         "measurement_floor_sha256": sha256_file(Path(mf.__file__).resolve()),
         "bootstrap": {"seed": mf.RULE_SEED, "draws": mf.BOOTSTRAP_DRAWS},
-        "pins": display(args.pins),
-        "pins_sha256": sha256_file(args.pins),
+        "pins": None if args.unpinned else display(args.pins),
+        "pins_sha256": None if args.unpinned else sha256_file(args.pins),
         "sets": {},
     }
     for name, fits, data, cache, analysis in args.set:
         print(f"[{name}] {fits}", flush=True)
         payload["sets"][name] = run_set(name, Path(fits), Path(data), Path(cache),
-                                         Path(analysis), pins)
+                                         Path(analysis), pins, dataset_seeds=dataset_seeds)
 
     out = args.out
     out.parent.mkdir(parents=True, exist_ok=True)

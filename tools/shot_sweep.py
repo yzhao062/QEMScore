@@ -14,6 +14,7 @@ import os
 import pickle
 import platform
 from collections import defaultdict
+from collections.abc import Sequence
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any
@@ -796,9 +797,16 @@ def check_exact(
 
 
 def check_caches(
-    reference_dir: Path, level_dir: Path, out_path: Path | None = None
+    reference_dir: Path, level_dir: Path, out_path: Path | None = None,
+    dataset_seeds: Sequence[int] | None = None,
+    reference_only_encoder_cache: bool = False,
 ) -> dict[str, Any]:
-    """Check that level ladder output caches match the 2048 reference cache."""
+    """Check that level ladder output caches match the 2048 reference cache.
+
+    ``reference_only_encoder_cache`` accepts an R4 encoder cache at the reference
+    alone (a fresh 2,048-shot tree prepared in full); a sweep level skips the R4
+    encoding, which no sweep rung reads. The report records the case.
+    """
     reference_dir = Path(reference_dir).resolve()
     level_dir = Path(level_dir).resolve()
 
@@ -816,7 +824,21 @@ def check_caches(
     row_discrepancies: dict[str, list[dict]] = {}
 
     # Every primary dataset is compared; a missing file at either level fails below.
-    keys_to_check = list(PRIMARY_KEYS)
+    if dataset_seeds is not None:
+        keys_to_check = [f"shipped-s{s}-n640" for s in dataset_seeds]
+    else:
+        djson_path = reference_dir / "datasets.json"
+        if djson_path.exists():
+            try:
+                ddata = json.loads(djson_path.read_text(encoding="utf-8"))
+                if ddata.get("_fresh"):
+                    keys_to_check = [k for k in ddata if not k.startswith("_")]
+                else:
+                    keys_to_check = list(PRIMARY_KEYS)
+            except Exception:
+                keys_to_check = list(PRIMARY_KEYS)
+        else:
+            keys_to_check = list(PRIMARY_KEYS)
 
     for key in keys_to_check:
         ref_order_path = reference_dir / "cache" / f"{key}.order.json"
@@ -918,6 +940,7 @@ def check_caches(
     ref_enc_dir = reference_dir / "encoder-cache"
     lvl_enc_dir = level_dir / "encoder-cache"
     enc_diffs = []
+    enc_note = None
     if ref_enc_dir.exists() and lvl_enc_dir.exists():
         ref_files = sorted(f.name for f in ref_enc_dir.iterdir() if f.is_file())
         lvl_files = sorted(f.name for f in lvl_enc_dir.iterdir() if f.is_file())
@@ -944,6 +967,8 @@ def check_caches(
                     enc_diffs.append(f"metadata mismatch in {fn} (data_dir and seconds ignored)")
             elif (ref_enc_dir / fn).read_bytes() != (lvl_enc_dir / fn).read_bytes():
                 enc_diffs.append(f"content mismatch in {fn}")
+    elif ref_enc_dir.exists() and reference_only_encoder_cache:
+        enc_note = "encoder-cache at the reference only (sweep levels skip the R4 encoding)"
     elif ref_enc_dir.exists() or lvl_enc_dir.exists():
         enc_diffs.append("encoder-cache directory present at only one level")
     # Absent at both levels: sweep preparation skips the R4 encoding.
@@ -967,6 +992,7 @@ def check_caches(
         "descriptors_diffs": desc_diffs,
         "encoder_cache_identical": len(enc_diffs) == 0,
         "encoder_cache_diffs": enc_diffs,
+        **({"encoder_cache_note": enc_note} if enc_note else {}),
         "passed": passed,
     }
 
@@ -1083,6 +1109,10 @@ def main(argv=None) -> int:
     cc.add_argument("--reference", type=Path, required=True)
     cc.add_argument("--level", type=Path, required=True)
     cc.add_argument("--report", "--out", dest="out", type=Path, default=None)
+    cc.add_argument("--dataset-seeds", type=int, nargs="+", default=None,
+                    help="Dataset seeds (default: auto-detected or 101 211 307)")
+    cc.add_argument("--reference-only-encoder-cache", action="store_true",
+                    help="accept an R4 encoder cache at the reference alone")
 
     val = sub.add_parser("validate-exact", help="validate exact simulation against 1M shots on a toy circuit")
     val.add_argument("--shots", type=int, default=1_000_000)
@@ -1111,7 +1141,8 @@ def main(argv=None) -> int:
         return 0 if rep["passed"] else 1
 
     if args.command == "check-caches":
-        rep = check_caches(args.reference, args.level, args.out)
+        rep = check_caches(args.reference, args.level, args.out, dataset_seeds=args.dataset_seeds,
+                           reference_only_encoder_cache=args.reference_only_encoder_cache)
         print(json.dumps(rep, indent=2))
         return 0 if rep["passed"] else 1
 

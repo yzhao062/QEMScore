@@ -36,6 +36,7 @@ import math
 import os
 from pathlib import Path
 import sys
+from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
@@ -82,6 +83,7 @@ def run_ivw_ceiling_analysis(
     floor_path: Path,
     strongest_ref_path: Path,
     out_json_path: Path,
+    dataset_seeds: Sequence[int] = SEEDS,
 ) -> dict[str, Any]:
     """Execute the full IVW ceiling analysis for original and strength-indicator fits."""
     analysis_a = json.loads(analysis_a_path.read_text(encoding="utf-8"))["parts"]["A"]
@@ -108,6 +110,8 @@ def run_ivw_ceiling_analysis(
 
         for row_key, row_val in rows.items():
             dataset_seed = row_val["dataset_seed"]
+            if dataset_seeds is not None and dataset_seed not in dataset_seeds:
+                continue
             fam = row_val["family"]
 
             for rung_name, rung_val in row_val["rungs"].items():
@@ -321,6 +325,13 @@ def main() -> None:
         default=_REPO / "artifacts" / "descriptor-information" / "posthoc-ivw-ceiling.json",
         help="Output JSON path",
     )
+    parser.add_argument(
+        "--dataset-seeds",
+        type=int,
+        nargs="+",
+        default=list(SEEDS),
+        help="Dataset seeds (default: %(default)s)",
+    )
     args = parser.parse_args()
 
     run_ivw_ceiling_analysis(
@@ -329,6 +340,7 @@ def main() -> None:
         floor_path=args.floor,
         strongest_ref_path=args.strongest_reference,
         out_json_path=args.out,
+        dataset_seeds=tuple(args.dataset_seeds),
     )
 
 

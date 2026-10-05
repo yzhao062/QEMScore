@@ -1,0 +1,15 @@
+name: mlqem
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9.23
+  - pip=25.2
+  - pip:
+      # Every package comes from PyPI at the versions in this lock file (numpy 1.23.5,
+      # pandas 1.5.3, scikit-learn 1.6.1, torch 2.8.0, torch-geometric 2.6.1, qiskit 0.43.2,
+      # qiskit-terra 0.24.1, qiskit-aer 0.12.1, and their dependencies).
+      - -r mlqem-requirements.txt
+# blackwater is installed from the pinned ml-qem checkout after the environment is created:
+#   bash reanalysis/download_upstream.sh upstream
+#   conda run -n mlqem pip install --no-deps -e upstream/ml-qem
+# run.py stops before any fit unless blackwater is imported from that checkout at b1eccf8.
