@@ -1,0 +1,4377 @@
+{
+  "schema": "descriptor-ladder-analysis-v1",
+  "frozen_rule": "docs/frozen-rules/2026-10-02-descriptor-information.md",
+  "rule_seed": 20261002,
+  "bootstrap_seed": 20261002,
+  "n_draws": 10000,
+  "rung_statements": {
+    "A": {
+      "R0": {
+        "heisenberg": "mixed",
+        "tfi": "Measurement hurts"
+      },
+      "N1": {
+        "heisenberg": "mixed",
+        "tfi": "mixed"
+      },
+      "N2": {
+        "heisenberg": "Not distinguished",
+        "tfi": "Measurement adds"
+      },
+      "R4": {
+        "heisenberg": "Measurement adds",
+        "tfi": "Measurement adds"
+      },
+      "R5": {
+        "heisenberg": "Measurement adds",
+        "tfi": "Measurement adds"
+      }
+    }
+  },
+  "largest_non_excluded_d_over_c_per_rung": {
+    "A": {
+      "R0": {
+        "heisenberg": 0.08218312544740891,
+        "tfi": -0.161444054160536
+      },
+      "N1": {
+        "heisenberg": 0.0575289395445037,
+        "tfi": 0.002928651903117919
+      },
+      "N2": {
+        "heisenberg": 0.12641753609807826,
+        "tfi": 0.18786238542193368
+      },
+      "R4": {
+        "heisenberg": 0.24364545687597297,
+        "tfi": 0.3064447134536811
+      },
+      "R5": {
+        "heisenberg": 0.38778872120882346,
+        "tfi": 0.8455369394569817
+      }
+    }
+  },
+  "dropped_cells_per_dataset": {
+    "shipped-s101-n640": [],
+    "shipped-s211-n640": [],
+    "shipped-s307-n640": []
+  },
+  "skipped_files": [],
+  "failed_fits": [],
+  "excluded_anchors": [],
+  "cells": [
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "heisenberg",
+      "row_key": "s101__heisenberg",
+      "rung": "R0",
+      "status": "estimated",
+      "mean_c": 0.020480657837539093,
+      "mean_f": 0.021929297154340614,
+      "mean_m": 0.06056159873304459,
+      "mean_a": 0.094960261026136,
+      "mean_r": 0.6025809297276531,
+      "mean_d": -0.0014486393168015206,
+      "d_ci_95": [
+        -0.00344248863469842,
+        0.0004450979287810787
+      ],
+      "mean_d_over_c": -0.07073206965775791,
+      "d_over_c_ci_95": [
+        -0.17750868209094875,
+        0.021013644440945195
+      ],
+      "e": 0.03863230157870398,
+      "e_ci_95": [
+        0.03315571729001392,
+        0.04455758883673822
+      ],
+      "s": 1.0198359605296266,
+      "s_ci_95": [
+        0.9938500397178569,
+        1.0480791828041118
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0,
+        "delta_d_ci_95": [
+          0.0,
+          0.0
+        ],
+        "delta_d_over_c": 0.0,
+        "delta_d_over_c_ci_95": [
+          0.0,
+          0.0
+        ]
+      },
+      "secondary_d": -0.0014486393168015206,
+      "secondary_d_ci_95": [
+        -0.00344248863469842,
+        0.0004450979287810787
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.0025371435357949244,
+        "L3": -0.0003601350978081168
+      },
+      "dropped_cells": [],
+      "classification_label": "Not distinguished",
+      "largest_non_excluded_d_over_c": 0.021013644440945195,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "mixed",
+      "rung_largest_non_excluded_d_over_c": 0.08218312544740891
+    },
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "tfi",
+      "row_key": "s101__tfi",
+      "rung": "R0",
+      "status": "estimated",
+      "mean_c": 0.00873990974118834,
+      "mean_f": 0.011225359301120457,
+      "mean_m": 0.04486451850804187,
+      "mean_a": 0.04569112136605276,
+      "mean_r": 0.26009765090021875,
+      "mean_d": -0.002485449559932117,
+      "d_ci_95": [
+        -0.0033978974785342296,
+        -0.0015385782114632413
+      ],
+      "mean_d_over_c": -0.2843793166671968,
+      "d_over_c_ci_95": [
+        -0.4161507898999263,
+        -0.161444054160536
+      ],
+      "e": 0.03363915920692141,
+      "e_ci_95": [
+        0.03054498365739746,
+        0.03679214432204808
+      ],
+      "s": 1.0721135820310492,
+      "s_ci_95": [
+        1.0434141673664503,
+        1.1012444914401887
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0,
+        "delta_d_ci_95": [
+          0.0,
+          0.0
+        ],
+        "delta_d_over_c": 0.0,
+        "delta_d_over_c_ci_95": [
+          0.0,
+          0.0
+        ]
+      },
+      "secondary_d": -0.002485449559932117,
+      "secondary_d_ci_95": [
+        -0.0033978974785342296,
+        -0.0015385782114632413
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.003600171825442873,
+        "L3": -0.0013707272944213575
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement hurts",
+      "largest_non_excluded_d_over_c": -0.161444054160536,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement hurts",
+      "rung_largest_non_excluded_d_over_c": -0.161444054160536
+    },
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "heisenberg",
+      "row_key": "s101__heisenberg",
+      "rung": "N1",
+      "status": "estimated",
+      "mean_c": 0.0223577315117522,
+      "mean_f": 0.022935755839757363,
+      "mean_m": 0.06056159873304459,
+      "mean_a": 0.09510465171774059,
+      "mean_r": 0.6025809297276531,
+      "mean_d": -0.0005780243280051646,
+      "d_ci_95": [
+        -0.002581145818694623,
+        0.001353849560295495
+      ],
+      "mean_d_over_c": -0.025853442586575914,
+      "d_over_c_ci_95": [
+        -0.12246531193635447,
+        0.0575289395445037
+      ],
+      "e": 0.03762584289328723,
+      "e_ci_95": [
+        0.03217968726345886,
+        0.04349675082624178
+      ],
+      "s": 1.008009327577665,
+      "s_ci_95": [
+        0.9807597914134734,
+        1.0366696361009438
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.000870614988796356,
+        "delta_d_ci_95": [
+          0.00013932559568375722,
+          0.0016279169704846302
+        ],
+        "delta_d_over_c": 0.044878627071181995,
+        "delta_d_over_c_ci_95": [
+          0.009327845095583069,
+          0.08272971305850374
+        ]
+      },
+      "secondary_d": -0.0005780243280051646,
+      "secondary_d_ci_95": [
+        -0.002581145818694623,
+        0.001353849560295495
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.0009847009200738277,
+        "L3": -0.00017134773593649802
+      },
+      "dropped_cells": [],
+      "classification_label": "Not distinguished",
+      "largest_non_excluded_d_over_c": 0.0575289395445037,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "mixed",
+      "rung_largest_non_excluded_d_over_c": 0.0575289395445037
+    },
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "tfi",
+      "row_key": "s101__tfi",
+      "rung": "N1",
+      "status": "estimated",
+      "mean_c": 0.012483814565814443,
+      "mean_f": 0.013716194093829842,
+      "mean_m": 0.04486451850804187,
+      "mean_a": 0.045150949588719104,
+      "mean_r": 0.26009765090021875,
+      "mean_d": -0.0012323795280153992,
+      "d_ci_95": [
+        -0.0022250956888017594,
+        -0.00017451250282297356
+      ],
+      "mean_d_over_c": -0.09871818597739632,
+      "d_over_c_ci_95": [
+        -0.1850979142822228,
+        -0.01311134336864089
+      ],
+      "e": 0.03114832441421203,
+      "e_ci_95": [
+        0.027981100023477125,
+        0.0343220801339264
+      ],
+      "s": 1.0392043618158813,
+      "s_ci_95": [
+        1.005433278423535,
+        1.0722081220057345
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0012530700319167178,
+        "delta_d_ci_95": [
+          0.0005664870647979423,
+          0.001958319330558548
+        ],
+        "delta_d_over_c": 0.18566113068980047,
+        "delta_d_over_c_ci_95": [
+          0.10345451808169985,
+          0.27991283377667703
+        ]
+      },
+      "secondary_d": -0.0012323795280153992,
+      "secondary_d_ci_95": [
+        -0.0022250956888017594,
+        -0.00017451250282297356
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.0018348901733027268,
+        "L3": -0.0006298688827280751
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement hurts",
+      "largest_non_excluded_d_over_c": -0.01311134336864089,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "mixed",
+      "rung_largest_non_excluded_d_over_c": 0.002928651903117919
+    },
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "heisenberg",
+      "row_key": "s101__heisenberg",
+      "rung": "N2",
+      "status": "estimated",
+      "mean_c": 0.029685201622985068,
+      "mean_f": 0.0278587769433629,
+      "mean_m": 0.06056159873304459,
+      "mean_a": 0.0954915697594034,
+      "mean_r": 0.6025809297276531,
+      "mean_d": 0.0018264246796221677,
+      "d_ci_95": [
+        -0.0003835996808642845,
+        0.003960715166071033
+      ],
+      "mean_d_over_c": 0.0615264367349952,
+      "d_over_c_ci_95": [
+        -0.013849113840280305,
+        0.12641753609807826
+      ],
+      "e": 0.03270282178968169,
+      "e_ci_95": [
+        0.027400586698386135,
+        0.03837377074541405
+      ],
+      "s": 0.9729949835933879,
+      "s_ci_95": [
+        0.9400849372241681,
+        1.005771994472388
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0032750639964236883,
+        "delta_d_ci_95": [
+          0.0012655580252148959,
+          0.005202212828755259
+        ],
+        "delta_d_over_c": 0.1322585063927531,
+        "delta_d_over_c_ci_95": [
+          0.05093103599189188,
+          0.21739945121360435
+        ]
+      },
+      "secondary_d": 0.0018264246796221677,
+      "secondary_d_ci_95": [
+        -0.0003835996808642845,
+        0.003960715166071033
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.0034251615767183774,
+        "L3": 0.00022768778252595795
+      },
+      "dropped_cells": [],
+      "classification_label": "Not distinguished",
+      "largest_non_excluded_d_over_c": 0.12641753609807826,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Not distinguished",
+      "rung_largest_non_excluded_d_over_c": 0.12641753609807826
+    },
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "tfi",
+      "row_key": "s101__tfi",
+      "rung": "N2",
+      "status": "estimated",
+      "mean_c": 0.02486594336276231,
+      "mean_f": 0.021586817169204187,
+      "mean_m": 0.04486451850804187,
+      "mean_a": 0.04674365461269775,
+      "mean_r": 0.26009765090021875,
+      "mean_d": 0.0032791261935581247,
+      "d_ci_95": [
+        0.0016284029679085024,
+        0.005048976490223871
+      ],
+      "mean_d_over_c": 0.1318721813896166,
+      "d_over_c_ci_95": [
+        0.07059347976983774,
+        0.18786238542193368
+      ],
+      "e": 0.023277701338837685,
+      "e_ci_95": [
+        0.019927331054198142,
+        0.0265768885445482
+      ],
+      "s": 0.869652685838449,
+      "s_ci_95": [
+        0.7973976738628115,
+        0.9350022707431319
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.005764575753490242,
+        "delta_d_ci_95": [
+          0.004128446879990152,
+          0.0074618049409406325
+        ],
+        "delta_d_over_c": 0.4162514980568134,
+        "delta_d_over_c_ci_95": [
+          0.29936103523862395,
+          0.5422128895449834
+        ]
+      },
+      "secondary_d": 0.0032791261935581247,
+      "secondary_d_ci_95": [
+        0.0016284029679085024,
+        0.005048976490223871
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.004559718833784452,
+        "L3": 0.0019985335533317973
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.18786238542193368,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.18786238542193368
+    },
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "heisenberg",
+      "row_key": "s101__heisenberg",
+      "rung": "R4",
+      "status": "estimated",
+      "mean_c": 0.0843024554180157,
+      "mean_f": 0.0677689532826947,
+      "mean_m": 0.06056159873304459,
+      "mean_a": 0.09369435916481592,
+      "mean_r": 0.6025809297276531,
+      "mean_d": 0.01653350213532101,
+      "d_ci_95": [
+        0.011943237366442087,
+        0.021626166352501808
+      ],
+      "mean_d_over_c": 0.19612124051831292,
+      "d_over_c_ci_95": [
+        0.15482219560840263,
+        0.23779127335371464
+      ],
+      "e": -0.007207354549650102,
+      "e_ci_95": [
+        -0.013539867237648174,
+        -0.001237631328774577
+      ],
+      "s": 0.3622664111606867,
+      "s_ci_95": [
+        -0.026689084020926707,
+        0.5926507580921425
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.01798214145212253,
+        "delta_d_ci_95": [
+          0.013110208726470946,
+          0.02337665680853921
+        ],
+        "delta_d_over_c": 0.26685331017607083,
+        "delta_d_over_c_ci_95": [
+          0.169971144255307,
+          0.3800532828436779
+        ]
+      },
+      "secondary_d": 0.01886262444303935,
+      "secondary_d_ci_95": [
+        0.013642327426030885,
+        0.024235203342360928
+      ],
+      "selection_counts": {
+        "F": {
+          "random_forest": 19,
+          "mlp": 1
+        },
+        "C": {
+          "random_forest": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.03109231535391503,
+        "L3": 0.0019746889167269605
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.23779127335371464,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.24364545687597297
+    },
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "tfi",
+      "row_key": "s101__tfi",
+      "rung": "R4",
+      "status": "estimated",
+      "mean_c": 0.06941435583722541,
+      "mean_f": 0.055038887567405624,
+      "mean_m": 0.04486451850804187,
+      "mean_a": 0.06977310019279508,
+      "mean_r": 0.26009765090021875,
+      "mean_d": 0.014375468269819787,
+      "d_ci_95": [
+        0.010909124265393236,
+        0.01808469356824253
+      ],
+      "mean_d_over_c": 0.20709647300523584,
+      "d_over_c_ci_95": [
+        0.17858234516326885,
+        0.23225129491312357
+      ],
+      "e": -0.010174369059363753,
+      "e_ci_95": [
+        -0.019086849991338688,
+        -0.002087285617396192
+      ],
+      "s": 0.024347711322659348,
+      "s_ci_95": [
+        -0.8420683691276116,
+        0.36612773478135846
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.016860917829751902,
+        "delta_d_ci_95": [
+          0.0133405025673638,
+          0.020665795706034735
+        ],
+        "delta_d_over_c": 0.49147578967243266,
+        "delta_d_over_c_ci_95": [
+          0.36569200031677673,
+          0.6279399822066658
+        ]
+      },
+      "secondary_d": 0.016432913249741665,
+      "secondary_d_ci_95": [
+        0.010160807837878276,
+        0.023275130317029716
+      ],
+      "selection_counts": {
+        "F": {
+          "random_forest": 19,
+          "mlp": 1
+        },
+        "C": {
+          "random_forest": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.013992337203181694,
+        "L3": 0.014758599336457866
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.23225129491312357,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.3064447134536811
+    },
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "heisenberg",
+      "row_key": "s101__heisenberg",
+      "rung": "R5",
+      "status": "estimated",
+      "mean_c": 0.09314425575949564,
+      "mean_f": 0.06056159873304459,
+      "mean_m": 0.06056159873304459,
+      "mean_a": 0.09578208244489861,
+      "mean_r": 0.6025809297276531,
+      "mean_d": 0.03258265702645105,
+      "d_ci_95": [
+        0.025843486573328522,
+        0.03971454214079453
+      ],
+      "mean_d_over_c": 0.3498085497680236,
+      "d_over_c_ci_95": [
+        0.31067795522130526,
+        0.3830946995138529
+      ],
+      "e": 0.0,
+      "e_ci_95": [
+        0.0,
+        0.0
+      ],
+      "s": 0.07489467512665544,
+      "s_ci_95": [
+        0.037468431451363214,
+        0.12994368181270874
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.03403129634325257,
+        "delta_d_ci_95": [
+          0.026941471569241485,
+          0.04166986246262774
+        ],
+        "delta_d_over_c": 0.4205406194257815,
+        "delta_d_over_c_ci_95": [
+          0.31864630940279026,
+          0.5355044425560631
+        ]
+      },
+      "secondary_d": 0.037508737803399195,
+      "secondary_d_ci_95": [
+        0.03075267014165426,
+        0.0445278605405619
+      ],
+      "selection_counts": {
+        "F": {
+          "random_forest": 4,
+          "mlp": 16
+        },
+        "C": {
+          "random_forest": 15,
+          "mlp": 5
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.06554031689468579,
+        "L3": -0.0003750028417836976
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.3830946995138529,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.38778872120882346
+    },
+    {
+      "part": "A",
+      "dataset_seed": 101,
+      "family": "tfi",
+      "row_key": "s101__tfi",
+      "rung": "R5",
+      "status": "estimated",
+      "mean_c": 0.2164182675571097,
+      "mean_f": 0.04486451850804187,
+      "mean_m": 0.04486451850804187,
+      "mean_a": 0.21793669211873362,
+      "mean_r": 0.26009765090021875,
+      "mean_d": 0.1715537490490678,
+      "d_ci_95": [
+        0.15182110574363064,
+        0.19192087971228702
+      ],
+      "mean_d_over_c": 0.7926953255172752,
+      "d_over_c_ci_95": [
+        0.7703068109491282,
+        0.8125412127207771
+      ],
+      "e": 0.0,
+      "e_ci_95": [
+        0.0,
+        0.0
+      ],
+      "s": 0.008773360442328956,
+      "s_ci_95": [
+        0.0021352624625302252,
+        0.016157450261297703
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.17403919860899994,
+        "delta_d_ci_95": [
+          0.15421389623658616,
+          0.19429745378917426
+        ],
+        "delta_d_over_c": 1.077074642184472,
+        "delta_d_over_c_ci_95": [
+          0.9526399620791687,
+          1.2086929010547385
+        ]
+      },
+      "secondary_d": 0.17034076860125186,
+      "secondary_d_ci_95": [
+        0.15072774197435734,
+        0.19051175035256002
+      ],
+      "selection_counts": {
+        "F": {
+          "random_forest": 4,
+          "mlp": 16
+        },
+        "C": {
+          "random_forest": 15,
+          "mlp": 5
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.18911215919579444,
+        "L3": 0.15399533890234124
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.8125412127207771,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.8455369394569817
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "heisenberg",
+      "row_key": "s211__heisenberg",
+      "rung": "R0",
+      "status": "estimated",
+      "mean_c": 0.023213324742128193,
+      "mean_f": 0.023213030411036898,
+      "mean_m": 0.056296129773706446,
+      "mean_a": 0.09392221336612741,
+      "mean_r": 0.6091582865507126,
+      "mean_d": 2.943310912946473e-07,
+      "d_ci_95": [
+        -0.0018571702093858199,
+        0.002054952551499842
+      ],
+      "mean_d_over_c": 1.2679402651895313e-05,
+      "d_over_c_ci_95": [
+        -0.08577094367226407,
+        0.08218312544740891
+      ],
+      "e": 0.03308309936266955,
+      "e_ci_95": [
+        0.028385398849561816,
+        0.03782042513326628
+      ],
+      "s": 0.999995837441772,
+      "s_ci_95": [
+        0.9707372598635328,
+        1.0265531826082996
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0,
+        "delta_d_ci_95": [
+          0.0,
+          0.0
+        ],
+        "delta_d_over_c": 0.0,
+        "delta_d_over_c_ci_95": [
+          0.0,
+          0.0
+        ]
+      },
+      "secondary_d": 2.943310912946473e-07,
+      "secondary_d_ci_95": [
+        -0.0018571702093858199,
+        0.002054952551499842
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.0008513765410732774,
+        "L3": -0.0008507878788906881
+      },
+      "dropped_cells": [],
+      "classification_label": "Not distinguished",
+      "largest_non_excluded_d_over_c": 0.08218312544740891,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "mixed",
+      "rung_largest_non_excluded_d_over_c": 0.08218312544740891
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "tfi",
+      "row_key": "s211__tfi",
+      "rung": "R0",
+      "status": "estimated",
+      "mean_c": 0.00819187926450056,
+      "mean_f": 0.011062428297340925,
+      "mean_m": 0.038150103729738545,
+      "mean_a": 0.04433320527384167,
+      "mean_r": 0.2813273005438781,
+      "mean_d": -0.002870549032840366,
+      "d_ci_95": [
+        -0.003781994964168691,
+        -0.001938124289303419
+      ],
+      "mean_d_over_c": -0.35041398196380485,
+      "d_over_c_ci_95": [
+        -0.48975777544879356,
+        -0.22212166532820293
+      ],
+      "e": 0.02708767543239762,
+      "e_ci_95": [
+        0.02458421836732944,
+        0.029632843426660536
+      ],
+      "s": 1.0862783888355794,
+      "s_ci_95": [
+        1.0571850201317294,
+        1.1173044675341446
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0,
+        "delta_d_ci_95": [
+          0.0,
+          0.0
+        ],
+        "delta_d_over_c": 0.0,
+        "delta_d_over_c_ci_95": [
+          0.0,
+          0.0
+        ]
+      },
+      "secondary_d": -0.002870549032840366,
+      "secondary_d_ci_95": [
+        -0.003781994964168691,
+        -0.001938124289303419
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.0035844451133624344,
+        "L3": -0.002156652952318292
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement hurts",
+      "largest_non_excluded_d_over_c": -0.22212166532820293,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement hurts",
+      "rung_largest_non_excluded_d_over_c": -0.161444054160536
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "heisenberg",
+      "row_key": "s211__heisenberg",
+      "rung": "N1",
+      "status": "estimated",
+      "mean_c": 0.023998912256357884,
+      "mean_f": 0.02438661579316248,
+      "mean_m": 0.056296129773706446,
+      "mean_a": 0.09390036893523386,
+      "mean_r": 0.6091582865507126,
+      "mean_d": -0.00038770353680459696,
+      "d_ci_95": [
+        -0.002127318278424635,
+        0.0014429493371563087
+      ],
+      "mean_d_over_c": -0.016155046223058925,
+      "d_over_c_ci_95": [
+        -0.09420497356462679,
+        0.055269503670701256
+      ],
+      "e": 0.031909513980543966,
+      "e_ci_95": [
+        0.027113506552348683,
+        0.036710025270811734
+      ],
+      "s": 1.005577364467895,
+      "s_ci_95": [
+        0.9793297962045576,
+        1.0311473429154017
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": -0.0003879978678958916,
+        "delta_d_ci_95": [
+          -0.0014337849340342868,
+          0.0006151549549494694
+        ],
+        "delta_d_over_c": -0.01616772562571082,
+        "delta_d_over_c_ci_95": [
+          -0.0588889440244828,
+          0.028489751509667927
+        ]
+      },
+      "secondary_d": -0.00038770353680459696,
+      "secondary_d_ci_95": [
+        -0.002127318278424635,
+        0.0014429493371563087
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.0010524313527099129,
+        "L3": -0.0018278384263191068
+      },
+      "dropped_cells": [],
+      "classification_label": "Not distinguished",
+      "largest_non_excluded_d_over_c": 0.055269503670701256,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "mixed",
+      "rung_largest_non_excluded_d_over_c": 0.0575289395445037
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "tfi",
+      "row_key": "s211__tfi",
+      "rung": "N1",
+      "status": "estimated",
+      "mean_c": 0.012744225650523855,
+      "mean_f": 0.013872266345501165,
+      "mean_m": 0.038150103729738545,
+      "mean_a": 0.04614863096688816,
+      "mean_r": 0.2813273005438781,
+      "mean_d": -0.0011280406949773104,
+      "d_ci_95": [
+        -0.0022415859837045,
+        3.865721547870474e-05
+      ],
+      "mean_d_over_c": -0.08851386705719087,
+      "d_over_c_ci_95": [
+        -0.18259392216726508,
+        0.002928651903117919
+      ],
+      "e": 0.02427783738423738,
+      "e_ci_95": [
+        0.02174260832578389,
+        0.02680452163580944
+      ],
+      "s": 1.034949434615999,
+      "s_ci_95": [
+        0.9987719700372947,
+        1.0712110041766816
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0017425083378630555,
+        "delta_d_ci_95": [
+          0.0009019822463730822,
+          0.002636922264139872
+        ],
+        "delta_d_over_c": 0.26190011490661397,
+        "delta_d_over_c_ci_95": [
+          0.15831653499966705,
+          0.3762118813193544
+        ]
+      },
+      "secondary_d": -0.0011280406949773104,
+      "secondary_d_ci_95": [
+        -0.0022415859837045,
+        3.865721547870474e-05
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.0009846509976046951,
+        "L3": -0.0012714303923499239
+      },
+      "dropped_cells": [],
+      "classification_label": "Not distinguished",
+      "largest_non_excluded_d_over_c": 0.002928651903117919,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "mixed",
+      "rung_largest_non_excluded_d_over_c": 0.002928651903117919
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "heisenberg",
+      "row_key": "s211__heisenberg",
+      "rung": "N2",
+      "status": "estimated",
+      "mean_c": 0.029291092473174338,
+      "mean_f": 0.028086317609356638,
+      "mean_m": 0.056296129773706446,
+      "mean_a": 0.0938035183815529,
+      "mean_r": 0.6091582865507126,
+      "mean_d": 0.0012047748638177001,
+      "d_ci_95": [
+        -0.0005360649418043983,
+        0.0028885380922394083
+      ],
+      "mean_d_over_c": 0.041131100348034785,
+      "d_over_c_ci_95": [
+        -0.018887658074375858,
+        0.09447341009186426
+      ],
+      "e": 0.02820981216434981,
+      "e_ci_95": [
+        0.023278274272255248,
+        0.03311016963172728
+      ],
+      "s": 0.9816672826952267,
+      "s_ci_95": [
+        0.9545205010341516,
+        1.0081427884689786
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0012044805327264055,
+        "delta_d_ci_95": [
+          -0.00068427897612698,
+          0.003028158426153636
+        ],
+        "delta_d_over_c": 0.04111842094538289,
+        "delta_d_over_c_ci_95": [
+          -0.030969962849607645,
+          0.11929336377720871
+        ]
+      },
+      "secondary_d": 0.0012047748638177001,
+      "secondary_d_ci_95": [
+        -0.0005360649418043983,
+        0.0028885380922394083
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.00346897141917947,
+        "L3": -0.0010594216915440838
+      },
+      "dropped_cells": [],
+      "classification_label": "Not distinguished",
+      "largest_non_excluded_d_over_c": 0.09447341009186426,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Not distinguished",
+      "rung_largest_non_excluded_d_over_c": 0.12641753609807826
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "tfi",
+      "row_key": "s211__tfi",
+      "rung": "N2",
+      "status": "estimated",
+      "mean_c": 0.02698981685884147,
+      "mean_f": 0.023323115876597845,
+      "mean_m": 0.038150103729738545,
+      "mean_a": 0.052775944993181875,
+      "mean_r": 0.2813273005438781,
+      "mean_d": 0.003666700982243625,
+      "d_ci_95": [
+        0.0019798096766580637,
+        0.0053524964770207215
+      ],
+      "mean_d_over_c": 0.13585497824682227,
+      "d_over_c_ci_95": [
+        0.07823412414876516,
+        0.18621437072772365
+      ],
+      "e": 0.0148269878531407,
+      "e_ci_95": [
+        0.011658823123340023,
+        0.017951490930483753
+      ],
+      "s": 0.8755059838995565,
+      "s_ci_95": [
+        0.8154991936651632,
+        0.9317616262789995
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.006537250015083991,
+        "delta_d_ci_95": [
+          0.0049056811715263585,
+          0.00822690362149322
+        ],
+        "delta_d_over_c": 0.48626896021062715,
+        "delta_d_over_c_ci_95": [
+          0.36085219337470065,
+          0.6251355174604211
+        ]
+      },
+      "secondary_d": 0.003666700982243625,
+      "secondary_d_ci_95": [
+        0.0019798096766580637,
+        0.0053524964770207215
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.0057548867309382135,
+        "L3": 0.0015785152335490334
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.18621437072772365,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.18786238542193368
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "heisenberg",
+      "row_key": "s211__heisenberg",
+      "rung": "R4",
+      "status": "estimated",
+      "mean_c": 0.08752326766029363,
+      "mean_f": 0.06906433192200934,
+      "mean_m": 0.056296129773706446,
+      "mean_a": 0.0858571741796484,
+      "mean_r": 0.6091582865507126,
+      "mean_d": 0.01845893573828429,
+      "d_ci_95": [
+        0.013759254419449399,
+        0.023034974940008515
+      ],
+      "mean_d_over_c": 0.2109031830247637,
+      "d_over_c_ci_95": [
+        0.1693358433517019,
+        0.24364545687597297
+      ],
+      "e": -0.01276820214830289,
+      "e_ci_95": [
+        -0.019330200795785124,
+        -0.006476292394850932
+      ],
+      "s": -0.09921450193384145,
+      "s_ci_95": [
+        -1.301560255119305,
+        0.3382130612721009
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.018458641407192996,
+        "delta_d_ci_95": [
+          0.013103312953520227,
+          0.02358422210389898
+        ],
+        "delta_d_over_c": 0.2108905036221118,
+        "delta_d_over_c_ci_95": [
+          0.11164828740030541,
+          0.31053863122107944
+        ]
+      },
+      "secondary_d": 0.01851435061736259,
+      "secondary_d_ci_95": [
+        0.012377288969540526,
+        0.02431331277432113
+      ],
+      "selection_counts": {
+        "F": {
+          "random_forest": 9,
+          "mlp": 11
+        },
+        "C": {
+          "random_forest": 12,
+          "mlp": 8
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.03958028514006125,
+        "L3": -0.0026624136634927076
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.24364545687597297,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.24364545687597297
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "tfi",
+      "row_key": "s211__tfi",
+      "rung": "R4",
+      "status": "estimated",
+      "mean_c": 0.06019969459013786,
+      "mean_f": 0.048264658798412345,
+      "mean_m": 0.038150103729738545,
+      "mean_a": 0.05551178594230268,
+      "mean_r": 0.2813273005438781,
+      "mean_d": 0.011935035791725515,
+      "d_ci_95": [
+        0.007844894908259408,
+        0.01627958115194745
+      ],
+      "mean_d_over_c": 0.19825741431054963,
+      "d_over_c_ci_95": [
+        0.1380129575816522,
+        0.2571670842788954
+      ],
+      "e": -0.0101145550686738,
+      "e_ci_95": [
+        -0.016392028442098836,
+        -0.004320753446231122
+      ],
+      "s": null,
+      "s_ci_95": null,
+      "s_defined": false,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.014805584824565881,
+        "delta_d_ci_95": [
+          0.010646829477699937,
+          0.01917554667010433
+        ],
+        "delta_d_over_c": 0.5486713962743545,
+        "delta_d_over_c_ci_95": [
+          0.4137470049798076,
+          0.6975013542875323
+        ]
+      },
+      "secondary_d": 0.012297383752514573,
+      "secondary_d_ci_95": [
+        0.007567465641201359,
+        0.017077636912572972
+      ],
+      "selection_counts": {
+        "F": {
+          "random_forest": 9,
+          "mlp": 11
+        },
+        "C": {
+          "random_forest": 12,
+          "mlp": 8
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.017816412185354,
+        "L3": 0.006053659398097037
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.2571670842788954,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.3064447134536811
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "heisenberg",
+      "row_key": "s211__heisenberg",
+      "rung": "R5",
+      "status": "estimated",
+      "mean_c": 0.08176803637795188,
+      "mean_f": 0.056296129773706446,
+      "mean_m": 0.056296129773706446,
+      "mean_a": 0.08639447507426963,
+      "mean_r": 0.6091582865507126,
+      "mean_d": 0.025471906604245434,
+      "d_ci_95": [
+        0.019140148617801975,
+        0.03204103261568076
+      ],
+      "mean_d_over_c": 0.31151422649442195,
+      "d_over_c_ci_95": [
+        0.2604869301794385,
+        0.35198459457971554
+      ],
+      "e": 0.0,
+      "e_ci_95": [
+        0.0,
+        0.0
+      ],
+      "s": 0.15371073227175658,
+      "s_ci_95": [
+        0.0933071900029345,
+        0.24205480557203013
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.02547161227315414,
+        "delta_d_ci_95": [
+          0.019069495920994176,
+          0.03223638380371176
+        ],
+        "delta_d_over_c": 0.3115015470917701,
+        "delta_d_over_c_ci_95": [
+          0.22137337375034158,
+          0.4039404937767451
+        ]
+      },
+      "secondary_d": 0.028655468141441674,
+      "secondary_d_ci_95": [
+        0.021275018780564432,
+        0.03593589294245147
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 18,
+          "random_forest": 2
+        },
+        "C": {
+          "mlp": 9,
+          "random_forest": 11
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.05439264817223307,
+        "L3": -0.003448834963742195
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.35198459457971554,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.38778872120882346
+    },
+    {
+      "part": "A",
+      "dataset_seed": 211,
+      "family": "tfi",
+      "row_key": "s211__tfi",
+      "rung": "R5",
+      "status": "estimated",
+      "mean_c": 0.22089292881545156,
+      "mean_f": 0.038150103729738545,
+      "mean_m": 0.038150103729738545,
+      "mean_a": 0.22399331270222328,
+      "mean_r": 0.2813273005438781,
+      "mean_d": 0.18274282508571302,
+      "d_ci_95": [
+        0.16451511589084616,
+        0.20111036491139955
+      ],
+      "mean_d_over_c": 0.8272914215302399,
+      "d_over_c_ci_95": [
+        0.8060008496349903,
+        0.8455369394569817
+      ],
+      "e": 0.0,
+      "e_ci_95": [
+        0.0,
+        0.0
+      ],
+      "s": 0.01668279354361964,
+      "s_ci_95": [
+        0.008473724856786463,
+        0.02685323927080584
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.1856133741185534,
+        "delta_d_ci_95": [
+          0.16723307985459507,
+          0.20400186346425606
+        ],
+        "delta_d_over_c": 1.1777054034940448,
+        "delta_d_over_c_ci_95": [
+          1.0515330051664515,
+          1.3148044417675726
+        ]
+      },
+      "secondary_d": 0.18229727153621955,
+      "secondary_d_ci_95": [
+        0.16434336038013658,
+        0.20059655560617612
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 18,
+          "random_forest": 2
+        },
+        "C": {
+          "mlp": 9,
+          "random_forest": 11
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.19752057680836446,
+        "L3": 0.16796507336306155
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.8455369394569817,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.8455369394569817
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "heisenberg",
+      "row_key": "s307__heisenberg",
+      "rung": "R0",
+      "status": "estimated",
+      "mean_c": 0.025344574862483524,
+      "mean_f": 0.027374296228335773,
+      "mean_m": 0.0673103654846471,
+      "mean_a": 0.10733079177094043,
+      "mean_r": 0.5964901288624219,
+      "mean_d": -0.0020297213658522495,
+      "d_ci_95": [
+        -0.004195188686740874,
+        -7.684549142565371e-05
+      ],
+      "mean_d_over_c": -0.08008504292793477,
+      "d_over_c_ci_95": [
+        -0.16930995420550352,
+        -0.00304411049596923
+      ],
+      "e": 0.039936069256311324,
+      "e_ci_95": [
+        0.03420757148368165,
+        0.045795656902187315
+      ],
+      "s": 1.0253853217562632,
+      "s_ci_95": [
+        1.0010073408253441,
+        1.0528800479254692
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0,
+        "delta_d_ci_95": [
+          0.0,
+          0.0
+        ],
+        "delta_d_over_c": 0.0,
+        "delta_d_over_c_ci_95": [
+          0.0,
+          0.0
+        ]
+      },
+      "secondary_d": -0.0020297213658522495,
+      "secondary_d_ci_95": [
+        -0.004195188686740874,
+        -7.684549142565371e-05
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.0008233674153624061,
+        "L3": -0.003236075316342086
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement hurts",
+      "largest_non_excluded_d_over_c": -0.00304411049596923,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "mixed",
+      "rung_largest_non_excluded_d_over_c": 0.08218312544740891
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "tfi",
+      "row_key": "s307__tfi",
+      "rung": "R0",
+      "status": "estimated",
+      "mean_c": 0.008354169694171163,
+      "mean_f": 0.011588563245736792,
+      "mean_m": 0.04448385111453188,
+      "mean_a": 0.04925140391004114,
+      "mean_r": 0.2509046733667312,
+      "mean_d": -0.0032343935515656286,
+      "d_ci_95": [
+        -0.004369275949431178,
+        -0.0021427503373260127
+      ],
+      "mean_d_over_c": -0.3871591875638241,
+      "d_over_c_ci_95": [
+        -0.5439860169195077,
+        -0.24712320412008243
+      ],
+      "e": 0.03289528786879509,
+      "e_ci_95": [
+        0.029671558136525465,
+        0.03639704222951685
+      ],
+      "s": 1.0858775783907102,
+      "s_ci_95": [
+        1.0554278737398322,
+        1.1194692506289265
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0,
+        "delta_d_ci_95": [
+          0.0,
+          0.0
+        ],
+        "delta_d_over_c": 0.0,
+        "delta_d_over_c_ci_95": [
+          0.0,
+          0.0
+        ]
+      },
+      "secondary_d": -0.0032343935515656286,
+      "secondary_d_ci_95": [
+        -0.004369275949431178,
+        -0.0021427503373260127
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.00357598256370637,
+        "L3": -0.0028928045394248855
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement hurts",
+      "largest_non_excluded_d_over_c": -0.24712320412008243,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement hurts",
+      "rung_largest_non_excluded_d_over_c": -0.161444054160536
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "heisenberg",
+      "row_key": "s307__heisenberg",
+      "rung": "N1",
+      "status": "estimated",
+      "mean_c": 0.02654771462197833,
+      "mean_f": 0.02868621609720202,
+      "mean_m": 0.0673103654846471,
+      "mean_a": 0.10708806796862555,
+      "mean_r": 0.5964901288624219,
+      "mean_d": -0.0021385014752236912,
+      "d_ci_95": [
+        -0.003995363983005152,
+        -0.0003481622761665412
+      ],
+      "mean_d_over_c": -0.08055312879750741,
+      "d_over_c_ci_95": [
+        -0.15536389983916649,
+        -0.012481216357564124
+      ],
+      "e": 0.03862414938744507,
+      "e_ci_95": [
+        0.03307934867318279,
+        0.04430140138761467
+      ],
+      "s": 1.0272761602459437,
+      "s_ci_95": [
+        1.004481624396005,
+        1.0512880216108413
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": -0.00010878010937144175,
+        "delta_d_ci_95": [
+          -0.0010895014063136619,
+          0.0008757991132812725
+        ],
+        "delta_d_over_c": -0.0004680858695726431,
+        "delta_d_over_c_ci_95": [
+          -0.04033690199901088,
+          0.04119703615622605
+        ]
+      },
+      "secondary_d": -0.0021385014752236912,
+      "secondary_d_ci_95": [
+        -0.003995363983005152,
+        -0.0003481622761665412
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.0005165983760955159,
+        "L3": -0.003760404574351856
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement hurts",
+      "largest_non_excluded_d_over_c": -0.012481216357564124,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "mixed",
+      "rung_largest_non_excluded_d_over_c": 0.0575289395445037
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "tfi",
+      "row_key": "s307__tfi",
+      "rung": "N1",
+      "status": "estimated",
+      "mean_c": 0.01256471157360823,
+      "mean_f": 0.014828893435596235,
+      "mean_m": 0.04448385111453188,
+      "mean_a": 0.04992813064270222,
+      "mean_r": 0.2509046733667312,
+      "mean_d": -0.002264181861988006,
+      "d_ci_95": [
+        -0.0038598503619318414,
+        -0.000743246998745574
+      ],
+      "mean_d_over_c": -0.18020165832885862,
+      "d_over_c_ci_95": [
+        -0.31590213348245005,
+        -0.05735950929462592
+      ],
+      "e": 0.029654957678935646,
+      "e_ci_95": [
+        0.026212803693161136,
+        0.03324517465376844
+      ],
+      "s": 1.0645080076421038,
+      "s_ci_95": [
+        1.0207232992886857,
+        1.1155325756286385
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.0009702116895776228,
+        "delta_d_ci_95": [
+          -0.0006460495630300429,
+          0.002451902039367798
+        ],
+        "delta_d_over_c": 0.2069575292349655,
+        "delta_d_over_c_ci_95": [
+          0.04756293616149312,
+          0.37626681716415433
+        ]
+      },
+      "secondary_d": -0.002264181861988006,
+      "secondary_d_ci_95": [
+        -0.0038598503619318414,
+        -0.000743246998745574
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": -0.0016513912974774753,
+        "L3": -0.002876972426498533
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement hurts",
+      "largest_non_excluded_d_over_c": -0.05735950929462592,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "mixed",
+      "rung_largest_non_excluded_d_over_c": 0.002928651903117919
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "heisenberg",
+      "row_key": "s307__heisenberg",
+      "rung": "N2",
+      "status": "estimated",
+      "mean_c": 0.03466370886677087,
+      "mean_f": 0.03396994425333449,
+      "mean_m": 0.0673103654846471,
+      "mean_a": 0.10661021796950727,
+      "mean_r": 0.5964901288624219,
+      "mean_d": 0.0006937646134363845,
+      "d_ci_95": [
+        -0.0011040421097755352,
+        0.0025583288231749764
+      ],
+      "mean_d_over_c": 0.02001414840237818,
+      "d_over_c_ci_95": [
+        -0.03350187577295029,
+        0.0699084306974268
+      ],
+      "e": 0.03334042123131261,
+      "e_ci_95": [
+        0.027983532071638405,
+        0.03875304632940719
+      ],
+      "s": 0.990449311684216,
+      "s_ci_95": [
+        0.9650363543673065,
+        1.0153591707975635
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.002723485979288634,
+        "delta_d_ci_95": [
+          0.0010984548753535952,
+          0.0044892775488589885
+        ],
+        "delta_d_over_c": 0.10009919133031295,
+        "delta_d_over_c_ci_95": [
+          0.038723354833084395,
+          0.1673348712307135
+        ]
+      },
+      "secondary_d": 0.0006937646134363845,
+      "secondary_d_ci_95": [
+        -0.0011040421097755352,
+        0.0025583288231749764
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.0036689050832050124,
+        "L3": -0.0022813758563322503
+      },
+      "dropped_cells": [],
+      "classification_label": "Not distinguished",
+      "largest_non_excluded_d_over_c": 0.0699084306974268,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Not distinguished",
+      "rung_largest_non_excluded_d_over_c": 0.12641753609807826
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "tfi",
+      "row_key": "s307__tfi",
+      "rung": "N2",
+      "status": "estimated",
+      "mean_c": 0.02556345883811601,
+      "mean_f": 0.02247775664412629,
+      "mean_m": 0.04448385111453188,
+      "mean_a": 0.053807031497057234,
+      "mean_r": 0.2509046733667312,
+      "mean_d": 0.003085702193989723,
+      "d_ci_95": [
+        0.001462715490004677,
+        0.004693344036764149
+      ],
+      "mean_d_over_c": 0.12070753858193997,
+      "d_over_c_ci_95": [
+        0.060658719904417756,
+        0.1739256350940802
+      ],
+      "e": 0.022006094470405593,
+      "e_ci_95": [
+        0.018541195548434905,
+        0.025582297953882158
+      ],
+      "s": 0.9015073853935357,
+      "s_ci_95": [
+        0.8484587831900614,
+        0.9527669205126891
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.006320095745555351,
+        "delta_d_ci_95": [
+          0.004545262278593268,
+          0.008141741418504704
+        ],
+        "delta_d_over_c": 0.5078667261457641,
+        "delta_d_over_c_ci_95": [
+          0.36607243154727126,
+          0.6713744396479409
+        ]
+      },
+      "secondary_d": 0.003085702193989723,
+      "secondary_d_ci_95": [
+        0.001462715490004677,
+        0.004693344036764149
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 20
+        },
+        "C": {
+          "mlp": 20
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.006405592002908484,
+        "L3": -0.00023418761492902465
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.1739256350940802,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.18786238542193368
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "heisenberg",
+      "row_key": "s307__heisenberg",
+      "rung": "R4",
+      "status": "estimated",
+      "mean_c": 0.09305943308569951,
+      "mean_f": 0.0747793601300115,
+      "mean_m": 0.0673103654846471,
+      "mean_a": 0.0972862026356727,
+      "mean_r": 0.5964901288624219,
+      "mean_d": 0.01828007295568801,
+      "d_ci_95": [
+        0.012716312331773257,
+        0.023684397775152327
+      ],
+      "mean_d_over_c": 0.1964343898254106,
+      "d_over_c_ci_95": [
+        0.14538770495560052,
+        0.2387876253848223
+      ],
+      "e": -0.007468994645364407,
+      "e_ci_95": [
+        -0.014417200007850479,
+        -0.0008868637655486567
+      ],
+      "s": 0.1877993125383987,
+      "s_ci_95": [
+        -0.1677820354954511,
+        0.42345828478127767
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.02030979432154026,
+        "delta_d_ci_95": [
+          0.014176980592965122,
+          0.026303471795257896
+        ],
+        "delta_d_over_c": 0.27651943275334534,
+        "delta_d_over_c_ci_95": [
+          0.18218604512279504,
+          0.37751744150963934
+        ]
+      },
+      "secondary_d": 0.02247763436939358,
+      "secondary_d_ci_95": [
+        0.016515109841848473,
+        0.028515764509998678
+      ],
+      "selection_counts": {
+        "F": {
+          "random_forest": 8,
+          "mlp": 12
+        },
+        "C": {
+          "random_forest": 16,
+          "mlp": 4
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.039967377651105584,
+        "L3": -0.0034072317397295243
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.2387876253848223,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.24364545687597297
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "tfi",
+      "row_key": "s307__tfi",
+      "rung": "R4",
+      "status": "estimated",
+      "mean_c": 0.07133521089044235,
+      "mean_f": 0.05383030604460828,
+      "mean_m": 0.04448385111453188,
+      "mean_a": 0.06780708115387771,
+      "mean_r": 0.2509046733667312,
+      "mean_d": 0.017504904845834078,
+      "d_ci_95": [
+        0.011700269236268273,
+        0.02441602406410966
+      ],
+      "mean_d_over_c": 0.24538940345628701,
+      "d_over_c_ci_95": [
+        0.1849700464560082,
+        0.3064447134536811
+      ],
+      "e": -0.009346454930076395,
+      "e_ci_95": [
+        -0.01782436367926398,
+        -0.0017277524974639998
+      ],
+      "s": null,
+      "s_ci_95": null,
+      "s_defined": false,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.020739298397399707,
+        "delta_d_ci_95": [
+          0.014663179742121063,
+          0.027834238937374748
+        ],
+        "delta_d_over_c": 0.6325485910201112,
+        "delta_d_over_c_ci_95": [
+          0.47539699478255953,
+          0.8058364651122816
+        ]
+      },
+      "secondary_d": 0.018208240366547078,
+      "secondary_d_ci_95": [
+        0.012484068642708419,
+        0.02428768195077619
+      ],
+      "selection_counts": {
+        "F": {
+          "random_forest": 8,
+          "mlp": 12
+        },
+        "C": {
+          "random_forest": 16,
+          "mlp": 4
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.022715310606655943,
+        "L3": 0.012294499085012227
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.3064447134536811,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.3064447134536811
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "heisenberg",
+      "row_key": "s307__heisenberg",
+      "rung": "R5",
+      "status": "estimated",
+      "mean_c": 0.10531100262778775,
+      "mean_f": 0.0673103654846471,
+      "mean_m": 0.0673103654846471,
+      "mean_a": 0.10758256678446565,
+      "mean_r": 0.5964901288624219,
+      "mean_d": 0.038000637143140656,
+      "d_ci_95": [
+        0.03147631753375158,
+        0.04472394406722002
+      ],
+      "mean_d_over_c": 0.3608420411440814,
+      "d_over_c_ci_95": [
+        0.33049851463648894,
+        0.38778872120882346
+      ],
+      "e": 0.0,
+      "e_ci_95": [
+        0.0,
+        0.0
+      ],
+      "s": 0.05640526426073787,
+      "s_ci_95": [
+        0.022104086109165266,
+        0.10767258286911292
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.040030358508992905,
+        "delta_d_ci_95": [
+          0.032849979958187135,
+          0.04756957444665002
+        ],
+        "delta_d_over_c": 0.4409270840720162,
+        "delta_d_over_c_ci_95": [
+          0.3527555327363928,
+          0.538170106773764
+        ]
+      },
+      "secondary_d": 0.0417140407773053,
+      "secondary_d_ci_95": [
+        0.03419408177631353,
+        0.049348731855319586
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 16,
+          "random_forest": 4
+        },
+        "C": {
+          "mlp": 6,
+          "random_forest": 14
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.07383827848667857,
+        "L3": 0.00216299579960276
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.38778872120882346,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.38778872120882346
+    },
+    {
+      "part": "A",
+      "dataset_seed": 307,
+      "family": "tfi",
+      "row_key": "s307__tfi",
+      "rung": "R5",
+      "status": "estimated",
+      "mean_c": 0.2175723705583005,
+      "mean_f": 0.04448385111453188,
+      "mean_m": 0.04448385111453188,
+      "mean_a": 0.2187895017566266,
+      "mean_r": 0.2509046733667312,
+      "mean_d": 0.17308851944376863,
+      "d_ci_95": [
+        0.15265813361333927,
+        0.19311038159331417
+      ],
+      "mean_d_over_c": 0.7955445767291853,
+      "d_over_c_ci_95": [
+        0.7715839430779355,
+        0.8152506491483865
+      ],
+      "e": 0.0,
+      "e_ci_95": [
+        0.0,
+        0.0
+      ],
+      "s": 0.006982740914264723,
+      "s_ci_95": [
+        0.000339105342525514,
+        0.01443884007932406
+      ],
+      "s_defined": true,
+      "paired_contrast": {
+        "baseline_rung": "R0",
+        "delta_d": 0.17632291299533426,
+        "delta_d_ci_95": [
+          0.15569629302307283,
+          0.19630957287075165
+        ],
+        "delta_d_over_c": 1.1827037642930094,
+        "delta_d_over_c_ci_95": [
+          1.0398376767195001,
+          1.3389450585744036
+        ]
+      },
+      "secondary_d": 0.17621790316276797,
+      "secondary_d_ci_95": [
+        0.1548677787959779,
+        0.19707055526551065
+      ],
+      "selection_counts": {
+        "F": {
+          "mlp": 16,
+          "random_forest": 4
+        },
+        "C": {
+          "mlp": 6,
+          "random_forest": 14
+        }
+      },
+      "d_per_severity": {
+        "L1": 0.19248624483851234,
+        "L3": 0.15369079404902491
+      },
+      "dropped_cells": [],
+      "classification_label": "Measurement adds",
+      "largest_non_excluded_d_over_c": 0.8152506491483865,
+      "n_learner_seeds": 20,
+      "n_circuits": 160,
+      "rung_statement": "Measurement adds",
+      "rung_largest_non_excluded_d_over_c": 0.8455369394569817
+    }
+  ],
+  "by_part_row_rung": {
+    "A": {
+      "s101__heisenberg": {
+        "R0": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "heisenberg",
+          "row_key": "s101__heisenberg",
+          "rung": "R0",
+          "status": "estimated",
+          "mean_c": 0.020480657837539093,
+          "mean_f": 0.021929297154340614,
+          "mean_m": 0.06056159873304459,
+          "mean_a": 0.094960261026136,
+          "mean_r": 0.6025809297276531,
+          "mean_d": -0.0014486393168015206,
+          "d_ci_95": [
+            -0.00344248863469842,
+            0.0004450979287810787
+          ],
+          "mean_d_over_c": -0.07073206965775791,
+          "d_over_c_ci_95": [
+            -0.17750868209094875,
+            0.021013644440945195
+          ],
+          "e": 0.03863230157870398,
+          "e_ci_95": [
+            0.03315571729001392,
+            0.04455758883673822
+          ],
+          "s": 1.0198359605296266,
+          "s_ci_95": [
+            0.9938500397178569,
+            1.0480791828041118
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0,
+            "delta_d_ci_95": [
+              0.0,
+              0.0
+            ],
+            "delta_d_over_c": 0.0,
+            "delta_d_over_c_ci_95": [
+              0.0,
+              0.0
+            ]
+          },
+          "secondary_d": -0.0014486393168015206,
+          "secondary_d_ci_95": [
+            -0.00344248863469842,
+            0.0004450979287810787
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.0025371435357949244,
+            "L3": -0.0003601350978081168
+          },
+          "dropped_cells": [],
+          "classification_label": "Not distinguished",
+          "largest_non_excluded_d_over_c": 0.021013644440945195,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "mixed",
+          "rung_largest_non_excluded_d_over_c": 0.08218312544740891
+        },
+        "N1": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "heisenberg",
+          "row_key": "s101__heisenberg",
+          "rung": "N1",
+          "status": "estimated",
+          "mean_c": 0.0223577315117522,
+          "mean_f": 0.022935755839757363,
+          "mean_m": 0.06056159873304459,
+          "mean_a": 0.09510465171774059,
+          "mean_r": 0.6025809297276531,
+          "mean_d": -0.0005780243280051646,
+          "d_ci_95": [
+            -0.002581145818694623,
+            0.001353849560295495
+          ],
+          "mean_d_over_c": -0.025853442586575914,
+          "d_over_c_ci_95": [
+            -0.12246531193635447,
+            0.0575289395445037
+          ],
+          "e": 0.03762584289328723,
+          "e_ci_95": [
+            0.03217968726345886,
+            0.04349675082624178
+          ],
+          "s": 1.008009327577665,
+          "s_ci_95": [
+            0.9807597914134734,
+            1.0366696361009438
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.000870614988796356,
+            "delta_d_ci_95": [
+              0.00013932559568375722,
+              0.0016279169704846302
+            ],
+            "delta_d_over_c": 0.044878627071181995,
+            "delta_d_over_c_ci_95": [
+              0.009327845095583069,
+              0.08272971305850374
+            ]
+          },
+          "secondary_d": -0.0005780243280051646,
+          "secondary_d_ci_95": [
+            -0.002581145818694623,
+            0.001353849560295495
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.0009847009200738277,
+            "L3": -0.00017134773593649802
+          },
+          "dropped_cells": [],
+          "classification_label": "Not distinguished",
+          "largest_non_excluded_d_over_c": 0.0575289395445037,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "mixed",
+          "rung_largest_non_excluded_d_over_c": 0.0575289395445037
+        },
+        "N2": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "heisenberg",
+          "row_key": "s101__heisenberg",
+          "rung": "N2",
+          "status": "estimated",
+          "mean_c": 0.029685201622985068,
+          "mean_f": 0.0278587769433629,
+          "mean_m": 0.06056159873304459,
+          "mean_a": 0.0954915697594034,
+          "mean_r": 0.6025809297276531,
+          "mean_d": 0.0018264246796221677,
+          "d_ci_95": [
+            -0.0003835996808642845,
+            0.003960715166071033
+          ],
+          "mean_d_over_c": 0.0615264367349952,
+          "d_over_c_ci_95": [
+            -0.013849113840280305,
+            0.12641753609807826
+          ],
+          "e": 0.03270282178968169,
+          "e_ci_95": [
+            0.027400586698386135,
+            0.03837377074541405
+          ],
+          "s": 0.9729949835933879,
+          "s_ci_95": [
+            0.9400849372241681,
+            1.005771994472388
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0032750639964236883,
+            "delta_d_ci_95": [
+              0.0012655580252148959,
+              0.005202212828755259
+            ],
+            "delta_d_over_c": 0.1322585063927531,
+            "delta_d_over_c_ci_95": [
+              0.05093103599189188,
+              0.21739945121360435
+            ]
+          },
+          "secondary_d": 0.0018264246796221677,
+          "secondary_d_ci_95": [
+            -0.0003835996808642845,
+            0.003960715166071033
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.0034251615767183774,
+            "L3": 0.00022768778252595795
+          },
+          "dropped_cells": [],
+          "classification_label": "Not distinguished",
+          "largest_non_excluded_d_over_c": 0.12641753609807826,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Not distinguished",
+          "rung_largest_non_excluded_d_over_c": 0.12641753609807826
+        },
+        "R4": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "heisenberg",
+          "row_key": "s101__heisenberg",
+          "rung": "R4",
+          "status": "estimated",
+          "mean_c": 0.0843024554180157,
+          "mean_f": 0.0677689532826947,
+          "mean_m": 0.06056159873304459,
+          "mean_a": 0.09369435916481592,
+          "mean_r": 0.6025809297276531,
+          "mean_d": 0.01653350213532101,
+          "d_ci_95": [
+            0.011943237366442087,
+            0.021626166352501808
+          ],
+          "mean_d_over_c": 0.19612124051831292,
+          "d_over_c_ci_95": [
+            0.15482219560840263,
+            0.23779127335371464
+          ],
+          "e": -0.007207354549650102,
+          "e_ci_95": [
+            -0.013539867237648174,
+            -0.001237631328774577
+          ],
+          "s": 0.3622664111606867,
+          "s_ci_95": [
+            -0.026689084020926707,
+            0.5926507580921425
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.01798214145212253,
+            "delta_d_ci_95": [
+              0.013110208726470946,
+              0.02337665680853921
+            ],
+            "delta_d_over_c": 0.26685331017607083,
+            "delta_d_over_c_ci_95": [
+              0.169971144255307,
+              0.3800532828436779
+            ]
+          },
+          "secondary_d": 0.01886262444303935,
+          "secondary_d_ci_95": [
+            0.013642327426030885,
+            0.024235203342360928
+          ],
+          "selection_counts": {
+            "F": {
+              "random_forest": 19,
+              "mlp": 1
+            },
+            "C": {
+              "random_forest": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.03109231535391503,
+            "L3": 0.0019746889167269605
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.23779127335371464,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.24364545687597297
+        },
+        "R5": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "heisenberg",
+          "row_key": "s101__heisenberg",
+          "rung": "R5",
+          "status": "estimated",
+          "mean_c": 0.09314425575949564,
+          "mean_f": 0.06056159873304459,
+          "mean_m": 0.06056159873304459,
+          "mean_a": 0.09578208244489861,
+          "mean_r": 0.6025809297276531,
+          "mean_d": 0.03258265702645105,
+          "d_ci_95": [
+            0.025843486573328522,
+            0.03971454214079453
+          ],
+          "mean_d_over_c": 0.3498085497680236,
+          "d_over_c_ci_95": [
+            0.31067795522130526,
+            0.3830946995138529
+          ],
+          "e": 0.0,
+          "e_ci_95": [
+            0.0,
+            0.0
+          ],
+          "s": 0.07489467512665544,
+          "s_ci_95": [
+            0.037468431451363214,
+            0.12994368181270874
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.03403129634325257,
+            "delta_d_ci_95": [
+              0.026941471569241485,
+              0.04166986246262774
+            ],
+            "delta_d_over_c": 0.4205406194257815,
+            "delta_d_over_c_ci_95": [
+              0.31864630940279026,
+              0.5355044425560631
+            ]
+          },
+          "secondary_d": 0.037508737803399195,
+          "secondary_d_ci_95": [
+            0.03075267014165426,
+            0.0445278605405619
+          ],
+          "selection_counts": {
+            "F": {
+              "random_forest": 4,
+              "mlp": 16
+            },
+            "C": {
+              "random_forest": 15,
+              "mlp": 5
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.06554031689468579,
+            "L3": -0.0003750028417836976
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.3830946995138529,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.38778872120882346
+        }
+      },
+      "s101__tfi": {
+        "R0": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "tfi",
+          "row_key": "s101__tfi",
+          "rung": "R0",
+          "status": "estimated",
+          "mean_c": 0.00873990974118834,
+          "mean_f": 0.011225359301120457,
+          "mean_m": 0.04486451850804187,
+          "mean_a": 0.04569112136605276,
+          "mean_r": 0.26009765090021875,
+          "mean_d": -0.002485449559932117,
+          "d_ci_95": [
+            -0.0033978974785342296,
+            -0.0015385782114632413
+          ],
+          "mean_d_over_c": -0.2843793166671968,
+          "d_over_c_ci_95": [
+            -0.4161507898999263,
+            -0.161444054160536
+          ],
+          "e": 0.03363915920692141,
+          "e_ci_95": [
+            0.03054498365739746,
+            0.03679214432204808
+          ],
+          "s": 1.0721135820310492,
+          "s_ci_95": [
+            1.0434141673664503,
+            1.1012444914401887
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0,
+            "delta_d_ci_95": [
+              0.0,
+              0.0
+            ],
+            "delta_d_over_c": 0.0,
+            "delta_d_over_c_ci_95": [
+              0.0,
+              0.0
+            ]
+          },
+          "secondary_d": -0.002485449559932117,
+          "secondary_d_ci_95": [
+            -0.0033978974785342296,
+            -0.0015385782114632413
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.003600171825442873,
+            "L3": -0.0013707272944213575
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement hurts",
+          "largest_non_excluded_d_over_c": -0.161444054160536,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement hurts",
+          "rung_largest_non_excluded_d_over_c": -0.161444054160536
+        },
+        "N1": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "tfi",
+          "row_key": "s101__tfi",
+          "rung": "N1",
+          "status": "estimated",
+          "mean_c": 0.012483814565814443,
+          "mean_f": 0.013716194093829842,
+          "mean_m": 0.04486451850804187,
+          "mean_a": 0.045150949588719104,
+          "mean_r": 0.26009765090021875,
+          "mean_d": -0.0012323795280153992,
+          "d_ci_95": [
+            -0.0022250956888017594,
+            -0.00017451250282297356
+          ],
+          "mean_d_over_c": -0.09871818597739632,
+          "d_over_c_ci_95": [
+            -0.1850979142822228,
+            -0.01311134336864089
+          ],
+          "e": 0.03114832441421203,
+          "e_ci_95": [
+            0.027981100023477125,
+            0.0343220801339264
+          ],
+          "s": 1.0392043618158813,
+          "s_ci_95": [
+            1.005433278423535,
+            1.0722081220057345
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0012530700319167178,
+            "delta_d_ci_95": [
+              0.0005664870647979423,
+              0.001958319330558548
+            ],
+            "delta_d_over_c": 0.18566113068980047,
+            "delta_d_over_c_ci_95": [
+              0.10345451808169985,
+              0.27991283377667703
+            ]
+          },
+          "secondary_d": -0.0012323795280153992,
+          "secondary_d_ci_95": [
+            -0.0022250956888017594,
+            -0.00017451250282297356
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.0018348901733027268,
+            "L3": -0.0006298688827280751
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement hurts",
+          "largest_non_excluded_d_over_c": -0.01311134336864089,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "mixed",
+          "rung_largest_non_excluded_d_over_c": 0.002928651903117919
+        },
+        "N2": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "tfi",
+          "row_key": "s101__tfi",
+          "rung": "N2",
+          "status": "estimated",
+          "mean_c": 0.02486594336276231,
+          "mean_f": 0.021586817169204187,
+          "mean_m": 0.04486451850804187,
+          "mean_a": 0.04674365461269775,
+          "mean_r": 0.26009765090021875,
+          "mean_d": 0.0032791261935581247,
+          "d_ci_95": [
+            0.0016284029679085024,
+            0.005048976490223871
+          ],
+          "mean_d_over_c": 0.1318721813896166,
+          "d_over_c_ci_95": [
+            0.07059347976983774,
+            0.18786238542193368
+          ],
+          "e": 0.023277701338837685,
+          "e_ci_95": [
+            0.019927331054198142,
+            0.0265768885445482
+          ],
+          "s": 0.869652685838449,
+          "s_ci_95": [
+            0.7973976738628115,
+            0.9350022707431319
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.005764575753490242,
+            "delta_d_ci_95": [
+              0.004128446879990152,
+              0.0074618049409406325
+            ],
+            "delta_d_over_c": 0.4162514980568134,
+            "delta_d_over_c_ci_95": [
+              0.29936103523862395,
+              0.5422128895449834
+            ]
+          },
+          "secondary_d": 0.0032791261935581247,
+          "secondary_d_ci_95": [
+            0.0016284029679085024,
+            0.005048976490223871
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.004559718833784452,
+            "L3": 0.0019985335533317973
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.18786238542193368,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.18786238542193368
+        },
+        "R4": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "tfi",
+          "row_key": "s101__tfi",
+          "rung": "R4",
+          "status": "estimated",
+          "mean_c": 0.06941435583722541,
+          "mean_f": 0.055038887567405624,
+          "mean_m": 0.04486451850804187,
+          "mean_a": 0.06977310019279508,
+          "mean_r": 0.26009765090021875,
+          "mean_d": 0.014375468269819787,
+          "d_ci_95": [
+            0.010909124265393236,
+            0.01808469356824253
+          ],
+          "mean_d_over_c": 0.20709647300523584,
+          "d_over_c_ci_95": [
+            0.17858234516326885,
+            0.23225129491312357
+          ],
+          "e": -0.010174369059363753,
+          "e_ci_95": [
+            -0.019086849991338688,
+            -0.002087285617396192
+          ],
+          "s": 0.024347711322659348,
+          "s_ci_95": [
+            -0.8420683691276116,
+            0.36612773478135846
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.016860917829751902,
+            "delta_d_ci_95": [
+              0.0133405025673638,
+              0.020665795706034735
+            ],
+            "delta_d_over_c": 0.49147578967243266,
+            "delta_d_over_c_ci_95": [
+              0.36569200031677673,
+              0.6279399822066658
+            ]
+          },
+          "secondary_d": 0.016432913249741665,
+          "secondary_d_ci_95": [
+            0.010160807837878276,
+            0.023275130317029716
+          ],
+          "selection_counts": {
+            "F": {
+              "random_forest": 19,
+              "mlp": 1
+            },
+            "C": {
+              "random_forest": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.013992337203181694,
+            "L3": 0.014758599336457866
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.23225129491312357,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.3064447134536811
+        },
+        "R5": {
+          "part": "A",
+          "dataset_seed": 101,
+          "family": "tfi",
+          "row_key": "s101__tfi",
+          "rung": "R5",
+          "status": "estimated",
+          "mean_c": 0.2164182675571097,
+          "mean_f": 0.04486451850804187,
+          "mean_m": 0.04486451850804187,
+          "mean_a": 0.21793669211873362,
+          "mean_r": 0.26009765090021875,
+          "mean_d": 0.1715537490490678,
+          "d_ci_95": [
+            0.15182110574363064,
+            0.19192087971228702
+          ],
+          "mean_d_over_c": 0.7926953255172752,
+          "d_over_c_ci_95": [
+            0.7703068109491282,
+            0.8125412127207771
+          ],
+          "e": 0.0,
+          "e_ci_95": [
+            0.0,
+            0.0
+          ],
+          "s": 0.008773360442328956,
+          "s_ci_95": [
+            0.0021352624625302252,
+            0.016157450261297703
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.17403919860899994,
+            "delta_d_ci_95": [
+              0.15421389623658616,
+              0.19429745378917426
+            ],
+            "delta_d_over_c": 1.077074642184472,
+            "delta_d_over_c_ci_95": [
+              0.9526399620791687,
+              1.2086929010547385
+            ]
+          },
+          "secondary_d": 0.17034076860125186,
+          "secondary_d_ci_95": [
+            0.15072774197435734,
+            0.19051175035256002
+          ],
+          "selection_counts": {
+            "F": {
+              "random_forest": 4,
+              "mlp": 16
+            },
+            "C": {
+              "random_forest": 15,
+              "mlp": 5
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.18911215919579444,
+            "L3": 0.15399533890234124
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.8125412127207771,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.8455369394569817
+        }
+      },
+      "s211__heisenberg": {
+        "R0": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "heisenberg",
+          "row_key": "s211__heisenberg",
+          "rung": "R0",
+          "status": "estimated",
+          "mean_c": 0.023213324742128193,
+          "mean_f": 0.023213030411036898,
+          "mean_m": 0.056296129773706446,
+          "mean_a": 0.09392221336612741,
+          "mean_r": 0.6091582865507126,
+          "mean_d": 2.943310912946473e-07,
+          "d_ci_95": [
+            -0.0018571702093858199,
+            0.002054952551499842
+          ],
+          "mean_d_over_c": 1.2679402651895313e-05,
+          "d_over_c_ci_95": [
+            -0.08577094367226407,
+            0.08218312544740891
+          ],
+          "e": 0.03308309936266955,
+          "e_ci_95": [
+            0.028385398849561816,
+            0.03782042513326628
+          ],
+          "s": 0.999995837441772,
+          "s_ci_95": [
+            0.9707372598635328,
+            1.0265531826082996
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0,
+            "delta_d_ci_95": [
+              0.0,
+              0.0
+            ],
+            "delta_d_over_c": 0.0,
+            "delta_d_over_c_ci_95": [
+              0.0,
+              0.0
+            ]
+          },
+          "secondary_d": 2.943310912946473e-07,
+          "secondary_d_ci_95": [
+            -0.0018571702093858199,
+            0.002054952551499842
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.0008513765410732774,
+            "L3": -0.0008507878788906881
+          },
+          "dropped_cells": [],
+          "classification_label": "Not distinguished",
+          "largest_non_excluded_d_over_c": 0.08218312544740891,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "mixed",
+          "rung_largest_non_excluded_d_over_c": 0.08218312544740891
+        },
+        "N1": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "heisenberg",
+          "row_key": "s211__heisenberg",
+          "rung": "N1",
+          "status": "estimated",
+          "mean_c": 0.023998912256357884,
+          "mean_f": 0.02438661579316248,
+          "mean_m": 0.056296129773706446,
+          "mean_a": 0.09390036893523386,
+          "mean_r": 0.6091582865507126,
+          "mean_d": -0.00038770353680459696,
+          "d_ci_95": [
+            -0.002127318278424635,
+            0.0014429493371563087
+          ],
+          "mean_d_over_c": -0.016155046223058925,
+          "d_over_c_ci_95": [
+            -0.09420497356462679,
+            0.055269503670701256
+          ],
+          "e": 0.031909513980543966,
+          "e_ci_95": [
+            0.027113506552348683,
+            0.036710025270811734
+          ],
+          "s": 1.005577364467895,
+          "s_ci_95": [
+            0.9793297962045576,
+            1.0311473429154017
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": -0.0003879978678958916,
+            "delta_d_ci_95": [
+              -0.0014337849340342868,
+              0.0006151549549494694
+            ],
+            "delta_d_over_c": -0.01616772562571082,
+            "delta_d_over_c_ci_95": [
+              -0.0588889440244828,
+              0.028489751509667927
+            ]
+          },
+          "secondary_d": -0.00038770353680459696,
+          "secondary_d_ci_95": [
+            -0.002127318278424635,
+            0.0014429493371563087
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.0010524313527099129,
+            "L3": -0.0018278384263191068
+          },
+          "dropped_cells": [],
+          "classification_label": "Not distinguished",
+          "largest_non_excluded_d_over_c": 0.055269503670701256,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "mixed",
+          "rung_largest_non_excluded_d_over_c": 0.0575289395445037
+        },
+        "N2": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "heisenberg",
+          "row_key": "s211__heisenberg",
+          "rung": "N2",
+          "status": "estimated",
+          "mean_c": 0.029291092473174338,
+          "mean_f": 0.028086317609356638,
+          "mean_m": 0.056296129773706446,
+          "mean_a": 0.0938035183815529,
+          "mean_r": 0.6091582865507126,
+          "mean_d": 0.0012047748638177001,
+          "d_ci_95": [
+            -0.0005360649418043983,
+            0.0028885380922394083
+          ],
+          "mean_d_over_c": 0.041131100348034785,
+          "d_over_c_ci_95": [
+            -0.018887658074375858,
+            0.09447341009186426
+          ],
+          "e": 0.02820981216434981,
+          "e_ci_95": [
+            0.023278274272255248,
+            0.03311016963172728
+          ],
+          "s": 0.9816672826952267,
+          "s_ci_95": [
+            0.9545205010341516,
+            1.0081427884689786
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0012044805327264055,
+            "delta_d_ci_95": [
+              -0.00068427897612698,
+              0.003028158426153636
+            ],
+            "delta_d_over_c": 0.04111842094538289,
+            "delta_d_over_c_ci_95": [
+              -0.030969962849607645,
+              0.11929336377720871
+            ]
+          },
+          "secondary_d": 0.0012047748638177001,
+          "secondary_d_ci_95": [
+            -0.0005360649418043983,
+            0.0028885380922394083
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.00346897141917947,
+            "L3": -0.0010594216915440838
+          },
+          "dropped_cells": [],
+          "classification_label": "Not distinguished",
+          "largest_non_excluded_d_over_c": 0.09447341009186426,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Not distinguished",
+          "rung_largest_non_excluded_d_over_c": 0.12641753609807826
+        },
+        "R4": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "heisenberg",
+          "row_key": "s211__heisenberg",
+          "rung": "R4",
+          "status": "estimated",
+          "mean_c": 0.08752326766029363,
+          "mean_f": 0.06906433192200934,
+          "mean_m": 0.056296129773706446,
+          "mean_a": 0.0858571741796484,
+          "mean_r": 0.6091582865507126,
+          "mean_d": 0.01845893573828429,
+          "d_ci_95": [
+            0.013759254419449399,
+            0.023034974940008515
+          ],
+          "mean_d_over_c": 0.2109031830247637,
+          "d_over_c_ci_95": [
+            0.1693358433517019,
+            0.24364545687597297
+          ],
+          "e": -0.01276820214830289,
+          "e_ci_95": [
+            -0.019330200795785124,
+            -0.006476292394850932
+          ],
+          "s": -0.09921450193384145,
+          "s_ci_95": [
+            -1.301560255119305,
+            0.3382130612721009
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.018458641407192996,
+            "delta_d_ci_95": [
+              0.013103312953520227,
+              0.02358422210389898
+            ],
+            "delta_d_over_c": 0.2108905036221118,
+            "delta_d_over_c_ci_95": [
+              0.11164828740030541,
+              0.31053863122107944
+            ]
+          },
+          "secondary_d": 0.01851435061736259,
+          "secondary_d_ci_95": [
+            0.012377288969540526,
+            0.02431331277432113
+          ],
+          "selection_counts": {
+            "F": {
+              "random_forest": 9,
+              "mlp": 11
+            },
+            "C": {
+              "random_forest": 12,
+              "mlp": 8
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.03958028514006125,
+            "L3": -0.0026624136634927076
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.24364545687597297,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.24364545687597297
+        },
+        "R5": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "heisenberg",
+          "row_key": "s211__heisenberg",
+          "rung": "R5",
+          "status": "estimated",
+          "mean_c": 0.08176803637795188,
+          "mean_f": 0.056296129773706446,
+          "mean_m": 0.056296129773706446,
+          "mean_a": 0.08639447507426963,
+          "mean_r": 0.6091582865507126,
+          "mean_d": 0.025471906604245434,
+          "d_ci_95": [
+            0.019140148617801975,
+            0.03204103261568076
+          ],
+          "mean_d_over_c": 0.31151422649442195,
+          "d_over_c_ci_95": [
+            0.2604869301794385,
+            0.35198459457971554
+          ],
+          "e": 0.0,
+          "e_ci_95": [
+            0.0,
+            0.0
+          ],
+          "s": 0.15371073227175658,
+          "s_ci_95": [
+            0.0933071900029345,
+            0.24205480557203013
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.02547161227315414,
+            "delta_d_ci_95": [
+              0.019069495920994176,
+              0.03223638380371176
+            ],
+            "delta_d_over_c": 0.3115015470917701,
+            "delta_d_over_c_ci_95": [
+              0.22137337375034158,
+              0.4039404937767451
+            ]
+          },
+          "secondary_d": 0.028655468141441674,
+          "secondary_d_ci_95": [
+            0.021275018780564432,
+            0.03593589294245147
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 18,
+              "random_forest": 2
+            },
+            "C": {
+              "mlp": 9,
+              "random_forest": 11
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.05439264817223307,
+            "L3": -0.003448834963742195
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.35198459457971554,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.38778872120882346
+        }
+      },
+      "s211__tfi": {
+        "R0": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "tfi",
+          "row_key": "s211__tfi",
+          "rung": "R0",
+          "status": "estimated",
+          "mean_c": 0.00819187926450056,
+          "mean_f": 0.011062428297340925,
+          "mean_m": 0.038150103729738545,
+          "mean_a": 0.04433320527384167,
+          "mean_r": 0.2813273005438781,
+          "mean_d": -0.002870549032840366,
+          "d_ci_95": [
+            -0.003781994964168691,
+            -0.001938124289303419
+          ],
+          "mean_d_over_c": -0.35041398196380485,
+          "d_over_c_ci_95": [
+            -0.48975777544879356,
+            -0.22212166532820293
+          ],
+          "e": 0.02708767543239762,
+          "e_ci_95": [
+            0.02458421836732944,
+            0.029632843426660536
+          ],
+          "s": 1.0862783888355794,
+          "s_ci_95": [
+            1.0571850201317294,
+            1.1173044675341446
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0,
+            "delta_d_ci_95": [
+              0.0,
+              0.0
+            ],
+            "delta_d_over_c": 0.0,
+            "delta_d_over_c_ci_95": [
+              0.0,
+              0.0
+            ]
+          },
+          "secondary_d": -0.002870549032840366,
+          "secondary_d_ci_95": [
+            -0.003781994964168691,
+            -0.001938124289303419
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.0035844451133624344,
+            "L3": -0.002156652952318292
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement hurts",
+          "largest_non_excluded_d_over_c": -0.22212166532820293,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement hurts",
+          "rung_largest_non_excluded_d_over_c": -0.161444054160536
+        },
+        "N1": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "tfi",
+          "row_key": "s211__tfi",
+          "rung": "N1",
+          "status": "estimated",
+          "mean_c": 0.012744225650523855,
+          "mean_f": 0.013872266345501165,
+          "mean_m": 0.038150103729738545,
+          "mean_a": 0.04614863096688816,
+          "mean_r": 0.2813273005438781,
+          "mean_d": -0.0011280406949773104,
+          "d_ci_95": [
+            -0.0022415859837045,
+            3.865721547870474e-05
+          ],
+          "mean_d_over_c": -0.08851386705719087,
+          "d_over_c_ci_95": [
+            -0.18259392216726508,
+            0.002928651903117919
+          ],
+          "e": 0.02427783738423738,
+          "e_ci_95": [
+            0.02174260832578389,
+            0.02680452163580944
+          ],
+          "s": 1.034949434615999,
+          "s_ci_95": [
+            0.9987719700372947,
+            1.0712110041766816
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0017425083378630555,
+            "delta_d_ci_95": [
+              0.0009019822463730822,
+              0.002636922264139872
+            ],
+            "delta_d_over_c": 0.26190011490661397,
+            "delta_d_over_c_ci_95": [
+              0.15831653499966705,
+              0.3762118813193544
+            ]
+          },
+          "secondary_d": -0.0011280406949773104,
+          "secondary_d_ci_95": [
+            -0.0022415859837045,
+            3.865721547870474e-05
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.0009846509976046951,
+            "L3": -0.0012714303923499239
+          },
+          "dropped_cells": [],
+          "classification_label": "Not distinguished",
+          "largest_non_excluded_d_over_c": 0.002928651903117919,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "mixed",
+          "rung_largest_non_excluded_d_over_c": 0.002928651903117919
+        },
+        "N2": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "tfi",
+          "row_key": "s211__tfi",
+          "rung": "N2",
+          "status": "estimated",
+          "mean_c": 0.02698981685884147,
+          "mean_f": 0.023323115876597845,
+          "mean_m": 0.038150103729738545,
+          "mean_a": 0.052775944993181875,
+          "mean_r": 0.2813273005438781,
+          "mean_d": 0.003666700982243625,
+          "d_ci_95": [
+            0.0019798096766580637,
+            0.0053524964770207215
+          ],
+          "mean_d_over_c": 0.13585497824682227,
+          "d_over_c_ci_95": [
+            0.07823412414876516,
+            0.18621437072772365
+          ],
+          "e": 0.0148269878531407,
+          "e_ci_95": [
+            0.011658823123340023,
+            0.017951490930483753
+          ],
+          "s": 0.8755059838995565,
+          "s_ci_95": [
+            0.8154991936651632,
+            0.9317616262789995
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.006537250015083991,
+            "delta_d_ci_95": [
+              0.0049056811715263585,
+              0.00822690362149322
+            ],
+            "delta_d_over_c": 0.48626896021062715,
+            "delta_d_over_c_ci_95": [
+              0.36085219337470065,
+              0.6251355174604211
+            ]
+          },
+          "secondary_d": 0.003666700982243625,
+          "secondary_d_ci_95": [
+            0.0019798096766580637,
+            0.0053524964770207215
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.0057548867309382135,
+            "L3": 0.0015785152335490334
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.18621437072772365,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.18786238542193368
+        },
+        "R4": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "tfi",
+          "row_key": "s211__tfi",
+          "rung": "R4",
+          "status": "estimated",
+          "mean_c": 0.06019969459013786,
+          "mean_f": 0.048264658798412345,
+          "mean_m": 0.038150103729738545,
+          "mean_a": 0.05551178594230268,
+          "mean_r": 0.2813273005438781,
+          "mean_d": 0.011935035791725515,
+          "d_ci_95": [
+            0.007844894908259408,
+            0.01627958115194745
+          ],
+          "mean_d_over_c": 0.19825741431054963,
+          "d_over_c_ci_95": [
+            0.1380129575816522,
+            0.2571670842788954
+          ],
+          "e": -0.0101145550686738,
+          "e_ci_95": [
+            -0.016392028442098836,
+            -0.004320753446231122
+          ],
+          "s": null,
+          "s_ci_95": null,
+          "s_defined": false,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.014805584824565881,
+            "delta_d_ci_95": [
+              0.010646829477699937,
+              0.01917554667010433
+            ],
+            "delta_d_over_c": 0.5486713962743545,
+            "delta_d_over_c_ci_95": [
+              0.4137470049798076,
+              0.6975013542875323
+            ]
+          },
+          "secondary_d": 0.012297383752514573,
+          "secondary_d_ci_95": [
+            0.007567465641201359,
+            0.017077636912572972
+          ],
+          "selection_counts": {
+            "F": {
+              "random_forest": 9,
+              "mlp": 11
+            },
+            "C": {
+              "random_forest": 12,
+              "mlp": 8
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.017816412185354,
+            "L3": 0.006053659398097037
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.2571670842788954,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.3064447134536811
+        },
+        "R5": {
+          "part": "A",
+          "dataset_seed": 211,
+          "family": "tfi",
+          "row_key": "s211__tfi",
+          "rung": "R5",
+          "status": "estimated",
+          "mean_c": 0.22089292881545156,
+          "mean_f": 0.038150103729738545,
+          "mean_m": 0.038150103729738545,
+          "mean_a": 0.22399331270222328,
+          "mean_r": 0.2813273005438781,
+          "mean_d": 0.18274282508571302,
+          "d_ci_95": [
+            0.16451511589084616,
+            0.20111036491139955
+          ],
+          "mean_d_over_c": 0.8272914215302399,
+          "d_over_c_ci_95": [
+            0.8060008496349903,
+            0.8455369394569817
+          ],
+          "e": 0.0,
+          "e_ci_95": [
+            0.0,
+            0.0
+          ],
+          "s": 0.01668279354361964,
+          "s_ci_95": [
+            0.008473724856786463,
+            0.02685323927080584
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.1856133741185534,
+            "delta_d_ci_95": [
+              0.16723307985459507,
+              0.20400186346425606
+            ],
+            "delta_d_over_c": 1.1777054034940448,
+            "delta_d_over_c_ci_95": [
+              1.0515330051664515,
+              1.3148044417675726
+            ]
+          },
+          "secondary_d": 0.18229727153621955,
+          "secondary_d_ci_95": [
+            0.16434336038013658,
+            0.20059655560617612
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 18,
+              "random_forest": 2
+            },
+            "C": {
+              "mlp": 9,
+              "random_forest": 11
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.19752057680836446,
+            "L3": 0.16796507336306155
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.8455369394569817,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.8455369394569817
+        }
+      },
+      "s307__heisenberg": {
+        "R0": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "heisenberg",
+          "row_key": "s307__heisenberg",
+          "rung": "R0",
+          "status": "estimated",
+          "mean_c": 0.025344574862483524,
+          "mean_f": 0.027374296228335773,
+          "mean_m": 0.0673103654846471,
+          "mean_a": 0.10733079177094043,
+          "mean_r": 0.5964901288624219,
+          "mean_d": -0.0020297213658522495,
+          "d_ci_95": [
+            -0.004195188686740874,
+            -7.684549142565371e-05
+          ],
+          "mean_d_over_c": -0.08008504292793477,
+          "d_over_c_ci_95": [
+            -0.16930995420550352,
+            -0.00304411049596923
+          ],
+          "e": 0.039936069256311324,
+          "e_ci_95": [
+            0.03420757148368165,
+            0.045795656902187315
+          ],
+          "s": 1.0253853217562632,
+          "s_ci_95": [
+            1.0010073408253441,
+            1.0528800479254692
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0,
+            "delta_d_ci_95": [
+              0.0,
+              0.0
+            ],
+            "delta_d_over_c": 0.0,
+            "delta_d_over_c_ci_95": [
+              0.0,
+              0.0
+            ]
+          },
+          "secondary_d": -0.0020297213658522495,
+          "secondary_d_ci_95": [
+            -0.004195188686740874,
+            -7.684549142565371e-05
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.0008233674153624061,
+            "L3": -0.003236075316342086
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement hurts",
+          "largest_non_excluded_d_over_c": -0.00304411049596923,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "mixed",
+          "rung_largest_non_excluded_d_over_c": 0.08218312544740891
+        },
+        "N1": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "heisenberg",
+          "row_key": "s307__heisenberg",
+          "rung": "N1",
+          "status": "estimated",
+          "mean_c": 0.02654771462197833,
+          "mean_f": 0.02868621609720202,
+          "mean_m": 0.0673103654846471,
+          "mean_a": 0.10708806796862555,
+          "mean_r": 0.5964901288624219,
+          "mean_d": -0.0021385014752236912,
+          "d_ci_95": [
+            -0.003995363983005152,
+            -0.0003481622761665412
+          ],
+          "mean_d_over_c": -0.08055312879750741,
+          "d_over_c_ci_95": [
+            -0.15536389983916649,
+            -0.012481216357564124
+          ],
+          "e": 0.03862414938744507,
+          "e_ci_95": [
+            0.03307934867318279,
+            0.04430140138761467
+          ],
+          "s": 1.0272761602459437,
+          "s_ci_95": [
+            1.004481624396005,
+            1.0512880216108413
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": -0.00010878010937144175,
+            "delta_d_ci_95": [
+              -0.0010895014063136619,
+              0.0008757991132812725
+            ],
+            "delta_d_over_c": -0.0004680858695726431,
+            "delta_d_over_c_ci_95": [
+              -0.04033690199901088,
+              0.04119703615622605
+            ]
+          },
+          "secondary_d": -0.0021385014752236912,
+          "secondary_d_ci_95": [
+            -0.003995363983005152,
+            -0.0003481622761665412
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.0005165983760955159,
+            "L3": -0.003760404574351856
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement hurts",
+          "largest_non_excluded_d_over_c": -0.012481216357564124,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "mixed",
+          "rung_largest_non_excluded_d_over_c": 0.0575289395445037
+        },
+        "N2": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "heisenberg",
+          "row_key": "s307__heisenberg",
+          "rung": "N2",
+          "status": "estimated",
+          "mean_c": 0.03466370886677087,
+          "mean_f": 0.03396994425333449,
+          "mean_m": 0.0673103654846471,
+          "mean_a": 0.10661021796950727,
+          "mean_r": 0.5964901288624219,
+          "mean_d": 0.0006937646134363845,
+          "d_ci_95": [
+            -0.0011040421097755352,
+            0.0025583288231749764
+          ],
+          "mean_d_over_c": 0.02001414840237818,
+          "d_over_c_ci_95": [
+            -0.03350187577295029,
+            0.0699084306974268
+          ],
+          "e": 0.03334042123131261,
+          "e_ci_95": [
+            0.027983532071638405,
+            0.03875304632940719
+          ],
+          "s": 0.990449311684216,
+          "s_ci_95": [
+            0.9650363543673065,
+            1.0153591707975635
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.002723485979288634,
+            "delta_d_ci_95": [
+              0.0010984548753535952,
+              0.0044892775488589885
+            ],
+            "delta_d_over_c": 0.10009919133031295,
+            "delta_d_over_c_ci_95": [
+              0.038723354833084395,
+              0.1673348712307135
+            ]
+          },
+          "secondary_d": 0.0006937646134363845,
+          "secondary_d_ci_95": [
+            -0.0011040421097755352,
+            0.0025583288231749764
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.0036689050832050124,
+            "L3": -0.0022813758563322503
+          },
+          "dropped_cells": [],
+          "classification_label": "Not distinguished",
+          "largest_non_excluded_d_over_c": 0.0699084306974268,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Not distinguished",
+          "rung_largest_non_excluded_d_over_c": 0.12641753609807826
+        },
+        "R4": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "heisenberg",
+          "row_key": "s307__heisenberg",
+          "rung": "R4",
+          "status": "estimated",
+          "mean_c": 0.09305943308569951,
+          "mean_f": 0.0747793601300115,
+          "mean_m": 0.0673103654846471,
+          "mean_a": 0.0972862026356727,
+          "mean_r": 0.5964901288624219,
+          "mean_d": 0.01828007295568801,
+          "d_ci_95": [
+            0.012716312331773257,
+            0.023684397775152327
+          ],
+          "mean_d_over_c": 0.1964343898254106,
+          "d_over_c_ci_95": [
+            0.14538770495560052,
+            0.2387876253848223
+          ],
+          "e": -0.007468994645364407,
+          "e_ci_95": [
+            -0.014417200007850479,
+            -0.0008868637655486567
+          ],
+          "s": 0.1877993125383987,
+          "s_ci_95": [
+            -0.1677820354954511,
+            0.42345828478127767
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.02030979432154026,
+            "delta_d_ci_95": [
+              0.014176980592965122,
+              0.026303471795257896
+            ],
+            "delta_d_over_c": 0.27651943275334534,
+            "delta_d_over_c_ci_95": [
+              0.18218604512279504,
+              0.37751744150963934
+            ]
+          },
+          "secondary_d": 0.02247763436939358,
+          "secondary_d_ci_95": [
+            0.016515109841848473,
+            0.028515764509998678
+          ],
+          "selection_counts": {
+            "F": {
+              "random_forest": 8,
+              "mlp": 12
+            },
+            "C": {
+              "random_forest": 16,
+              "mlp": 4
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.039967377651105584,
+            "L3": -0.0034072317397295243
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.2387876253848223,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.24364545687597297
+        },
+        "R5": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "heisenberg",
+          "row_key": "s307__heisenberg",
+          "rung": "R5",
+          "status": "estimated",
+          "mean_c": 0.10531100262778775,
+          "mean_f": 0.0673103654846471,
+          "mean_m": 0.0673103654846471,
+          "mean_a": 0.10758256678446565,
+          "mean_r": 0.5964901288624219,
+          "mean_d": 0.038000637143140656,
+          "d_ci_95": [
+            0.03147631753375158,
+            0.04472394406722002
+          ],
+          "mean_d_over_c": 0.3608420411440814,
+          "d_over_c_ci_95": [
+            0.33049851463648894,
+            0.38778872120882346
+          ],
+          "e": 0.0,
+          "e_ci_95": [
+            0.0,
+            0.0
+          ],
+          "s": 0.05640526426073787,
+          "s_ci_95": [
+            0.022104086109165266,
+            0.10767258286911292
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.040030358508992905,
+            "delta_d_ci_95": [
+              0.032849979958187135,
+              0.04756957444665002
+            ],
+            "delta_d_over_c": 0.4409270840720162,
+            "delta_d_over_c_ci_95": [
+              0.3527555327363928,
+              0.538170106773764
+            ]
+          },
+          "secondary_d": 0.0417140407773053,
+          "secondary_d_ci_95": [
+            0.03419408177631353,
+            0.049348731855319586
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 16,
+              "random_forest": 4
+            },
+            "C": {
+              "mlp": 6,
+              "random_forest": 14
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.07383827848667857,
+            "L3": 0.00216299579960276
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.38778872120882346,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.38778872120882346
+        }
+      },
+      "s307__tfi": {
+        "R0": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "tfi",
+          "row_key": "s307__tfi",
+          "rung": "R0",
+          "status": "estimated",
+          "mean_c": 0.008354169694171163,
+          "mean_f": 0.011588563245736792,
+          "mean_m": 0.04448385111453188,
+          "mean_a": 0.04925140391004114,
+          "mean_r": 0.2509046733667312,
+          "mean_d": -0.0032343935515656286,
+          "d_ci_95": [
+            -0.004369275949431178,
+            -0.0021427503373260127
+          ],
+          "mean_d_over_c": -0.3871591875638241,
+          "d_over_c_ci_95": [
+            -0.5439860169195077,
+            -0.24712320412008243
+          ],
+          "e": 0.03289528786879509,
+          "e_ci_95": [
+            0.029671558136525465,
+            0.03639704222951685
+          ],
+          "s": 1.0858775783907102,
+          "s_ci_95": [
+            1.0554278737398322,
+            1.1194692506289265
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0,
+            "delta_d_ci_95": [
+              0.0,
+              0.0
+            ],
+            "delta_d_over_c": 0.0,
+            "delta_d_over_c_ci_95": [
+              0.0,
+              0.0
+            ]
+          },
+          "secondary_d": -0.0032343935515656286,
+          "secondary_d_ci_95": [
+            -0.004369275949431178,
+            -0.0021427503373260127
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.00357598256370637,
+            "L3": -0.0028928045394248855
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement hurts",
+          "largest_non_excluded_d_over_c": -0.24712320412008243,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement hurts",
+          "rung_largest_non_excluded_d_over_c": -0.161444054160536
+        },
+        "N1": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "tfi",
+          "row_key": "s307__tfi",
+          "rung": "N1",
+          "status": "estimated",
+          "mean_c": 0.01256471157360823,
+          "mean_f": 0.014828893435596235,
+          "mean_m": 0.04448385111453188,
+          "mean_a": 0.04992813064270222,
+          "mean_r": 0.2509046733667312,
+          "mean_d": -0.002264181861988006,
+          "d_ci_95": [
+            -0.0038598503619318414,
+            -0.000743246998745574
+          ],
+          "mean_d_over_c": -0.18020165832885862,
+          "d_over_c_ci_95": [
+            -0.31590213348245005,
+            -0.05735950929462592
+          ],
+          "e": 0.029654957678935646,
+          "e_ci_95": [
+            0.026212803693161136,
+            0.03324517465376844
+          ],
+          "s": 1.0645080076421038,
+          "s_ci_95": [
+            1.0207232992886857,
+            1.1155325756286385
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.0009702116895776228,
+            "delta_d_ci_95": [
+              -0.0006460495630300429,
+              0.002451902039367798
+            ],
+            "delta_d_over_c": 0.2069575292349655,
+            "delta_d_over_c_ci_95": [
+              0.04756293616149312,
+              0.37626681716415433
+            ]
+          },
+          "secondary_d": -0.002264181861988006,
+          "secondary_d_ci_95": [
+            -0.0038598503619318414,
+            -0.000743246998745574
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": -0.0016513912974774753,
+            "L3": -0.002876972426498533
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement hurts",
+          "largest_non_excluded_d_over_c": -0.05735950929462592,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "mixed",
+          "rung_largest_non_excluded_d_over_c": 0.002928651903117919
+        },
+        "N2": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "tfi",
+          "row_key": "s307__tfi",
+          "rung": "N2",
+          "status": "estimated",
+          "mean_c": 0.02556345883811601,
+          "mean_f": 0.02247775664412629,
+          "mean_m": 0.04448385111453188,
+          "mean_a": 0.053807031497057234,
+          "mean_r": 0.2509046733667312,
+          "mean_d": 0.003085702193989723,
+          "d_ci_95": [
+            0.001462715490004677,
+            0.004693344036764149
+          ],
+          "mean_d_over_c": 0.12070753858193997,
+          "d_over_c_ci_95": [
+            0.060658719904417756,
+            0.1739256350940802
+          ],
+          "e": 0.022006094470405593,
+          "e_ci_95": [
+            0.018541195548434905,
+            0.025582297953882158
+          ],
+          "s": 0.9015073853935357,
+          "s_ci_95": [
+            0.8484587831900614,
+            0.9527669205126891
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.006320095745555351,
+            "delta_d_ci_95": [
+              0.004545262278593268,
+              0.008141741418504704
+            ],
+            "delta_d_over_c": 0.5078667261457641,
+            "delta_d_over_c_ci_95": [
+              0.36607243154727126,
+              0.6713744396479409
+            ]
+          },
+          "secondary_d": 0.003085702193989723,
+          "secondary_d_ci_95": [
+            0.001462715490004677,
+            0.004693344036764149
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 20
+            },
+            "C": {
+              "mlp": 20
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.006405592002908484,
+            "L3": -0.00023418761492902465
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.1739256350940802,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.18786238542193368
+        },
+        "R4": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "tfi",
+          "row_key": "s307__tfi",
+          "rung": "R4",
+          "status": "estimated",
+          "mean_c": 0.07133521089044235,
+          "mean_f": 0.05383030604460828,
+          "mean_m": 0.04448385111453188,
+          "mean_a": 0.06780708115387771,
+          "mean_r": 0.2509046733667312,
+          "mean_d": 0.017504904845834078,
+          "d_ci_95": [
+            0.011700269236268273,
+            0.02441602406410966
+          ],
+          "mean_d_over_c": 0.24538940345628701,
+          "d_over_c_ci_95": [
+            0.1849700464560082,
+            0.3064447134536811
+          ],
+          "e": -0.009346454930076395,
+          "e_ci_95": [
+            -0.01782436367926398,
+            -0.0017277524974639998
+          ],
+          "s": null,
+          "s_ci_95": null,
+          "s_defined": false,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.020739298397399707,
+            "delta_d_ci_95": [
+              0.014663179742121063,
+              0.027834238937374748
+            ],
+            "delta_d_over_c": 0.6325485910201112,
+            "delta_d_over_c_ci_95": [
+              0.47539699478255953,
+              0.8058364651122816
+            ]
+          },
+          "secondary_d": 0.018208240366547078,
+          "secondary_d_ci_95": [
+            0.012484068642708419,
+            0.02428768195077619
+          ],
+          "selection_counts": {
+            "F": {
+              "random_forest": 8,
+              "mlp": 12
+            },
+            "C": {
+              "random_forest": 16,
+              "mlp": 4
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.022715310606655943,
+            "L3": 0.012294499085012227
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.3064447134536811,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.3064447134536811
+        },
+        "R5": {
+          "part": "A",
+          "dataset_seed": 307,
+          "family": "tfi",
+          "row_key": "s307__tfi",
+          "rung": "R5",
+          "status": "estimated",
+          "mean_c": 0.2175723705583005,
+          "mean_f": 0.04448385111453188,
+          "mean_m": 0.04448385111453188,
+          "mean_a": 0.2187895017566266,
+          "mean_r": 0.2509046733667312,
+          "mean_d": 0.17308851944376863,
+          "d_ci_95": [
+            0.15265813361333927,
+            0.19311038159331417
+          ],
+          "mean_d_over_c": 0.7955445767291853,
+          "d_over_c_ci_95": [
+            0.7715839430779355,
+            0.8152506491483865
+          ],
+          "e": 0.0,
+          "e_ci_95": [
+            0.0,
+            0.0
+          ],
+          "s": 0.006982740914264723,
+          "s_ci_95": [
+            0.000339105342525514,
+            0.01443884007932406
+          ],
+          "s_defined": true,
+          "paired_contrast": {
+            "baseline_rung": "R0",
+            "delta_d": 0.17632291299533426,
+            "delta_d_ci_95": [
+              0.15569629302307283,
+              0.19630957287075165
+            ],
+            "delta_d_over_c": 1.1827037642930094,
+            "delta_d_over_c_ci_95": [
+              1.0398376767195001,
+              1.3389450585744036
+            ]
+          },
+          "secondary_d": 0.17621790316276797,
+          "secondary_d_ci_95": [
+            0.1548677787959779,
+            0.19707055526551065
+          ],
+          "selection_counts": {
+            "F": {
+              "mlp": 16,
+              "random_forest": 4
+            },
+            "C": {
+              "mlp": 6,
+              "random_forest": 14
+            }
+          },
+          "d_per_severity": {
+            "L1": 0.19248624483851234,
+            "L3": 0.15369079404902491
+          },
+          "dropped_cells": [],
+          "classification_label": "Measurement adds",
+          "largest_non_excluded_d_over_c": 0.8152506491483865,
+          "n_learner_seeds": 20,
+          "n_circuits": 160,
+          "rung_statement": "Measurement adds",
+          "rung_largest_non_excluded_d_over_c": 0.8455369394569817
+        }
+      }
+    }
+  },
+  "follow_up_rule": {
+    "path": "docs/frozen-rules/2026-10-04-crossed-follow-ups.md",
+    "sha256": "a2b2292a7a8701eb8cc768029d61397abd0355d50351f196b74b8847431ccb58"
+  }
+}

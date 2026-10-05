@@ -81,8 +81,10 @@ def _run_g_analyze(tmp_path: Path, drop: str | None = None):
     for s in (101, 211, 307):
         for rung, where in (("R0", sw_fits), ("N1", sw_fits), ("N2", sw_fits), ("R5", sw_fits),
                             ("R4", strong_fits), ("N3", sw_fits)):
+            for ext in ("json", "npz"):
+                (where / f"shipped-s{s}-n640__{rung}__A.{ext}").write_text("")
             for k in range(1, 21):
-                for arm in ("C", "F"):
+                for arm in ("C", "F", "P"):
                     for ext in ("json", "npz"):
                         (where / f"shipped-s{s}-n640__{rung}__k{k:02d}__{arm}.{ext}").write_text("")
         # The derived baseline also holds other rungs; only R4 may be linked from it.
@@ -108,7 +110,16 @@ def test_g_analyze_passes_the_n640_reference(tmp_path):
     assert len(lines) == 4
     assert all(f"--original-fits {ref}" in l for l in lines)
     linked = sorted(p.name for p in ref.iterdir())
-    assert len(linked) == 3 * 4 * 20 * 2 * 2 + 3 * 20 * 2 * 2  # sweep R0 N1 N2 R5, derived R4
+    # As in the released inventory: per dataset and rung, A (2 files) and C, F, P at 20 seeds
+    # (120 files), so 3 x 5 x 122 = 1,830 links, 1,200 of them C and F.
+    assert len(linked) == 3 * 5 * (2 + 20 * 3 * 2)
+    required = {f"shipped-s{s}-n640__{r}__k{k:02d}__{a}.{e}" for s in (101, 211, 307)
+                for r in ("R0", "N1", "N2", "R4", "R5") for k in range(1, 21)
+                for a in ("C", "F") for e in ("json", "npz")}
+    assert required <= set(linked) and len(required) == 1200
+    for n in linked:
+        source = str((ref / n).resolve())
+        assert ("strong" in source) == ("__R4__" in n)
     assert not any("__N3__" in n for n in linked)
     # Every R0 link points at the shot sweep's fit, never at the derived baseline.
     assert all("sweep" in str((ref / n).resolve()) for n in linked if "__R0__" in n)

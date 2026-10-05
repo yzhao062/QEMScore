@@ -1,0 +1,4804 @@
+{
+ "schema": "descriptor-information-posthoc-learner-adequacy-v1",
+ "status": "post hoc, descriptive; evaluating learner stability and seed-ensemble estimand",
+ "script_sha256": "61d9ec2f6b0d2fafbe348aeca53cb40c04deba6e30fe138e0927785697984063",
+ "bootstrap": {
+  "seed": 20261002,
+  "draws": 10000,
+  "percentiles": [
+   2.5,
+   97.5
+  ],
+  "rng_scheme": "Cell bootstrap: per-cell fresh default_rng(seed) via bootstrap_draws(20, n_circuits, draws, seed). Pooled R0 bootstrap: single default_rng(seed), learner seeds resampled once per dataset seed and applied to both family rows; circuits resampled separately per row; dataset seeds drawn independently."
+ },
+ "inputs": {
+  "fits": [
+   "fits"
+  ],
+  "cache": [
+   "cache"
+  ],
+  "n_fit_files": 732,
+  "fits_sha256_digest": "169b84fc5d96283cb69067a71092947e252c141e88f0925e23dd4cc02c041a10",
+  "caches_shadowed": [],
+  "reference_analysis_a": "analysis-a.json"
+ },
+ "parts": {
+  "A": {
+   "title": "Part A: spin chains, same circuits",
+   "rows": {
+    "shipped-s401-n640/tfi": {
+     "key": "shipped-s401-n640",
+     "dataset_seed": 401,
+     "family": "tfi",
+     "rungs": {
+      "R0": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 4.865820900361123e-05,
+         "median": 4.865820900361124e-05,
+         "sd": 6.952299739086386e-21,
+         "min": 4.865820900361124e-05,
+         "max": 4.865820900361124e-05
+        },
+        "F": {
+         "n": 20,
+         "mean": 2.848308443940527e-06,
+         "median": 2.8483084439405273e-06,
+         "sd": 4.345187336928991e-22,
+         "min": 2.8483084439405273e-06,
+         "max": 2.8483084439405273e-06
+        },
+        "D": {
+         "n": 20,
+         "mean": 4.580990055967072e-05,
+         "median": 4.5809900559670715e-05,
+         "sd": 6.952299739086386e-21,
+         "min": 4.5809900559670715e-05,
+         "max": 4.5809900559670715e-05
+        }
+       },
+       "standard": {
+        "mean_C": 4.865820900361123e-05,
+        "mean_F": 2.848308443940527e-06,
+        "mean_D": {
+         "status": "estimated",
+         "point": 4.580990055967072e-05,
+         "interval": {
+          "lower": 3.8572504373046e-05,
+          "upper": 5.445856738114344e-05
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 4.077405265109639e-06,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9414629411508113,
+         "interval": {
+          "lower": 0.9334107857549295,
+          "upper": 0.9488215223368806
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0038985424184727582,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 3.8572504373046e-05,
+          "upper": 5.445856738114344e-05
+         },
+         "mean_D": 4.580990055967072e-05,
+         "mean_C": 4.865820900361123e-05,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 4.865820900361133e-05,
+        "E_F": 2.8483084439365268e-06,
+        "D_ens": {
+         "status": "estimated",
+         "point": 4.58099005596748e-05,
+         "interval": {
+          "lower": 3.857250437304871e-05,
+          "upper": 5.445856738114628e-05
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 4.077405265109249e-06,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9414629411508934,
+         "interval": {
+          "lower": 0.933410785754905,
+          "upper": 0.9488215223370122
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.003898542418464359,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 3.857250437304871e-05,
+          "upper": 5.445856738114628e-05
+         },
+         "mean_D": 4.58099005596748e-05,
+         "mean_C": 4.865820900361133e-05,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N1": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.0067732627684662745,
+         "median": 0.006773262768466275,
+         "sd": 8.898943666030574e-19,
+         "min": 0.006773262768466275,
+         "max": 0.006773262768466275
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.00010208037946348499,
+         "median": 0.00010208037946348499,
+         "sd": 0.0,
+         "min": 0.00010208037946348499,
+         "max": 0.00010208037946348499
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.00667118238900279,
+         "median": 0.00667118238900279,
+         "sd": 0.0,
+         "min": 0.00667118238900279,
+         "max": 0.00667118238900279
+        }
+       },
+       "standard": {
+        "mean_C": 0.0067732627684662745,
+        "mean_F": 0.00010208037946348499,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.00667118238900279,
+         "interval": {
+          "lower": 0.005919107162382952,
+          "upper": 0.007410452162580444
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0003819069299063877,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9849289208239888,
+         "interval": {
+          "lower": 0.9818782995151318,
+          "upper": 0.9873914855002027
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0014061516072017691,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.005919107162382952,
+          "upper": 0.007410452162580444
+         },
+         "mean_D": 0.00667118238900279,
+         "mean_C": 0.0067732627684662745,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.006773262768466292,
+        "E_F": 0.00010208037946349754,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.006671182389002795,
+         "interval": {
+          "lower": 0.0059191071623829515,
+          "upper": 0.00741045216258046
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.00038190692990638746,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9849289208239869,
+         "interval": {
+          "lower": 0.981878299515131,
+          "upper": 0.9873914855002031
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0014061516072017993,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.0059191071623829515,
+          "upper": 0.00741045216258046
+         },
+         "mean_D": 0.006671182389002795,
+         "mean_C": 0.006773262768466292,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N2": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.01997449178179933,
+         "median": 0.01997449178179933,
+         "sd": 0.0,
+         "min": 0.01997449178179933,
+         "max": 0.01997449178179933
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0002971763867919688,
+         "median": 0.0002971763867919688,
+         "sd": 0.0,
+         "min": 0.0002971763867919688,
+         "max": 0.0002971763867919688
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.019677315395007368,
+         "median": 0.01967731539500736,
+         "sd": 7.119154932824459e-18,
+         "min": 0.01967731539500736,
+         "max": 0.01967731539500736
+        }
+       },
+       "standard": {
+        "mean_C": 0.01997449178179933,
+        "mean_F": 0.0002971763867919688,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.019677315395007368,
+         "interval": {
+          "lower": 0.017446606657746673,
+          "upper": 0.02190924174101277
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.001142960113025613,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9851222053587992,
+         "interval": {
+          "lower": 0.9821366105793271,
+          "upper": 0.9875747329759458
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0013915255153113583,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.017446606657746673,
+          "upper": 0.02190924174101277
+         },
+         "mean_D": 0.019677315395007368,
+         "mean_C": 0.01997449178179933,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.019974491781799327,
+        "E_F": 0.00029717638679195606,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.01967731539500737,
+         "interval": {
+          "lower": 0.017446606657746673,
+          "upper": 0.02190924174101278
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0011429601130256127,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9851222053587996,
+         "interval": {
+          "lower": 0.9821366105793271,
+          "upper": 0.987574732975946
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0013915255153113567,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.017446606657746673,
+          "upper": 0.02190924174101278
+         },
+         "mean_D": 0.01967731539500737,
+         "mean_C": 0.019974491781799327,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "R5": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.18913845232925847,
+         "median": 0.18931940879471315,
+         "sd": 0.0008163843494327484,
+         "min": 0.1874047565369098,
+         "max": 0.19063895815248272
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0037738441945416217,
+         "median": 0.0037738441945416226,
+         "sd": 8.898943666030574e-19,
+         "min": 0.0037738441945416226,
+         "max": 0.0037738441945416226
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.18536460813471684,
+         "median": 0.18554556460017152,
+         "sd": 0.0008163843494327484,
+         "min": 0.18363091234236817,
+         "max": 0.1868651139579411
+        }
+       },
+       "standard": {
+        "mean_C": 0.18913845232925847,
+        "mean_F": 0.0037738441945416217,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.18536460813471684,
+         "interval": {
+          "lower": 0.16797209332649743,
+          "upper": 0.20277853063458137
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.008802508847728721,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9800471868725457,
+         "interval": {
+          "lower": 0.9769741995434396,
+          "upper": 0.9826544863674048
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.001459669034661467,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.16797209332649743,
+          "upper": 0.20277853063458137
+         },
+         "mean_D": 0.18536460813471684,
+         "mean_C": 0.18913845232925847,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.18904792940326187,
+        "E_F": 0.003773844194541622,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.18527408520872024,
+         "interval": {
+          "lower": 0.1678767436801385,
+          "upper": 0.2027079927043621
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.008812665222550595,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9800376327503086,
+         "interval": {
+          "lower": 0.9769555650563496,
+          "upper": 0.9826475463015308
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.001461483463053146,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.1678767436801385,
+          "upper": 0.2027079927043621
+         },
+         "mean_D": 0.18527408520872024,
+         "mean_C": 0.18904792940326187,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      }
+     }
+    },
+    "shipped-s401-n640/heisenberg": {
+     "key": "shipped-s401-n640",
+     "dataset_seed": 401,
+     "family": "heisenberg",
+     "rungs": {
+      "R0": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.00027665779996687766,
+         "median": 0.0002766577999668776,
+         "sd": 5.561839791269109e-20,
+         "min": 0.0002766577999668776,
+         "max": 0.0002766577999668776
+        },
+        "F": {
+         "n": 20,
+         "mean": 2.1107455199536897e-05,
+         "median": 2.11074551995369e-05,
+         "sd": 3.476149869543193e-21,
+         "min": 2.11074551995369e-05,
+         "max": 2.11074551995369e-05
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.0002555503447673407,
+         "median": 0.0002555503447673407,
+         "sd": 0.0,
+         "min": 0.0002555503447673407,
+         "max": 0.0002555503447673407
+        }
+       },
+       "standard": {
+        "mean_C": 0.00027665779996687766,
+        "mean_F": 2.1107455199536897e-05,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.0002555503447673407,
+         "interval": {
+          "lower": 0.00021496069289466107,
+          "upper": 0.0003018943100390166
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 2.2141941062153002e-05,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9237055481462515,
+         "interval": {
+          "lower": 0.9114528621834033,
+          "upper": 0.9336158981617327
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.005644621325392753,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.00021496069289466107,
+          "upper": 0.0003018943100390166
+         },
+         "mean_D": 0.0002555503447673407,
+         "mean_C": 0.00027665779996687766,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.00027665779996688096,
+        "E_F": 2.11074551995356e-05,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.0002555503447673454,
+         "interval": {
+          "lower": 0.00021496069289466386,
+          "upper": 0.0003018943100390219
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 2.2141941062152633e-05,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9237055481462573,
+         "interval": {
+          "lower": 0.9114528621834107,
+          "upper": 0.9336158981617257
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.005644621325394129,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.00021496069289466386,
+          "upper": 0.0003018943100390219
+         },
+         "mean_D": 0.0002555503447673454,
+         "mean_C": 0.00027665779996688096,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N1": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.004705636110423782,
+         "median": 0.004705636110423782,
+         "sd": 0.0,
+         "min": 0.004705636110423782,
+         "max": 0.004705636110423782
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0008075287558680803,
+         "median": 0.0008075287558680803,
+         "sd": 0.0,
+         "min": 0.0008075287558680803,
+         "max": 0.0008075287558680803
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.0038981073545557013,
+         "median": 0.0038981073545557017,
+         "sd": 4.449471833015287e-19,
+         "min": 0.0038981073545557017,
+         "max": 0.0038981073545557017
+        }
+       },
+       "standard": {
+        "mean_C": 0.004705636110423782,
+        "mean_F": 0.0008075287558680803,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.0038981073545557013,
+         "interval": {
+          "lower": 0.003236316711929463,
+          "upper": 0.004617707092060663
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0003573158135857295,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.8283911596820528,
+         "interval": {
+          "lower": 0.7974428283023426,
+          "upper": 0.8539143797088813
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.014596506286574239,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.003236316711929463,
+          "upper": 0.004617707092060663
+         },
+         "mean_D": 0.0038981073545557013,
+         "mean_C": 0.004705636110423782,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.004705636110423774,
+        "E_F": 0.0008075287558680697,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.0038981073545557047,
+         "interval": {
+          "lower": 0.0032363167119294814,
+          "upper": 0.004617707092060671
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0003573158135857294,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.8283911596820549,
+         "interval": {
+          "lower": 0.7974428283023426,
+          "upper": 0.8539143797088826
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.014596506286574131,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.0032363167119294814,
+          "upper": 0.004617707092060671
+         },
+         "mean_D": 0.0038981073545557047,
+         "mean_C": 0.004705636110423774,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N2": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.013702127490120456,
+         "median": 0.013702127490120454,
+         "sd": 1.7797887332061147e-18,
+         "min": 0.013702127490120454,
+         "max": 0.013702127490120454
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0023104644469665704,
+         "median": 0.00231046444696657,
+         "sd": 4.449471833015287e-19,
+         "min": 0.00231046444696657,
+         "max": 0.00231046444696657
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.011391663043153887,
+         "median": 0.011391663043153885,
+         "sd": 1.7797887332061147e-18,
+         "min": 0.011391663043153885,
+         "max": 0.011391663043153885
+        }
+       },
+       "standard": {
+        "mean_C": 0.013702127490120456,
+        "mean_F": 0.0023104644469665704,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.011391663043153887,
+         "interval": {
+          "lower": 0.009371792017258221,
+          "upper": 0.01357082097364402
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.001075105464998466,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.831379145418661,
+         "interval": {
+          "lower": 0.7988352265025158,
+          "upper": 0.8579071044095417
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.015139117045290425,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.009371792017258221,
+          "upper": 0.01357082097364402
+         },
+         "mean_D": 0.011391663043153887,
+         "mean_C": 0.013702127490120456,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.013702127490120451,
+        "E_F": 0.002310464446966572,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.01139166304315388,
+         "interval": {
+          "lower": 0.009371792017258221,
+          "upper": 0.013570820973644012
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0010751054649984662,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.8313791454186608,
+         "interval": {
+          "lower": 0.7988352265025149,
+          "upper": 0.8579071044095415
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.01513911704529046,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.009371792017258221,
+          "upper": 0.013570820973644012
+         },
+         "mean_D": 0.01139166304315388,
+         "mean_C": 0.013702127490120451,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "R5": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.09301823109601615,
+         "median": 0.0942799961994904,
+         "sd": 0.002984077356548267,
+         "min": 0.08713953284911627,
+         "max": 0.09571942617488562
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.016546398189778436,
+         "median": 0.016546398189778436,
+         "sd": 0.0,
+         "min": 0.016546398189778436,
+         "max": 0.016546398189778436
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.07647183290623771,
+         "median": 0.07773359800971197,
+         "sd": 0.002984077356548267,
+         "min": 0.07059313465933784,
+         "max": 0.07917302798510718
+        }
+       },
+       "standard": {
+        "mean_C": 0.09301823109601615,
+        "mean_F": 0.016546398189778436,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.07647183290623771,
+         "interval": {
+          "lower": 0.0648575115749288,
+          "upper": 0.0892612508277647
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.006225279402730035,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.8221166109609335,
+         "interval": {
+          "lower": 0.788494615424996,
+          "upper": 0.8497739780906026
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.015709418071325334,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.0648575115749288,
+          "upper": 0.0892612508277647
+         },
+         "mean_D": 0.07647183290623771,
+         "mean_C": 0.09301823109601615,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.09292358954721387,
+        "E_F": 0.016546398189778443,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.07637719135743543,
+         "interval": {
+          "lower": 0.0647567672329924,
+          "upper": 0.0891604567329004
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0062353404520545394,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.8219354388869005,
+         "interval": {
+          "lower": 0.78824432064576,
+          "upper": 0.8497068867470573
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.015758978821141613,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.0647567672329924,
+          "upper": 0.0891604567329004
+         },
+         "mean_D": 0.07637719135743543,
+         "mean_C": 0.09292358954721387,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      }
+     }
+    },
+    "shipped-s503-n640/tfi": {
+     "key": "shipped-s503-n640",
+     "dataset_seed": 503,
+     "family": "tfi",
+     "rungs": {
+      "R0": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 4.8752966264803505e-05,
+         "median": 4.87529662648035e-05,
+         "sd": 6.952299739086386e-21,
+         "min": 4.87529662648035e-05,
+         "max": 4.87529662648035e-05
+        },
+        "F": {
+         "n": 20,
+         "mean": 2.8638949630091677e-06,
+         "median": 2.8638949630091677e-06,
+         "sd": 0.0,
+         "min": 2.8638949630091677e-06,
+         "max": 2.8638949630091677e-06
+        },
+        "D": {
+         "n": 20,
+         "mean": 4.588907130179434e-05,
+         "median": 4.588907130179433e-05,
+         "sd": 6.952299739086386e-21,
+         "min": 4.588907130179433e-05,
+         "max": 4.588907130179433e-05
+        }
+       },
+       "standard": {
+        "mean_C": 4.8752966264803505e-05,
+        "mean_F": 2.8638949630091677e-06,
+        "mean_D": {
+         "status": "estimated",
+         "point": 4.588907130179434e-05,
+         "interval": {
+          "lower": 4.0624463960989374e-05,
+          "upper": 5.140903877236517e-05
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 2.7475983160733217e-06,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9412570109590087,
+         "interval": {
+          "lower": 0.934376205330396,
+          "upper": 0.9472656764639568
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0033092223530400886,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 4.0624463960989374e-05,
+          "upper": 5.140903877236517e-05
+         },
+         "mean_D": 4.588907130179434e-05,
+         "mean_C": 4.8752966264803505e-05,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 4.875296626479999e-05,
+        "E_F": 2.863894963002229e-06,
+        "D_ens": {
+         "status": "estimated",
+         "point": 4.588907130179776e-05,
+         "interval": {
+          "lower": 4.062446396099134e-05,
+          "upper": 5.140903877237985e-05
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 2.7475983160736893e-06,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9412570109591468,
+         "interval": {
+          "lower": 0.9343762053300989,
+          "upper": 0.9472656764640275
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0033092223530419374,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 4.062446396099134e-05,
+          "upper": 5.140903877237985e-05
+         },
+         "mean_D": 4.588907130179776e-05,
+         "mean_C": 4.875296626479999e-05,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N1": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.005564445140590537,
+         "median": 0.005564445140590536,
+         "sd": 8.898943666030574e-19,
+         "min": 0.005564445140590536,
+         "max": 0.005564445140590536
+        },
+        "F": {
+         "n": 20,
+         "mean": 9.0400803240876e-05,
+         "median": 9.040080324087601e-05,
+         "sd": 1.390459947817277e-20,
+         "min": 9.040080324087601e-05,
+         "max": 9.040080324087601e-05
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.00547404433734966,
+         "median": 0.00547404433734966,
+         "sd": 0.0,
+         "min": 0.00547404433734966,
+         "max": 0.00547404433734966
+        }
+       },
+       "standard": {
+        "mean_C": 0.005564445140590537,
+        "mean_F": 9.0400803240876e-05,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.00547404433734966,
+         "interval": {
+          "lower": 0.004833813527947752,
+          "upper": 0.0061478844705519795
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.00033638957351979495,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9837538512903224,
+         "interval": {
+          "lower": 0.9802173860839091,
+          "upper": 0.9867213000223626
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.001667394201816991,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.004833813527947752,
+          "upper": 0.0061478844705519795
+         },
+         "mean_D": 0.00547404433734966,
+         "mean_C": 0.005564445140590537,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.005564445140590533,
+        "E_F": 9.040080324087445e-05,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.005474044337349658,
+         "interval": {
+          "lower": 0.0048338135279477525,
+          "upper": 0.006147884470551975
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0003363895735197951,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9837538512903227,
+         "interval": {
+          "lower": 0.9802173860839096,
+          "upper": 0.9867213000223618
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0016673942018170136,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.0048338135279477525,
+          "upper": 0.006147884470551975
+         },
+         "mean_D": 0.005474044337349658,
+         "mean_C": 0.005564445140590533,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N2": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.016595354660867912,
+         "median": 0.01659535466086791,
+         "sd": 3.5595774664122295e-18,
+         "min": 0.01659535466086791,
+         "max": 0.01659535466086791
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.00026480989307221554,
+         "median": 0.00026480989307221554,
+         "sd": 0.0,
+         "min": 0.00026480989307221554,
+         "max": 0.00026480989307221554
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.016330544767795697,
+         "median": 0.016330544767795694,
+         "sd": 3.5595774664122295e-18,
+         "min": 0.016330544767795694,
+         "max": 0.016330544767795694
+        }
+       },
+       "standard": {
+        "mean_C": 0.016595354660867912,
+        "mean_F": 0.00026480989307221554,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.016330544767795697,
+         "interval": {
+          "lower": 0.014387037964002106,
+          "upper": 0.01835868426423378
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.001014307094075265,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9840431314374594,
+         "interval": {
+          "lower": 0.9805495854810785,
+          "upper": 0.9869618693010698
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0016462131229608443,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.014387037964002106,
+          "upper": 0.01835868426423378
+         },
+         "mean_D": 0.016330544767795697,
+         "mean_C": 0.016595354660867912,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.01659535466086791,
+        "E_F": 0.0002648098930722151,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.016330544767795694,
+         "interval": {
+          "lower": 0.01438703796400211,
+          "upper": 0.018358684264233784
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0010143070940752648,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9840431314374594,
+         "interval": {
+          "lower": 0.9805495854810786,
+          "upper": 0.9869618693010698
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0016462131229608597,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.01438703796400211,
+          "upper": 0.018358684264233784
+         },
+         "mean_D": 0.016330544767795694,
+         "mean_C": 0.01659535466086791,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "R5": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.21004147641330775,
+         "median": 0.21051736494165246,
+         "sd": 0.0010322930966898728,
+         "min": 0.20814407520476447,
+         "max": 0.21212256630218237
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.003987237335480541,
+         "median": 0.003987237335480542,
+         "sd": 8.898943666030574e-19,
+         "min": 0.003987237335480542,
+         "max": 0.003987237335480542
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.2060542390778272,
+         "median": 0.20653012760617195,
+         "sd": 0.0010322930966898728,
+         "min": 0.20415683786928393,
+         "max": 0.20813532896670184
+        }
+       },
+       "standard": {
+        "mean_C": 0.21004147641330775,
+        "mean_F": 0.003987237335480541,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.2060542390778272,
+         "interval": {
+          "lower": 0.1876664030336148,
+          "upper": 0.22498891328371864
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.009514252223073302,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9810169048343828,
+         "interval": {
+          "lower": 0.9776531342160366,
+          "upper": 0.9838139494316296
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0015766602466923347,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.1876664030336148,
+          "upper": 0.22498891328371864
+         },
+         "mean_D": 0.2060542390778272,
+         "mean_C": 0.21004147641330775,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.20998858054418917,
+        "E_F": 0.003987237335480541,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.20600134320870864,
+         "interval": {
+          "lower": 0.18759874222780426,
+          "upper": 0.22492305010588423
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.00952015883237165,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9810121230157014,
+         "interval": {
+          "lower": 0.9776476714632116,
+          "upper": 0.9838121429368352
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0015772274203139326,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.18759874222780426,
+          "upper": 0.22492305010588423
+         },
+         "mean_D": 0.20600134320870864,
+         "mean_C": 0.20998858054418917,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      }
+     }
+    },
+    "shipped-s503-n640/heisenberg": {
+     "key": "shipped-s503-n640",
+     "dataset_seed": 503,
+     "family": "heisenberg",
+     "rungs": {
+      "R0": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.00025145797862251095,
+         "median": 0.0002514579786225109,
+         "sd": 5.561839791269109e-20,
+         "min": 0.0002514579786225109,
+         "max": 0.0002514579786225109
+        },
+        "F": {
+         "n": 20,
+         "mean": 1.892841205625735e-05,
+         "median": 1.8928412056257346e-05,
+         "sd": 3.476149869543193e-21,
+         "min": 1.8928412056257346e-05,
+         "max": 1.8928412056257346e-05
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.00023252956656625358,
+         "median": 0.00023252956656625356,
+         "sd": 2.780919895634554e-20,
+         "min": 0.00023252956656625356,
+         "max": 0.00023252956656625356
+        }
+       },
+       "standard": {
+        "mean_C": 0.00025145797862251095,
+        "mean_F": 1.892841205625735e-05,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.00023252956656625358,
+         "interval": {
+          "lower": 0.0002012313436624702,
+          "upper": 0.000265279221133594
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 1.6556558573191348e-05,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9247253471138702,
+         "interval": {
+          "lower": 0.9154140076229468,
+          "upper": 0.9328632931675098
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.004499639813626581,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.0002012313436624702,
+          "upper": 0.000265279221133594
+         },
+         "mean_D": 0.00023252956656625358,
+         "mean_C": 0.00025145797862251095,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.00025145797862251865,
+        "E_F": 1.8928412056272613e-05,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.00023252956656624605,
+         "interval": {
+          "lower": 0.0002012313436624709,
+          "upper": 0.0002652792211336069
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 1.655655857319188e-05,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9247253471138119,
+         "interval": {
+          "lower": 0.9154140076229543,
+          "upper": 0.9328632931675185
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.004499639813628778,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.0002012313436624709,
+          "upper": 0.0002652792211336069
+         },
+         "mean_D": 0.00023252956656624605,
+         "mean_C": 0.00025145797862251865,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N1": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.004642006986578314,
+         "median": 0.0046420069865783144,
+         "sd": 8.898943666030574e-19,
+         "min": 0.0046420069865783144,
+         "max": 0.0046420069865783144
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0008327662184567201,
+         "median": 0.0008327662184567201,
+         "sd": 0.0,
+         "min": 0.0008327662184567201,
+         "max": 0.0008327662184567201
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.003809240768121595,
+         "median": 0.0038092407681215943,
+         "sd": 8.898943666030574e-19,
+         "min": 0.0038092407681215943,
+         "max": 0.0038092407681215943
+        }
+       },
+       "standard": {
+        "mean_C": 0.004642006986578314,
+        "mean_F": 0.0008327662184567201,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.003809240768121595,
+         "interval": {
+          "lower": 0.003073936232278277,
+          "upper": 0.004581184057422903
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.000385643299414498,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.8206021186817382,
+         "interval": {
+          "lower": 0.7826063881805198,
+          "upper": 0.8497434987541632
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.01712208216012294,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.003073936232278277,
+          "upper": 0.004581184057422903
+         },
+         "mean_D": 0.003809240768121595,
+         "mean_C": 0.004642006986578314,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.004642006986578327,
+        "E_F": 0.0008327662184567097,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.003809240768121617,
+         "interval": {
+          "lower": 0.003073936232278285,
+          "upper": 0.00458118405742291
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0003856432994144977,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.8206021186817406,
+         "interval": {
+          "lower": 0.7826063881805231,
+          "upper": 0.8497434987541639
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.01712208216012282,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.003073936232278285,
+          "upper": 0.00458118405742291
+         },
+         "mean_D": 0.003809240768121617,
+         "mean_C": 0.004642006986578327,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N2": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.013883876922751162,
+         "median": 0.01388387692275116,
+         "sd": 1.7797887332061147e-18,
+         "min": 0.01388387692275116,
+         "max": 0.01388387692275116
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.002422359474120642,
+         "median": 0.0024223594741206414,
+         "sd": 4.449471833015287e-19,
+         "min": 0.0024223594741206414,
+         "max": 0.0024223594741206414
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.01146151744863052,
+         "median": 0.011461517448630519,
+         "sd": 1.7797887332061147e-18,
+         "min": 0.011461517448630519,
+         "max": 0.011461517448630519
+        }
+       },
+       "standard": {
+        "mean_C": 0.013883876922751162,
+        "mean_F": 0.002422359474120642,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.01146151744863052,
+         "interval": {
+          "lower": 0.009274297489697969,
+          "upper": 0.013748158780849735
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0011362573898864585,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.8255271573207926,
+         "interval": {
+          "lower": 0.789056029926646,
+          "upper": 0.8536467698731948
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.016535645863854136,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.009274297489697969,
+          "upper": 0.013748158780849735
+         },
+         "mean_D": 0.01146151744863052,
+         "mean_C": 0.013883876922751162,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.013883876922751146,
+        "E_F": 0.002422359474120639,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.011461517448630507,
+         "interval": {
+          "lower": 0.009274297489697941,
+          "upper": 0.01374815878084973
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0011362573898864587,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.8255271573207926,
+         "interval": {
+          "lower": 0.7890560299266458,
+          "upper": 0.8536467698731947
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.016535645863854184,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.009274297489697941,
+          "upper": 0.01374815878084973
+         },
+         "mean_D": 0.011461517448630507,
+         "mean_C": 0.013883876922751146,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "R5": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.09460066904098903,
+         "median": 0.09579614174938586,
+         "sd": 0.0023499815212750796,
+         "min": 0.08644437381009196,
+         "max": 0.09601924933786454
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0186997751906165,
+         "median": 0.0186997751906165,
+         "sd": 0.0,
+         "min": 0.0186997751906165,
+         "max": 0.0186997751906165
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.07590089385037255,
+         "median": 0.07709636655876936,
+         "sd": 0.0023499815212750796,
+         "min": 0.06774459861947546,
+         "max": 0.07731947414724805
+        }
+       },
+       "standard": {
+        "mean_C": 0.09460066904098903,
+        "mean_F": 0.0186997751906165,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.07590089385037255,
+         "interval": {
+          "lower": 0.06485829336914348,
+          "upper": 0.08801854902228386
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.005934348309668434,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.8023293558049346,
+         "interval": {
+          "lower": 0.7692584915074923,
+          "upper": 0.8309193823699452
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.015551444765269791,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.06485829336914348,
+          "upper": 0.08801854902228386
+         },
+         "mean_D": 0.07590089385037255,
+         "mean_C": 0.09460066904098903,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.09446504056666316,
+        "E_F": 0.01869977519061651,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.07576526537604665,
+         "interval": {
+          "lower": 0.06468493977240783,
+          "upper": 0.08794977452899934
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.005957481324681944,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.8020455495658181,
+         "interval": {
+          "lower": 0.7688135418949666,
+          "upper": 0.8308118907413252
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.015633834480269528,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.06468493977240783,
+          "upper": 0.08794977452899934
+         },
+         "mean_D": 0.07576526537604665,
+         "mean_C": 0.09446504056666316,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      }
+     }
+    },
+    "shipped-s607-n640/tfi": {
+     "key": "shipped-s607-n640",
+     "dataset_seed": 607,
+     "family": "tfi",
+     "rungs": {
+      "R0": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 4.640198541841933e-05,
+         "median": 4.640198541841932e-05,
+         "sd": 6.952299739086386e-21,
+         "min": 4.640198541841932e-05,
+         "max": 4.640198541841932e-05
+        },
+        "F": {
+         "n": 20,
+         "mean": 3.0170976510869275e-06,
+         "median": 3.017097651086928e-06,
+         "sd": 4.345187336928991e-22,
+         "min": 3.017097651086928e-06,
+         "max": 3.017097651086928e-06
+        },
+        "D": {
+         "n": 20,
+         "mean": 4.338488776733239e-05,
+         "median": 4.3384887767332395e-05,
+         "sd": 6.952299739086386e-21,
+         "min": 4.3384887767332395e-05,
+         "max": 4.3384887767332395e-05
+        }
+       },
+       "standard": {
+        "mean_C": 4.640198541841933e-05,
+        "mean_F": 3.0170976510869275e-06,
+        "mean_D": {
+         "status": "estimated",
+         "point": 4.338488776733239e-05,
+         "interval": {
+          "lower": 3.7116618865988805e-05,
+          "upper": 5.075236190474139e-05
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 3.483321884937709e-06,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9349791259171144,
+         "interval": {
+          "lower": 0.9262816288756583,
+          "upper": 0.943019975336955
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0042442821759654395,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 3.7116618865988805e-05,
+          "upper": 5.075236190474139e-05
+         },
+         "mean_D": 4.338488776733239e-05,
+         "mean_C": 4.640198541841933e-05,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 4.640198541842521e-05,
+        "E_F": 3.0170976510855185e-06,
+        "D_ens": {
+         "status": "estimated",
+         "point": 4.338488776733969e-05,
+         "interval": {
+          "lower": 3.7116618865992606e-05,
+          "upper": 5.0752361904743266e-05
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 3.483321884937851e-06,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9349791259171533,
+         "interval": {
+          "lower": 0.9262816288758451,
+          "upper": 0.9430199753371067
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.004244282175973476,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 3.7116618865992606e-05,
+          "upper": 5.0752361904743266e-05
+         },
+         "mean_D": 4.338488776733969e-05,
+         "mean_C": 4.640198541842521e-05,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N1": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.0064440406740684615,
+         "median": 0.006444040674068461,
+         "sd": 8.898943666030574e-19,
+         "min": 0.006444040674068461,
+         "max": 0.006444040674068461
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0001098032021538492,
+         "median": 0.00010980320215384922,
+         "sd": 2.780919895634554e-20,
+         "min": 0.00010980320215384922,
+         "max": 0.00010980320215384922
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.006334237471914611,
+         "median": 0.006334237471914611,
+         "sd": 0.0,
+         "min": 0.006334237471914611,
+         "max": 0.006334237471914611
+        }
+       },
+       "standard": {
+        "mean_C": 0.0064440406740684615,
+        "mean_F": 0.0001098032021538492,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.006334237471914611,
+         "interval": {
+          "lower": 0.005615399610639439,
+          "upper": 0.00705278840926297
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.00036387938389322597,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9829605044866165,
+         "interval": {
+          "lower": 0.9794057336106887,
+          "upper": 0.9860088611866832
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0016897850205569462,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.005615399610639439,
+          "upper": 0.00705278840926297
+         },
+         "mean_D": 0.006334237471914611,
+         "mean_C": 0.0064440406740684615,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.006444040674068476,
+        "E_F": 0.00010980320215384613,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.00633423747191463,
+         "interval": {
+          "lower": 0.005615399610639438,
+          "upper": 0.007052788409262963
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.00036387938389322537,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9829605044866172,
+         "interval": {
+          "lower": 0.9794057336106875,
+          "upper": 0.9860088611866831
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0016897850205569262,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.005615399610639438,
+          "upper": 0.007052788409262963
+         },
+         "mean_D": 0.00633423747191463,
+         "mean_C": 0.006444040674068476,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N2": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.018912069828040116,
+         "median": 0.018912069828040116,
+         "sd": 0.0,
+         "min": 0.018912069828040116,
+         "max": 0.018912069828040116
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0003114842043265001,
+         "median": 0.0003114842043265001,
+         "sd": 0.0,
+         "min": 0.0003114842043265001,
+         "max": 0.0003114842043265001
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.01860058562371362,
+         "median": 0.018600585623713615,
+         "sd": 3.5595774664122295e-18,
+         "min": 0.018600585623713615,
+         "max": 0.018600585623713615
+        }
+       },
+       "standard": {
+        "mean_C": 0.018912069828040116,
+        "mean_F": 0.0003114842043265001,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.01860058562371362,
+         "interval": {
+          "lower": 0.01645803917358711,
+          "upper": 0.020769331212641913
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0010937539632266979,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9835298723429694,
+         "interval": {
+          "lower": 0.9801766123923615,
+          "upper": 0.9863854209849704
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0015801442884568757,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.01645803917358711,
+          "upper": 0.020769331212641913
+         },
+         "mean_D": 0.01860058562371362,
+         "mean_C": 0.018912069828040116,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.018912069828040123,
+        "E_F": 0.0003114842043265073,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.018600585623713615,
+         "interval": {
+          "lower": 0.016458039173587104,
+          "upper": 0.02076933121264191
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0010937539632266979,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9835298723429688,
+         "interval": {
+          "lower": 0.9801766123923613,
+          "upper": 0.9863854209849702
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0015801442884568594,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.016458039173587104,
+          "upper": 0.02076933121264191
+         },
+         "mean_D": 0.018600585623713615,
+         "mean_C": 0.018912069828040123,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "R5": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.20173712085542905,
+         "median": 0.20170591060638607,
+         "sd": 0.0002338321301311576,
+         "min": 0.20145357658760366,
+         "max": 0.20238633510066084
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0049342098352793415,
+         "median": 0.0049342098352793415,
+         "sd": 0.0,
+         "min": 0.0049342098352793415,
+         "max": 0.0049342098352793415
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.19680291102014968,
+         "median": 0.19677170077110673,
+         "sd": 0.00023383213013115762,
+         "min": 0.19651936675232431,
+         "max": 0.1974521252653815
+        }
+       },
+       "standard": {
+        "mean_C": 0.20173712085542905,
+        "mean_F": 0.0049342098352793415,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.19680291102014968,
+         "interval": {
+          "lower": 0.17775965199476113,
+          "upper": 0.21635788316311155
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.009822750796404595,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9755413886430184,
+         "interval": {
+          "lower": 0.9712270449108067,
+          "upper": 0.9792002729579791
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0020287232742863667,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.17775965199476113,
+          "upper": 0.21635788316311155
+         },
+         "mean_D": 0.19680291102014968,
+         "mean_C": 0.20173712085542905,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.20167734333775533,
+        "E_F": 0.004934209835279355,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.19674313350247596,
+         "interval": {
+          "lower": 0.17771019490532924,
+          "upper": 0.21631633719313603
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.009828796238761619,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9755341390677886,
+         "interval": {
+          "lower": 0.9712179921307703,
+          "upper": 0.9791969181633734
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.002029737229636224,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.17771019490532924,
+          "upper": 0.21631633719313603
+         },
+         "mean_D": 0.19674313350247596,
+         "mean_C": 0.20167734333775533,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      }
+     }
+    },
+    "shipped-s607-n640/heisenberg": {
+     "key": "shipped-s607-n640",
+     "dataset_seed": 607,
+     "family": "heisenberg",
+     "rungs": {
+      "R0": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.0003067897301322865,
+         "median": 0.0003067897301322866,
+         "sd": 5.561839791269109e-20,
+         "min": 0.0003067897301322866,
+         "max": 0.0003067897301322866
+        },
+        "F": {
+         "n": 20,
+         "mean": 1.843469867991417e-05,
+         "median": 1.843469867991417e-05,
+         "sd": 0.0,
+         "min": 1.843469867991417e-05,
+         "max": 1.843469867991417e-05
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.0002883550314523724,
+         "median": 0.0002883550314523724,
+         "sd": 0.0,
+         "min": 0.0002883550314523724,
+         "max": 0.0002883550314523724
+        }
+       },
+       "standard": {
+        "mean_C": 0.0003067897301322865,
+        "mean_F": 1.843469867991417e-05,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.0002883550314523724,
+         "interval": {
+          "lower": 0.000255732842337956,
+          "upper": 0.0003235058546155517
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 1.7458142687389368e-05,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.9399109654942975,
+         "interval": {
+          "lower": 0.9316229165872759,
+          "upper": 0.9472159942909703
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.003966025592959785,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.000255732842337956,
+          "upper": 0.0003235058546155517
+         },
+         "mean_D": 0.0002883550314523724,
+         "mean_C": 0.0003067897301322865,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.0003067897301322964,
+        "E_F": 1.843469867991131e-05,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.0002883550314523851,
+         "interval": {
+          "lower": 0.0002557328423379615,
+          "upper": 0.0003235058546155684
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 1.745814268738923e-05,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.9399109654943086,
+         "interval": {
+          "lower": 0.9316229165872826,
+          "upper": 0.9472159942909829
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.003966025592959918,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.0002557328423379615,
+          "upper": 0.0003235058546155684
+         },
+         "mean_D": 0.0002883550314523851,
+         "mean_C": 0.0003067897301322964,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N1": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.0051746885885415265,
+         "median": 0.005174688588541525,
+         "sd": 1.7797887332061147e-18,
+         "min": 0.005174688588541525,
+         "max": 0.005174688588541525
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.0007497750739943974,
+         "median": 0.0007497750739943975,
+         "sd": 1.1123679582538217e-19,
+         "min": 0.0007497750739943975,
+         "max": 0.0007497750739943975
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.004424913514547128,
+         "median": 0.004424913514547127,
+         "sd": 8.898943666030574e-19,
+         "min": 0.004424913514547127,
+         "max": 0.004424913514547127
+        }
+       },
+       "standard": {
+        "mean_C": 0.0051746885885415265,
+        "mean_F": 0.0007497750739943974,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.004424913514547128,
+         "interval": {
+          "lower": 0.003679304935377524,
+          "upper": 0.005222339543017162
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0003983182576056736,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.855107208643502,
+         "interval": {
+          "lower": 0.8278983535116973,
+          "upper": 0.8770346700356314
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.012625413102762913,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.003679304935377524,
+          "upper": 0.005222339543017162
+         },
+         "mean_D": 0.004424913514547128,
+         "mean_C": 0.0051746885885415265,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.0051746885885415195,
+        "E_F": 0.0007497750739944075,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.004424913514547112,
+         "interval": {
+          "lower": 0.0036793049353775202,
+          "upper": 0.00522233954301715
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0003983182576056739,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.8551072086435001,
+         "interval": {
+          "lower": 0.8278983535116955,
+          "upper": 0.87703467003563
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.012625413102762925,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.0036793049353775202,
+          "upper": 0.00522233954301715
+         },
+         "mean_D": 0.004424913514547112,
+         "mean_C": 0.0051746885885415195,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "N2": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.015458958765389445,
+         "median": 0.015458958765389445,
+         "sd": 0.0,
+         "min": 0.015458958765389445,
+         "max": 0.015458958765389445
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.002195802699104149,
+         "median": 0.0021958026991041497,
+         "sd": 8.898943666030574e-19,
+         "min": 0.0021958026991041497,
+         "max": 0.0021958026991041497
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.013263156066285298,
+         "median": 0.013263156066285295,
+         "sd": 3.5595774664122295e-18,
+         "min": 0.013263156066285295,
+         "max": 0.013263156066285295
+        }
+       },
+       "standard": {
+        "mean_C": 0.015458958765389445,
+        "mean_F": 0.002195802699104149,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.013263156066285298,
+         "interval": {
+          "lower": 0.011037437837204402,
+          "upper": 0.015683123067980486
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0011969487064167953,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.857959211067937,
+         "interval": {
+          "lower": 0.8301760490206309,
+          "upper": 0.8801782873741061
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.012736405469236173,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.011037437837204402,
+          "upper": 0.015683123067980486
+         },
+         "mean_D": 0.013263156066285298,
+         "mean_C": 0.015458958765389445,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.015458958765389438,
+        "E_F": 0.0021958026991041575,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.013263156066285281,
+         "interval": {
+          "lower": 0.011037437837204397,
+          "upper": 0.015683123067980483
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.0011969487064167946,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.8579592110679364,
+         "interval": {
+          "lower": 0.830176049020631,
+          "upper": 0.8801782873741055
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.012736405469236135,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.011037437837204397,
+          "upper": 0.015683123067980483
+         },
+         "mean_D": 0.013263156066285281,
+         "mean_C": 0.015458958765389438,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      },
+      "R5": {
+       "spread": {
+        "C": {
+         "n": 20,
+         "mean": 0.09205386053994356,
+         "median": 0.09301737979378213,
+         "sd": 0.00166453717644204,
+         "min": 0.08767124942748726,
+         "max": 0.0937746766384285
+        },
+        "F": {
+         "n": 20,
+         "mean": 0.016494355085248887,
+         "median": 0.016494355085248887,
+         "sd": 0.0,
+         "min": 0.016494355085248887,
+         "max": 0.016494355085248887
+        },
+        "D": {
+         "n": 20,
+         "mean": 0.07555950545469467,
+         "median": 0.07652302470853324,
+         "sd": 0.001664537176442042,
+         "min": 0.07117689434223837,
+         "max": 0.07728032155317963
+        }
+       },
+       "standard": {
+        "mean_C": 0.09205386053994356,
+        "mean_F": 0.016494355085248887,
+        "mean_D": {
+         "status": "estimated",
+         "point": 0.07555950545469467,
+         "interval": {
+          "lower": 0.06433049840687922,
+          "upper": 0.08751901379580103
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.005957232297753237,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_over_C": {
+         "status": "estimated",
+         "point": 0.8208184318560791,
+         "interval": {
+          "lower": 0.7882922611432182,
+          "upper": 0.8474285092596457
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.015136137369904974,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.06433049840687922,
+          "upper": 0.08751901379580103
+         },
+         "mean_D": 0.07555950545469467,
+         "mean_C": 0.09205386053994356,
+         "label": "measurement_adds"
+        }
+       },
+       "ensemble": {
+        "E_C": 0.09197128132278615,
+        "E_F": 0.016494355085248873,
+        "D_ens": {
+         "status": "estimated",
+         "point": 0.07547692623753727,
+         "interval": {
+          "lower": 0.06421525854137052,
+          "upper": 0.08746689538662325
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.005966189762171112,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "D_ens_over_E_C": {
+         "status": "estimated",
+         "point": 0.8206575482257378,
+         "interval": {
+          "lower": 0.7880382302579723,
+          "upper": 0.8473815176829553
+         },
+         "excludes_zero_above": true,
+         "excludes_zero_below": false,
+         "draw_sd": 0.015175731108471993,
+         "n_seeds": 20,
+         "learner_seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+         ]
+        },
+        "classification": {
+         "status": "estimated",
+         "interval_D": {
+          "lower": 0.06421525854137052,
+          "upper": 0.08746689538662325
+         },
+         "mean_D": 0.07547692623753727,
+         "mean_C": 0.09197128132278615,
+         "label": "measurement_adds"
+        }
+       },
+       "sign_flip": false
+      }
+     }
+    }
+   }
+  }
+ },
+ "summary": {
+  "n_cells_analyzed": 24,
+  "n_sign_flips": 0,
+  "sign_flip_cells": []
+ },
+ "pooled_R0": {
+  "rows": [
+   "shipped-s401-n640/tfi",
+   "shipped-s401-n640/heisenberg",
+   "shipped-s503-n640/tfi",
+   "shipped-s503-n640/heisenberg",
+   "shipped-s607-n640/tfi",
+   "shipped-s607-n640/heisenberg"
+  ],
+  "standard": {
+   "pooled_D": {
+    "status": "estimated",
+    "point": 0.00015191980040246068,
+    "interval": {
+     "lower": 0.00014140791095174567,
+     "upper": 0.0001627812735191449
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 5.49700522843113e-06,
+    "n_seeds": 20
+   },
+   "pooled_D_over_C": {
+    "status": "estimated",
+    "point": 0.9313389341654661,
+    "interval": {
+     "lower": 0.926745035812557,
+     "upper": 0.935604388233762
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.0022750783180550235,
+    "n_seeds": 20
+   },
+   "classification": {
+    "status": "estimated",
+    "interval_D": {
+     "lower": 0.00014140791095174567,
+     "upper": 0.0001627812735191449
+    },
+    "mean_D": 0.00015191980040246068,
+    "mean_C": 0.00016311977823475155,
+    "label": "measurement_adds"
+   }
+  },
+  "ensemble": {
+   "pooled_D_ens": {
+    "status": "estimated",
+    "point": 0.0001519198004024648,
+    "interval": {
+     "lower": 0.00014140791095174914,
+     "upper": 0.0001627812735191431
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 5.497005228431098e-06,
+    "n_seeds": 20
+   },
+   "pooled_D_ens_over_C": {
+    "status": "estimated",
+    "point": 0.9313389341654691,
+    "interval": {
+     "lower": 0.9267450358125526,
+     "upper": 0.9356043882337792
+    },
+    "excludes_zero_above": true,
+    "excludes_zero_below": false,
+    "draw_sd": 0.002275078318055589,
+    "n_seeds": 20
+   },
+   "classification": {
+    "status": "estimated",
+    "interval_D": {
+     "lower": 0.00014140791095174914,
+     "upper": 0.0001627812735191431
+    },
+    "mean_D": 0.0001519198004024648,
+    "mean_C": 0.0001631197782347554,
+    "label": "measurement_adds"
+   }
+  },
+  "sign_flip": false,
+  "seeding_description": "Single fresh default_rng(seed) at seed 20261002. For each draw b in range(10000), iterates over dataset seeds (101, 211, 307): draws learner seeds once (integers(0, 20, 20)) shared by both family rows (tfi and heisenberg), then draws circuits separately for tfi and heisenberg. The three dataset seeds are drawn independently."
+ },
+ "verification": {
+  "n_checked_against_analysis_a": 24,
+  "max_abs_diff_mean_C": 0.0,
+  "max_abs_diff_mean_F": 0.0,
+  "max_abs_diff_mean_D": 0.0,
+  "tolerance": 1e-12
+ },
+ "elapsed_seconds": 8.796230929030571
+}
