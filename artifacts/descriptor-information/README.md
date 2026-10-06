@@ -296,7 +296,7 @@ New options and tools:
 
 ### Round-8 Results
 
-The three rules and their code were pushed at commit b04f49b before any fresh dataset or governed fit. Outputs are under `round8/`; logs under `round8/logs/` (`run-deltaai.log`, `run-macos-fresh.log`, `run-macos-follow-analyses.log`). Fits and the fresh datasets go to release assets; `round8/fresh/reports/tree-sha256.txt.sha256` identifies the 141,367-file hash list of the fresh trees.
+The three rules and their code were pushed at commit b04f49b before any fresh dataset or governed fit. Outputs are under `round8/`; logs under `round8/logs/` (`run-deltaai.log`, `run-macos-fresh.log`, `run-macos-follow-analyses.log`). Release `confirmation-v1` (tag at 0152dd5) holds the fits and the fresh datasets: `descriptor-information-fresh-v1.tar.xz` (SHA-256 `1bfcdb1c46938013cbb9d743f61c2e441aceb17dbcced5e9d0f6fb9dcb115e15`) and `descriptor-information-crossed-follow-ups-v1.tar.xz` (SHA-256 `e341be45e244f90fa14ae524281f577479e2a6aaaef135894c12cbcb32e615c2`, with part G's 640-circuit reference links stored as files). `round8/fresh/reports/tree-sha256.txt.sha256` identifies the 141,367-file hash list of the fresh trees.
 
 **Fresh-circuit confirmation** (`round8/fresh/fresh-confirmation.json`, scored once). Generation, the determinism check (seed 401 byte-identical), the three checks at every level, and preparation passed on macOS; DeltaAI verified every copied file. The predictions file (SHA-256 271f445f...) was written at 07:56Z before any fit of F or P. Five of eight predictions pass.
 - P1 pass: no R0 cell reads "F beats C" at any of the seven levels (42 cells, original candidates).

@@ -6,7 +6,7 @@ Rule: `docs/frozen-rules/2026-10-04-mlqem-own-data.md` (pushed at commit b04f49b
 - `run-log.jsonl`: the runner's environment record (ml-qem commit b1eccf8, the loaded `blackwater` path, package versions, thread settings, arguments, rule SHA-256), written before encoding.
 - Timing: the record itself carries no timestamp. The file modification times, which the release archive preserves, place it after the push of commit b04f49b to GitHub at 2026-10-05T03:47:32Z (remote-tracking reflog): run log 03:49:40Z, encoded matrices 03:50:43Z to 03:52:18Z, and the 438 fits 03:52:22Z to 03:58:19Z.
 - `encoded/*.json`: the encoded feature matrices' records, with the SHA-256 of every data file read (all match `reanalysis/mlqem/upstream_data_sha256.json`).
-- `release-asset-sha256.txt`: the SHA-256 of `mlqem-own-data-v1.tar.gz`, which holds the 438 fits (predictions and records) and the encoded matrices.
+- `release-asset-sha256.txt`: the SHA-256 of `mlqem-own-data-v1.tar.gz`, which holds the 438 fits (predictions and records) and the encoded matrices. The asset is in release `confirmation-v1`.
 
 Results. The reproduction check passes. On the no-readout test circuits the 20-seed mean random-forest error is 0.015533 against the published 0.015510 (ratio 1.0015; per seed 0.015508 to 0.015572). Reading 1 of the rule therefore applies. Every setting and model reads "F beats C".
 

@@ -135,7 +135,7 @@ Use a new output directory for each split-v2 generation. The console script has 
 
 ## Campaign Archive
 
-QEMScore has two GitHub releases. Tag `campaign-archive-v1` (2026-09-08) ships the frozen controlled campaign reported in the paper as a release asset rather than as package data. Tag `descriptor-information-v1` (2026-10-04, at `431d101`) ships the fits of the descriptor-information experiment and its three follow-ups; see [Descriptor-Information Fits](#descriptor-information-fits) below.
+QEMScore has three GitHub releases. Tag `campaign-archive-v1` (2026-09-08) ships the frozen controlled campaign reported in the paper as a release asset rather than as package data. Tag `descriptor-information-v1` (2026-10-04, at `431d101`) ships the fits of the descriptor-information experiment and its three follow-ups; see [Descriptor-Information Fits](#descriptor-information-fits) below. Tag `confirmation-v1` (2026-10-06, at `0152dd5`) ships the new-seed confirmation, the crossed follow-ups, and the ML-QEM refits; see [Confirmation Fits](#confirmation-fits) below.
 
 ```bash
 curl -L -O https://github.com/yzhao062/QEMScore/releases/download/campaign-archive-v1/campaign-archive-v1.tar.gz
@@ -169,6 +169,16 @@ curl -L -O https://github.com/yzhao062/QEMScore/releases/download/descriptor-inf
 sha256sum descriptor-information-v1.tar.xz
 tar -xJf descriptor-information-v1.tar.xz
 ```
+
+### Confirmation Fits
+
+Release `confirmation-v1` holds the datasets and fits of three rules committed at `b04f49b` before any dataset or fit they govern: [`2026-10-04-fresh-confirmation.md`](docs/frozen-rules/2026-10-04-fresh-confirmation.md), [`2026-10-04-crossed-follow-ups.md`](docs/frozen-rules/2026-10-04-crossed-follow-ups.md), and [`2026-10-04-mlqem-own-data.md`](docs/frozen-rules/2026-10-04-mlqem-own-data.md). The analyses, scores, and logs are in [`artifacts/descriptor-information/round8/`](artifacts/descriptor-information/round8/) and [`artifacts/mlqem-own-data/`](artifacts/mlqem-own-data/). Part G's 640-circuit reference fits are included as files, copied from release `descriptor-information-v1`. The ML-QEM data are not redistributed; `qiskit-community/ml-qem` at commit `b1eccf8` and [`reanalysis/mlqem/upstream_data_sha256.json`](reanalysis/mlqem/upstream_data_sha256.json) identify them.
+
+| Asset | Bytes | SHA-256 | Holds |
+|---|---:|---|---|
+| `descriptor-information-fresh-v1.tar.xz` | 1,309,808,828 | `1bfcdb1c46938013cbb9d743f61c2e441aceb17dbcced5e9d0f6fb9dcb115e15` | New seeds 401, 503, 607: level datasets, caches and cache records, fits of both candidate sets, the predictions file, generation reports with the tree hash list, run log |
+| `descriptor-information-crossed-follow-ups-v1.tar.xz` | 726,032,300 | `e341be45e244f90fa14ae524281f577479e2a6aaaef135894c12cbcb32e615c2` | Parts B, C, D, and G: fits with per-candidate predictions, analyses, run log |
+| `mlqem-own-data-v1.tar.gz` | 43,676,096 | `fc6303e3186523d889b81754a0a09f929d2b91e36496830ec9c328c172a343fc` | ML-QEM refits: 438 fits and the encoded feature matrices |
 
 ## What the Campaign Found
 
