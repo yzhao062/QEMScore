@@ -32,6 +32,31 @@ def _sha256_array(arr: np.ndarray) -> str:
     return hashlib.sha256(arr.tobytes(order="C")).hexdigest()
 
 
+# The oracle was recorded on macOS arm64 with scikit-learn 1.9.1 and numpy
+# 2.2.6. There the defaults must reproduce it bit for bit. Elsewhere (CI runs
+# Linux x86_64 with the lock's scikit-learn 1.9.0) the BLAS and library builds
+# differ in the last bits: on Linux with the CI lock the largest difference is
+# 5.6e-16, so other platforms compare values within a tolerance far above that
+# drift and far below any change to the default fitting path.
+ORACLE_PLATFORM = ("Darwin", "arm64", "1.9.1", "2.2.6")
+
+
+def _on_oracle_platform() -> bool:
+    import platform
+    import sklearn
+
+    return (platform.system(), platform.machine(), sklearn.__version__,
+            np.__version__) == ORACLE_PLATFORM
+
+
+def _assert_matches_oracle(pred: np.ndarray, entry: dict) -> None:
+    if _on_oracle_platform():
+        assert _sha256_array(pred) == entry["sha256"]
+    else:
+        np.testing.assert_allclose(pred, np.asarray(entry["values"], dtype=float),
+                                   rtol=1e-9, atol=1e-12)
+
+
 def _make_synthetic_items(n_train: int = 128, n_val: int = 64, n_features: int = 8, seed: int = 42):
     rng = np.random.default_rng(seed)
 
@@ -93,8 +118,8 @@ def test_defaults_bit_identical_oracle(tmp_path):
     mlp1 = LiaoMLPMitigator(random_state=42).fit(train)
     val_p1 = mlp1.predict(val)
     test_p1 = mlp1.predict(test)
-    assert _sha256_array(val_p1) == oracle["cases"]["mlp_fixed_epochs"]["validation_predictions"]["sha256"]
-    assert _sha256_array(test_p1) == oracle["cases"]["mlp_fixed_epochs"]["test_predictions"]["sha256"]
+    _assert_matches_oracle(val_p1, oracle["cases"]["mlp_fixed_epochs"]["validation_predictions"])
+    _assert_matches_oracle(test_p1, oracle["cases"]["mlp_fixed_epochs"]["test_predictions"])
     assert mlp1.n_iter_ == oracle["cases"]["mlp_fixed_epochs"]["n_iter"]
 
     # Case 2: LiaoMLPMitigator validation_patience
@@ -103,16 +128,16 @@ def test_defaults_bit_identical_oracle(tmp_path):
     ).fit(train, validation_items=val)
     val_p2 = mlp2.predict(val)
     test_p2 = mlp2.predict(test)
-    assert _sha256_array(val_p2) == oracle["cases"]["mlp_validation_patience"]["validation_predictions"]["sha256"]
-    assert _sha256_array(test_p2) == oracle["cases"]["mlp_validation_patience"]["test_predictions"]["sha256"]
+    _assert_matches_oracle(val_p2, oracle["cases"]["mlp_validation_patience"]["validation_predictions"])
+    _assert_matches_oracle(test_p2, oracle["cases"]["mlp_validation_patience"]["test_predictions"])
     assert mlp2.n_iter_ == oracle["cases"]["mlp_validation_patience"]["n_iter"]
 
     # Case 3: LiaoMitigator default (fixed_epochs)
     mit1 = LiaoMitigator(random_state=42).fit(train, val)
     val_p3 = mit1.predict(val)
     test_p3 = mit1.predict(test)
-    assert _sha256_array(val_p3) == oracle["cases"]["mitigator_fixed_epochs"]["validation_predictions"]["sha256"]
-    assert _sha256_array(test_p3) == oracle["cases"]["mitigator_fixed_epochs"]["test_predictions"]["sha256"]
+    _assert_matches_oracle(val_p3, oracle["cases"]["mitigator_fixed_epochs"]["validation_predictions"])
+    _assert_matches_oracle(test_p3, oracle["cases"]["mitigator_fixed_epochs"]["test_predictions"])
     assert mit1.selected_model_name_ == oracle["cases"]["mitigator_fixed_epochs"]["selected_model"]
 
     # Case 4: LiaoMitigator validation_patience
@@ -121,16 +146,16 @@ def test_defaults_bit_identical_oracle(tmp_path):
     ).fit(train, val)
     val_p4 = mit2.predict(val)
     test_p4 = mit2.predict(test)
-    assert _sha256_array(val_p4) == oracle["cases"]["mitigator_validation_patience"]["validation_predictions"]["sha256"]
-    assert _sha256_array(test_p4) == oracle["cases"]["mitigator_validation_patience"]["test_predictions"]["sha256"]
+    _assert_matches_oracle(val_p4, oracle["cases"]["mitigator_validation_patience"]["validation_predictions"])
+    _assert_matches_oracle(test_p4, oracle["cases"]["mitigator_validation_patience"]["test_predictions"])
     assert mit2.selected_model_name_ == oracle["cases"]["mitigator_validation_patience"]["selected_model"]
 
     # Case 5: LiaoMitigator drop_features (feat-only)
     mit3 = LiaoMitigator(random_state=17, drop_features=("noisy_expectation",)).fit(train, val)
     val_p5 = mit3.predict(val)
     test_p5 = mit3.predict(test)
-    assert _sha256_array(val_p5) == oracle["cases"]["mitigator_drop_features"]["validation_predictions"]["sha256"]
-    assert _sha256_array(test_p5) == oracle["cases"]["mitigator_drop_features"]["test_predictions"]["sha256"]
+    _assert_matches_oracle(val_p5, oracle["cases"]["mitigator_drop_features"]["validation_predictions"])
+    _assert_matches_oracle(test_p5, oracle["cases"]["mitigator_drop_features"]["test_predictions"])
 
 
 # --------------------------------------------------------------------------
