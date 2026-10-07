@@ -1,0 +1,80 @@
+{
+ "schema": "oracle-distinct-cells-v1",
+ "post_hoc": true,
+ "source": "artifacts/descriptor-information/round9/bayes-oracle.json",
+ "source_sha256": "a39cd22ddcf4b81ea9df2e699228ba204cdebe71186083beb1ee93ffe4fdb8ae",
+ "rules": {
+  "all": "every fit set",
+  "fit_identity": "drop derived fit sets (they reuse another set's fits)",
+  "design": "also drop sweep_2048 (a refit of the strength-indicator design)"
+ },
+ "dropped": {
+  "all": [],
+  "fit_identity": [
+   "follow_b_1024_derived",
+   "follow_b_131072_derived",
+   "follow_b_256_derived",
+   "follow_b_32768_derived",
+   "follow_b_8192_derived",
+   "follow_b_exact_derived",
+   "fresh_strong_1024_derived",
+   "fresh_strong_131072_derived",
+   "fresh_strong_2048_derived",
+   "fresh_strong_256_derived",
+   "fresh_strong_32768_derived",
+   "fresh_strong_8192_derived",
+   "fresh_strong_exact_derived"
+  ],
+  "design": [
+   "follow_b_1024_derived",
+   "follow_b_131072_derived",
+   "follow_b_256_derived",
+   "follow_b_32768_derived",
+   "follow_b_8192_derived",
+   "follow_b_exact_derived",
+   "fresh_strong_1024_derived",
+   "fresh_strong_131072_derived",
+   "fresh_strong_2048_derived",
+   "fresh_strong_256_derived",
+   "fresh_strong_32768_derived",
+   "fresh_strong_8192_derived",
+   "fresh_strong_exact_derived",
+   "sweep_2048"
+  ]
+ },
+ "counts": {
+  "all": {
+   "fit_sets": 44,
+   "cells": 696,
+   "detections": 391,
+   "misses": 94,
+   "wrong_signs": 0,
+   "other_no_information": 72,
+   "false_positives": 12,
+   "undetermined": 127,
+   "informative": 485
+  },
+  "fit_identity": {
+   "fit_sets": 31,
+   "cells": 522,
+   "detections": 296,
+   "misses": 71,
+   "wrong_signs": 0,
+   "other_no_information": 54,
+   "false_positives": 12,
+   "undetermined": 89,
+   "informative": 367
+  },
+  "design": {
+   "fit_sets": 30,
+   "cells": 498,
+   "detections": 285,
+   "misses": 66,
+   "wrong_signs": 0,
+   "other_no_information": 48,
+   "false_positives": 12,
+   "undetermined": 87,
+   "informative": 351
+  }
+ }
+}

@@ -135,7 +135,7 @@ Use a new output directory for each split-v2 generation. The console script has 
 
 ## Campaign Archive
 
-QEMScore has three GitHub releases. Tag `campaign-archive-v1` (2026-09-08) ships the frozen controlled campaign reported in the paper as a release asset rather than as package data. Tag `descriptor-information-v1` (2026-10-04, at `431d101`) ships the fits of the descriptor-information experiment and its three follow-ups; see [Descriptor-Information Fits](#descriptor-information-fits) below. Tag `confirmation-v1` (2026-10-06, at `0152dd5`) ships the new-seed confirmation, the crossed follow-ups, and the ML-QEM refits; see [Confirmation Fits](#confirmation-fits) below.
+QEMScore has five GitHub releases. Tag `campaign-archive-v1` (2026-09-08) ships the frozen controlled campaign reported in the paper as a release asset rather than as package data. Tag `descriptor-information-v1` (2026-10-04, at `431d101`) ships the fits of the descriptor-information experiment and its three follow-ups; see [Descriptor-Information Fits](#descriptor-information-fits) below. Tag `confirmation-v1` (2026-10-06, at `0152dd5`) ships the new-seed confirmation, the crossed follow-ups, and the ML-QEM refits; see [Confirmation Fits](#confirmation-fits) below. Tags `exact-labels-oracle-v1` and `shift-transfer-v1` ship the fits and logs of the two rules of 2026-10-06; see [Exact-Label and Shift-Transfer Fits](#exact-label-and-shift-transfer-fits) below.
 
 ```bash
 curl -L -O https://github.com/yzhao062/QEMScore/releases/download/campaign-archive-v1/campaign-archive-v1.tar.gz
@@ -179,6 +179,16 @@ Release `confirmation-v1` holds the datasets and fits of three rules committed a
 | `descriptor-information-fresh-v1.tar.xz` | 1,309,808,828 | `1bfcdb1c46938013cbb9d743f61c2e441aceb17dbcced5e9d0f6fb9dcb115e15` | New seeds 401, 503, 607: level datasets, caches and cache records, fits of both candidate sets, the predictions file, generation reports with the tree hash list, run log |
 | `descriptor-information-crossed-follow-ups-v1.tar.xz` | 726,032,300 | `e341be45e244f90fa14ae524281f577479e2a6aaaef135894c12cbcb32e615c2` | Parts B, C, D, and G: fits with per-candidate predictions, analyses, run log |
 | `mlqem-own-data-v1.tar.gz` | 43,676,096 | `fc6303e3186523d889b81754a0a09f929d2b91e36496830ec9c328c172a343fc` | ML-QEM refits: 438 fits and the encoded feature matrices |
+
+### Exact-Label and Shift-Transfer Fits
+
+Release `exact-labels-oracle-v1` holds the fits and logs of [`2026-10-06-round9-follow-ups.md`](docs/frozen-rules/2026-10-06-round9-follow-ups.md); its labels, oracle, pooling, and field outputs are in the repository ([`artifacts/mlqem-exact/`](artifacts/mlqem-exact/), [`artifacts/mlqem-own-data/round9/`](artifacts/mlqem-own-data/round9/), [`artifacts/descriptor-information/round9/`](artifacts/descriptor-information/round9/)). Release `shift-transfer-v1` holds the fits and logs of [`2026-10-06-shift-transfer.md`](docs/frozen-rules/2026-10-06-shift-transfer.md), which scores the descriptor ladder's fitted models on deeper circuits (S4) and stronger noise (S2); its records are in [`artifacts/descriptor-information/shift-transfer/`](artifacts/descriptor-information/shift-transfer/).
+
+| Asset | Bytes | SHA-256 | Holds |
+|---|---:|---|---|
+| `mlqem-exact-fits-v1.tar.xz` | 32,616,140 | `43e6e78abfa21843530a8ab204c8dbcd39ba14ea49e815ccb4be14de4c2d913d` | ML-QEM refits with exact circuit parameters and on exact labels |
+| `round9-run-logs-v1.tar.xz` | 4,536 | `43d8442145f7129af0939596ec32d597c654a7827e6ef7ff7951040f0f6fe179` | Run logs of the 2026-10-06 follow-ups |
+| `shift-transfer-fits-v1.tar.xz` | 34,755,064 | `29f2a383aaee17c6f0c624adaadf374cb217d9df314192b5f144614fe7be163c` | 960 shift-transfer fits, N3 tables, R4 encoder caches, generation and run logs |
 
 ## What the Campaign Found
 
