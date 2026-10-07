@@ -79,6 +79,7 @@ Three pinned requirement files are provided in `environments/`:
   python scripts/qlear/signflip_qlear.py --input outputs/qlear/field-report.json --out outputs/qlear/qlear-signflip-report.json
   ```
 - **Expected Runtimes**: Scoring & cost derivation: ~12 seconds. Ladder refit: ~25 minutes.
+- **Results under the 2026-10-06 rule** (`outputs/qlear/round9/field-report.json`): the ten O2 fits ran on the original fits' machine (Python 3.10) at commit 82aaaf6; `outputs/qlear/fits/SHA256SUMS-O2` checks them. On every fit, F beats the raw arm R. The ten-fit mean F − R is −0.0738 on hardware and −0.1570 on the simulator. The descriptor control is worse than R (C − R +0.1453 on hardware). O2 is within 0.005 of C on every fit. The order-averaged share of base execution is 0.950 on hardware (range 0.929 to 0.975) and 0.988 on the simulator (0.970 to 0.999).
 
 ### 3.2 QRAFT (Patel et al. 2021)
 
@@ -87,6 +88,7 @@ Three pinned requirement files are provided in `environments/`:
   - `outputs/qraft/qraft-panel-report.json`: Panel R (released predictions) and Panel M (matched retraining over 10 seeds) MAE scores and ratios across 5 IBM machines (`scripts/qraft/score_qraft_panel.py`).
   - `outputs/qraft/qraft-grouped-report.json`: Grouped validation under matched retraining over 10 seeds evaluating three holdout definitions: primary 7-descriptor groups (3,800 groups), circuit-level 6-descriptor groups (1,038 groups), and structure-only 6-descriptor groups (864 groups; `scripts/qraft/score_qraft_grouped.py`). Each definition has two group-bootstrap intervals (10,000 draws, seed 20261002): `bootstrap_per_split` resamples groups independently within each of the ten test sets (`bootstrap` keeps the same values under its earlier name), and `bootstrap_joint` resamples each distinct test group once per draw across all ten splits. The paper reports the joint intervals.
 - **Raw Arm and Contrasts**: `score_qraft_panel.py` supports `--raw` to evaluate unmitigated forward execution baseline arm R (`StateUpProb50`). Contrasts of each learned arm with R are evaluated in Panel R and Panel M with bootstrap intervals. Governed evaluations require `--frozen-rule`.
+- **Results under the 2026-10-06 rule** (`outputs/qraft/round9/qraft-panel-report.json`): R scores 3.2427 in Panel R and 3.4838 in Panel M. The full arm beats it by 0.7960 [0.4259, 1.1496] (Panel R) and 1.3592 [1.2668, 1.4525] (Panel M). The descriptor-only arm is about four times worse than R.
 - **Execution Commands**:
   ```bash
   # Step 1: Score released predictions and matched retraining panel (~15s)

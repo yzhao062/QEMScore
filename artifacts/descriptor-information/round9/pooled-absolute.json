@@ -1,0 +1,5337 @@
+{
+ "schema": "descriptor-information-pooled-absolute-v1",
+ "frozen_rule": "docs/frozen-rules/2026-10-06-round9-follow-ups.md",
+ "rule_file_sha256": "b48d79578c91eff91a68b496c56b5d06ead918471418564c52acdb8cc5d4d536",
+ "script_sha256": "6cdc45c00af23da815ba227c124cd009d4a954a569758f135123369ab8eebb6b",
+ "inputs": {
+  "original_2,048_first": {
+   "path": "artifacts/descriptor-information/strength-indicator/analysis-a.json",
+   "sha256": "67d23dfbfab108620b098e6d0614146a075500367c86cf4c8d3953cf6dc8025d"
+  },
+  "original_2,048_new": {
+   "path": "artifacts/descriptor-information/round8/fresh/orig/2048/analysis-a.json",
+   "sha256": "48aa30f351bba09b86d4cf062dc38e6ce6285118a5c2128dcda618d3dbf258ca"
+  },
+  "strong_2,048_first": {
+   "path": "artifacts/descriptor-information/strong-learners/analysis-a.json",
+   "sha256": "0c1dda863038ab288f53dcc580a160749e0826520334236057abd2c9caa23015"
+  },
+  "strong_2,048_new": {
+   "path": "artifacts/descriptor-information/round8/fresh/strong/2048/analysis-a.json",
+   "sha256": "b76e14fb62e6c15dbe66d773a8110a56e89f8852e22f595234feea686a96f002"
+  },
+  "strong_exact_first": {
+   "path": "artifacts/descriptor-information/round8/follow/B/exact/analysis-a.json",
+   "sha256": "0d02aba5147d3b2d92fdc82fc62cafbb4058ee3bd3edaaba0a653848441ca599"
+  },
+  "strong_exact_new": {
+   "path": "artifacts/descriptor-information/round8/fresh/strong/exact/analysis-a.json",
+   "sha256": "862a943c669c912b8d1acb39517ee08b16eda3387fc2f0214b9c38460dc35176"
+  }
+ },
+ "margins": {
+  "per_seed_rcal_mae": {
+   "tfi": {
+    "101": 0.039173934513350134,
+    "211": 0.0343998280709716,
+    "307": 0.03803400499429985,
+    "401": 0.03447490581073839,
+    "503": 0.037128901958401454,
+    "607": 0.038562893534053025
+   },
+   "heisenberg": {
+    "101": 0.05915091033539977,
+    "211": 0.055794621588908036,
+    "307": 0.0636404657494531,
+    "401": 0.061716514044434734,
+    "503": 0.05788644475215389,
+    "607": 0.056529402919513014
+   }
+  },
+  "mean_rcal_mae": {
+   "tfi": 0.03696241148030241,
+   "heisenberg": 0.0591197265649771
+  },
+  "delta": {
+   "tfi": 0.003696241148030241,
+   "heisenberg": 0.00591197265649771
+  },
+  "shot_noise_scale": {
+   "tfi": 0.019987624632727175,
+   "heisenberg": 0.020359789865449247
+  },
+  "shot_noise_source": {
+   "tfi": "exact",
+   "heisenberg": "exact"
+  }
+ },
+ "absent_rungs": {
+  "original 2,048": {
+   "tfi": [],
+   "heisenberg": []
+  },
+  "strong 2,048": {
+   "tfi": [],
+   "heisenberg": []
+  },
+  "strong exact": {
+   "tfi": [
+    "N3",
+    "N4",
+    "R3-TFI",
+    "R4"
+   ],
+   "heisenberg": [
+    "N3",
+    "N4",
+    "R3-Heis",
+    "R4"
+   ]
+  }
+ },
+ "per_seed_table": [
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": -0.0006513075611404474,
+   "D_draw_sd": 0.0002826563378945631,
+   "D_interval": {
+    "lower": -0.001206489601459127,
+    "upper": -0.0001035774391837677
+   },
+   "C_point": 0.0030222908483639485,
+   "F_point": 0.003673598409504396,
+   "label": "C beats F"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": -0.00042023914565599615,
+   "D_draw_sd": 0.0003181551208336772,
+   "D_interval": {
+    "lower": -0.0010560524761459263,
+    "upper": 0.00020304545029295747
+   },
+   "C_point": 0.002733242029295279,
+   "F_point": 0.0031534811749512753,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": -0.00031674477505012156,
+   "D_draw_sd": 0.00032131039245074036,
+   "D_interval": {
+    "lower": -0.0009370915347204318,
+    "upper": 0.00031391607417129077
+   },
+   "C_point": 0.0024336306371701604,
+   "F_point": 0.002750375412220282,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": -6.394772589112176e-05,
+   "D_draw_sd": 0.00043355171720489715,
+   "D_interval": {
+    "lower": -0.0009148271295921541,
+    "upper": 0.0007823873551111987
+   },
+   "C_point": 0.0033370068973287135,
+   "F_point": 0.0034009546232198345,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.0003131973154645214,
+   "D_draw_sd": 0.0005235113423090952,
+   "D_interval": {
+    "lower": -0.000640601450606813,
+    "upper": 0.001398940377739303
+   },
+   "C_point": 0.0031836642765124103,
+   "F_point": 0.002870466961047889,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": -0.0004572463695013005,
+   "D_draw_sd": 0.00046535359869855124,
+   "D_interval": {
+    "lower": -0.0013396144609721555,
+    "upper": 0.0004949720156257109
+   },
+   "C_point": 0.002604579821781613,
+   "F_point": 0.003061826191282913,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 9.160489878152667e-05,
+   "D_draw_sd": 0.00033820441465536223,
+   "D_interval": {
+    "lower": -0.0006075003013381381,
+    "upper": 0.0007050955656169569
+   },
+   "C_point": 0.008302718023279,
+   "F_point": 0.008211113124497472,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.0001874408644289383,
+   "D_draw_sd": 0.0003766146609339098,
+   "D_interval": {
+    "lower": -0.0005575497763805002,
+    "upper": 0.0009228984810719179
+   },
+   "C_point": 0.00799501647112303,
+   "F_point": 0.007807575606694092,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": -9.40930867997192e-05,
+   "D_draw_sd": 0.0001885224204404343,
+   "D_interval": {
+    "lower": -0.0004734378133194819,
+    "upper": 0.00026377823892494856
+   },
+   "C_point": 0.00810239902734734,
+   "F_point": 0.008196492114147058,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.00013731114478730857,
+   "D_draw_sd": 0.00028285657142344784,
+   "D_interval": {
+    "lower": -0.00043087028520481075,
+    "upper": 0.0006783709385499086
+   },
+   "C_point": 0.008013646869340302,
+   "F_point": 0.007876335724552996,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": -0.00019373652399940186,
+   "D_draw_sd": 0.00022247803991251486,
+   "D_interval": {
+    "lower": -0.0006248505933241688,
+    "upper": 0.0002377560232940658
+   },
+   "C_point": 0.007066337266242187,
+   "F_point": 0.007260073790241588,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": -0.0002365140687479967,
+   "D_draw_sd": 0.0003004923394470551,
+   "D_interval": {
+    "lower": -0.0008562012918166544,
+    "upper": 0.0003263126868735926
+   },
+   "C_point": 0.007993702639323344,
+   "F_point": 0.00823021670807134,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.0034954655798718455,
+   "D_draw_sd": 0.0006662822874491115,
+   "D_interval": {
+    "lower": 0.0022259256090706053,
+    "upper": 0.004806639998316459
+   },
+   "C_point": 0.02031938029309629,
+   "F_point": 0.016823914713224447,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.004309670026092907,
+   "D_draw_sd": 0.0006807875925803147,
+   "D_interval": {
+    "lower": 0.003022767830198568,
+    "upper": 0.005668983184495446
+   },
+   "C_point": 0.02037575508124425,
+   "F_point": 0.016066085055151343,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.004257302090264906,
+   "D_draw_sd": 0.0005962457417439556,
+   "D_interval": {
+    "lower": 0.0030964600704618305,
+    "upper": 0.005437024740882263
+   },
+   "C_point": 0.021849928529185995,
+   "F_point": 0.01759262643892109,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.004870150790818218,
+   "D_draw_sd": 0.0006166239384066511,
+   "D_interval": {
+    "lower": 0.0036302456258961377,
+    "upper": 0.006053156890401875
+   },
+   "C_point": 0.021538609368276444,
+   "F_point": 0.016668458577458224,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.0021993393209405517,
+   "D_draw_sd": 0.0005513962281190227,
+   "D_interval": {
+    "lower": 0.0011205315826771302,
+    "upper": 0.0032810290235966728
+   },
+   "C_point": 0.01772179944050563,
+   "F_point": 0.015522460119565077,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.003227500520919714,
+   "D_draw_sd": 0.0006031609372021181,
+   "D_interval": {
+    "lower": 0.0020538057493593273,
+    "upper": 0.004443902164465876
+   },
+   "C_point": 0.020121990839188815,
+   "F_point": 0.016894490318269107,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.02783278791340944,
+   "D_draw_sd": 0.0032042257328229627,
+   "D_interval": {
+    "lower": 0.021814277484238552,
+    "upper": 0.03432285458211913
+   },
+   "C_point": 0.05961737717647192,
+   "F_point": 0.03178458926306248,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.03060210122156452,
+   "D_draw_sd": 0.003255198901532799,
+   "D_interval": {
+    "lower": 0.024456542012592557,
+    "upper": 0.03711142426226448
+   },
+   "C_point": 0.05872166252070016,
+   "F_point": 0.028119561299135638,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.031187998756413694,
+   "D_draw_sd": 0.0030561380832817577,
+   "D_interval": {
+    "lower": 0.025403021067643562,
+    "upper": 0.0374325330041644
+   },
+   "C_point": 0.0634615049464881,
+   "F_point": 0.032273506190074394,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.03476407624541748,
+   "D_draw_sd": 0.0031516776649082707,
+   "D_interval": {
+    "lower": 0.028597771822392228,
+    "upper": 0.040851289923831406
+   },
+   "C_point": 0.06483650730657187,
+   "F_point": 0.03007243106115439,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.022389463910432908,
+   "D_draw_sd": 0.0028425318134457055,
+   "D_interval": {
+    "lower": 0.017085597161346125,
+    "upper": 0.02821423166807003
+   },
+   "C_point": 0.051562757791286704,
+   "F_point": 0.029173293880853813,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.0319857908795006,
+   "D_draw_sd": 0.0027656391762857172,
+   "D_interval": {
+    "lower": 0.026619221621113423,
+    "upper": 0.03747143132578323
+   },
+   "C_point": 0.06286387987118122,
+   "F_point": 0.030878088991680607,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.10623802639753885,
+   "D_draw_sd": 0.007113704074147406,
+   "D_interval": {
+    "lower": 0.09240127315845532,
+    "upper": 0.12066930898796864
+   },
+   "C_point": 0.14719860338925633,
+   "F_point": 0.0409605769917175,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.10470206354617666,
+   "D_draw_sd": 0.007612870200485644,
+   "D_interval": {
+    "lower": 0.0900089474912128,
+    "upper": 0.12006082239504882
+   },
+   "C_point": 0.14006735545551072,
+   "F_point": 0.03536529190933405,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.0965721360803835,
+   "D_draw_sd": 0.008134996273688699,
+   "D_interval": {
+    "lower": 0.08095925139272822,
+    "upper": 0.11254368594956804
+   },
+   "C_point": 0.1372278923094989,
+   "F_point": 0.0406557562291154,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.11238770438804524,
+   "D_draw_sd": 0.008166257720235395,
+   "D_interval": {
+    "lower": 0.09686507492526782,
+    "upper": 0.12871748064184588
+   },
+   "C_point": 0.14979777695595278,
+   "F_point": 0.037410072567907564,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.09431812217388622,
+   "D_draw_sd": 0.0072344055555512874,
+   "D_interval": {
+    "lower": 0.08052981285869952,
+    "upper": 0.10895999624605857
+   },
+   "C_point": 0.130499682168411,
+   "F_point": 0.03618155999452479,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.10646248142782418,
+   "D_draw_sd": 0.007695897506515887,
+   "D_interval": {
+    "lower": 0.09138927014984756,
+    "upper": 0.12174383022020643
+   },
+   "C_point": 0.1460287533006796,
+   "F_point": 0.03956627187285543,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.17039626938822022,
+   "D_draw_sd": 0.009148286397174544,
+   "D_interval": {
+    "lower": 0.1529267477402473,
+    "upper": 0.18886590413403367
+   },
+   "C_point": 0.20835778386502368,
+   "F_point": 0.03796151447680347,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.1756622691902161,
+   "D_draw_sd": 0.008582911748261873,
+   "D_interval": {
+    "lower": 0.15887565355761699,
+    "upper": 0.19228988669517788
+   },
+   "C_point": 0.2085276185506107,
+   "F_point": 0.03286534936039456,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.1642368725500644,
+   "D_draw_sd": 0.009020151164116676,
+   "D_interval": {
+    "lower": 0.1464781870591012,
+    "upper": 0.18174211629375453
+   },
+   "C_point": 0.20190654151895213,
+   "F_point": 0.03766966896888772,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.15255274918614736,
+   "D_draw_sd": 0.009308478985329027,
+   "D_interval": {
+    "lower": 0.13461208582480044,
+    "upper": 0.17096747121660189
+   },
+   "C_point": 0.18916931307132073,
+   "F_point": 0.03661656388517337,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.17639660977481908,
+   "D_draw_sd": 0.009073684221377457,
+   "D_interval": {
+    "lower": 0.15854468660162635,
+    "upper": 0.19443375912366168
+   },
+   "C_point": 0.2125065178249264,
+   "F_point": 0.03610990805010732,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.15952579733193303,
+   "D_draw_sd": 0.009747382402547945,
+   "D_interval": {
+    "lower": 0.14054757762733397,
+    "upper": 0.17874606655151384
+   },
+   "C_point": 0.19717741417916257,
+   "F_point": 0.03765161684722951,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.011855187772986706,
+   "D_draw_sd": 0.0015185577247404376,
+   "D_interval": {
+    "lower": 0.008925472634023586,
+    "upper": 0.014839281881689918
+   },
+   "C_point": 0.03732348402581237,
+   "F_point": 0.02546829625282566,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.015290855933525882,
+   "D_draw_sd": 0.0016073986579591846,
+   "D_interval": {
+    "lower": 0.012164506119546576,
+    "upper": 0.018469420755840252
+   },
+   "C_point": 0.0393680021074027,
+   "F_point": 0.024077146173876813,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.01487919326965279,
+   "D_draw_sd": 0.0015815246836040672,
+   "D_interval": {
+    "lower": 0.011793303410855695,
+    "upper": 0.018046063652311196
+   },
+   "C_point": 0.039914093870014045,
+   "F_point": 0.025034900600361253,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.011183502326488803,
+   "D_draw_sd": 0.0014336791932374202,
+   "D_interval": {
+    "lower": 0.008431159164313324,
+    "upper": 0.014019067805542214
+   },
+   "C_point": 0.03486535202360842,
+   "F_point": 0.02368184969711962,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.013992550446110596,
+   "D_draw_sd": 0.0016141100559057496,
+   "D_interval": {
+    "lower": 0.010929354167147463,
+    "upper": 0.017157667640596664
+   },
+   "C_point": 0.03872471716031684,
+   "F_point": 0.024732166714206243,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.013863506885295755,
+   "D_draw_sd": 0.0014918418330162617,
+   "D_interval": {
+    "lower": 0.010954751600932641,
+    "upper": 0.016776619818467415
+   },
+   "C_point": 0.03927106488820083,
+   "F_point": 0.025407558002905072,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.17210097569827382,
+   "D_draw_sd": 0.009873666908345702,
+   "D_interval": {
+    "lower": 0.15304436278351835,
+    "upper": 0.1919578870326731
+   },
+   "C_point": 0.21147609073317114,
+   "F_point": 0.03937511503489736,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.17902810954247914,
+   "D_draw_sd": 0.009177400453449265,
+   "D_interval": {
+    "lower": 0.16158396972179576,
+    "upper": 0.1974248374718028
+   },
+   "C_point": 0.21357737860942483,
+   "F_point": 0.03454926906694572,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.16902648016710015,
+   "D_draw_sd": 0.009459690406649117,
+   "D_interval": {
+    "lower": 0.15044679112328616,
+    "upper": 0.18737066361650936
+   },
+   "C_point": 0.20723489621892907,
+   "F_point": 0.03820841605182891,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.15386467182559718,
+   "D_draw_sd": 0.008854154016112658,
+   "D_interval": {
+    "lower": 0.13648083692640348,
+    "upper": 0.17131527529670526
+   },
+   "C_point": 0.18914758827576816,
+   "F_point": 0.03528291645017096,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.17304157486025223,
+   "D_draw_sd": 0.009788153275443393,
+   "D_interval": {
+    "lower": 0.15381770151881313,
+    "upper": 0.19261817256421224
+   },
+   "C_point": 0.21005379471198554,
+   "F_point": 0.03701221985173333,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.16356781398679102,
+   "D_draw_sd": 0.010176859313678722,
+   "D_interval": {
+    "lower": 0.14407056178161604,
+    "upper": 0.18356280525466442
+   },
+   "C_point": 0.2017403076854439,
+   "F_point": 0.0381724936986529,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": -0.0005339823824434631,
+   "D_draw_sd": 0.0004100206604784501,
+   "D_interval": {
+    "lower": -0.0013624287414364723,
+    "upper": 0.000248270377162851
+   },
+   "C_point": 0.003934340185462441,
+   "F_point": 0.004468322567905905,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.00014506864650465712,
+   "D_draw_sd": 0.00037554511081833717,
+   "D_interval": {
+    "lower": -0.000594766346936151,
+    "upper": 0.0008861017829104946
+   },
+   "C_point": 0.004039431897918047,
+   "F_point": 0.00389436325141339,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.00010191979133941107,
+   "D_draw_sd": 0.0002720756720243749,
+   "D_interval": {
+    "lower": -0.00041873188478907863,
+    "upper": 0.000640334435763816
+   },
+   "C_point": 0.0042253090537318705,
+   "F_point": 0.004123389262392458,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.0001667840602033041,
+   "D_draw_sd": 0.0004197636096158817,
+   "D_interval": {
+    "lower": -0.0006180150696908617,
+    "upper": 0.001018496058062419
+   },
+   "C_point": 0.003941381780537149,
+   "F_point": 0.003774597720333845,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.0004970744434956871,
+   "D_draw_sd": 0.00042323723102759834,
+   "D_interval": {
+    "lower": -0.00038654452630329,
+    "upper": 0.0012884567385173704
+   },
+   "C_point": 0.003961084188719955,
+   "F_point": 0.0034640097452242674,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": -0.00019350240890710917,
+   "D_draw_sd": 0.0006253528125082382,
+   "D_interval": {
+    "lower": -0.001408692146028188,
+    "upper": 0.001059692831940565
+   },
+   "C_point": 0.0038242031319324485,
+   "F_point": 0.004017705540839558,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": -0.0005354738880637107,
+   "D_draw_sd": 0.00038162162678278275,
+   "D_interval": {
+    "lower": -0.0012669054527528673,
+    "upper": 0.00022256218223520258
+   },
+   "C_point": 0.007440330296331213,
+   "F_point": 0.007975804184394924,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": -0.0005678713501698704,
+   "D_draw_sd": 0.0004203312932855355,
+   "D_interval": {
+    "lower": -0.0014090192782304078,
+    "upper": 0.00023909149729045033
+   },
+   "C_point": 0.007638918753787628,
+   "F_point": 0.008206790103957497,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.0003253005785699828,
+   "D_draw_sd": 0.000426636971138668,
+   "D_interval": {
+    "lower": -0.000502252773182458,
+    "upper": 0.0011664120319209018
+   },
+   "C_point": 0.00845460369739806,
+   "F_point": 0.008129303118828075,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 7.336370952761209e-05,
+   "D_draw_sd": 0.0003488781372089717,
+   "D_interval": {
+    "lower": -0.0006179946591040105,
+    "upper": 0.0007497077678389654
+   },
+   "C_point": 0.007732437301031665,
+   "F_point": 0.007659073591504054,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": -5.242252882668476e-05,
+   "D_draw_sd": 0.0003072218555579852,
+   "D_interval": {
+    "lower": -0.000662015049822491,
+    "upper": 0.0005395628528127197
+   },
+   "C_point": 0.007221333265729718,
+   "F_point": 0.007273755794556402,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": -0.000251032953266422,
+   "D_draw_sd": 0.0007068005528471549,
+   "D_interval": {
+    "lower": -0.0018023267042186902,
+    "upper": 0.0009556464926470536
+   },
+   "C_point": 0.008332703805629314,
+   "F_point": 0.008583736758895736,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.0006943923269845462,
+   "D_draw_sd": 0.0005384980634037833,
+   "D_interval": {
+    "lower": -0.0003853270162501085,
+    "upper": 0.0017358003146479193
+   },
+   "C_point": 0.015977710133150986,
+   "F_point": 0.015283317806166444,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.0013865409432817781,
+   "D_draw_sd": 0.0004991842318087492,
+   "D_interval": {
+    "lower": 0.00040637457844529355,
+    "upper": 0.0023614221727990227
+   },
+   "C_point": 0.016659951406112233,
+   "F_point": 0.015273410462830452,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.0010888878021313904,
+   "D_draw_sd": 0.0004719546078171216,
+   "D_interval": {
+    "lower": 0.00018690622646486311,
+    "upper": 0.002016999919052288
+   },
+   "C_point": 0.01743550423592803,
+   "F_point": 0.01634661643379664,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.0010859230220064296,
+   "D_draw_sd": 0.0004943464734408302,
+   "D_interval": {
+    "lower": 0.00011111538616594737,
+    "upper": 0.0020532715866772226
+   },
+   "C_point": 0.016391900919211725,
+   "F_point": 0.0153059778972053,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.00045413384856548894,
+   "D_draw_sd": 0.0005391034060984511,
+   "D_interval": {
+    "lower": -0.0006199929074621773,
+    "upper": 0.001490419866585084
+   },
+   "C_point": 0.01572121381643394,
+   "F_point": 0.015267079967868446,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.0014063919459588322,
+   "D_draw_sd": 0.000494513657499077,
+   "D_interval": {
+    "lower": 0.00046853389515641376,
+    "upper": 0.0024197995995273343
+   },
+   "C_point": 0.01729558620305978,
+   "F_point": 0.015889194257100944,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.011652665333725954,
+   "D_draw_sd": 0.001669951106607456,
+   "D_interval": {
+    "lower": 0.008551855705575647,
+    "upper": 0.015095557299000504
+   },
+   "C_point": 0.04616835347174593,
+   "F_point": 0.03451568813801996,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.009949598994708967,
+   "D_draw_sd": 0.0015599958023959331,
+   "D_interval": {
+    "lower": 0.006988072286401271,
+    "upper": 0.013106552247067275
+   },
+   "C_point": 0.04379560926815139,
+   "F_point": 0.03384601027344243,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.015005472784524984,
+   "D_draw_sd": 0.0020017616209979665,
+   "D_interval": {
+    "lower": 0.011206684202599801,
+    "upper": 0.019056527174660488
+   },
+   "C_point": 0.05359049527314604,
+   "F_point": 0.03858502248862107,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.011339810555913465,
+   "D_draw_sd": 0.0016542244735630652,
+   "D_interval": {
+    "lower": 0.008254135332950293,
+    "upper": 0.01466502221275404
+   },
+   "C_point": 0.04329649113130934,
+   "F_point": 0.031956680575395864,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.012493524519985932,
+   "D_draw_sd": 0.0017463788377648842,
+   "D_interval": {
+    "lower": 0.009281350392599733,
+    "upper": 0.016130706035759605
+   },
+   "C_point": 0.04488755426589283,
+   "F_point": 0.0323940297459069,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.011553725954103833,
+   "D_draw_sd": 0.0017585301913560709,
+   "D_interval": {
+    "lower": 0.008258296983723185,
+    "upper": 0.015084009788999077
+   },
+   "C_point": 0.04686887800897997,
+   "F_point": 0.03531515205487614,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.032375611522779235,
+   "D_draw_sd": 0.0032861013443644628,
+   "D_interval": {
+    "lower": 0.026021747831575348,
+    "upper": 0.03884237530966097
+   },
+   "C_point": 0.09143441852519449,
+   "F_point": 0.059058807002415246,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.028003978560157496,
+   "D_draw_sd": 0.0028483646336259737,
+   "D_interval": {
+    "lower": 0.022521031910617863,
+    "upper": 0.033661141851934716
+   },
+   "C_point": 0.08168652366760569,
+   "F_point": 0.0536825451074482,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.036874876827125126,
+   "D_draw_sd": 0.0034201171350984674,
+   "D_interval": {
+    "lower": 0.030359618924152672,
+    "upper": 0.04367536010772004
+   },
+   "C_point": 0.09913883411617845,
+   "F_point": 0.06226395728905335,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.03149824782847925,
+   "D_draw_sd": 0.0033302782420219575,
+   "D_interval": {
+    "lower": 0.02511506588001469,
+    "upper": 0.03814588136457024
+   },
+   "C_point": 0.08740197723249697,
+   "F_point": 0.055903729404017735,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.03552261453101593,
+   "D_draw_sd": 0.003678262403778562,
+   "D_interval": {
+    "lower": 0.028828758313583766,
+    "upper": 0.043132535835524136
+   },
+   "C_point": 0.09221444109932592,
+   "F_point": 0.05669182656830999,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.03164889989739199,
+   "D_draw_sd": 0.0033853653361738296,
+   "D_interval": {
+    "lower": 0.025234869297695518,
+    "upper": 0.03855418407410855
+   },
+   "C_point": 0.08957977706651617,
+   "F_point": 0.05793087716912415,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.0008975429595662304,
+   "D_draw_sd": 0.00038858239522579117,
+   "D_interval": {
+    "lower": 0.00019202322405215073,
+    "upper": 0.0017174120635962264
+   },
+   "C_point": 0.009950814220894014,
+   "F_point": 0.009053271261327784,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.0002538153114582462,
+   "D_draw_sd": 0.0003413850255136146,
+   "D_interval": {
+    "lower": -0.0004025787902752373,
+    "upper": 0.0009415615498246151
+   },
+   "C_point": 0.01038124530496414,
+   "F_point": 0.010127429993505896,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.0007271158531100199,
+   "D_draw_sd": 0.0004335770774569045,
+   "D_interval": {
+    "lower": -0.0001742746858703214,
+    "upper": 0.0015133526852977998
+   },
+   "C_point": 0.012117326862771859,
+   "F_point": 0.011390211009661838,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.00013226525392963097,
+   "D_draw_sd": 0.00035350139764420396,
+   "D_interval": {
+    "lower": -0.0005128377710353853,
+    "upper": 0.0008755766638842708
+   },
+   "C_point": 0.009605800108011785,
+   "F_point": 0.009473534854082153,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.0006250264950381829,
+   "D_draw_sd": 0.00046241866547304324,
+   "D_interval": {
+    "lower": -0.00028739236143297337,
+    "upper": 0.0015202169620958782
+   },
+   "C_point": 0.010124020205048748,
+   "F_point": 0.009498993710010565,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.0002516254485126359,
+   "D_draw_sd": 0.00034155754295150123,
+   "D_interval": {
+    "lower": -0.00040682673037446804,
+    "upper": 0.0009473007168535798
+   },
+   "C_point": 0.01006006659178062,
+   "F_point": 0.009808441143267984,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.02566333607506029,
+   "D_draw_sd": 0.0028259595455952507,
+   "D_interval": {
+    "lower": 0.020240886539064695,
+    "upper": 0.03134766684193317
+   },
+   "C_point": 0.07542834159623954,
+   "F_point": 0.049765005521179254,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.018855507642720478,
+   "D_draw_sd": 0.0028716363110704054,
+   "D_interval": {
+    "lower": 0.01333796961762479,
+    "upper": 0.024625134299181044
+   },
+   "C_point": 0.06570871733995196,
+   "F_point": 0.04685320969723149,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.022528185726232604,
+   "D_draw_sd": 0.00282627075088044,
+   "D_interval": {
+    "lower": 0.017080535876132886,
+    "upper": 0.02814071320408263
+   },
+   "C_point": 0.07192359302463609,
+   "F_point": 0.049395407298403485,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.02810812167751452,
+   "D_draw_sd": 0.0034902878910875496,
+   "D_interval": {
+    "lower": 0.021558789128871474,
+    "upper": 0.03519888581289756
+   },
+   "C_point": 0.07820136074032558,
+   "F_point": 0.05009323906281106,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.021237466662607098,
+   "D_draw_sd": 0.003071076453908912,
+   "D_interval": {
+    "lower": 0.015459997615188757,
+    "upper": 0.02738427238540596
+   },
+   "C_point": 0.06759440817208501,
+   "F_point": 0.046356941509477924,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.019909388484802847,
+   "D_draw_sd": 0.002792908642443632,
+   "D_interval": {
+    "lower": 0.01447766387747027,
+    "upper": 0.025552419929444858
+   },
+   "C_point": 0.06808628559208528,
+   "F_point": 0.04817689710728245,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.03632395037003026,
+   "D_draw_sd": 0.003269585698397383,
+   "D_interval": {
+    "lower": 0.030084428296225794,
+    "upper": 0.04282391456058763
+   },
+   "C_point": 0.09530260176453413,
+   "F_point": 0.05897865139450388,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.029736118456514672,
+   "D_draw_sd": 0.003126906432128348,
+   "D_interval": {
+    "lower": 0.023659413926868794,
+    "upper": 0.03593244699429926
+   },
+   "C_point": 0.08540573212194795,
+   "F_point": 0.05566961366543327,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.039206343769453915,
+   "D_draw_sd": 0.0036732914150382984,
+   "D_interval": {
+    "lower": 0.03232967226707695,
+    "upper": 0.04672660901591657
+   },
+   "C_point": 0.10152972385509748,
+   "F_point": 0.06232338008564359,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.03579909884354934,
+   "D_draw_sd": 0.003452741314955098,
+   "D_interval": {
+    "lower": 0.0292787903716356,
+    "upper": 0.0428091471687662
+   },
+   "C_point": 0.0930362995093685,
+   "F_point": 0.05723720066581915,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.03680937436062884,
+   "D_draw_sd": 0.0033913314324343674,
+   "D_interval": {
+    "lower": 0.030485130981519507,
+    "upper": 0.04373577897176017
+   },
+   "C_point": 0.09462836232606874,
+   "F_point": 0.057818987965439904,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.0341443258196468,
+   "D_draw_sd": 0.003398504421013881,
+   "D_interval": {
+    "lower": 0.02764882936098966,
+    "upper": 0.040961415300289
+   },
+   "C_point": 0.09207751091482087,
+   "F_point": 0.05793318509517409,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": -5.027381920179867e-07,
+   "D_draw_sd": 2.473949572699548e-07,
+   "D_interval": {
+    "lower": -9.845384673459646e-07,
+    "upper": -1.936485707885041e-08
+   },
+   "C_point": 4.237403495485748e-05,
+   "F_point": 4.2876773146875474e-05,
+   "label": "C beats F"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 1.2184115223608802e-08,
+   "D_draw_sd": 1.6070838029871815e-07,
+   "D_interval": {
+    "lower": -3.0144781898182703e-07,
+    "upper": 3.3135924044413846e-07
+   },
+   "C_point": 5.139798149575592e-05,
+   "F_point": 5.138579738053232e-05,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": -2.880163390880022e-07,
+   "D_draw_sd": 2.866884841496032e-07,
+   "D_interval": {
+    "lower": -8.422609706149812e-07,
+    "upper": 2.664024647022038e-07
+   },
+   "C_point": 5.122952614940075e-05,
+   "F_point": 5.151754248848876e-05,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": -1.6167742822965556e-07,
+   "D_draw_sd": 2.2069075706934039e-07,
+   "D_interval": {
+    "lower": -6.008710737285477e-07,
+    "upper": 2.683499814772024e-07
+   },
+   "C_point": 4.865820900361123e-05,
+   "F_point": 4.881988643184089e-05,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": -3.416453346515705e-07,
+   "D_draw_sd": 2.0545787125017205e-07,
+   "D_interval": {
+    "lower": -7.380745630431817e-07,
+    "upper": 6.171985491375139e-08
+   },
+   "C_point": 4.8752966264803505e-05,
+   "F_point": 4.909461159945507e-05,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 2.9548249857484294e-07,
+   "D_draw_sd": 1.651080368796556e-07,
+   "D_interval": {
+    "lower": -2.4112468987586784e-08,
+    "upper": 6.209970634375959e-07
+   },
+   "C_point": 4.640198541841933e-05,
+   "F_point": 4.6106502919844484e-05,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.00018221971809578331,
+   "D_draw_sd": 0.00010932777164096135,
+   "D_interval": {
+    "lower": -3.0854660737709934e-05,
+    "upper": 0.00039349029192755204
+   },
+   "C_point": 0.00629348899796635,
+   "F_point": 0.0061112692798705685,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.00023609637637639,
+   "D_draw_sd": 8.68720660699029e-05,
+   "D_interval": {
+    "lower": 6.67619510179287e-05,
+    "upper": 0.0004055669060378944
+   },
+   "C_point": 0.0060709100683193126,
+   "F_point": 0.005834813691942924,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.00027465145500599284,
+   "D_draw_sd": 0.00010538690172439117,
+   "D_interval": {
+    "lower": 7.191566134161203e-05,
+    "upper": 0.00048514896565546355
+   },
+   "C_point": 0.00693382217922166,
+   "F_point": 0.006659170724215668,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.00031815225856635966,
+   "D_draw_sd": 0.00010647422911704598,
+   "D_interval": {
+    "lower": 0.00011188066027247495,
+    "upper": 0.0005281657223108456
+   },
+   "C_point": 0.0067732627684662745,
+   "F_point": 0.006455110509899916,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.00015782809331510786,
+   "D_draw_sd": 9.056035485524801e-05,
+   "D_interval": {
+    "lower": -1.9744842335378673e-05,
+    "upper": 0.00033624776315152144
+   },
+   "C_point": 0.005564445140590537,
+   "F_point": 0.005406617047275427,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.0002396411129717028,
+   "D_draw_sd": 0.00010082236510275369,
+   "D_interval": {
+    "lower": 3.919205641790161e-05,
+    "upper": 0.000434548002592645
+   },
+   "C_point": 0.0064440406740684615,
+   "F_point": 0.006204399561096757,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.003105627057495117,
+   "D_draw_sd": 0.0006665283703588775,
+   "D_interval": {
+    "lower": 0.0018310546536334028,
+    "upper": 0.004433655982346779
+   },
+   "C_point": 0.018470677960148906,
+   "F_point": 0.01536505090265379,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.0033140853935068855,
+   "D_draw_sd": 0.0006354472259370072,
+   "D_interval": {
+    "lower": 0.0020790506166452603,
+    "upper": 0.004555151009766987
+   },
+   "C_point": 0.017798359138129806,
+   "F_point": 0.014484273744622916,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.003775342273660817,
+   "D_draw_sd": 0.0006251942118787752,
+   "D_interval": {
+    "lower": 0.0025675439617274154,
+    "upper": 0.005024167941990644
+   },
+   "C_point": 0.019987798232446896,
+   "F_point": 0.016212455958786075,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.004377541975344133,
+   "D_draw_sd": 0.000611967589684756,
+   "D_interval": {
+    "lower": 0.0031857737042047638,
+    "upper": 0.005580675222643933
+   },
+   "C_point": 0.01997449178179933,
+   "F_point": 0.015596949806455198,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.002502470991940231,
+   "D_draw_sd": 0.0005423681283152303,
+   "D_interval": {
+    "lower": 0.001448407023597162,
+    "upper": 0.003573569041536505
+   },
+   "C_point": 0.016595354660867912,
+   "F_point": 0.014092883668927681,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.00370489672922156,
+   "D_draw_sd": 0.0005988643795105831,
+   "D_interval": {
+    "lower": 0.0025351206181993685,
+    "upper": 0.0048852756622062895
+   },
+   "C_point": 0.018912069828040116,
+   "F_point": 0.01520717309881856,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.028957941552832774,
+   "D_draw_sd": 0.0032642294048375554,
+   "D_interval": {
+    "lower": 0.022765069757386184,
+    "upper": 0.035444245948055175
+   },
+   "C_point": 0.05924248781328735,
+   "F_point": 0.03028454626045457,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.029620072081661293,
+   "D_draw_sd": 0.003311332739999268,
+   "D_interval": {
+    "lower": 0.023295623713834514,
+    "upper": 0.0361672850681396
+   },
+   "C_point": 0.05646926158484361,
+   "F_point": 0.026849189503182304,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.031054327050509027,
+   "D_draw_sd": 0.0032584802061188765,
+   "D_interval": {
+    "lower": 0.024834826477566962,
+    "upper": 0.03773061802025247
+   },
+   "C_point": 0.062141383301715224,
+   "F_point": 0.031087056251206197,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.0342065681963114,
+   "D_draw_sd": 0.0031830682294840423,
+   "D_interval": {
+    "lower": 0.027958708179030654,
+    "upper": 0.04037461393811851
+   },
+   "C_point": 0.06274524661610889,
+   "F_point": 0.02853867841979748,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.0228872544428219,
+   "D_draw_sd": 0.0029956906138987284,
+   "D_interval": {
+    "lower": 0.017201716962661585,
+    "upper": 0.028969665508941082
+   },
+   "C_point": 0.050546040535566085,
+   "F_point": 0.027658786092744185,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.032203739068455514,
+   "D_draw_sd": 0.0029401318759862223,
+   "D_interval": {
+    "lower": 0.026518660386621994,
+    "upper": 0.03799524094119713
+   },
+   "C_point": 0.06165443463802349,
+   "F_point": 0.029450695569567996,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.10238245877430663,
+   "D_draw_sd": 0.0071546531017106455,
+   "D_interval": {
+    "lower": 0.08837082153921695,
+    "upper": 0.11661872547637961
+   },
+   "C_point": 0.1419854169224149,
+   "F_point": 0.03960295814810828,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.10198027738266727,
+   "D_draw_sd": 0.00799145084044699,
+   "D_interval": {
+    "lower": 0.08670184158299095,
+    "upper": 0.11808754550181702
+   },
+   "C_point": 0.1363546662663563,
+   "F_point": 0.034374388883689065,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.10013988794772913,
+   "D_draw_sd": 0.008204772867104733,
+   "D_interval": {
+    "lower": 0.08431279364253098,
+    "upper": 0.11638285380834124
+   },
+   "C_point": 0.13931284415616912,
+   "F_point": 0.039172956208439955,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.11170570473954897,
+   "D_draw_sd": 0.00940712090261091,
+   "D_interval": {
+    "lower": 0.09398939694151065,
+    "upper": 0.13065813341014368
+   },
+   "C_point": 0.14816173824472048,
+   "F_point": 0.036456033505171515,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.09548862434405272,
+   "D_draw_sd": 0.007591910792498061,
+   "D_interval": {
+    "lower": 0.08105548344225706,
+    "upper": 0.11064287297761677
+   },
+   "C_point": 0.13163288030088385,
+   "F_point": 0.036144255956831114,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.10328654784832134,
+   "D_draw_sd": 0.007930208172978067,
+   "D_interval": {
+    "lower": 0.087991691177653,
+    "upper": 0.11897705327365325
+   },
+   "C_point": 0.14266789574961009,
+   "F_point": 0.039381347901288784,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.17025296857728417,
+   "D_draw_sd": 0.008966962259425284,
+   "D_interval": {
+    "lower": 0.1529321211464651,
+    "upper": 0.18832363627713694
+   },
+   "C_point": 0.20851556800792093,
+   "F_point": 0.038262599430636784,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.1746193841400629,
+   "D_draw_sd": 0.008331848228907146,
+   "D_interval": {
+    "lower": 0.15838061425567407,
+    "upper": 0.1909097503194619
+   },
+   "C_point": 0.2080814333905207,
+   "F_point": 0.03346204925045777,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.16328664928520778,
+   "D_draw_sd": 0.008708585745744176,
+   "D_interval": {
+    "lower": 0.1461852215202089,
+    "upper": 0.18022154338066343
+   },
+   "C_point": 0.20106671729783873,
+   "F_point": 0.03778006801263088,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.15251286912113743,
+   "D_draw_sd": 0.008965398738524635,
+   "D_interval": {
+    "lower": 0.13532075213458447,
+    "upper": 0.17031177355845376
+   },
+   "C_point": 0.18849275445017918,
+   "F_point": 0.03597988532904175,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.17445665815333017,
+   "D_draw_sd": 0.008789433824605205,
+   "D_interval": {
+    "lower": 0.15711874464992473,
+    "upper": 0.19170582492731797
+   },
+   "C_point": 0.21154075210583007,
+   "F_point": 0.03708409395249991,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.16026809815308257,
+   "D_draw_sd": 0.00942383104622279,
+   "D_interval": {
+    "lower": 0.14196442658615005,
+    "upper": 0.17890319301149324
+   },
+   "C_point": 0.1976969024962586,
+   "F_point": 0.03742880434317596,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.012033252638769263,
+   "D_draw_sd": 0.0015343752215552279,
+   "D_interval": {
+    "lower": 0.00907335728062798,
+    "upper": 0.015037258886109326
+   },
+   "C_point": 0.0374148596398818,
+   "F_point": 0.025381607001112538,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.015289268295994456,
+   "D_draw_sd": 0.0015981098391775201,
+   "D_interval": {
+    "lower": 0.012188299085978542,
+    "upper": 0.018431251060632415
+   },
+   "C_point": 0.03934574940985805,
+   "F_point": 0.02405648111386359,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.014848494566490667,
+   "D_draw_sd": 0.0015798117043303167,
+   "D_interval": {
+    "lower": 0.011778381706152688,
+    "upper": 0.01801170050865292
+   },
+   "C_point": 0.0399098030558469,
+   "F_point": 0.025061308489356227,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.011740167861056054,
+   "D_draw_sd": 0.0014730906921311593,
+   "D_interval": {
+    "lower": 0.008893287023767486,
+    "upper": 0.01467088495285376
+   },
+   "C_point": 0.03524167362800813,
+   "F_point": 0.023501505766952084,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.014583277542980347,
+   "D_draw_sd": 0.001629450785902623,
+   "D_interval": {
+    "lower": 0.011486039733910589,
+    "upper": 0.01782242523781371
+   },
+   "C_point": 0.038766476140453796,
+   "F_point": 0.024183198597473445,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.013635113545424484,
+   "D_draw_sd": 0.0015211749140953967,
+   "D_interval": {
+    "lower": 0.010653872637349843,
+    "upper": 0.016616523880810138
+   },
+   "C_point": 0.03927106488820083,
+   "F_point": 0.025635951342776336,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.17227959414092126,
+   "D_draw_sd": 0.009871149079527783,
+   "D_interval": {
+    "lower": 0.15322490527152666,
+    "upper": 0.1921363160946687
+   },
+   "C_point": 0.2114737261731336,
+   "F_point": 0.039194132032212385,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.17949255612636167,
+   "D_draw_sd": 0.009165343998953596,
+   "D_interval": {
+    "lower": 0.16208855903150898,
+    "upper": 0.19788789846229077
+   },
+   "C_point": 0.21363358024990325,
+   "F_point": 0.03414102412354159,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.16916386357503893,
+   "D_draw_sd": 0.009459491349804247,
+   "D_interval": {
+    "lower": 0.15053985441100703,
+    "upper": 0.18751220328120588
+   },
+   "C_point": 0.20713918297099437,
+   "F_point": 0.03797531939595544,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.15404072779480743,
+   "D_draw_sd": 0.008911987163984473,
+   "D_interval": {
+    "lower": 0.13655945563476118,
+    "upper": 0.17166033749146922
+   },
+   "C_point": 0.18913845232925847,
+   "F_point": 0.03509772453445103,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.1731803424590363,
+   "D_draw_sd": 0.009830217957458202,
+   "D_interval": {
+    "lower": 0.15409031578736862,
+    "upper": 0.19283483222698092
+   },
+   "C_point": 0.21004147641330775,
+   "F_point": 0.03686113395427142,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.16391254705315203,
+   "D_draw_sd": 0.010166884904133353,
+   "D_interval": {
+    "lower": 0.14441142459939932,
+    "upper": 0.18392428042910292
+   },
+   "C_point": 0.20173712085542905,
+   "F_point": 0.03782457380227698,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": -4.254599559591458e-06,
+   "D_draw_sd": 1.7833039756492176e-06,
+   "D_interval": {
+    "lower": -7.831365058508215e-06,
+    "upper": -8.687570861120236e-07
+   },
+   "C_point": 0.0002556159994179623,
+   "F_point": 0.0002598705989775538,
+   "label": "C beats F"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": -3.869602446207436e-06,
+   "D_draw_sd": 1.7663183355538692e-06,
+   "D_interval": {
+    "lower": -7.303584743243469e-06,
+    "upper": -4.09864202348884e-07
+   },
+   "C_point": 0.00029232289937043243,
+   "F_point": 0.00029619250181663986,
+   "label": "C beats F"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": -2.8568225511072247e-06,
+   "D_draw_sd": 1.2836080014759332e-06,
+   "D_interval": {
+    "lower": -5.385335128238733e-06,
+    "upper": -3.9717210594958785e-07
+   },
+   "C_point": 0.0002657687412954294,
+   "F_point": 0.0002686255638465367,
+   "label": "C beats F"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": -2.189729983571138e-06,
+   "D_draw_sd": 2.7182232108741064e-06,
+   "D_interval": {
+    "lower": -7.554881450802837e-06,
+    "upper": 3.1537939314333064e-06
+   },
+   "C_point": 0.00027665779996687766,
+   "F_point": 0.0002788475299504487,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": -5.212999879610305e-07,
+   "D_draw_sd": 1.7911292066354098e-06,
+   "D_interval": {
+    "lower": -4.031791949677837e-06,
+    "upper": 3.00216209080206e-06
+   },
+   "C_point": 0.00025145797862251095,
+   "F_point": 0.00025197927861047187,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": -6.40548085627593e-06,
+   "D_draw_sd": 3.5549360961090565e-06,
+   "D_interval": {
+    "lower": -1.3455776582214287e-05,
+    "upper": 4.130498595007118e-07
+   },
+   "C_point": 0.0003067897301322865,
+   "F_point": 0.00031319521098856245,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": -8.51290560848145e-05,
+   "D_draw_sd": 5.199578397098816e-05,
+   "D_interval": {
+    "lower": -0.00018779504604116154,
+    "upper": 1.649986935061806e-05
+   },
+   "C_point": 0.0045040390348531755,
+   "F_point": 0.004589168090937989,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": -4.7528443615716884e-05,
+   "D_draw_sd": 5.587355478582434e-05,
+   "D_interval": {
+    "lower": -0.0001579581562415899,
+    "upper": 5.943661344412478e-05
+   },
+   "C_point": 0.004790394523644414,
+   "F_point": 0.004837922967260132,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": -7.342790917427497e-06,
+   "D_draw_sd": 4.9180801013051434e-05,
+   "D_interval": {
+    "lower": -0.00010461387232169296,
+    "upper": 8.704015033976731e-05
+   },
+   "C_point": 0.005082826593520893,
+   "F_point": 0.00509016938443832,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": -4.276544790724271e-05,
+   "D_draw_sd": 4.61904164839165e-05,
+   "D_interval": {
+    "lower": -0.00013089277774756806,
+    "upper": 4.854351249499596e-05
+   },
+   "C_point": 0.004705636110423782,
+   "F_point": 0.004748401558331024,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 5.114829558124957e-05,
+   "D_draw_sd": 4.971497419092723e-05,
+   "D_interval": {
+    "lower": -4.5811461134474185e-05,
+    "upper": 0.00014725029786040092
+   },
+   "C_point": 0.004642006986578314,
+   "F_point": 0.004590858690997066,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 1.4521869044913267e-05,
+   "D_draw_sd": 5.420064572886584e-05,
+   "D_interval": {
+    "lower": -8.909789464410078e-05,
+    "upper": 0.00012197443819079935
+   },
+   "C_point": 0.0051746885885415265,
+   "F_point": 0.005160166719496611,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.0005039533145506404,
+   "D_draw_sd": 0.0003442002116734503,
+   "D_interval": {
+    "lower": -0.0001620725226641656,
+    "upper": 0.0011939234689136435
+   },
+   "C_point": 0.013205596290346244,
+   "F_point": 0.012701642975795605,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.00039801963631080385,
+   "D_draw_sd": 0.0003623372832036059,
+   "D_interval": {
+    "lower": -0.0003053839090649929,
+    "upper": 0.0011130491339275941
+   },
+   "C_point": 0.014028260510656818,
+   "F_point": 0.01363024087434601,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.0008317463029077002,
+   "D_draw_sd": 0.00036950942444665747,
+   "D_interval": {
+    "lower": 0.00010548041943942324,
+    "upper": 0.001570538985238008
+   },
+   "C_point": 0.015743240419284675,
+   "F_point": 0.01491149411637698,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.0006411120253702416,
+   "D_draw_sd": 0.0003022063469066954,
+   "D_interval": {
+    "lower": 5.720435674010372e-05,
+    "upper": 0.0012433680922162146
+   },
+   "C_point": 0.013702127490120456,
+   "F_point": 0.013061015464750214,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.0007256184121104924,
+   "D_draw_sd": 0.0003552711298569117,
+   "D_interval": {
+    "lower": 3.9611270182953664e-05,
+    "upper": 0.0014306567640940513
+   },
+   "C_point": 0.013883876922751162,
+   "F_point": 0.01315825851064067,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.0008679083829240975,
+   "D_draw_sd": 0.0003583073845114533,
+   "D_interval": {
+    "lower": 0.00017043556897779552,
+    "upper": 0.001574744788128831
+   },
+   "C_point": 0.015458958765389445,
+   "F_point": 0.014591050382465345,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.009853245130584797,
+   "D_draw_sd": 0.0015525769740335376,
+   "D_interval": {
+    "lower": 0.006922461063910009,
+    "upper": 0.012987058829973577
+   },
+   "C_point": 0.04361449685154958,
+   "F_point": 0.03376125172096478,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.009698314463357,
+   "D_draw_sd": 0.0015493814548296263,
+   "D_interval": {
+    "lower": 0.006764341254205258,
+    "upper": 0.012827378003421938
+   },
+   "C_point": 0.04209559190316871,
+   "F_point": 0.03239727743981172,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.01295897481682443,
+   "D_draw_sd": 0.002101280705985512,
+   "D_interval": {
+    "lower": 0.00901617648205019,
+    "upper": 0.017184454531411708
+   },
+   "C_point": 0.051170625591046494,
+   "F_point": 0.03821165077422207,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.010046052240734673,
+   "D_draw_sd": 0.001625600880445985,
+   "D_interval": {
+    "lower": 0.006990620169086219,
+    "upper": 0.013332684929150476
+   },
+   "C_point": 0.0405217666932729,
+   "F_point": 0.030475714452538234,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.008863468445031214,
+   "D_draw_sd": 0.0017198877991054786,
+   "D_interval": {
+    "lower": 0.005601007091226681,
+    "upper": 0.012328882541607767
+   },
+   "C_point": 0.04104654357872815,
+   "F_point": 0.03218307513369692,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.010406138595558853,
+   "D_draw_sd": 0.0016939560546462907,
+   "D_interval": {
+    "lower": 0.007185907467240046,
+    "upper": 0.01379383323376115
+   },
+   "C_point": 0.045540814401434426,
+   "F_point": 0.035134675805875565,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.035989482786898286,
+   "D_draw_sd": 0.0036701407287817486,
+   "D_interval": {
+    "lower": 0.02905126600797851,
+    "upper": 0.04338802375026201
+   },
+   "C_point": 0.09070329158103038,
+   "F_point": 0.05471380879413209,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.03182963519433068,
+   "D_draw_sd": 0.003254854369894616,
+   "D_interval": {
+    "lower": 0.025471183587936763,
+    "upper": 0.038122058247523835
+   },
+   "C_point": 0.08230481178016037,
+   "F_point": 0.050475176585829694,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.03480723404051898,
+   "D_draw_sd": 0.004223984311225832,
+   "D_interval": {
+    "lower": 0.02647087642820821,
+    "upper": 0.0430846637174285
+   },
+   "C_point": 0.09848733423831398,
+   "F_point": 0.06368010019779499,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.03353833144655717,
+   "D_draw_sd": 0.003680279619730796,
+   "D_interval": {
+    "lower": 0.026552071011674047,
+    "upper": 0.04092123581449607
+   },
+   "C_point": 0.08399641900791413,
+   "F_point": 0.05045808756135696,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.030767865949284805,
+   "D_draw_sd": 0.003528762323927973,
+   "D_interval": {
+    "lower": 0.02426789485628594,
+    "upper": 0.03800073937722689
+   },
+   "C_point": 0.08531398962726784,
+   "F_point": 0.054546123677983026,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.039306955023782134,
+   "D_draw_sd": 0.005519298748571108,
+   "D_interval": {
+    "lower": 0.029068018867022684,
+    "upper": 0.05065812709425396
+   },
+   "C_point": 0.09527291962652089,
+   "F_point": 0.05596596460273876,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": -0.00030066957013789603,
+   "D_draw_sd": 0.00014200479099246062,
+   "D_interval": {
+    "lower": -0.000577513441391875,
+    "upper": -2.337577116285263e-05
+   },
+   "C_point": 0.007031111279728007,
+   "F_point": 0.007331780849865905,
+   "label": "C beats F"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": -0.00027035504279819544,
+   "D_draw_sd": 0.00014397316512540354,
+   "D_interval": {
+    "lower": -0.000551297754208436,
+    "upper": 1.1434443021452598e-05
+   },
+   "C_point": 0.007063716186630991,
+   "F_point": 0.00733407122942919,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": -0.00024387201624502877,
+   "D_draw_sd": 0.00015918573856072302,
+   "D_interval": {
+    "lower": -0.0005486346779515395,
+    "upper": 7.614577717433255e-05
+   },
+   "C_point": 0.008939700816315621,
+   "F_point": 0.009183572832560652,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": -0.00028224015744429936,
+   "D_draw_sd": 0.00010009585919550086,
+   "D_interval": {
+    "lower": -0.0004796136054509308,
+    "upper": -8.688619979046642e-05
+   },
+   "C_point": 0.006405338190207527,
+   "F_point": 0.006687578347651826,
+   "label": "C beats F"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": -0.00024218777259103763,
+   "D_draw_sd": 0.00015394378513569523,
+   "D_interval": {
+    "lower": -0.00054382207789105,
+    "upper": 6.0418007190367046e-05
+   },
+   "C_point": 0.0070358231988490675,
+   "F_point": 0.007278010971440102,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": -0.0002720188523766048,
+   "D_draw_sd": 0.000139374617924818,
+   "D_interval": {
+    "lower": -0.0005430075302581374,
+    "upper": 7.306594550984021e-06
+   },
+   "C_point": 0.007046078352836632,
+   "F_point": 0.007318097205213236,
+   "label": "not distinguished"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.026049166399909812,
+   "D_draw_sd": 0.0028523545474981246,
+   "D_interval": {
+    "lower": 0.020536429065001114,
+    "upper": 0.03175325953258436
+   },
+   "C_point": 0.07561617607590831,
+   "F_point": 0.0495670096759985,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.019048263364990433,
+   "D_draw_sd": 0.002868711689384975,
+   "D_interval": {
+    "lower": 0.013551034781579,
+    "upper": 0.02475423489459426
+   },
+   "C_point": 0.06563638646922093,
+   "F_point": 0.04658812310423049,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.022714972874386348,
+   "D_draw_sd": 0.00283371054263207,
+   "D_interval": {
+    "lower": 0.017234868153270428,
+    "upper": 0.028330325181747502
+   },
+   "C_point": 0.07192689939301469,
+   "F_point": 0.04921192651862834,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.02854005910545327,
+   "D_draw_sd": 0.003593640362543632,
+   "D_interval": {
+    "lower": 0.021802613667726626,
+    "upper": 0.03578581532792316
+   },
+   "C_point": 0.07823551120689917,
+   "F_point": 0.049695452101445915,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.02174807296273732,
+   "D_draw_sd": 0.003069783239933498,
+   "D_interval": {
+    "lower": 0.015954974176620344,
+    "upper": 0.027898280813143436
+   },
+   "C_point": 0.06762694870351496,
+   "F_point": 0.04587887574077761,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.020006752355744346,
+   "D_draw_sd": 0.00280184099198862,
+   "D_interval": {
+    "lower": 0.014551624409743792,
+    "upper": 0.025668645276834164
+   },
+   "C_point": 0.06808628559208528,
+   "F_point": 0.04807953323634095,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.03708290410198413,
+   "D_draw_sd": 0.0032704699700325883,
+   "D_interval": {
+    "lower": 0.030769019200541484,
+    "upper": 0.043569187443752315
+   },
+   "C_point": 0.0952930077154172,
+   "F_point": 0.05821010361343306,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.030859434113242053,
+   "D_draw_sd": 0.0031818097536908388,
+   "D_interval": {
+    "lower": 0.024646614269787374,
+    "upper": 0.037017688413313286
+   },
+   "C_point": 0.08541524374552022,
+   "F_point": 0.05455580963227817,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.039183403674675675,
+   "D_draw_sd": 0.0036467635936448094,
+   "D_interval": {
+    "lower": 0.0323195670462022,
+    "upper": 0.04659645366314652
+   },
+   "C_point": 0.10152556156654975,
+   "F_point": 0.062342157891874084,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.03694821820549811,
+   "D_draw_sd": 0.0034683418475954094,
+   "D_interval": {
+    "lower": 0.03031558720361309,
+    "upper": 0.043879973516199704
+   },
+   "C_point": 0.09301823109601615,
+   "F_point": 0.05607001289051804,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.03804466518758877,
+   "D_draw_sd": 0.003426576502065573,
+   "D_interval": {
+    "lower": 0.031616232308430366,
+    "upper": 0.04501931025497476
+   },
+   "C_point": 0.09460066904098903,
+   "F_point": 0.05655600385340025,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.03502218973152668,
+   "D_draw_sd": 0.0034070405345184465,
+   "D_interval": {
+    "lower": 0.028531854902735847,
+    "upper": 0.04193363693637751
+   },
+   "C_point": 0.09205386053994356,
+   "F_point": 0.0570316708084169,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 3.9266639001085464e-05,
+   "D_draw_sd": 2.996964374077597e-06,
+   "D_interval": {
+    "lower": 3.378801014423386e-05,
+    "upper": 4.558013253252251e-05
+   },
+   "C_point": 4.237403495485748e-05,
+   "F_point": 3.1073959537720287e-06,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 4.782950664960414e-05,
+   "D_draw_sd": 4.368302921724287e-06,
+   "D_interval": {
+    "lower": 3.9963775951468095e-05,
+    "upper": 5.713934860833691e-05
+   },
+   "C_point": 5.139798149575592e-05,
+   "F_point": 3.5684748461517826e-06,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 4.8542998768872854e-05,
+   "D_draw_sd": 3.2049019572053265e-06,
+   "D_interval": {
+    "lower": 4.278396823910857e-05,
+    "upper": 5.514637694965582e-05
+   },
+   "C_point": 5.122952614940075e-05,
+   "F_point": 2.6865273805279068e-06,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 4.580990055967072e-05,
+   "D_draw_sd": 4.077405265109639e-06,
+   "D_interval": {
+    "lower": 3.8572504373046e-05,
+    "upper": 5.445856738114344e-05
+   },
+   "C_point": 4.865820900361123e-05,
+   "F_point": 2.848308443940527e-06,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 4.588907130179434e-05,
+   "D_draw_sd": 2.7475983160733217e-06,
+   "D_interval": {
+    "lower": 4.0624463960989374e-05,
+    "upper": 5.140903877236517e-05
+   },
+   "C_point": 4.8752966264803505e-05,
+   "F_point": 2.8638949630091677e-06,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R0",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 4.338488776733239e-05,
+   "D_draw_sd": 3.483321884937709e-06,
+   "D_interval": {
+    "lower": 3.711661886598881e-05,
+    "upper": 5.075236190474139e-05
+   },
+   "C_point": 4.640198541841933e-05,
+   "F_point": 3.0170976510869275e-06,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.006173991931326808,
+   "D_draw_sd": 0.00041202976635949215,
+   "D_interval": {
+    "lower": 0.005382494762076627,
+    "upper": 0.0069940033755457945
+   },
+   "C_point": 0.00629348899796635,
+   "F_point": 0.00011949706663954257,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.005966339078684957,
+   "D_draw_sd": 0.0004333630015091865,
+   "D_interval": {
+    "lower": 0.005146937791026021,
+    "upper": 0.006845153189417506
+   },
+   "C_point": 0.0060709100683193126,
+   "F_point": 0.00010457098963435841,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.0068232854710292504,
+   "D_draw_sd": 0.00040184401371549055,
+   "D_interval": {
+    "lower": 0.006058706163003425,
+    "upper": 0.00762594150994689
+   },
+   "C_point": 0.00693382217922166,
+   "F_point": 0.00011053670819241054,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.00667118238900279,
+   "D_draw_sd": 0.0003819069299063876,
+   "D_interval": {
+    "lower": 0.005919107162382952,
+    "upper": 0.007410452162580445
+   },
+   "C_point": 0.0067732627684662745,
+   "F_point": 0.00010208037946348499,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.00547404433734966,
+   "D_draw_sd": 0.00033638957351979495,
+   "D_interval": {
+    "lower": 0.004833813527947752,
+    "upper": 0.006147884470551981
+   },
+   "C_point": 0.005564445140590537,
+   "F_point": 9.0400803240876e-05,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N1",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.006334237471914611,
+   "D_draw_sd": 0.00036387938389322597,
+   "D_interval": {
+    "lower": 0.00561539961063944,
+    "upper": 0.00705278840926297
+   },
+   "C_point": 0.0064440406740684615,
+   "F_point": 0.0001098032021538492,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.018113740762787805,
+   "D_draw_sd": 0.0011837775169450402,
+   "D_interval": {
+    "lower": 0.01586108392669997,
+    "upper": 0.020448168680149828
+   },
+   "C_point": 0.018470677960148906,
+   "F_point": 0.000356937197361108,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.017499176849285362,
+   "D_draw_sd": 0.0012287531191094287,
+   "D_interval": {
+    "lower": 0.0151596944205184,
+    "upper": 0.019963219188357143
+   },
+   "C_point": 0.017798359138129806,
+   "F_point": 0.00029918228884444234,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.01966735860997868,
+   "D_draw_sd": 0.0011863081955509915,
+   "D_interval": {
+    "lower": 0.017399815497947172,
+    "upper": 0.02206093153451425
+   },
+   "C_point": 0.019987798232446896,
+   "F_point": 0.000320439622468217,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.019677315395007368,
+   "D_draw_sd": 0.001142960113025613,
+   "D_interval": {
+    "lower": 0.017446606657746673,
+    "upper": 0.02190924174101277
+   },
+   "C_point": 0.01997449178179933,
+   "F_point": 0.0002971763867919688,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.016330544767795697,
+   "D_draw_sd": 0.001014307094075265,
+   "D_interval": {
+    "lower": 0.014387037964002107,
+    "upper": 0.018358684264233784
+   },
+   "C_point": 0.016595354660867912,
+   "F_point": 0.00026480989307221554,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N2",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.01860058562371362,
+   "D_draw_sd": 0.0010937539632266979,
+   "D_interval": {
+    "lower": 0.016458039173587107,
+    "upper": 0.020769331212641913
+   },
+   "C_point": 0.018912069828040116,
+   "F_point": 0.0003114842043265001,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.20643467802394713,
+   "D_draw_sd": 0.009709453545955865,
+   "D_interval": {
+    "lower": 0.18775889401339266,
+    "upper": 0.2256462550019361
+   },
+   "C_point": 0.2114737261731336,
+   "F_point": 0.005039048149186519,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.20956143067310756,
+   "D_draw_sd": 0.008938852913102376,
+   "D_interval": {
+    "lower": 0.1927591290734299,
+    "upper": 0.22757498887513963
+   },
+   "C_point": 0.21363358024990325,
+   "F_point": 0.004072149576795703,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.20248105473636513,
+   "D_draw_sd": 0.009319587703504668,
+   "D_interval": {
+    "lower": 0.18412252246276992,
+    "upper": 0.22041428929733778
+   },
+   "C_point": 0.20713918297099437,
+   "F_point": 0.004658128234629246,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.18536460813471684,
+   "D_draw_sd": 0.008802508847728721,
+   "D_interval": {
+    "lower": 0.1679720933264974,
+    "upper": 0.20277853063458132
+   },
+   "C_point": 0.18913845232925847,
+   "F_point": 0.0037738441945416217,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.2060542390778272,
+   "D_draw_sd": 0.009514252223073302,
+   "D_interval": {
+    "lower": 0.1876664030336148,
+    "upper": 0.22498891328371867
+   },
+   "C_point": 0.21004147641330775,
+   "F_point": 0.003987237335480541,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R5",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.19680291102014968,
+   "D_draw_sd": 0.009822750796404597,
+   "D_interval": {
+    "lower": 0.17775965199476115,
+    "upper": 0.21635788316311155
+   },
+   "C_point": 0.20173712085542905,
+   "F_point": 0.0049342098352793415,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.0002363264481365214,
+   "D_draw_sd": 2.4439213693843814e-05,
+   "D_interval": {
+    "lower": 0.00019397125225157125,
+    "upper": 0.0002887892237551711
+   },
+   "C_point": 0.0002556159994179623,
+   "F_point": 1.928955128144083e-05,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.000269944269735059,
+   "D_draw_sd": 1.7880725570496786e-05,
+   "D_interval": {
+    "lower": 0.00023573408664920257,
+    "upper": 0.0003055313577403487
+   },
+   "C_point": 0.00029232289937043243,
+   "F_point": 2.2378629635373426e-05,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.0002457164466777309,
+   "D_draw_sd": 2.7532439570936352e-05,
+   "D_interval": {
+    "lower": 0.00019970443295746717,
+    "upper": 0.00030604316970225354
+   },
+   "C_point": 0.0002657687412954294,
+   "F_point": 2.005229461769856e-05,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.0002555503447673407,
+   "D_draw_sd": 2.2141941062153002e-05,
+   "D_interval": {
+    "lower": 0.00021496069289466107,
+    "upper": 0.00030189431003901663
+   },
+   "C_point": 0.00027665779996687766,
+   "F_point": 2.1107455199536897e-05,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.00023252956656625358,
+   "D_draw_sd": 1.6556558573191348e-05,
+   "D_interval": {
+    "lower": 0.00020123134366247027,
+    "upper": 0.00026527922113359407
+   },
+   "C_point": 0.00025145797862251095,
+   "F_point": 1.892841205625735e-05,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R0",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.0002883550314523724,
+   "D_draw_sd": 1.7458142687389368e-05,
+   "D_interval": {
+    "lower": 0.00025573284233795606,
+    "upper": 0.0003235058546155517
+   },
+   "C_point": 0.0003067897301322865,
+   "F_point": 1.843469867991417e-05,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.003628590084705104,
+   "D_draw_sd": 0.00034169730394954925,
+   "D_interval": {
+    "lower": 0.00298384083429785,
+    "upper": 0.004331267250665612
+   },
+   "C_point": 0.0045040390348531755,
+   "F_point": 0.000875448950148071,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.003974428056428727,
+   "D_draw_sd": 0.00038460158983234105,
+   "D_interval": {
+    "lower": 0.0032386548222459875,
+    "upper": 0.0047481600472139415
+   },
+   "C_point": 0.004790394523644414,
+   "F_point": 0.0008159664672156882,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.004220373899482455,
+   "D_draw_sd": 0.0004462300093134814,
+   "D_interval": {
+    "lower": 0.0033865664309515476,
+    "upper": 0.005134317161978931
+   },
+   "C_point": 0.005082826593520893,
+   "F_point": 0.0008624526940384394,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.0038981073545557013,
+   "D_draw_sd": 0.0003573158135857295,
+   "D_interval": {
+    "lower": 0.003236316711929463,
+    "upper": 0.0046177070920606625
+   },
+   "C_point": 0.004705636110423782,
+   "F_point": 0.0008075287558680803,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.003809240768121595,
+   "D_draw_sd": 0.000385643299414498,
+   "D_interval": {
+    "lower": 0.0030739362322782762,
+    "upper": 0.004581184057422903
+   },
+   "C_point": 0.004642006986578314,
+   "F_point": 0.0008327662184567201,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N1",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.004424913514547128,
+   "D_draw_sd": 0.00039831825760567365,
+   "D_interval": {
+    "lower": 0.003679304935377524,
+    "upper": 0.005222339543017162
+   },
+   "C_point": 0.0051746885885415265,
+   "F_point": 0.0007497750739943974,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.010623442731220572,
+   "D_draw_sd": 0.001025585407333882,
+   "D_interval": {
+    "lower": 0.008729648583116287,
+    "upper": 0.012736803563932803
+   },
+   "C_point": 0.013205596290346244,
+   "F_point": 0.0025821535591256726,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.011666940465534658,
+   "D_draw_sd": 0.0010870078097441481,
+   "D_interval": {
+    "lower": 0.009596754655303604,
+    "upper": 0.013843157595082407
+   },
+   "C_point": 0.014028260510656818,
+   "F_point": 0.002361320045122158,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.013353014909027428,
+   "D_draw_sd": 0.0013037476010838934,
+   "D_interval": {
+    "lower": 0.010878408160973416,
+    "upper": 0.016034564149513486
+   },
+   "C_point": 0.015743240419284675,
+   "F_point": 0.0023902255102572494,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.011391663043153887,
+   "D_draw_sd": 0.001075105464998466,
+   "D_interval": {
+    "lower": 0.009371792017258221,
+    "upper": 0.013570820973644022
+   },
+   "C_point": 0.013702127490120456,
+   "F_point": 0.0023104644469665704,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.01146151744863052,
+   "D_draw_sd": 0.0011362573898864585,
+   "D_interval": {
+    "lower": 0.009274297489697972,
+    "upper": 0.013748158780849734
+   },
+   "C_point": 0.013883876922751162,
+   "F_point": 0.002422359474120642,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N2",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.013263156066285298,
+   "D_draw_sd": 0.0011969487064167953,
+   "D_interval": {
+    "lower": 0.011037437837204402,
+    "upper": 0.015683123067980486
+   },
+   "C_point": 0.015458958765389445,
+   "F_point": 0.002195802699104149,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 101,
+   "panel": "first",
+   "D_point": 0.07702387844431582,
+   "D_draw_sd": 0.005887842342314146,
+   "D_interval": {
+    "lower": 0.06600029968204937,
+    "upper": 0.0889227270045326
+   },
+   "C_point": 0.0952930077154172,
+   "F_point": 0.018269129271101376,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 211,
+   "panel": "first",
+   "D_point": 0.06778713285111751,
+   "D_draw_sd": 0.005270744836612108,
+   "D_interval": {
+    "lower": 0.057788574580609785,
+    "upper": 0.07845155731909555
+   },
+   "C_point": 0.08541524374552022,
+   "F_point": 0.0176281108944027,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 307,
+   "panel": "first",
+   "D_point": 0.08343220225353867,
+   "D_draw_sd": 0.006743993887047622,
+   "D_interval": {
+    "lower": 0.07087481657737665,
+    "upper": 0.09718734483665657
+   },
+   "C_point": 0.10152556156654975,
+   "F_point": 0.018093359313011082,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 401,
+   "panel": "new",
+   "D_point": 0.07647183290623771,
+   "D_draw_sd": 0.006225279402730035,
+   "D_interval": {
+    "lower": 0.0648575115749288,
+    "upper": 0.08926125082776472
+   },
+   "C_point": 0.09301823109601615,
+   "F_point": 0.016546398189778436,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 503,
+   "panel": "new",
+   "D_point": 0.07590089385037255,
+   "D_draw_sd": 0.005934348309668434,
+   "D_interval": {
+    "lower": 0.06485829336914348,
+    "upper": 0.08801854902228388
+   },
+   "C_point": 0.09460066904098903,
+   "F_point": 0.0186997751906165,
+   "label": "F beats C"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R5",
+   "dataset_seed": 607,
+   "panel": "new",
+   "D_point": 0.07555950545469467,
+   "D_draw_sd": 0.005957232297753237,
+   "D_interval": {
+    "lower": 0.06433049840687921,
+    "upper": 0.08751901379580103
+   },
+   "C_point": 0.09205386053994356,
+   "F_point": 0.016494355085248887,
+   "label": "F beats C"
+  }
+ ],
+ "pooled_table": [
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "mean_C": 0.002885735751742021,
+   "mean_F": 0.0031517837953710984,
+   "pooled_D": -0.00036525480098762895,
+   "pooled_D_interval": {
+    "lower": -0.0006732691769331156,
+    "upper": -5.7240425042142285e-05
+   },
+   "se_hksj": 0.0001198228244187533,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": -0.00036525480098762895,
+   "q_stat": 3.2784281051823463,
+   "df": 5,
+   "first_panel_statement": "mixed",
+   "first_panel_labels": {
+    "101": "C beats F",
+    "211": "not distinguished",
+    "307": "not distinguished"
+   },
+   "new_panel_statement": "not distinguished",
+   "new_panel_labels": {
+    "401": "not distinguished",
+    "503": "not distinguished",
+    "607": "not distinguished"
+   },
+   "pooled_label": "C beats F",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "mean_C": 0.007912303382775867,
+   "mean_F": 0.00793030117803409,
+   "pooled_D": -6.091167020899745e-05,
+   "pooled_D_interval": {
+    "lower": -0.00022824465404338163,
+    "upper": 0.00010642131362538672
+   },
+   "se_hksj": 6.509537316206977e-05,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": -6.091167020899745e-05,
+   "q_stat": 1.8582430964849097,
+   "df": 5,
+   "first_panel_statement": "not distinguished",
+   "first_panel_labels": {
+    "101": "not distinguished",
+    "211": "not distinguished",
+    "307": "not distinguished"
+   },
+   "new_panel_statement": "not distinguished",
+   "new_panel_labels": {
+    "401": "not distinguished",
+    "503": "not distinguished",
+    "607": "not distinguished"
+   },
+   "pooled_label": "not distinguished",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "mean_C": 0.02032124392524957,
+   "mean_F": 0.016594672537098214,
+   "pooled_D": 0.0037015833920618028,
+   "pooled_D_interval": {
+    "lower": 0.002679577271166682,
+    "upper": 0.004723589512956924
+   },
+   "se_hksj": 0.0003975777416330092,
+   "tau2": 6.336716199543829e-07,
+   "I2": 0.6256824227863395,
+   "fixed_effect_D": 0.0036537659690157064,
+   "q_stat": 13.35764149046626,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "undetermined",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "mean_C": 0.06017728160211666,
+   "mean_F": 0.03038357844766022,
+   "pooled_D": 0.029725774208401883,
+   "pooled_D_interval": {
+    "lower": 0.02518526104731149,
+    "upper": 0.034266287369492276
+   },
+   "se_hksj": 0.0017663367484141773,
+   "tau2": 1.0180058998468324e-05,
+   "I2": 0.5252086725905993,
+   "fixed_effect_D": 0.02964874385435155,
+   "q_stat": 10.530942145218726,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "mean_C": 0.1418033439298849,
+   "mean_F": 0.038356588260909125,
+   "pooled_D": 0.10328679504817945,
+   "pooled_D_interval": {
+    "lower": 0.09627393057710061,
+    "upper": 0.11029965951925828
+   },
+   "se_hksj": 0.002728123405315705,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.10328679504817945,
+   "q_stat": 3.8371662696164837,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "mean_C": 0.20294086483499937,
+   "mean_F": 0.036479103598099326,
+   "pooled_D": 0.1668753900938971,
+   "pooled_D_interval": {
+    "lower": 0.15699415677623058,
+    "upper": 0.17675662341156362
+   },
+   "se_hksj": 0.0038439676110216254,
+   "tau2": 5.317984135215241e-06,
+   "I2": 0.05994310132539372,
+   "fixed_effect_D": 0.1669019484706053,
+   "q_stat": 5.31882698488734,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "mean_C": 0.03824445234589253,
+   "mean_F": 0.024733652906882442,
+   "pooled_D": 0.013421237089562344,
+   "pooled_D_interval": {
+    "lower": 0.01167082522941108,
+    "upper": 0.01517164894971361
+   },
+   "se_hksj": 0.0006809399474800123,
+   "tau2": 4.3286059472561904e-07,
+   "I2": 0.1546738945528485,
+   "fixed_effect_D": 0.013404194596042146,
+   "q_stat": 5.914877072624125,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "mean_C": 0.20553834270578708,
+   "mean_F": 0.03710007169237153,
+   "pooled_D": 0.16821153384252255,
+   "pooled_D_interval": {
+    "lower": 0.1585951898630843,
+    "upper": 0.1778278778219608
+   },
+   "se_hksj": 0.0037409211588308924,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.16821153384252255,
+   "q_stat": 4.628975143778774,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "mean_C": 0.003987625039716985,
+   "mean_F": 0.00395706468135157,
+   "pooled_D": 6.084499960219393e-05,
+   "pooled_D_interval": {
+    "lower": -0.0002761848170034327,
+    "upper": 0.00039787481620782056
+   },
+   "se_hksj": 0.00013111032371478624,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 6.084499960219393e-05,
+   "q_stat": 3.4691504218090716,
+   "df": 5,
+   "first_panel_statement": "not distinguished",
+   "first_panel_labels": {
+    "101": "not distinguished",
+    "211": "not distinguished",
+    "307": "not distinguished"
+   },
+   "new_panel_statement": "not distinguished",
+   "new_panel_labels": {
+    "401": "not distinguished",
+    "503": "not distinguished",
+    "607": "not distinguished"
+   },
+   "pooled_label": "not distinguished",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "mean_C": 0.007803387853317935,
+   "mean_F": 0.007971410592022781,
+   "pooled_D": -0.00014315091424363065,
+   "pooled_D_interval": {
+    "lower": -0.0005017783832164367,
+    "upper": 0.00021547655472917534
+   },
+   "se_hksj": 0.00013951217736043496,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": -0.00014315091424363065,
+   "q_stat": 3.779146045524249,
+   "df": 5,
+   "first_panel_statement": "not distinguished",
+   "first_panel_labels": {
+    "101": "not distinguished",
+    "211": "not distinguished",
+    "307": "not distinguished"
+   },
+   "new_panel_statement": "not distinguished",
+   "new_panel_labels": {
+    "401": "not distinguished",
+    "503": "not distinguished",
+    "607": "not distinguished"
+   },
+   "pooled_label": "not distinguished",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "mean_C": 0.01658031111898278,
+   "mean_F": 0.01556093280416137,
+   "pooled_D": 0.001043762837963773,
+   "pooled_D_interval": {
+    "lower": 0.0006588414786761289,
+    "upper": 0.001428684197251417
+   },
+   "se_hksj": 0.00014974094734173743,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.001043762837963773,
+   "q_stat": 2.642826762358525,
+   "df": 5,
+   "first_panel_statement": "mixed",
+   "first_panel_labels": {
+    "101": "not distinguished",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "mixed",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "not distinguished",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "mean_C": 0.04643456356987092,
+   "mean_F": 0.034435430546043734,
+   "pooled_D": 0.011783473642349537,
+   "pooled_D_interval": {
+    "lower": 0.010125736545066894,
+    "upper": 0.01344121073963218
+   },
+   "se_hksj": 0.0006448878904772511,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.011783473642349537,
+   "q_stat": 4.233150851476661,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "mean_C": 0.09024266195121962,
+   "mean_F": 0.05758862375672811,
+   "pooled_D": 0.032259628621662,
+   "pooled_D_interval": {
+    "lower": 0.028827484728311405,
+    "upper": 0.03569177251501259
+   },
+   "se_hksj": 0.0013351622756258255,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.032259628621662,
+   "q_stat": 4.926237060931054,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "mean_C": 0.010373212215578527,
+   "mean_F": 0.009891980328642703,
+   "pooled_D": 0.0004339648175562244,
+   "pooled_D_interval": {
+    "lower": 0.0001087559911788181,
+    "upper": 0.0007591736439336307
+   },
+   "se_hksj": 0.00012651175771531312,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.0004339648175562244,
+   "q_stat": 3.3429596885740667,
+   "df": 5,
+   "first_panel_statement": "mixed",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "not distinguished",
+    "307": "not distinguished"
+   },
+   "new_panel_statement": "not distinguished",
+   "new_panel_labels": {
+    "401": "not distinguished",
+    "503": "not distinguished",
+    "607": "not distinguished"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "mean_C": 0.07115711774422058,
+   "mean_F": 0.0484401166993976,
+   "pooled_D": 0.022482260112692557,
+   "pooled_D_interval": {
+    "lower": 0.018918461886756704,
+    "upper": 0.02604605833862841
+   },
+   "se_hksj": 0.001386378047386179,
+   "tau2": 2.5771533757466884e-06,
+   "I2": 0.22739483554278772,
+   "fixed_effect_D": 0.02243031870149324,
+   "q_stat": 6.4716108952141305,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "original 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "mean_C": 0.0936633717486396,
+   "mean_F": 0.05832683647866898,
+   "pooled_D": 0.03509005600553143,
+   "pooled_D_interval": {
+    "lower": 0.031655679797419845,
+    "upper": 0.03852443221364302
+   },
+   "se_hksj": 0.0013360306839877174,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.03509005600553143,
+   "q_stat": 4.706477627391916,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R0",
+   "mean_C": 4.813578388114137e-05,
+   "mean_F": 4.830018566117283e-05,
+   "pooled_D": -1.2561054775279378e-07,
+   "pooled_D_interval": {
+    "lower": -4.328454216589181e-07,
+    "upper": 1.816243261533305e-07
+   },
+   "se_hksj": 1.1951958488420277e-07,
+   "tau2": 4.775267826868369e-14,
+   "I2": 0.5329667017136224,
+   "fixed_effect_D": -7.979811326028469e-08,
+   "q_stat": 10.705874759563882,
+   "df": 5,
+   "first_panel_statement": "mixed",
+   "first_panel_labels": {
+    "101": "C beats F",
+    "211": "not distinguished",
+    "307": "not distinguished"
+   },
+   "new_panel_statement": "not distinguished",
+   "new_panel_labels": {
+    "401": "not distinguished",
+    "503": "not distinguished",
+    "607": "not distinguished"
+   },
+   "pooled_label": "not distinguished",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N1",
+   "mean_C": 0.006346661638105432,
+   "mean_F": 0.006111896802383544,
+   "pooled_D": 0.00023122770768247967,
+   "pooled_D_interval": {
+    "lower": 0.00017069776893439972,
+    "upper": 0.0002917576464305596
+   },
+   "se_hksj": 2.3547174382447362e-05,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.00023122770768247967,
+   "q_stat": 1.7042371210459892,
+   "df": 5,
+   "first_panel_statement": "mixed",
+   "first_panel_labels": {
+    "101": "not distinguished",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "mixed",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "not distinguished",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N2",
+   "mean_C": 0.01862312526690549,
+   "mean_F": 0.01515979786337737,
+   "pooled_D": 0.0034383151604629805,
+   "pooled_D_interval": {
+    "lower": 0.0027374182206920776,
+    "upper": 0.0041392121002338834
+   },
+   "se_hksj": 0.00027266081556100494,
+   "tau2": 8.264729198999441e-08,
+   "I2": 0.1813926054264706,
+   "fixed_effect_D": 0.0034306091469343165,
+   "q_stat": 6.107934075778602,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "undetermined",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N3",
+   "mean_C": 0.05879980908159078,
+   "mean_F": 0.028978158682825456,
+   "pooled_D": 0.029773989573584098,
+   "pooled_D_interval": {
+    "lower": 0.02561431418361453,
+    "upper": 0.03393366496355367
+   },
+   "se_hksj": 0.0016181843862363924,
+   "tau2": 6.209445822334971e-06,
+   "I2": 0.3846499386053924,
+   "fixed_effect_D": 0.02974280230312307,
+   "q_stat": 8.125456246267657,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "N4",
+   "mean_C": 0.14001924027335913,
+   "mean_F": 0.03752199010058812,
+   "pooled_D": 0.10196504597938597,
+   "pooled_D_interval": {
+    "lower": 0.09683945547761923,
+    "upper": 0.1070906364811527
+   },
+   "se_hksj": 0.001993941772524026,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.10196504597938597,
+   "q_stat": 1.8805562415069372,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R3-TFI",
+   "mean_C": 0.20256568795809135,
+   "mean_F": 0.03666625005307384,
+   "pooled_D": 0.16624006966710933,
+   "pooled_D_interval": {
+    "lower": 0.15700636079914093,
+    "upper": 0.17547377853507773
+   },
+   "se_hksj": 0.0035920696007262923,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.16624006966710933,
+   "q_stat": 4.9465653099055285,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R4",
+   "mean_C": 0.03832493779370825,
+   "mean_F": 0.024636675385255703,
+   "pooled_D": 0.013609905048508232,
+   "pooled_D_interval": {
+    "lower": 0.01202220571799449,
+    "upper": 0.015197604379021975
+   },
+   "se_hksj": 0.0006176420094872133,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.013609905048508232,
+   "q_stat": 4.742951776139636,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "tfi",
+   "rung": "R5",
+   "mean_C": 0.2055272564986711,
+   "mean_F": 0.03684898464045148,
+   "pooled_D": 0.16848585098050747,
+   "pooled_D_interval": {
+    "lower": 0.1588305006807847,
+    "upper": 0.17814120128023025
+   },
+   "se_hksj": 0.0037560952800137996,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.16848585098050747,
+   "q_stat": 4.652620015135483,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R0",
+   "mean_C": 0.0002747688581342499,
+   "mean_F": 0.00027811844736503553,
+   "pooled_D": -2.985023569838836e-06,
+   "pooled_D_interval": {
+    "lower": -4.6415179044414965e-06,
+    "upper": -1.3285292352361754e-06
+   },
+   "se_hksj": 6.444044346841876e-07,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": -2.985023569838836e-06,
+   "q_stat": 3.671029449939728,
+   "df": 5,
+   "first_panel_statement": "C beats F",
+   "first_panel_labels": {
+    "101": "C beats F",
+    "211": "C beats F",
+    "307": "C beats F"
+   },
+   "new_panel_statement": "not distinguished",
+   "new_panel_labels": {
+    "401": "not distinguished",
+    "503": "not distinguished",
+    "607": "not distinguished"
+   },
+   "pooled_label": "C beats F",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N1",
+   "mean_C": 0.0048165986395936845,
+   "mean_F": 0.004836114568576857,
+   "pooled_D": -1.905385393706859e-05,
+   "pooled_D_interval": {
+    "lower": -7.01198270488367e-05,
+    "upper": 3.2012119174699505e-05
+   },
+   "se_hksj": 1.9865530987511773e-05,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": -1.905385393706859e-05,
+   "q_stat": 4.572574743587386,
+   "df": 5,
+   "first_panel_statement": "not distinguished",
+   "first_panel_labels": {
+    "101": "not distinguished",
+    "211": "not distinguished",
+    "307": "not distinguished"
+   },
+   "new_panel_statement": "not distinguished",
+   "new_panel_labels": {
+    "401": "not distinguished",
+    "503": "not distinguished",
+    "607": "not distinguished"
+   },
+   "pooled_label": "not distinguished",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N2",
+   "mean_C": 0.014337010066424799,
+   "mean_F": 0.01367561705406247,
+   "pooled_D": 0.0006575574178183956,
+   "pooled_D_interval": {
+    "lower": 0.0004709379031891336,
+    "upper": 0.0008441769324476576
+   },
+   "se_hksj": 7.259816125755307e-05,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.0006575574178183956,
+   "q_stat": 1.3187546389598257,
+   "df": 5,
+   "first_panel_statement": "mixed",
+   "first_panel_labels": {
+    "101": "not distinguished",
+    "211": "not distinguished",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N3",
+   "mean_C": 0.043998306503200045,
+   "mean_F": 0.03369394088785155,
+   "pooled_D": 0.01012169392286065,
+   "pooled_D_interval": {
+    "lower": 0.008875818593312521,
+    "upper": 0.011367569252408779
+   },
+   "se_hksj": 0.0004846666666185825,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.01012169392286065,
+   "q_stat": 2.4933371405657336,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "N4",
+   "mean_C": 0.08934646097686794,
+   "mean_F": 0.05497321023663925,
+   "pooled_D": 0.033680884556133356,
+   "pooled_D_interval": {
+    "lower": 0.030840869931576226,
+    "upper": 0.036520899180690486
+   },
+   "se_hksj": 0.0011048139316887843,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.033680884556133356,
+   "q_stat": 2.5122949432568698,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R3-Heis",
+   "mean_C": 0.00725362800409464,
+   "mean_F": 0.007522185239360151,
+   "pooled_D": -0.0002719921494426199,
+   "pooled_D_interval": {
+    "lower": -0.0002938957589670528,
+    "upper": -0.00025008853991818696
+   },
+   "se_hksj": 8.520876177050777e-06,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": -0.0002719921494426199,
+   "q_stat": 0.12008221176195324,
+   "df": 5,
+   "first_panel_statement": "mixed",
+   "first_panel_labels": {
+    "101": "C beats F",
+    "211": "not distinguished",
+    "307": "not distinguished"
+   },
+   "new_panel_statement": "mixed",
+   "new_panel_labels": {
+    "401": "C beats F",
+    "503": "not distinguished",
+    "607": "not distinguished"
+   },
+   "pooled_label": "C beats F",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R4",
+   "mean_C": 0.07118803457344057,
+   "mean_F": 0.048170153396236974,
+   "pooled_D": 0.022736650058235434,
+   "pooled_D_interval": {
+    "lower": 0.01909172798054874,
+    "upper": 0.02638157213592213
+   },
+   "se_hksj": 0.001417936603751206,
+   "tau2": 2.9429732743693257e-06,
+   "I2": 0.2491970352810904,
+   "fixed_effect_D": 0.02266750461375433,
+   "q_stat": 6.659536835835394,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong 2,048",
+   "family": "heisenberg",
+   "rung": "R5",
+   "mean_C": 0.09365109561740598,
+   "mean_F": 0.05746095978165342,
+   "pooled_D": 0.03600303288021847,
+   "pooled_D_interval": {
+    "lower": 0.03282243697418473,
+    "upper": 0.039183628786252214
+   },
+   "se_hksj": 0.0012373058355663775,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.03600303288021847,
+   "q_stat": 3.995024926761487,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R0",
+   "mean_C": 4.813578388114137e-05,
+   "mean_F": 3.015283206414723e-06,
+   "pooled_D": 4.481957615301017e-05,
+   "pooled_D_interval": {
+    "lower": 4.110264367130132e-05,
+    "upper": 4.853650863471902e-05
+   },
+   "se_hksj": 1.4459498741415365e-06,
+   "tau2": 1.4548775803946272e-12,
+   "I2": 0.11305406186844455,
+   "fixed_effect_D": 4.479158029261175e-05,
+   "q_stat": 5.637322169300447,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N1",
+   "mean_C": 0.006346661638105432,
+   "mean_F": 0.00010614819155408695,
+   "pooled_D": 0.00622491606599344,
+   "pooled_D_interval": {
+    "lower": 0.00569596695063512,
+    "upper": 0.00675386518135176
+   },
+   "se_hksj": 0.00020577019102268156,
+   "tau2": 1.1918306201445098e-07,
+   "I2": 0.4453060524969957,
+   "fixed_effect_D": 0.006207168267227955,
+   "q_stat": 9.013979731540012,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "N2",
+   "mean_C": 0.01862312526690549,
+   "mean_F": 0.0003083382654774086,
+   "pooled_D": 0.018262803506893535,
+   "pooled_D_interval": {
+    "lower": 0.01686457465285711,
+    "upper": 0.01966103236092996
+   },
+   "se_hksj": 0.000543934775642073,
+   "tau2": 5.314219309872098e-07,
+   "I2": 0.2914264486551748,
+   "fixed_effect_D": 0.01823552882715456,
+   "q_stat": 7.056430472899157,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "tfi",
+   "rung": "R5",
+   "mean_C": 0.2055272564986711,
+   "mean_F": 0.004410769554318828,
+   "pooled_D": 0.20088971177509132,
+   "pooled_D_interval": {
+    "lower": 0.19122363364595124,
+    "upper": 0.2105557899042314
+   },
+   "se_hksj": 0.003760268587888536,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.20088971177509132,
+   "q_stat": 4.874863832028198,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.003696241148030241,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.019987624632727175,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R0",
+   "mean_C": 0.0002747688581342499,
+   "mean_F": 2.003184024503687e-05,
+   "pooled_D": 0.0002566715391777442,
+   "pooled_D_interval": {
+    "lower": 0.00023270197243764935,
+    "upper": 0.0002806411059178391
+   },
+   "se_hksj": 9.324568627927582e-06,
+   "tau2": 1.4848333499975573e-10,
+   "I2": 0.2670579899686079,
+   "fixed_effect_D": 0.0002571084901225811,
+   "q_stat": 6.821822097202272,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N1",
+   "mean_C": 0.0048165986395936845,
+   "mean_F": 0.0008239896932868995,
+   "pooled_D": 0.0039599640942770045,
+   "pooled_D_interval": {
+    "lower": 0.0036588147153857314,
+    "upper": 0.0042611134731682775
+   },
+   "se_hksj": 0.00011715222395039116,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.0039599640942770045,
+   "q_stat": 2.82773331351748,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically negligible",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "N2",
+   "mean_C": 0.014337010066424799,
+   "mean_F": 0.0023770542891160735,
+   "pooled_D": 0.011818693601961876,
+   "pooled_D_interval": {
+    "lower": 0.010699613087124818,
+    "upper": 0.012937774116798934
+   },
+   "se_hksj": 0.0004353413298589047,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.011818693601961876,
+   "q_stat": 4.475624957167725,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  },
+  {
+   "fit_set": "strong exact",
+   "family": "heisenberg",
+   "rung": "R5",
+   "mean_C": 0.09365109561740598,
+   "mean_F": 0.01762185465735983,
+   "pooled_D": 0.07537510586421457,
+   "pooled_D_interval": {
+    "lower": 0.07005915799167592,
+    "upper": 0.08069105373675323
+   },
+   "se_hksj": 0.002067994023315256,
+   "tau2": 0.0,
+   "I2": 0.0,
+   "fixed_effect_D": 0.07537510586421457,
+   "q_stat": 3.6181489266219313,
+   "df": 5,
+   "first_panel_statement": "F beats C",
+   "first_panel_labels": {
+    "101": "F beats C",
+    "211": "F beats C",
+    "307": "F beats C"
+   },
+   "new_panel_statement": "F beats C",
+   "new_panel_labels": {
+    "401": "F beats C",
+    "503": "F beats C",
+    "607": "F beats C"
+   },
+   "pooled_label": "F beats C",
+   "delta": 0.00591197265649771,
+   "practical_verdict": "practically relevant gain",
+   "shot_noise_scale": 0.020359789865449247,
+   "shot_noise_source": "exact"
+  }
+ ],
+ "markdown_table": "| Fit Set | Family | Rung | Mean C | Pooled D [95% HKSJ CI] | tau^2 | I^2 | Panel 1 (101-307) | Panel 2 (401-607) | Pooled Label | delta | Practical Verdict | Shot Noise Scale |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| original 2,048 | tfi | R0 | 0.00289 | -0.00037 [-0.00067, -0.00006] | 0.00e+00 | 0.0% | mixed | not distinguished | C beats F | 0.00370 | practically negligible | 0.01999 (exact) |\n| original 2,048 | tfi | N1 | 0.00791 | -0.00006 [-0.00023, +0.00011] | 0.00e+00 | 0.0% | not distinguished | not distinguished | not distinguished | 0.00370 | practically negligible | 0.01999 (exact) |\n| original 2,048 | tfi | N2 | 0.02032 | +0.00370 [+0.00268, +0.00472] | 6.34e-07 | 62.6% | F beats C | F beats C | F beats C | 0.00370 | undetermined | 0.01999 (exact) |\n| original 2,048 | tfi | N3 | 0.06018 | +0.02973 [+0.02519, +0.03427] | 1.02e-05 | 52.5% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| original 2,048 | tfi | N4 | 0.14180 | +0.10329 [+0.09627, +0.11030] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| original 2,048 | tfi | R3-TFI | 0.20294 | +0.16688 [+0.15699, +0.17676] | 5.32e-06 | 6.0% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| original 2,048 | tfi | R4 | 0.03824 | +0.01342 [+0.01167, +0.01517] | 4.33e-07 | 15.5% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| original 2,048 | tfi | R5 | 0.20554 | +0.16821 [+0.15860, +0.17783] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| original 2,048 | heisenberg | R0 | 0.00399 | +0.00006 [-0.00028, +0.00040] | 0.00e+00 | 0.0% | not distinguished | not distinguished | not distinguished | 0.00591 | practically negligible | 0.02036 (exact) |\n| original 2,048 | heisenberg | N1 | 0.00780 | -0.00014 [-0.00050, +0.00022] | 0.00e+00 | 0.0% | not distinguished | not distinguished | not distinguished | 0.00591 | practically negligible | 0.02036 (exact) |\n| original 2,048 | heisenberg | N2 | 0.01658 | +0.00104 [+0.00066, +0.00143] | 0.00e+00 | 0.0% | mixed | mixed | F beats C | 0.00591 | practically negligible | 0.02036 (exact) |\n| original 2,048 | heisenberg | N3 | 0.04643 | +0.01178 [+0.01013, +0.01344] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n| original 2,048 | heisenberg | N4 | 0.09024 | +0.03226 [+0.02883, +0.03569] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n| original 2,048 | heisenberg | R3-Heis | 0.01037 | +0.00043 [+0.00011, +0.00076] | 0.00e+00 | 0.0% | mixed | not distinguished | F beats C | 0.00591 | practically negligible | 0.02036 (exact) |\n| original 2,048 | heisenberg | R4 | 0.07116 | +0.02248 [+0.01892, +0.02605] | 2.58e-06 | 22.7% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n| original 2,048 | heisenberg | R5 | 0.09366 | +0.03509 [+0.03166, +0.03852] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n| strong 2,048 | tfi | R0 | 0.00005 | -0.00000 [-0.00000, +0.00000] | 4.78e-14 | 53.3% | mixed | not distinguished | not distinguished | 0.00370 | practically negligible | 0.01999 (exact) |\n| strong 2,048 | tfi | N1 | 0.00635 | +0.00023 [+0.00017, +0.00029] | 0.00e+00 | 0.0% | mixed | mixed | F beats C | 0.00370 | practically negligible | 0.01999 (exact) |\n| strong 2,048 | tfi | N2 | 0.01862 | +0.00344 [+0.00274, +0.00414] | 8.26e-08 | 18.1% | F beats C | F beats C | F beats C | 0.00370 | undetermined | 0.01999 (exact) |\n| strong 2,048 | tfi | N3 | 0.05880 | +0.02977 [+0.02561, +0.03393] | 6.21e-06 | 38.5% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| strong 2,048 | tfi | N4 | 0.14002 | +0.10197 [+0.09684, +0.10709] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| strong 2,048 | tfi | R3-TFI | 0.20257 | +0.16624 [+0.15701, +0.17547] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| strong 2,048 | tfi | R4 | 0.03832 | +0.01361 [+0.01202, +0.01520] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| strong 2,048 | tfi | R5 | 0.20553 | +0.16849 [+0.15883, +0.17814] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| strong 2,048 | heisenberg | R0 | 0.00027 | -0.00000 [-0.00000, -0.00000] | 0.00e+00 | 0.0% | C beats F | not distinguished | C beats F | 0.00591 | practically negligible | 0.02036 (exact) |\n| strong 2,048 | heisenberg | N1 | 0.00482 | -0.00002 [-0.00007, +0.00003] | 0.00e+00 | 0.0% | not distinguished | not distinguished | not distinguished | 0.00591 | practically negligible | 0.02036 (exact) |\n| strong 2,048 | heisenberg | N2 | 0.01434 | +0.00066 [+0.00047, +0.00084] | 0.00e+00 | 0.0% | mixed | F beats C | F beats C | 0.00591 | practically negligible | 0.02036 (exact) |\n| strong 2,048 | heisenberg | N3 | 0.04400 | +0.01012 [+0.00888, +0.01137] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n| strong 2,048 | heisenberg | N4 | 0.08935 | +0.03368 [+0.03084, +0.03652] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n| strong 2,048 | heisenberg | R3-Heis | 0.00725 | -0.00027 [-0.00029, -0.00025] | 0.00e+00 | 0.0% | mixed | mixed | C beats F | 0.00591 | practically negligible | 0.02036 (exact) |\n| strong 2,048 | heisenberg | R4 | 0.07119 | +0.02274 [+0.01909, +0.02638] | 2.94e-06 | 24.9% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n| strong 2,048 | heisenberg | R5 | 0.09365 | +0.03600 [+0.03282, +0.03918] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n| strong exact | tfi | R0 | 0.00005 | +0.00004 [+0.00004, +0.00005] | 1.45e-12 | 11.3% | F beats C | F beats C | F beats C | 0.00370 | practically negligible | 0.01999 (exact) |\n| strong exact | tfi | N1 | 0.00635 | +0.00622 [+0.00570, +0.00675] | 1.19e-07 | 44.5% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| strong exact | tfi | N2 | 0.01862 | +0.01826 [+0.01686, +0.01966] | 5.31e-07 | 29.1% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| strong exact | tfi | R5 | 0.20553 | +0.20089 [+0.19122, +0.21056] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00370 | practically relevant gain | 0.01999 (exact) |\n| strong exact | heisenberg | R0 | 0.00027 | +0.00026 [+0.00023, +0.00028] | 1.48e-10 | 26.7% | F beats C | F beats C | F beats C | 0.00591 | practically negligible | 0.02036 (exact) |\n| strong exact | heisenberg | N1 | 0.00482 | +0.00396 [+0.00366, +0.00426] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00591 | practically negligible | 0.02036 (exact) |\n| strong exact | heisenberg | N2 | 0.01434 | +0.01182 [+0.01070, +0.01294] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n| strong exact | heisenberg | R5 | 0.09365 | +0.07538 [+0.07006, +0.08069] | 0.00e+00 | 0.0% | F beats C | F beats C | F beats C | 0.00591 | practically relevant gain | 0.02036 (exact) |\n\n### Absent Rungs\n- strong exact / tfi: N3, N4, R3-TFI, R4\n- strong exact / heisenberg: N3, N4, R3-Heis, R4"
+}
