@@ -61,6 +61,121 @@ PYTHONPATH=. python -m reanalysis.mlqem.analyze --fits artifacts/mlqem-own-data/
 
 `analyze.py` reports, per setting and model, C, F, P, R, Rcal, D = C − F, D/C, F − R, F − Rcal, and P − F, with two-stage percentile intervals (learner seeds, then whole test circuits) and the label of D, plus a descriptive per-step table. Deterministic arms repeat their single prediction across the 20 learner-seed slots. Before computing, it requires every fit and its record, the rule's SHA-256, the manifest's data SHA-256 values, and identical circuit identifiers, targets, and steps across arms and seeds; any gap stops it. `reproduction_check` holds the rule's random-forest ratio and verdict and the MLP's ratio, each with the per-seed spread, and each cell carries `test_is_validation`.
 
+## Exact Labels and Exact Descriptors
+
+Round 9 follow-up analyses support exact statevector labels and exact circuit descriptors under `docs/frozen-rules/2026-10-06-round9-follow-ups.md`.
+
+### 1. Generating Exact Labels and Manifests
+
+`reanalysis.mlqem.exact` calculates exact statevector labels and circuit parameters for each circuit. It extracts the coupling constant J, the measurement basis, and Trotter step count.
+
+```bash
+PYTHONPATH=. $MLQEM_PY -m reanalysis.mlqem.exact \
+    --data-root <upstream-dir> \
+    --settings no_readout readout coherent \
+    --splits <splits> \
+    --out-dir <exact-dir> \
+    --frozen-rule docs/frozen-rules/2026-10-06-round9-follow-ups.md
+```
+
+Each output NPZ file contains exact labels, archived labels, coupling J, basis indicators, and Trotter steps. The companion JSON manifest records source file and output SHA-256 digests with a statistical validation block.
+
+Once all eight setting and split manifests are generated, evaluate the quality gate:
+
+```bash
+PYTHONPATH=. $MLQEM_PY -m reanalysis.mlqem.exact gate \
+    --exact-dir <exact-dir> \
+    --frozen-rule docs/frozen-rules/2026-10-06-round9-follow-ups.md
+```
+
+The gate verifies binomial shot-noise thresholds across all eight splits and writes `gate.json`.
+
+### 2. Rescoring Against Exact Targets
+
+`analyze.py` accepts `--targets {archived,exact}` (default `archived`), `--exact-dir <exact-dir>`, and `--fit-frozen-rule <rule>`.
+
+```bash
+PYTHONPATH=. python -m reanalysis.mlqem.analyze \
+    --fits <fits-dir> \
+    --out <out-path> \
+    --settings no_readout readout coherent \
+    --models ols rf mlp \
+    --draws 10000 --bootstrap-seed 20261002 \
+    --targets exact --exact-dir <exact-dir> \
+    --frozen-rule docs/frozen-rules/2026-10-06-round9-follow-ups.md \
+    --fit-frozen-rule docs/frozen-rules/2026-10-04-mlqem-own-data.md
+```
+
+Under `--targets exact`, the analyzer requires `gate.json` to exist and pass. It checks that archived labels in the exact NPZ match stored fit targets in float32 precision. It also verifies circuit identifiers and steps in order. It then rescores all arms against the exact targets. Each cell reports `C_minus_R`, `F_minus_R`, and `reference_error`. The output references the round-8 reproduction report.
+
+### 3. Fitting with Exact Descriptors and Exact Targets
+
+`run.py` accepts `--descriptors {encoding,exact}` (default `encoding`), `--train-targets {archived,exact}` (default `archived`), and `--exact-dir <exact-dir>`.
+
+```bash
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. \
+  $MLQEM_PY -m reanalysis.mlqem.run \
+    --settings no_readout readout coherent --models ols rf mlp \
+    --arms F C P R Rcal --seeds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 \
+    --descriptors exact --train-targets archived --exact-dir <exact-dir> \
+    --data-root <upstream-dir> --output-dir <fits-dir> --workers 8 \
+    --frozen-rule docs/frozen-rules/2026-10-06-round9-follow-ups.md
+```
+
+When `--descriptors exact` is specified, five extra features append to the descriptor block. Learned arm F reads 63 features, arm C reads 59 features, and arm P permutes only the four noisy columns. When `--train-targets exact` is specified, training and validation use exact labels, while test targets remain archived references. Fits record `train_targets`, `descriptors`, and input SHA-256 values in their metadata records.
+
+### 4. Secondary Refits and F/C Scoring
+
+The primary cell (no readout error, random forest) receives two secondary fit sets at learner seeds 1 to 20. Both use exact training targets (`--train-targets exact`).
+
+```bash
+# Secondary refit with published encoding
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. \
+  $MLQEM_PY -m reanalysis.mlqem.run \
+    --settings no_readout --models rf --arms F C --seeds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 \
+    --descriptors encoding --train-targets exact --exact-dir artifacts/mlqem-exact \
+    --data-root <upstream-dir> \
+    --output-dir artifacts/mlqem-own-data/round9/exact-training-encoding/fits \
+    --workers 8 --frozen-rule docs/frozen-rules/2026-10-06-round9-follow-ups.md
+
+# Secondary refit with exact descriptors
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. \
+  $MLQEM_PY -m reanalysis.mlqem.run \
+    --settings no_readout --models rf --arms F C --seeds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 \
+    --descriptors exact --train-targets exact --exact-dir artifacts/mlqem-exact \
+    --data-root <upstream-dir> \
+    --output-dir artifacts/mlqem-own-data/round9/exact-training-exact/fits \
+    --workers 8 --frozen-rule docs/frozen-rules/2026-10-06-round9-follow-ups.md
+```
+
+Each fits directory is scored against both exact and archived targets using `--analysis-arms F C`. Set `<descriptors>` to `encoding` for `exact-training-encoding` and to `exact` for `exact-training-exact`; the analyzer rejects a fit whose descriptor mode differs.
+
+```bash
+# Score against exact targets
+PYTHONPATH=. python -m reanalysis.mlqem.analyze \
+    --fits artifacts/mlqem-own-data/round9/<variant>/fits \
+    --out artifacts/mlqem-own-data/round9/<variant>/analysis-exact.json \
+    --analysis-arms F C --settings no_readout --models rf \
+    --seeds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 \
+    --draws 10000 --bootstrap-seed 20261002 \
+    --descriptors <descriptors> \
+    --targets exact --exact-dir artifacts/mlqem-exact \
+    --frozen-rule docs/frozen-rules/2026-10-06-round9-follow-ups.md
+
+# Score against archived targets
+PYTHONPATH=. python -m reanalysis.mlqem.analyze \
+    --fits artifacts/mlqem-own-data/round9/<variant>/fits \
+    --out artifacts/mlqem-own-data/round9/<variant>/analysis-archived.json \
+    --analysis-arms F C --settings no_readout --models rf \
+    --seeds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 \
+    --draws 10000 --bootstrap-seed 20261002 \
+    --descriptors <descriptors> \
+    --targets archived \
+    --frozen-rule docs/frozen-rules/2026-10-06-round9-follow-ups.md
+```
+
+Under `--analysis-arms F C`, the analyzer evaluates only arms F and C. It computes C, F, D, and D/C with bootstrap intervals, as well as the D label. It requires identical `train_targets` across the roster and records it in each analysis report. Under `--targets exact`, it also reports `reference_error`.
+
 ## Tests
 
-`reanalysis/mlqem/tests/test_throwaway.py` (mlqem environment) tests the encoding against `encode_data`, the arms, determinism, the runner, the scheduler's validation loss, the manifest and step-file checks, and the environment check on generated circuits only. `tests/test_mlqem_reanalysis.py` (py312) tests `analyze.py` on synthetic fits: the shared Rcal file, missing fits, reordered circuits, identity mismatches, the coherent note, the manifest inventory, and the reproduction bounds.
+`reanalysis/mlqem/tests/test_throwaway.py` (mlqem environment) tests the encoding against `encode_data`, the arms, determinism, the runner, the scheduler's validation loss, the manifest and step-file checks, and the environment check on generated circuits only. `reanalysis/mlqem/tests/test_exact.py` (mlqem environment) tests exact labels on hand-built circuits, agreement with `cal_z_exp`, recovery of J and basis, and invariance of default paths. `tests/test_mlqem_reanalysis.py` (py312) tests `analyze.py` on synthetic fits: the shared Rcal file, missing fits, reordered circuits, identity mismatches, the coherent note, the manifest inventory, and the reproduction bounds.

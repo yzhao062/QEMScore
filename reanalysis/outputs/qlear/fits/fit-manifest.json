@@ -1,0 +1,198 @@
+{
+ "arms": {
+  "A": {
+   "columns": [
+    "Num_1Q_Gates",
+    "Num_2Q_Gates",
+    "circuit_depth",
+    "circuit_width",
+    "state_weight"
+   ],
+   "kind": "affine"
+  },
+  "C4": {
+   "columns": [
+    "Num_1Q_Gates",
+    "Num_2Q_Gates",
+    "circuit_depth",
+    "circuit_width"
+   ],
+   "kind": "network"
+  },
+  "C": {
+   "columns": [
+    "Num_1Q_Gates",
+    "Num_2Q_Gates",
+    "circuit_depth",
+    "circuit_width",
+    "state_weight"
+   ],
+   "kind": "network"
+  },
+  "O": {
+   "columns": [
+    "Num_1Q_Gates",
+    "Num_2Q_Gates",
+    "circuit_depth",
+    "circuit_width",
+    "state_weight",
+    "observed_prob_50",
+    "Avg_odds_ratio"
+   ],
+   "kind": "network"
+  },
+  "F": {
+   "columns": [
+    "Num_1Q_Gates",
+    "Num_2Q_Gates",
+    "circuit_depth",
+    "circuit_width",
+    "state_weight",
+    "observed_prob_50",
+    "Avg_odds_ratio",
+    "Avg_inverted_error_25",
+    "Avg_inverted_error_50",
+    "Avg_inverted_error_75"
+   ],
+   "kind": "network"
+  }
+ },
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9
+ ],
+ "dropped_columns": [
+  "Avg_inverted_error",
+  "observed_prob_25",
+  "observed_prob_75"
+ ],
+ "n_train_rows": 9486,
+ "n_validation_rows": 1050,
+ "panels": {
+  "hardware": [
+   "groundstate_ibm_lagos",
+   "groundstate_ibm_nairobi",
+   "groundstate_ibm_perth",
+   "groundstate_ibmq_belem",
+   "groundstate_ibmq_jakarta",
+   "groundstate_ibmq_lima",
+   "groundstate_ibmq_manila",
+   "groundstate_ibmq_quito",
+   "pricingcall_ibm_lagos",
+   "pricingcall_ibm_nairobi",
+   "pricingcall_ibm_perth",
+   "pricingcall_ibmq_belem",
+   "pricingcall_ibmq_jakarta",
+   "pricingcall_ibmq_lima",
+   "pricingcall_ibmq_manila",
+   "pricingcall_ibmq_quito",
+   "pricingput_ibm_lagos",
+   "pricingput_ibm_nairobi",
+   "pricingput_ibm_perth",
+   "pricingput_ibmq_belem",
+   "pricingput_ibmq_jakarta",
+   "pricingput_ibmq_lima",
+   "pricingput_ibmq_manila",
+   "pricingput_ibmq_quito",
+   "qaoa_ibm_lagos",
+   "qaoa_ibm_nairobi",
+   "qaoa_ibm_perth",
+   "qaoa_ibmq_belem",
+   "qaoa_ibmq_jakarta",
+   "qaoa_ibmq_lima",
+   "qaoa_ibmq_manila",
+   "qaoa_ibmq_quito",
+   "routing_ibm_lagos",
+   "routing_ibm_nairobi",
+   "routing_ibm_perth",
+   "routing_ibmq_belem",
+   "routing_ibmq_jakarta",
+   "routing_ibmq_lima",
+   "routing_ibmq_manila",
+   "routing_ibmq_quito",
+   "tsp_ibm_lagos",
+   "tsp_ibm_nairobi",
+   "tsp_ibm_perth",
+   "tsp_ibmq_belem",
+   "tsp_ibmq_jakarta",
+   "tsp_ibmq_lima",
+   "tsp_ibmq_manila",
+   "tsp_ibmq_quito"
+  ],
+  "simulator": [
+   "groundstate_ibm_lagos",
+   "groundstate_ibm_nairobi",
+   "groundstate_ibm_perth",
+   "groundstate_ibmq_belem",
+   "groundstate_ibmq_jakarta",
+   "groundstate_ibmq_lima",
+   "groundstate_ibmq_manila",
+   "groundstate_ibmq_quito",
+   "pricingcall_ibm_lagos",
+   "pricingcall_ibm_nairobi",
+   "pricingcall_ibm_perth",
+   "pricingcall_ibmq_belem",
+   "pricingcall_ibmq_jakarta",
+   "pricingcall_ibmq_lima",
+   "pricingcall_ibmq_manila",
+   "pricingcall_ibmq_quito",
+   "pricingput_ibm_lagos",
+   "pricingput_ibm_nairobi",
+   "pricingput_ibm_perth",
+   "pricingput_ibmq_belem",
+   "pricingput_ibmq_jakarta",
+   "pricingput_ibmq_lima",
+   "pricingput_ibmq_manila",
+   "pricingput_ibmq_quito",
+   "qaoa_ibm_lagos",
+   "qaoa_ibm_nairobi",
+   "qaoa_ibm_perth",
+   "qaoa_ibmq_belem",
+   "qaoa_ibmq_jakarta",
+   "qaoa_ibmq_lima",
+   "qaoa_ibmq_manila",
+   "qaoa_ibmq_quito",
+   "routing_ibm_lagos",
+   "routing_ibm_nairobi",
+   "routing_ibm_perth",
+   "routing_ibmq_belem",
+   "routing_ibmq_jakarta",
+   "routing_ibmq_lima",
+   "routing_ibmq_manila",
+   "routing_ibmq_quito",
+   "tsp_ibm_lagos",
+   "tsp_ibm_nairobi",
+   "tsp_ibm_perth",
+   "tsp_ibmq_belem",
+   "tsp_ibmq_jakarta",
+   "tsp_ibmq_lima",
+   "tsp_ibmq_manila",
+   "tsp_ibmq_quito"
+  ]
+ },
+ "recipe": {
+  "hidden_layers": [
+   128,
+   1000,
+   128
+  ],
+  "hidden_dropouts": [
+   0,
+   0.5,
+   0
+  ],
+  "bn": false,
+  "batch_size": 128,
+  "lr": 0.0001,
+  "early_stopping": 20,
+  "reduce_on_plateau": 3
+ }
+}

@@ -16,6 +16,7 @@ import numpy as np
 
 from reanalysis.mlqem.encode import encode_setting_dataset, SETTINGS
 from reanalysis.mlqem.arms import run_arm_job, compute_file_sha256
+from reanalysis.mlqem.exact import check_gate_approval
 
 
 def enforce_frozen_rule(frozen_rule: str):
@@ -76,6 +77,37 @@ def environment_record(data_root: str, strict: bool) -> Dict[str, Any]:
     return record
 
 
+def _find_exact_file_for_split(exact_dir: str, setting: str, split: str) -> str:
+    """Finds exact npz file for a setting and split."""
+    config = SETTINGS.get(setting)
+    dir_name = config["dir_name"] if config else setting
+    candidates = [
+        os.path.join(exact_dir, f"exact-{setting}-{split}.npz"),
+        os.path.join(exact_dir, f"exact-{dir_name}-{split}.npz"),
+    ]
+    for cand in candidates:
+        if os.path.isfile(cand):
+            return cand
+    raise FileNotFoundError(
+        f"Could not find exact npz file for setting={setting} split={split} in {exact_dir}. "
+        f"Checked: {candidates}"
+    )
+
+
+def _load_exact_features(npz_path: str) -> Tuple[np.ndarray, str]:
+    """Loads 5-column exact parameter features and file SHA-256."""
+    sha = compute_file_sha256(npz_path)
+    with np.load(npz_path) as ex_data:
+        j_col = np.nan_to_num(ex_data["J"], nan=0.0)[:, None]
+        basis_raw = ex_data["basis"]
+        b0 = (basis_raw == 0).astype(float)[:, None]
+        b1 = (basis_raw == 1).astype(float)[:, None]
+        b2 = (basis_raw == 2).astype(float)[:, None]
+        steps_col = ex_data["steps"].astype(float)[:, None]
+        feats = np.hstack([j_col, b0, b1, b2, steps_col])
+    return feats, sha
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="ML-QEM Replication Control Runner")
     parser.add_argument("--settings", nargs="+",
@@ -97,6 +129,12 @@ def parse_args():
                         help="Path to frozen rule file (strictly required)")
     parser.add_argument("--no-manifest-check", action="store_true",
                         help="rehearsal on generated data only: skip the upstream SHA-256 manifest")
+    parser.add_argument("--descriptors", choices=["encoding", "exact"], default="encoding",
+                        help="Descriptor set: encoding (58 cols) or exact (63 cols with exact parameters)")
+    parser.add_argument("--train-targets", choices=["archived", "exact"], default="archived",
+                        help="Targets used for training and validation: archived (default) or exact")
+    parser.add_argument("--exact-dir", type=str, default=None,
+                        help="Directory containing exact-<setting>-<split>.npz files")
     return parser.parse_args()
 
 
@@ -110,6 +148,8 @@ def job_worker(job_dict: Dict[str, Any]) -> Dict[str, Any]:
     encoded_npz = job_dict["encoded_npz"]
     encoded_json = job_dict["encoded_json"]
     frozen_rule = job_dict["frozen_rule"]
+    descriptors = job_dict.get("descriptors", "encoding")
+    train_targets = job_dict.get("train_targets", "archived")
 
     base_name = f"{setting}_{model}_{arm}_seed{seed}"
     npz_path = os.path.join(output_dir, f"{base_name}.npz")
@@ -120,23 +160,62 @@ def job_worker(job_dict: Dict[str, Any]) -> Dict[str, Any]:
         return {"status": "skipped", "job": base_name, "reason": "output_exists"}
 
     # Load encoded data from cache
-    with np.load(encoded_npz) as data:
-        X_tr = data["X_train"]
-        y_tr = data["y_train"]
-        X_va = data["X_val"]
-        y_va = data["y_val"]
-        X_te = data["X_test"]
-        y_te = data["y_test"]
-        noisy_range = tuple(data["noisy_range"])
-        test_steps = data["test_steps"].tolist()
-        test_files = data["test_circuit_files"].tolist()
-        test_indices = data["test_circuit_indices"].tolist()
-        test_ids = list(zip(test_files, test_indices))
+    with np.load(encoded_npz) as raw_data:
+        data = {k: raw_data[k] for k in raw_data.files}
+    X_tr = data["X_train"]
+    y_tr = data["y_train"]
+    X_va = data["X_val"]
+    y_va = data["y_val"]
+    X_te = data["X_test"]
+    y_te = data["y_test"]
+    noisy_range = tuple(data["noisy_range"])
+    test_steps = data["test_steps"].tolist()
+    test_files = data["test_circuit_files"].tolist()
+    test_indices = data["test_circuit_indices"].tolist()
+    test_ids = list(zip(test_files, test_indices))
 
     with open(encoded_json, "r") as f:
         meta = json.load(f)
     test_is_val = meta.get("test_is_validation", False)
     input_shas = meta.get("input_files_sha256", {})
+
+    exact_shas = {}
+    if descriptors == "exact" or train_targets == "exact":
+        exact_paths = job_dict["exact_npz_paths"]
+        for split_key, y_split in (("train", y_tr), ("val", y_va), ("test", y_te)):
+            ep = exact_paths[split_key]
+            exact_shas[os.path.basename(ep)] = compute_file_sha256(ep)
+            with np.load(ep) as ex_check:
+                if f"{split_key}_circuit_files" in data:
+                    if not np.array_equal(data[f"{split_key}_circuit_files"], ex_check["step_file"]):
+                        raise ValueError(f"Encoded {split_key} circuit files do not match exact npz in order")
+                if f"{split_key}_circuit_indices" in data:
+                    if not np.array_equal(data[f"{split_key}_circuit_indices"], ex_check["entry_index"]):
+                        raise ValueError(f"Encoded {split_key} circuit indices do not match exact npz in order")
+                if f"{split_key}_steps" in data:
+                    if not np.array_equal(data[f"{split_key}_steps"], ex_check["steps"]):
+                        raise ValueError(f"Encoded {split_key} steps do not match exact npz in order")
+                archived = np.asarray(ex_check["archived"], dtype=np.float64)
+                if archived.shape != np.asarray(y_split).shape or not np.allclose(
+                        archived, np.asarray(y_split, dtype=np.float64), rtol=0.0, atol=1e-6):
+                    raise ValueError(f"Exact npz rows do not match the encoded {split_key} labels")
+
+        if train_targets == "exact":
+            with np.load(exact_paths["train"]) as ex_tr_npz:
+                y_tr = ex_tr_npz["exact"]
+            with np.load(exact_paths["val"]) as ex_va_npz:
+                y_va = ex_va_npz["exact"]
+
+        if descriptors == "exact":
+            if tuple(int(v) for v in noisy_range) != (54, 58):
+                raise ValueError(f"Expected noisy columns (54, 58), found {noisy_range}")
+            exact_tr, h_tr = _load_exact_features(exact_paths["train"])
+            exact_va, h_va = _load_exact_features(exact_paths["val"])
+            exact_te, h_te = _load_exact_features(exact_paths["test"])
+            X_tr = np.hstack([X_tr[:, :54], exact_tr, X_tr[:, 54:58]])
+            X_va = np.hstack([X_va[:, :54], exact_va, X_va[:, 54:58]])
+            X_te = np.hstack([X_te[:, :54], exact_te, X_te[:, 54:58]])
+            noisy_range = (59, 63)
 
     # Execute fit and prediction
     run_arm_job(
@@ -156,10 +235,14 @@ def job_worker(job_dict: Dict[str, Any]) -> Dict[str, Any]:
         test_steps=test_steps,
         test_is_validation=test_is_val,
         frozen_rule_path=frozen_rule,
-        data_files_sha256=input_shas
+        data_files_sha256=input_shas,
+        descriptors=descriptors,
+        exact_npz_sha256=exact_shas if (descriptors == "exact" or train_targets == "exact") else None,
+        train_targets=train_targets,
     )
 
     return {"status": "completed", "job": base_name}
+
 
 
 def main():
@@ -189,6 +272,27 @@ def main():
         )
         encoded_map[setting] = (npz_p, json_p)
 
+    need_exact = (args.descriptors == "exact" or args.train_targets == "exact")
+    exact_paths_by_setting = {}
+    if need_exact:
+        if not args.exact_dir or not os.path.isdir(args.exact_dir):
+            raise ValueError(
+                f"With exact descriptors or train-targets, --exact-dir must be an existing directory, got {args.exact_dir!r}"
+            )
+        all_exact_paths = []
+        for setting in args.settings:
+            config = SETTINGS[setting]
+            tr_p = _find_exact_file_for_split(args.exact_dir, setting, config["train_split"])
+            va_p = _find_exact_file_for_split(args.exact_dir, setting, config["val_split"])
+            te_p = _find_exact_file_for_split(args.exact_dir, setting, config["test_split"])
+            exact_paths_by_setting[setting] = {
+                "train": tr_p,
+                "val": va_p,
+                "test": te_p,
+            }
+            all_exact_paths.extend([tr_p, va_p, te_p])
+        check_gate_approval(args.exact_dir, expected_npz_paths=sorted(set(all_exact_paths)))
+
     # Schedule jobs
     jobs = []
     for setting in args.settings:
@@ -212,7 +316,7 @@ def main():
                     seeds_to_run = args.seeds
 
                 for seed in seeds_to_run:
-                    jobs.append({
+                    j_info = {
                         "setting": setting,
                         "model": model,
                         "arm": arm,
@@ -220,8 +324,14 @@ def main():
                         "output_dir": args.output_dir,
                         "encoded_npz": npz_p,
                         "encoded_json": json_p,
-                        "frozen_rule": args.frozen_rule
-                    })
+                        "frozen_rule": args.frozen_rule,
+                        "descriptors": args.descriptors,
+                        "train_targets": args.train_targets,
+                    }
+                    if need_exact:
+                        j_info["exact_npz_paths"] = exact_paths_by_setting[setting]
+                    jobs.append(j_info)
+
 
     print(f"Total jobs scheduled: {len(jobs)} across {args.workers} workers.")
 

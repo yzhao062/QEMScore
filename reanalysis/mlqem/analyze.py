@@ -131,6 +131,13 @@ SETTING_DIRS = {
 MANIFEST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "upstream_data_sha256.json")
 
 
+TEST_SPLITS = {
+    "no_readout": "val_extra",
+    "readout": "val_Zonly",
+    "coherent": "val",
+}
+
+
 def canonical_setting(setting: str) -> str:
     """Maps a raw ML-QEM directory name to its setting name; other names pass unchanged."""
     for name, dir_name in SETTING_DIRS.items():
@@ -139,7 +146,63 @@ def canonical_setting(setting: str) -> str:
     return setting
 
 
-def load_fit(fits_dir: str, setting: str, model: str, arm: str, seed: int) -> Dict[str, Any]:
+def find_exact_file(exact_dir: str, setting: str) -> str:
+    """Locates the exact npz file for a setting and its canonical test split."""
+    can_setting = canonical_setting(setting)
+    split = TEST_SPLITS.get(can_setting)
+    if not split:
+        raise ValueError(f"Unknown test split for setting {setting!r}")
+    candidates = [
+        os.path.join(exact_dir, f"exact-{can_setting}-{split}.npz"),
+        os.path.join(exact_dir, f"exact-{SETTING_DIRS.get(can_setting, can_setting)}-{split}.npz"),
+    ]
+    for cand in candidates:
+        if os.path.isfile(cand):
+            return cand
+    raise FileNotFoundError(
+        f"Could not find exact npz file for setting={setting} split={split} in {exact_dir}. "
+        f"Checked: {candidates}"
+    )
+
+
+def check_gate_approval(exact_dir: str, expected_npz_paths: Optional[List[str]] = None) -> Dict[str, Any]:
+    """Requires that gate.json exists in exact_dir, passed, and matches expected NPZ hashes."""
+    gate_path = os.path.join(exact_dir, "gate.json")
+    if not os.path.isfile(gate_path):
+        raise FileNotFoundError(
+            f"Gate file not found: {gate_path}. Exact label operations require gate.json to exist and pass."
+        )
+    with open(gate_path, "r") as handle:
+        gate_data = json.load(handle)
+    is_passed = gate_data.get("gate_passed", gate_data.get("overall_pass", False))
+    if not is_passed:
+        raise ValueError(
+            f"Exact label gate check failed in {gate_path}. Operations on exact targets/descriptors are blocked."
+        )
+
+    if expected_npz_paths:
+        splits = gate_data.get("splits", {})
+        hash_to_split = {s_info.get("npz_sha256"): k for k, s_info in splits.items() if "npz_sha256" in s_info}
+        for npz_path in expected_npz_paths:
+            h = compute_file_sha256(npz_path)
+            fn = os.path.basename(npz_path)
+            found = False
+            for s_key, s_info in splits.items():
+                if s_info.get("npz_file") == fn:
+                    found = True
+                    if s_info.get("npz_sha256") != h:
+                        raise ValueError(
+                            f"{npz_path} SHA-256 {h} does not match gate.json recorded SHA-256 {s_info.get('npz_sha256')}"
+                        )
+                    break
+            if not found and h not in hash_to_split:
+                raise ValueError(f"{npz_path} is not recorded in {gate_path}")
+
+    return gate_data
+
+
+def load_fit(fits_dir: str, setting: str, model: str, arm: str, seed: int,
+             expected_descriptors: str = "encoding") -> Dict[str, Any]:
     """Loads one fit's NPZ arrays and its JSON record and checks them.
 
     The record must name the same job. Targets must be a nonempty (n, 4) array, predictions must
@@ -158,8 +221,17 @@ def load_fit(fits_dir: str, setting: str, model: str, arm: str, seed: int) -> Di
             raise ValueError(f"{json_path}: {key} is {meta.get(key)!r}, expected {value!r}")
     if meta.get("setting") not in (setting, SETTING_DIRS.get(setting)):
         raise ValueError(f"{json_path}: setting is {meta.get('setting')!r}, expected {setting!r}")
+    if expected_descriptors == "exact":
+        if meta.get("descriptors") != "exact":
+            raise ValueError(f"{json_path}: descriptors is {meta.get('descriptors')!r}, expected 'exact'")
+    else:
+        if meta.get("descriptors") == "exact":
+            raise ValueError(f"{json_path}: fit has descriptors='exact', expected 'encoding'")
     with np.load(npz_path) as data:
         arrays = {key: data[key] for key in ("predictions", "targets", "test_circuit_ids", "test_steps")}
+        for opt in ("test_circuit_files", "test_circuit_indices"):
+            if opt in data:
+                arrays[opt] = data[opt]
     targets = arrays["targets"]
     if targets.ndim != 2 or targets.shape[1] != 4 or len(targets) == 0:
         raise ValueError(f"{npz_path}: expected nonempty targets with four observables")
@@ -190,14 +262,22 @@ def check_manifest(setting: str, data_shas: Dict[str, str]) -> None:
                          f"unexpected={unexpected}, changed={changed}")
 
 
-def fit_plan(model: str, seeds: List[int]) -> List[Tuple[str, str, List[int], bool]]:
+def fit_plan(model: str, seeds: List[int], analysis_arms: Optional[List[str]] = None) -> List[Tuple[str, str, List[int], bool]]:
     """(arm, fitted model, seeds read, repeated across seed slots) for every arm of a cell."""
     is_ols = (model.lower() == "ols")
-    plan = [("R", model, [1], True), ("Rcal", "ols", [1], True)]
+    full_plan = [("R", model, [1], True), ("Rcal", "ols", [1], True)]
     for arm in ("F", "C"):
-        plan.append((arm, model, [1] if is_ols else list(seeds), is_ols))
-    plan.append(("P", model, list(seeds), False))
-    return plan
+        plan_seeds = [1] if is_ols else list(seeds)
+        full_plan.append((arm, model, plan_seeds, is_ols))
+    full_plan.append(("P", model, list(seeds), False))
+    if analysis_arms is None:
+        return full_plan
+    valid_arms = {"R", "Rcal", "F", "C", "P"}
+    unknown = set(analysis_arms) - valid_arms
+    if unknown:
+        raise ValueError(f"Unknown arms in --analysis-arms: {sorted(unknown)}")
+    arms_set = set(analysis_arms)
+    return [entry for entry in full_plan if entry[0] in arms_set]
 
 
 def load_model_fits(
@@ -207,6 +287,10 @@ def load_model_fits(
     seeds: List[int],
     rule_sha256: Optional[str] = None,
     manifest_check: bool = True,
+    targets_mode: str = "archived",
+    exact_dir: Optional[str] = None,
+    descriptors: str = "encoding",
+    analysis_arms: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """Loads and binds every fit of one setting and model; computes no error.
 
@@ -217,15 +301,40 @@ def load_model_fits(
     values (equal to the manifest's when `manifest_check`), rule SHA-256 (equal to `rule_sha256`
     when given), and `test_is_validation` flag.
     """
-    reference = None
+    exact_targets = None
+    archived_targets = None
+    ref_error = None
     input_files: List[str] = []
+
+    if targets_mode == "exact":
+        if not exact_dir or not os.path.isdir(exact_dir):
+            raise ValueError(f"With --targets exact, --exact-dir must be a valid directory, got {exact_dir!r}")
+        exact_path = find_exact_file(exact_dir, setting)
+        input_files.append(exact_path)
+        with np.load(exact_path) as ex_data:
+            exact_targets = ex_data["exact"]
+            archived_targets = ex_data["archived"]
+            exact_steps = ex_data["steps"]
+            exact_step_file = ex_data["step_file"]
+            exact_entry_index = ex_data["entry_index"]
+        ref_error = float(np.mean(np.mean(np.abs(archived_targets - exact_targets), axis=1)))
+
+    reference = None
+    roster_train_targets = None
     arms: Dict[str, Tuple[List[np.ndarray], bool]] = {}
-    for arm, fit_model, fit_seeds, repeat in fit_plan(model, seeds):
+    for arm, fit_model, fit_seeds, repeat in fit_plan(model, seeds, analysis_arms=analysis_arms):
         rows = []
         for s in fit_seeds:
-            fit = load_fit(fits_dir, setting, fit_model, arm, s)
+            fit = load_fit(fits_dir, setting, fit_model, arm, s, expected_descriptors=descriptors)
             input_files.extend([fit["npz"], fit["json"]])
             meta = fit["meta"]
+            fit_tt = meta.get("train_targets", "archived")
+            if roster_train_targets is None:
+                roster_train_targets = fit_tt
+            elif fit_tt != roster_train_targets:
+                raise ValueError(
+                    f"{fit['json']}: mixed train_targets in roster: {fit_tt!r} != {roster_train_targets!r}"
+                )
             binding = {
                 "frozen_rule_sha256": meta.get("frozen_rule_sha256"),
                 "data_files_sha256": meta.get("data_files_sha256"),
@@ -247,8 +356,34 @@ def load_model_fits(
             for key in ("test_circuit_ids", "targets", "test_steps"):
                 if not np.array_equal(fit[key], reference[key]):
                     raise ValueError(f"{fit['npz']}: {key} differ from {reference['first']}")
+            if targets_mode == "exact":
+                fit_targets = fit["targets"]
+                if not np.array_equal(fit_targets, archived_targets.astype(fit_targets.dtype)):
+                    raise ValueError(
+                        f"{fit['npz']}: fit targets do not match archived array of "
+                        f"{os.path.basename(exact_path)} exactly and in order"
+                    )
+                if not np.array_equal(fit["test_steps"], exact_steps):
+                    raise ValueError(
+                        f"{fit['npz']}: test steps do not match {os.path.basename(exact_path)} in order"
+                    )
+                if "test_circuit_files" in fit and not np.array_equal(fit["test_circuit_files"], exact_step_file):
+                    raise ValueError(
+                        f"{fit['npz']}: test circuit files do not match {os.path.basename(exact_path)} in order"
+                    )
+                if "test_circuit_indices" in fit and not np.array_equal(fit["test_circuit_indices"], exact_entry_index):
+                    raise ValueError(
+                        f"{fit['npz']}: test circuit indices do not match {os.path.basename(exact_path)} in order"
+                    )
+                exact_cids = np.array([f"{f}:{idx}" for f, idx in zip(exact_step_file, exact_entry_index)])
+                if not np.array_equal(fit["test_circuit_ids"], exact_cids):
+                    raise ValueError(
+                        f"{fit['npz']}: test circuit identifiers do not match {os.path.basename(exact_path)} in order"
+                    )
             rows.append(fit["predictions"])
         arms[arm] = (rows, repeat)
+
+    scoring_targets = exact_targets if targets_mode == "exact" else reference["targets"]
 
     ids_digest = hashlib.sha256("\n".join(str(x) for x in reference["test_circuit_ids"]).encode()).hexdigest()
     notes = {
@@ -261,28 +396,40 @@ def load_model_fits(
             "manifest_checked": bool(manifest_check),
         },
         "test_is_validation": bool(reference["test_is_validation"]),
-        "rcal_source": f"{setting}_ols_Rcal_seed1",
     }
+    if "Rcal" in arms:
+        notes["rcal_source"] = f"{setting}_ols_Rcal_seed1"
+    if analysis_arms is not None or targets_mode == "exact" or descriptors == "exact" or roster_train_targets == "exact":
+        notes["train_targets"] = roster_train_targets
+    if targets_mode == "exact":
+        notes["targets"] = "exact"
+        notes["exact_npz"] = os.path.basename(exact_path)
+        notes["exact_npz_sha256"] = compute_file_sha256(exact_path)
+        notes["reference_error"] = ref_error
+    if descriptors == "exact":
+        notes["descriptors"] = "exact"
     if reference["test_is_validation"]:
         notes["test_is_validation_note"] = (
             "The test split is the validation split"
             + ("; the MLP's scheduler read these labels." if model.lower() == "mlp" else ".")
         )
-    if model.lower() == "ols":
+    if model.lower() == "ols" and ("C" in arms or "F" in arms or "Rcal" in arms):
         notes["ols_deterministic_seeds_repeated"] = True
         notes["note"] = (
             "For OLS, arms C, F, and Rcal are deterministic; seed 1 predictions repeated "
             "across learner seeds so the two-stage bootstrap applies identically."
         )
-    return {"arms": arms, "targets": reference["targets"], "test_steps": reference["test_steps"],
-            "input_files": input_files, "notes": notes, "n_seeds": len(seeds)}
+    return {"arms": arms, "targets": reference["targets"], "scoring_targets": scoring_targets,
+            "test_steps": reference["test_steps"], "input_files": input_files, "notes": notes,
+            "n_seeds": len(seeds), "reference_error": ref_error, "train_targets": roster_train_targets}
 
 
 def errors_from_fits(loaded: Dict[str, Any]) -> Dict[str, np.ndarray]:
     """Per-circuit errors (mean over the four observables) as (n_seeds x n_circuits) matrices."""
     out = {}
+    scoring_targets = loaded.get("scoring_targets", loaded["targets"])
     for arm, (rows, repeat) in loaded["arms"].items():
-        errs = [np.mean(np.abs(pred - loaded["targets"]), axis=1) for pred in rows]
+        errs = [np.mean(np.abs(pred - scoring_targets), axis=1) for pred in rows]
         out[arm] = np.tile(errs[0], (loaded["n_seeds"], 1)) if repeat else np.array(errs)
     return out
 
@@ -294,10 +441,26 @@ def load_model_errors(
     seeds: List[int],
     rule_sha256: Optional[str] = None,
     manifest_check: bool = True,
+    targets_mode: str = "archived",
+    exact_dir: Optional[str] = None,
+    descriptors: str = "encoding",
+    analysis_arms: Optional[List[str]] = None,
 ) -> Tuple[Dict[str, np.ndarray], np.ndarray, List[str], Dict[str, Any]]:
     """`load_model_fits` then `errors_from_fits`, for one setting and model."""
-    loaded = load_model_fits(fits_dir, setting, model, seeds, rule_sha256, manifest_check)
+    loaded = load_model_fits(
+        fits_dir=fits_dir,
+        setting=setting,
+        model=model,
+        seeds=seeds,
+        rule_sha256=rule_sha256,
+        manifest_check=manifest_check,
+        targets_mode=targets_mode,
+        exact_dir=exact_dir,
+        descriptors=descriptors,
+        analysis_arms=analysis_arms,
+    )
     return errors_from_fits(loaded), loaded["test_steps"], loaded["input_files"], loaded["notes"]
+
 
 
 def reproduction_record(results: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
@@ -342,50 +505,62 @@ def analyze_setting_model(
     test_steps: np.ndarray,
     draws: int = 10000,
     seed: int = RULE_BOOTSTRAP_SEED,
-    meta_notes: Optional[Dict[str, Any]] = None
+    meta_notes: Optional[Dict[str, Any]] = None,
+    report_c_minus_r: bool = False,
+    reference_error: Optional[float] = None,
 ) -> Dict[str, Any]:
     """Performs point estimation, two-stage percentile bootstrap, and classification."""
-    n_seeds = arm_errors["F"].shape[0]
-    n_circuits = arm_errors["F"].shape[1]
-
-    err_C = arm_errors["C"]
-    err_F = arm_errors["F"]
-    err_P = arm_errors["P"]
-    err_R = arm_errors["R"]
+    has_F = "F" in arm_errors
+    has_C = "C" in arm_errors
+    has_P = "P" in arm_errors
+    has_R = "R" in arm_errors
     has_rcal = "Rcal" in arm_errors
-    err_Rcal = arm_errors.get("Rcal")
+
+    first_arm = next(iter(arm_errors.values()))
+    n_seeds = first_arm.shape[0]
+    n_circuits = first_arm.shape[1]
+
+    err_F = arm_errors["F"] if has_F else None
+    err_C = arm_errors["C"] if has_C else None
+    err_P = arm_errors["P"] if has_P else None
+    err_R = arm_errors["R"] if has_R else None
+    err_Rcal = arm_errors.get("Rcal") if has_rcal else None
 
     # Point estimates
-    pt_C = float(np.mean(err_C))
-    pt_F = float(np.mean(err_F))
-    pt_P = float(np.mean(err_P))
-    pt_R = float(np.mean(err_R))
-    pt_D = pt_C - pt_F
-    pt_D_over_C = pt_D / pt_C if pt_C != 0 else 0.0
-    pt_F_minus_R = pt_F - pt_R
-    pt_P_minus_F = pt_P - pt_F
+    pt_C = float(np.mean(err_C)) if has_C else None
+    pt_F = float(np.mean(err_F)) if has_F else None
+    pt_P = float(np.mean(err_P)) if has_P else None
+    pt_R = float(np.mean(err_R)) if has_R else None
+    pt_D = (pt_C - pt_F) if (has_C and has_F) else None
+    pt_D_over_C = (pt_D / pt_C if pt_C != 0 else 0.0) if (has_C and has_F) else None
+    pt_F_minus_R = (pt_F - pt_R) if (has_F and has_R) else None
+    pt_P_minus_F = (pt_P - pt_F) if (has_P and has_F) else None
 
     quantities = {}
 
     # 1. C
-    sc_C, cc_C = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
-    d_C = evaluate_draws(err_C, sc_C, cc_C)
-    quantities["C"] = format_interval(d_C, pt_C)
+    if has_C:
+        sc_C, cc_C = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
+        d_C = evaluate_draws(err_C, sc_C, cc_C)
+        quantities["C"] = format_interval(d_C, pt_C)
 
     # 2. F
-    sc_F, cc_F = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
-    d_F = evaluate_draws(err_F, sc_F, cc_F)
-    quantities["F"] = format_interval(d_F, pt_F)
+    if has_F:
+        sc_F, cc_F = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
+        d_F = evaluate_draws(err_F, sc_F, cc_F)
+        quantities["F"] = format_interval(d_F, pt_F)
 
     # 3. P
-    sc_P, cc_P = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
-    d_P = evaluate_draws(err_P, sc_P, cc_P)
-    quantities["P"] = format_interval(d_P, pt_P)
+    if has_P:
+        sc_P, cc_P = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
+        d_P = evaluate_draws(err_P, sc_P, cc_P)
+        quantities["P"] = format_interval(d_P, pt_P)
 
     # 4. R
-    sc_R, cc_R = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
-    d_R = evaluate_draws(err_R, sc_R, cc_R)
-    quantities["R"] = format_interval(d_R, pt_R)
+    if has_R:
+        sc_R, cc_R = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
+        d_R = evaluate_draws(err_R, sc_R, cc_R)
+        quantities["R"] = format_interval(d_R, pt_R)
 
     # 5. Rcal (if present)
     if has_rcal:
@@ -395,65 +570,81 @@ def analyze_setting_model(
         quantities["Rcal"] = format_interval(d_Rcal, pt_Rcal)
 
     # 6. D = C - F (paired inside draw)
-    sc_D, cc_D = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
-    d_D = evaluate_draws(err_C, sc_D, cc_D) - evaluate_draws(err_F, sc_D, cc_D)
-    quantities["D"] = format_interval(d_D, pt_D)
+    if has_C and has_F:
+        sc_D, cc_D = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
+        d_D = evaluate_draws(err_C, sc_D, cc_D) - evaluate_draws(err_F, sc_D, cc_D)
+        quantities["D"] = format_interval(d_D, pt_D)
 
     # 7. D / C (ratio inside draw)
-    sc_DC, cc_DC = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
-    d_C_dc = evaluate_draws(err_C, sc_DC, cc_DC)
-    d_F_dc = evaluate_draws(err_F, sc_DC, cc_DC)
-    d_DC = np.where(d_C_dc != 0, (d_C_dc - d_F_dc) / d_C_dc, 0.0)
-    quantities["D_over_C"] = format_interval(d_DC, pt_D_over_C)
+    if has_C and has_F:
+        sc_DC, cc_DC = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
+        d_C_dc = evaluate_draws(err_C, sc_DC, cc_DC)
+        d_F_dc = evaluate_draws(err_F, sc_DC, cc_DC)
+        d_DC = np.where(d_C_dc != 0, (d_C_dc - d_F_dc) / d_C_dc, 0.0)
+        quantities["D_over_C"] = format_interval(d_DC, pt_D_over_C)
 
     # 8. F - R (paired inside draw)
-    sc_FR, cc_FR = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
-    d_FR = evaluate_draws(err_F, sc_FR, cc_FR) - evaluate_draws(err_R, sc_FR, cc_FR)
-    quantities["F_minus_R"] = format_interval(d_FR, pt_F_minus_R)
+    if has_F and has_R:
+        sc_FR, cc_FR = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
+        d_FR = evaluate_draws(err_F, sc_FR, cc_FR) - evaluate_draws(err_R, sc_FR, cc_FR)
+        quantities["F_minus_R"] = format_interval(d_FR, pt_F_minus_R)
 
     # 9. F - Rcal (paired inside draw, if Rcal present)
-    if has_rcal:
+    if has_F and has_rcal:
         pt_F_minus_Rcal = pt_F - pt_Rcal
         sc_FRc, cc_FRc = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
         d_FRcal = evaluate_draws(err_F, sc_FRc, cc_FRc) - evaluate_draws(err_Rcal, sc_FRc, cc_FRc)
         quantities["F_minus_Rcal"] = format_interval(d_FRcal, pt_F_minus_Rcal)
 
     # 10. P - F (paired inside draw)
-    sc_PF, cc_PF = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
-    d_PF = evaluate_draws(err_P, sc_PF, cc_PF) - evaluate_draws(err_F, sc_PF, cc_PF)
-    quantities["P_minus_F"] = format_interval(d_PF, pt_P_minus_F)
+    if has_P and has_F:
+        sc_PF, cc_PF = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
+        d_PF = evaluate_draws(err_P, sc_PF, cc_PF) - evaluate_draws(err_F, sc_PF, cc_PF)
+        quantities["P_minus_F"] = format_interval(d_PF, pt_P_minus_F)
+
+    # 11. C - R (paired inside draw, when requested)
+    if report_c_minus_r and has_C and has_R:
+        pt_C_minus_R = pt_C - pt_R
+        sc_CR, cc_CR = bootstrap_draws(n_seeds, n_circuits, draws=draws, seed=seed)
+        d_CR = evaluate_draws(err_C, sc_CR, cc_CR) - evaluate_draws(err_R, sc_CR, cc_CR)
+        quantities["C_minus_R"] = format_interval(d_CR, pt_C_minus_R)
 
     # Classification from interval of D
-    classification = classify_d(quantities["D"], mean_c=pt_C)
+    classification = None
+    if "D" in quantities and has_C:
+        classification = classify_d(quantities["D"], mean_c=pt_C)
 
     # Descriptive per-step table (points only)
     unique_steps = np.unique(test_steps)
     per_step = []
-    mean_err_C = np.mean(err_C, axis=0)
-    mean_err_F = np.mean(err_F, axis=0)
-    mean_err_R = np.mean(err_R, axis=0)
+    mean_err_C = np.mean(err_C, axis=0) if has_C else None
+    mean_err_F = np.mean(err_F, axis=0) if has_F else None
+    mean_err_R = np.mean(err_R, axis=0) if has_R else None
     mean_err_Rcal = np.mean(err_Rcal, axis=0) if has_rcal else None
 
     for step_val in unique_steps:
         mask = (test_steps == step_val)
-        c_step_D = float(np.mean(mean_err_C[mask] - mean_err_F[mask]))
-        c_step_FR = float(np.mean(mean_err_F[mask] - mean_err_R[mask]))
         step_dict = {
             "step": int(step_val),
             "circuit_count": int(np.sum(mask)),
-            "D": c_step_D,
-            "F_minus_R": c_step_FR
         }
-        if has_rcal:
+        if mean_err_C is not None and mean_err_F is not None:
+            step_dict["D"] = float(np.mean(mean_err_C[mask] - mean_err_F[mask]))
+        if mean_err_F is not None and mean_err_R is not None:
+            step_dict["F_minus_R"] = float(np.mean(mean_err_F[mask] - mean_err_R[mask]))
+        if mean_err_F is not None and mean_err_Rcal is not None:
             step_dict["F_minus_Rcal"] = float(np.mean(mean_err_F[mask] - mean_err_Rcal[mask]))
         per_step.append(step_dict)
 
-    res = {
-        "classification": classification,
-        "quantities": quantities,
-        "per_step": per_step,
-        "F_per_seed": [float(x) for x in np.mean(err_F, axis=1)],
-    }
+    res = {}
+    if classification is not None:
+        res["classification"] = classification
+    res["quantities"] = quantities
+    res["per_step"] = per_step
+    if has_F:
+        res["F_per_seed"] = [float(x) for x in np.mean(err_F, axis=1)]
+    if reference_error is not None:
+        res["reference_error"] = reference_error
     if meta_notes:
         res["meta"] = meta_notes
 
@@ -481,6 +672,18 @@ def parse_args():
                         help="the ML-QEM rule; every fit must record its SHA-256")
     parser.add_argument("--no-manifest-check", action="store_true",
                         help="synthetic fits only: skip the upstream data manifest")
+    parser.add_argument("--targets", choices=["archived", "exact"], default="archived",
+                        help="Evaluation targets: archived (default) or exact statevector")
+    parser.add_argument("--exact-dir", type=str, default=None,
+                        help="Directory containing exact-<setting>-<split>.npz files")
+    parser.add_argument("--report-c-minus-r", action="store_true", default=False,
+                        help="Include C - R in archived targets output")
+    parser.add_argument("--descriptors", choices=["encoding", "exact"], default="encoding",
+                        help="Fit descriptor type: encoding (default) or exact")
+    parser.add_argument("--fit-frozen-rule", type=str, default=None,
+                        help="Path to rule that generated fits; defaults to --frozen-rule")
+    parser.add_argument("--analysis-arms", nargs="+", default=None,
+                        help="Arms to analyze (default: None for all arms [R, Rcal, F, C, P])")
     return parser.parse_args()
 
 
@@ -488,10 +691,20 @@ def main():
     args = parse_args()
     script_sha = compute_file_sha256(os.path.abspath(__file__))
 
+    if args.targets == "exact":
+        if not args.exact_dir or not os.path.isdir(args.exact_dir):
+            raise ValueError(
+                f"With --targets exact, --exact-dir must be an existing directory, got {args.exact_dir!r}"
+            )
+        expected_paths = [find_exact_file(args.exact_dir, s) for s in args.settings]
+        check_gate_approval(args.exact_dir, expected_npz_paths=expected_paths)
+
     all_results = {}
     all_input_files = []
 
     rule_sha = compute_file_sha256(args.frozen_rule)
+    fit_rule_path = args.fit_frozen_rule or args.frozen_rule
+    fit_rule_sha = compute_file_sha256(fit_rule_path)
     settings = [canonical_setting(s) for s in args.settings]
     # Phase 1: load and bind every requested fit. A missing or mismatched fit stops the analysis
     # before any error or interval is computed.
@@ -503,23 +716,42 @@ def main():
                 setting=setting,
                 model=model,
                 seeds=args.seeds,
-                rule_sha256=rule_sha,
+                rule_sha256=fit_rule_sha,
                 manifest_check=not args.no_manifest_check,
+                targets_mode=args.targets,
+                exact_dir=args.exact_dir,
+                descriptors=args.descriptors,
+                analysis_arms=args.analysis_arms,
             )
+
+    # Check that train_targets is consistent across the entire roster
+    roster_train_targets_set = {
+        cell["train_targets"] for cell in loaded.values() if cell.get("train_targets") is not None
+    }
+    if len(roster_train_targets_set) > 1:
+        raise ValueError(f"Mixed train_targets across roster: {sorted(roster_train_targets_set)}")
+    common_train_targets = next(iter(roster_train_targets_set)) if roster_train_targets_set else "archived"
+
     # Phase 2: errors, intervals, and labels.
     for setting in settings:
         all_results[setting] = {}
         for model in args.models:
             cell = loaded[(setting, model)]
             all_input_files.extend(cell["input_files"])
+            should_report_cr = (args.targets == "exact" or args.report_c_minus_r)
+            ref_err = cell["reference_error"] if args.targets == "exact" else None
             res = analyze_setting_model(
                 arm_errors=errors_from_fits(cell),
                 test_steps=cell["test_steps"],
                 draws=args.draws,
                 seed=args.bootstrap_seed,
-                meta_notes=cell["notes"]
+                meta_notes=cell["notes"],
+                report_c_minus_r=should_report_cr,
+                reference_error=ref_err,
             )
             res["test_is_validation"] = cell["notes"]["test_is_validation"]
+            if args.analysis_arms is not None or args.targets == "exact" or args.descriptors == "exact" or common_train_targets == "exact":
+                res["train_targets"] = cell["train_targets"]
             all_results[setting][model] = res
 
     # Collect input SHA-256 values
@@ -536,9 +768,20 @@ def main():
         "learner_seeds": args.seeds,
         "frozen_rule_sha256": rule_sha,
         "input_files_sha256": input_shas,
-        "reproduction_check": reproduction_record(all_results),
-        "results": all_results
     }
+    if args.targets == "exact" or args.descriptors == "exact" or args.analysis_arms is not None:
+        report["fit_frozen_rule_sha256"] = fit_rule_sha
+
+    if args.analysis_arms is not None or args.targets == "exact" or args.descriptors == "exact" or common_train_targets == "exact":
+        report["train_targets"] = common_train_targets
+    if args.analysis_arms is not None:
+        report["analysis_arms"] = args.analysis_arms
+
+    if args.targets == "archived" and args.analysis_arms is None:
+        report["reproduction_check"] = reproduction_record(all_results)
+    else:
+        report["reproduction_check_source"] = "artifacts/mlqem-own-data/analysis.json"
+    report["results"] = all_results
 
     out_dir = os.path.dirname(os.path.abspath(args.out))
     if out_dir:
@@ -551,3 +794,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

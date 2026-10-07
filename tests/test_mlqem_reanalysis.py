@@ -37,7 +37,8 @@ DATA_SHAS = {"train/step_0.pk": "b" * 64, "val/step_0.pk": "c" * 64}
 
 
 def write_fit(fits_dir, setting, model, arm, seed, preds, targets, *, steps=None, ids=None,
-              rule_sha=RULE_SHA, data_shas=None, test_is_validation=False):
+              rule_sha=RULE_SHA, data_shas=None, test_is_validation=False, descriptors=None,
+              train_targets=None):
     n = len(targets)
     steps = np.zeros(n, dtype=int) if steps is None else steps
     ids = np.array([f"step_0.pk:{i}" for i in range(n)]) if ids is None else ids
@@ -48,6 +49,10 @@ def write_fit(fits_dir, setting, model, arm, seed, preds, targets, *, steps=None
             "frozen_rule_sha256": rule_sha,
             "data_files_sha256": DATA_SHAS if data_shas is None else data_shas,
             "test_is_validation": test_is_validation}
+    if descriptors is not None:
+        meta["descriptors"] = descriptors
+    if train_targets is not None:
+        meta["train_targets"] = train_targets
     with open(base + ".json", "w") as handle:
         json.dump(meta, handle)
 
@@ -304,3 +309,202 @@ def test_no_cell_is_computed_when_a_later_fit_is_invalid(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="frozen_rule_sha256"):
         an.main()
     assert not (tmp_path / "o.json").exists()
+
+
+def test_fit_frozen_rule_option(tmp_path, monkeypatch):
+    fits = tmp_path / "fits"
+    fits.mkdir()
+    rule_fit = tmp_path / "rule_fit.md"
+    rule_fit.write_text("fit rule\n")
+    rule_fit_sha = hashlib.sha256(rule_fit.read_bytes()).hexdigest()
+
+    rule_analysis = tmp_path / "rule_analysis.md"
+    rule_analysis.write_text("analysis rule\n")
+    rule_analysis_sha = hashlib.sha256(rule_analysis.read_bytes()).hexdigest()
+
+    rng = np.random.default_rng(42)
+    targets = write_model(str(fits), "cli", "ols", [1], rng, rule_sha=rule_fit_sha)
+
+    # Archived mode default: unchanged output, no fit_frozen_rule_sha256
+    out_archived = tmp_path / "out_archived.json"
+    monkeypatch.setattr(sys, "argv", [
+        "analyze", "--fits", str(fits), "--out", str(out_archived),
+        "--settings", "cli", "--models", "ols", "--seeds", "1",
+        "--draws", "50", "--frozen-rule", str(rule_analysis),
+        "--fit-frozen-rule", str(rule_fit), "--no-manifest-check"
+    ])
+    an.main()
+    with open(out_archived) as f:
+        data_arc = json.load(f)
+    assert data_arc["frozen_rule_sha256"] == rule_analysis_sha
+    assert "fit_frozen_rule_sha256" not in data_arc
+
+    # Exact descriptors mode: records fit_frozen_rule_sha256
+    fits_desc = tmp_path / "fits_desc"
+    fits_desc.mkdir()
+    write_model(str(fits_desc), "cli", "ols", [1], rng, rule_sha=rule_fit_sha, descriptors="exact")
+
+    out_desc = tmp_path / "out_desc.json"
+    monkeypatch.setattr(sys, "argv", [
+        "analyze", "--fits", str(fits_desc), "--out", str(out_desc),
+        "--settings", "cli", "--models", "ols", "--seeds", "1",
+        "--draws", "50", "--frozen-rule", str(rule_analysis),
+        "--fit-frozen-rule", str(rule_fit), "--no-manifest-check",
+        "--descriptors", "exact"
+    ])
+    an.main()
+    with open(out_desc) as f:
+        data_desc = json.load(f)
+    assert data_desc["frozen_rule_sha256"] == rule_analysis_sha
+    assert data_desc["fit_frozen_rule_sha256"] == rule_fit_sha
+
+
+def test_float32_target_binding_exact(tmp_path):
+    fits = tmp_path / "fits"
+    fits.mkdir()
+    exact_dir = tmp_path / "exact"
+    exact_dir.mkdir()
+
+    n = 20
+    rng = np.random.default_rng(99)
+    archived_f64 = rng.uniform(-1.0, 1.0, size=(n, 4)).astype(np.float64)
+    exact_f64 = archived_f64 + 0.05
+    targets_f32 = archived_f64.astype(np.float32)
+
+    npz_path = exact_dir / "exact-no_readout-val_extra.npz"
+    np.savez_compressed(
+        npz_path,
+        archived=archived_f64,
+        exact=exact_f64,
+        steps=np.zeros(n, dtype=int),
+        step_file=np.array(["step_0.pk"] * n),
+        entry_index=np.arange(n),
+    )
+
+    write_model(str(fits), "no_readout", "ols", [1], rng, targets=targets_f32)
+
+    # Should bind float32 targets to float64 archive and compute reference_error
+    cell = an.load_model_fits(
+        str(fits), "no_readout", "ols", [1],
+        targets_mode="exact", exact_dir=str(exact_dir), manifest_check=False
+    )
+    assert abs(cell["reference_error"] - 0.05) < 1e-6
+
+
+def test_analysis_arms_fc_only(tmp_path, monkeypatch):
+    fits = tmp_path / "fits"
+    fits.mkdir()
+    exact_dir = tmp_path / "exact"
+    exact_dir.mkdir()
+    rule_p = tmp_path / "rule.md"
+    rule_p.write_text("rule\n")
+    rule_sha = hashlib.sha256(rule_p.read_bytes()).hexdigest()
+
+    n = 20
+    rng = np.random.default_rng(77)
+    archived_f64 = rng.uniform(-1.0, 1.0, size=(n, 4))
+    exact_f64 = archived_f64 + 0.04
+
+    npz_path = exact_dir / "exact-no_readout-val_extra.npz"
+    np.savez_compressed(
+        npz_path,
+        archived=archived_f64,
+        exact=exact_f64,
+        steps=np.zeros(n, dtype=int),
+        step_file=np.array(["step_0.pk"] * n),
+        entry_index=np.arange(n),
+    )
+    exact_sha = hashlib.sha256(npz_path.read_bytes()).hexdigest()
+    gate_p = exact_dir / "gate.json"
+    with open(gate_p, "w") as f:
+        json.dump({
+            "overall_pass": True,
+            "gate_passed": True,
+            "splits": {
+                "val_extra": {
+                    "npz_file": "exact-no_readout-val_extra.npz",
+                    "npz_sha256": exact_sha,
+                }
+            }
+        }, f)
+
+    # Write ONLY F and C fits with train_targets="exact"
+    for arm in ("F", "C"):
+        for seed in (1, 2):
+            write_fit(
+                str(fits), "no_readout", "rf", arm, seed,
+                archived_f64 + 0.02, archived_f64, rule_sha=rule_sha,
+                train_targets="exact",
+            )
+
+    # 1. Score under --targets archived
+    out_arc = tmp_path / "out_arc.json"
+    monkeypatch.setattr(sys, "argv", [
+        "analyze", "--fits", str(fits), "--out", str(out_arc),
+        "--analysis-arms", "F", "C",
+        "--settings", "no_readout", "--models", "rf", "--seeds", "1", "2",
+        "--draws", "50", "--frozen-rule", str(rule_p), "--no-manifest-check",
+        "--targets", "archived",
+    ])
+    an.main()
+    with open(out_arc) as f:
+        data_arc = json.load(f)
+    assert data_arc["train_targets"] == "exact"
+    assert data_arc["analysis_arms"] == ["F", "C"]
+    assert data_arc["reproduction_check_source"] == "artifacts/mlqem-own-data/analysis.json"
+    cell_arc = data_arc["results"]["no_readout"]["rf"]
+    assert set(cell_arc["quantities"].keys()) == {"C", "F", "D", "D_over_C"}
+    assert "label" in cell_arc["classification"]
+    assert "reference_error" not in cell_arc
+
+    # 2. Score under --targets exact
+    out_exc = tmp_path / "out_exc.json"
+    monkeypatch.setattr(sys, "argv", [
+        "analyze", "--fits", str(fits), "--out", str(out_exc),
+        "--analysis-arms", "F", "C",
+        "--settings", "no_readout", "--models", "rf", "--seeds", "1", "2",
+        "--draws", "50", "--frozen-rule", str(rule_p), "--no-manifest-check",
+        "--targets", "exact", "--exact-dir", str(exact_dir),
+    ])
+    an.main()
+    with open(out_exc) as f:
+        data_exc = json.load(f)
+    assert data_exc["train_targets"] == "exact"
+    cell_exc = data_exc["results"]["no_readout"]["rf"]
+    assert set(cell_exc["quantities"].keys()) == {"C", "F", "D", "D_over_C"}
+    assert abs(cell_exc["reference_error"] - 0.04) < 1e-6
+
+
+def test_analysis_arms_mixed_train_targets_rejected(tmp_path, monkeypatch):
+    fits = tmp_path / "fits"
+    fits.mkdir()
+    rule_p = tmp_path / "rule.md"
+    rule_p.write_text("rule\n")
+    rule_sha = hashlib.sha256(rule_p.read_bytes()).hexdigest()
+
+    n = 20
+    rng = np.random.default_rng(88)
+    archived_f64 = rng.uniform(-1.0, 1.0, size=(n, 4))
+
+    # Mixed: F has exact, C has archived
+    write_fit(
+        str(fits), "no_readout", "rf", "F", 1,
+        archived_f64 + 0.02, archived_f64, rule_sha=rule_sha,
+        train_targets="exact",
+    )
+    write_fit(
+        str(fits), "no_readout", "rf", "C", 1,
+        archived_f64 + 0.02, archived_f64, rule_sha=rule_sha,
+        train_targets="archived",
+    )
+
+    out_p = tmp_path / "out.json"
+    monkeypatch.setattr(sys, "argv", [
+        "analyze", "--fits", str(fits), "--out", str(out_p),
+        "--analysis-arms", "F", "C",
+        "--settings", "no_readout", "--models", "rf", "--seeds", "1",
+        "--draws", "50", "--frozen-rule", str(rule_p), "--no-manifest-check",
+        "--targets", "archived",
+    ])
+    with pytest.raises(ValueError, match="mixed train_targets in roster"):
+        an.main()

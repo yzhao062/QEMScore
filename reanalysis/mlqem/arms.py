@@ -284,7 +284,10 @@ def run_arm_job(
     test_steps: Optional[List[int]] = None,
     test_is_validation: bool = False,
     frozen_rule_path: Optional[str] = None,
-    data_files_sha256: Optional[Dict[str, str]] = None
+    data_files_sha256: Optional[Dict[str, str]] = None,
+    descriptors: str = "encoding",
+    exact_npz_sha256: Optional[Dict[str, str]] = None,
+    train_targets: str = "archived",
 ) -> Dict[str, Any]:
     """Executes a single (setting, model, arm, learner_seed) run, saving NPZ and JSON.
 
@@ -382,10 +385,18 @@ def run_arm_job(
             "numpy": np.__version__
         },
         "wall_time_seconds": float(wall_time),
-        "npz_file": os.path.basename(npz_path)
+        "npz_file": os.path.basename(npz_path),
     }
+
+    if descriptors == "exact":
+        metadata["descriptors"] = "exact"
+    if descriptors == "exact" or train_targets == "exact":
+        metadata["train_targets"] = train_targets
+    if exact_npz_sha256:
+        metadata["exact_npz_sha256"] = exact_npz_sha256
 
     with open(json_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
     return metadata
+
