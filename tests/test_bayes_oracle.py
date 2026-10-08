@@ -913,7 +913,7 @@ def test_redraw_is_per_item_and_variant_and_never_changes_c_star(monkeypatch):
     ids = [it["item_id"] for it in sorted(items, key=lambda x: (x["severity"], x["observable"]))]
     calls = {"n": 0}
 
-    def fake_predictions(c_items, samples, y_s, e_s, shots, fam):
+    def fake_predictions(c_items, samples, y_s, e_s, shots, fam, likelihood="gaussian"):
         calls["n"] += 1
         if calls["n"] == 1:
             c = {i: 0.1 for i in ids}

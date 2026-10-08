@@ -44,6 +44,12 @@ DEFAULT_M_SAMPLES = 20000
 DEFAULT_R5_SAMPLES = 200000
 MIN_ESS = 50.0
 REDRAW_FACTOR = 10
+# Round-10 sensitivity options (rule 2026-10-07-round10-checks, Part B). The
+# defaults reproduce the round-9 oracle exactly.
+STREAM_TAG = 20261007
+DEFAULT_DEGREE = 5
+LIKELIHOODS = ("gaussian", "binomial")
+GOVERNED_OUT = "artifacts/descriptor-information/round9/bayes-oracle.json"
 
 RIDGE_ALPHAS = tuple(10.0**k for k in range(-12, -1))
 
@@ -119,9 +125,10 @@ def fit_degree5_surrogate(
     y_test: np.ndarray | None = None,
     alphas: tuple[float, ...] = RIDGE_ALPHAS,
     refit_train_val: bool = True,
+    degree: int = DEFAULT_DEGREE,
 ) -> dict[str, Any]:
-    """Fit a degree-5 ridge polynomial surrogate on scaled couplings."""
-    poly = PolynomialFeatures(degree=5, include_bias=False)
+    """Fit a ridge polynomial surrogate (degree 5 unless stated) on scaled couplings."""
+    poly = PolynomialFeatures(degree=degree, include_bias=False)
     d_train = poly.fit_transform(x_train)
     d_val = poly.transform(x_val)
 
@@ -158,6 +165,7 @@ def fit_degree5_surrogate(
     flagged = bool(test_mae is not None and test_mae >= 1e-3)
     return {
         "best_alpha": float(best_alpha),
+        "degree": int(degree),
         "validation_mae": float(best_val_mae),
         "test_mae": test_mae,
         "flagged": flagged,
@@ -247,12 +255,20 @@ def draw_coupling_samples(
     circuit_index: int,
     sample_size: int = DEFAULT_M_SAMPLES,
     extra_seed_word: int | None = None,
+    stream: int | None = None,
 ) -> np.ndarray:
-    """Draw coupling samples from the posterior given rung descriptors."""
+    """Draw coupling samples from the posterior given rung descriptors.
+
+    ``stream`` (round-10 Part B) appends [STREAM_TAG, stream] to the governed
+    seed words (which hold the redraw word when there is one) for an
+    independent Monte Carlo stream; None keeps the round-9 draws.
+    """
     rung_idx = RUNG_INDEX[rung]
     seed_words = [SURROGATE_SEED, dataset_seed, circuit_index, rung_idx]
     if extra_seed_word is not None:
         seed_words.append(extra_seed_word)
+    if stream is not None:
+        seed_words.extend([STREAM_TAG, int(stream)])
     rng = np.random.default_rng(np.random.SeedSequence(seed_words))
 
     c_names = COUPLINGS[family]
@@ -359,6 +375,7 @@ def compute_bayes_predictions_for_circuit(
     e_surrogates: dict[tuple[str, str], Any],
     shots: int,
     family: str,
+    likelihood: str = "gaussian",
 ) -> tuple[
     dict[str, float],
     dict[str, float],
@@ -369,7 +386,25 @@ def compute_bayes_predictions_for_circuit(
     """Compute C-star, F-star, and ESS for items belonging to one circuit.
 
     Evaluates both observed and hidden noise strength variants from the same coupling draws.
+    ``likelihood`` "binomial" (round-10 Part B) replaces the normal approximation
+    by the binomial probability of k = (r + 1) n / 2 successes in n shots with
+    success probability (1 + e) / 2; the binomial coefficient is common to all
+    draws and both strengths, so it is omitted.
     """
+    if likelihood not in LIKELIHOODS:
+        raise ValueError(f"unknown likelihood {likelihood}")
+
+    def log_lik(r_value: float, e_values: np.ndarray) -> np.ndarray:
+        if likelihood == "gaussian":
+            var = np.maximum(1.0 - e_values * e_values, 1e-6) / float(shots)
+            return -0.5 * np.log(2.0 * np.pi * var) - 0.5 * (r_value - e_values) ** 2 / var
+        k_real = (r_value + 1.0) * shots / 2.0
+        k = round(k_real)
+        if abs(k_real - k) > 1e-6:
+            raise ValueError(f"r = {r_value} is not on the {shots}-shot lattice")
+        p = np.clip((1.0 + e_values) / 2.0, 1e-15, 1.0 - 1e-15)
+        return k * np.log(p) + (shots - k) * np.log1p(-p)
+
     c_preds = {}
     f_preds_obs = {}
     ess_obs_by_item = {}
@@ -405,8 +440,7 @@ def compute_bayes_predictions_for_circuit(
 
             # Observed strength variant
             e_s_obs = e_pred_samples[(obs, sev)]
-            var_obs = np.maximum(1.0 - e_s_obs * e_s_obs, 1e-6) / float(shots)
-            log_w_obs = -0.5 * np.log(2.0 * np.pi * var_obs) - 0.5 * (r - e_s_obs) ** 2 / var_obs
+            log_w_obs = log_lik(r, e_s_obs)
             log_w_obs_shifted = log_w_obs - np.max(log_w_obs)
             w_obs = np.exp(log_w_obs_shifted)
             ess_obs = compute_effective_sample_size(w_obs)
@@ -417,10 +451,7 @@ def compute_bayes_predictions_for_circuit(
             log_terms_hid = []
             for sev_k in ("L1", "L3"):
                 e_s_k = e_pred_samples[(obs, sev_k)]
-                var_k = np.maximum(1.0 - e_s_k * e_s_k, 1e-6) / float(shots)
-                log_terms_hid.append(
-                    -0.5 * np.log(2.0 * np.pi * var_k) - 0.5 * (r - e_s_k) ** 2 / var_k
-                )
+                log_terms_hid.append(log_lik(r, e_s_k))
             log_w_hid = logsumexp(np.stack(log_terms_hid), axis=0) - math.log(2.0)
             log_w_hid_shifted = log_w_hid - np.max(log_w_hid)
             w_hid = np.exp(log_w_hid_shifted)
@@ -446,6 +477,9 @@ def evaluate_rung_task(
     y_surrs = task["y_surrs"]
     e_surrs = task["e_surrs"]
     r5_shared_samples = task.get("r5_shared_samples")
+    stream = task.get("stream")
+    multiplier = int(task.get("draw_multiplier", 1))
+    likelihood = task.get("likelihood", "gaussian")
     c_names = COUPLINGS[fam]
     n_circ = len(sorted_circuits)
     redrawn_circuits_log = []
@@ -468,11 +502,12 @@ def evaluate_rung_task(
             samples = r5_shared_samples
         else:
             samples = draw_coupling_samples(
-                rung, fam, true_c, z_vals, seed, c_idx, sample_size=DEFAULT_M_SAMPLES
+                rung, fam, true_c, z_vals, seed, c_idx,
+                sample_size=DEFAULT_M_SAMPLES * multiplier, stream=stream,
             )
 
         c_preds, f_preds_obs, ess_obs, f_preds_hid, ess_hid = compute_bayes_predictions_for_circuit(
-            c_items, samples, y_surrs, e_surrs, shots_int, fam
+            c_items, samples, y_surrs, e_surrs, shots_int, fam, likelihood=likelihood
         )
 
         # The rule redraws per item and per variant. C* never uses a redraw:
@@ -484,9 +519,9 @@ def evaluate_rung_task(
 
         if low_obs or low_hid:
             redraw_size = (
-                DEFAULT_R5_SAMPLES * REDRAW_FACTOR
+                DEFAULT_R5_SAMPLES * REDRAW_FACTOR * multiplier
                 if rung == "R5"
-                else DEFAULT_M_SAMPLES * REDRAW_FACTOR
+                else DEFAULT_M_SAMPLES * REDRAW_FACTOR * multiplier
             )
             samples_retry = draw_coupling_samples(
                 rung,
@@ -497,10 +532,12 @@ def evaluate_rung_task(
                 c_idx,
                 sample_size=redraw_size,
                 extra_seed_word=10,
+                stream=stream,
             )
             _c_unused, f_obs_retry, ess_obs_retry, f_hid_retry, ess_hid_retry = (
                 compute_bayes_predictions_for_circuit(
-                    c_items, samples_retry, y_surrs, e_surrs, shots_int, fam
+                    c_items, samples_retry, y_surrs, e_surrs, shots_int, fam,
+                    likelihood=likelihood,
                 )
             )
             for variant, low, retry, ess0, ess1, target in (
@@ -1080,7 +1117,34 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=Path("/Users/yzhao062/qemscore-r8/fresh/levels"),
         help="Base path to fresh shot-sweep dataset levels.",
     )
+    parser.add_argument(
+        "--sensitivity",
+        action="store_true",
+        help=("Round-10 Part B sensitivity run: no Equation 2 or confusion table; "
+              "requires --eval-split test and an --out other than the governed file."),
+    )
+    parser.add_argument("--surrogate-degree", type=int, default=DEFAULT_DEGREE,
+                        help="Ridge polynomial degree of the surrogates (default 5).")
+    parser.add_argument("--stream", type=int, default=None,
+                        help="Independent Monte Carlo stream index (default: round-9 draws).")
+    parser.add_argument("--draw-multiplier", type=int, default=1,
+                        help="Multiplies every posterior and prior draw count (default 1).")
+    parser.add_argument("--likelihood", choices=LIKELIHOODS, default="gaussian",
+                        help="Likelihood of r given e (default gaussian).")
     parsed = parser.parse_args(argv)
+
+    options_changed = (parsed.surrogate_degree != DEFAULT_DEGREE or parsed.stream is not None
+                       or parsed.draw_multiplier != 1 or parsed.likelihood != "gaussian")
+    if options_changed and not parsed.sensitivity:
+        parser.error("--surrogate-degree, --stream, --draw-multiplier, and --likelihood "
+                     "need --sensitivity")
+    if parsed.draw_multiplier < 1:
+        parser.error("--draw-multiplier must be at least 1")
+    if parsed.sensitivity:
+        if parsed.eval_split != "test":
+            parser.error("--sensitivity needs --eval-split test")
+        if parsed.out is None or parsed.out.resolve() == (REPO_ROOT / GOVERNED_OUT).resolve():
+            parser.error("--sensitivity needs an --out other than the governed oracle file")
 
     if parsed.eval_split == "test":
         if parsed.levels is None:
@@ -1201,7 +1265,8 @@ def run_oracle_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                     y_te = np.array([y_te_map[c["circuit_id"]] for c in te_circ])
 
                 surr_y = fit_degree5_surrogate(
-                    x_tr, y_tr, x_val, y_val, x_test=x_te, y_test=y_te, refit_train_val=refit_flag
+                    x_tr, y_tr, x_val, y_val, x_test=x_te, y_test=y_te, refit_train_val=refit_flag,
+                    degree=args.surrogate_degree,
                 )
                 surrogate_models[(seed, fam)]["y"][obs] = surr_y
                 surrogate_reports[fam_key]["y"][obs] = {
@@ -1245,7 +1310,8 @@ def run_oracle_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                         e_te = np.array([e_te_map[c["circuit_id"]] for c in te_circ])
 
                     surr_e = fit_degree5_surrogate(
-                        x_tr, e_tr, x_val, e_val, x_test=x_te, y_test=e_te, refit_train_val=refit_flag
+                        x_tr, e_tr, x_val, e_val, x_test=x_te, y_test=e_te, refit_train_val=refit_flag,
+                        degree=args.surrogate_degree,
                     )
                     surrogate_models[(seed, fam)]["e"][(obs, sev)] = surr_e
                     surrogate_reports[fam_key]["e"][f"{obs}_{sev}"] = {
@@ -1338,7 +1404,8 @@ def run_oracle_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                 r5_shared_samples = None
                 if "R5" in candidate_rungs:
                     r5_shared_samples = draw_coupling_samples(
-                        "R5", fam, {}, (), seed, 999999, sample_size=DEFAULT_R5_SAMPLES
+                        "R5", fam, {}, (), seed, 999999,
+                        sample_size=DEFAULT_R5_SAMPLES * args.draw_multiplier, stream=args.stream,
                     )
 
                 y_surrs = surrogate_models[(seed, fam)]["y"]
@@ -1390,6 +1457,9 @@ def run_oracle_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                         "y_surrs": y_surrs,
                         "e_surrs": e_surrs,
                         "r5_shared_samples": r5_shared_samples,
+                        "stream": args.stream,
+                        "draw_multiplier": args.draw_multiplier,
+                        "likelihood": args.likelihood,
                     })
 
     if args.workers > 1 and len(tasks) > 1:
@@ -1402,6 +1472,39 @@ def run_oracle_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             risks_map, redrawn = evaluate_rung_task(task)
             oracle_risks.update(risks_map)
             redrawn_circuits_log.extend(redrawn)
+
+    sensitivity_options = {
+        "surrogate_degree": args.surrogate_degree,
+        "stream": args.stream,
+        "draw_multiplier": args.draw_multiplier,
+        "likelihood": args.likelihood,
+        "rungs": args.rungs,
+    }
+    if args.sensitivity:
+        serialized = {
+            f"s{s}__{fam}__{r}__shots_{l}__{variant}": r_data
+            for (s, fam, r, l, variant), r_data in oracle_risks.items()
+        }
+        doc = {
+            "schema": "bayes_oracle_sensitivity_v1",
+            "frozen_rule": str(args.frozen_rule),
+            "rule_file_sha256": sha256_file(args.frozen_rule),
+            "script_sha256": sha256_file(Path(__file__).resolve()),
+            "options": sensitivity_options,
+            "eval_split": eval_split_name,
+            "seeds": selected_seeds,
+            "levels": [str(l) for l in selected_levels],
+            "seconds": float(time.perf_counter() - start_time),
+            "inputs": input_digests,
+            "surrogates": surrogate_reports,
+            "shot_noise_checks": shot_noise_checks,
+            "oracle_risks": serialized,
+            "redrawn_circuits": redrawn_circuits_log,
+        }
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        with open(args.out, "w", encoding="utf-8") as f:
+            json.dump(doc, f, indent=2)
+        return doc
 
     active_schedule = {
         key for key in get_governed_oracle_schedule()
